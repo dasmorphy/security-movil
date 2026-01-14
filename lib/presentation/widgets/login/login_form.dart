@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 class LoginForm extends StatefulWidget {
   const LoginForm({super.key});
@@ -65,23 +66,6 @@ class _LoginFormState extends State<LoginForm> {
           ),
           decoration: inputDecoration.copyWith(
             hintText: 'Correo electrónico',
-            // prefixIcon: const Icon(Icons.email, color: Colors.white70),
-            // suffixIcon: Padding(
-            //   padding: const EdgeInsets.only(right: 6),
-            //   child: GestureDetector(
-            //     onTap: () {},
-            //     child: Container(
-            //       width: 44,
-            //       height: 44,
-            //       decoration: BoxDecoration(
-            //         shape: BoxShape.circle,
-            //         gradient: LinearGradient(colors: [Colors.greenAccent.shade400, Colors.tealAccent.shade200]),
-            //         boxShadow: [BoxShadow(color: Colors.greenAccent.withOpacity(0.16), blurRadius: 8, offset: const Offset(0, 4))],
-            //       ),
-            //       child: const Icon(Icons.arrow_forward, color: Colors.black87),
-            //     ),
-            //   ),
-            // ),
           ),
         ),
 
@@ -101,82 +85,31 @@ class _LoginFormState extends State<LoginForm> {
           ),
         ),
 
-        const SizedBox(height: 18),
+        const SizedBox(height: 30),
+        
 
-        // OR divider
-        Row(
-          children: const [
-            Expanded(child: Divider(color: Colors.white24, thickness: 1)),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 12),
-              child: Text('O', style: TextStyle(color: Colors.white54)),
+        // Login button
+        ElevatedButton(
+          onPressed: () => context.go('/home'),
+          style: ElevatedButton.styleFrom(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30),
             ),
-            Expanded(child: Divider(color: Colors.white24, thickness: 1)),
-          ],
+            backgroundColor: Color.fromARGB(190, 58, 199, 199),
+          ),
+          child: const Text(
+            'Iniciar sesión', 
+            style: TextStyle(
+              color: Colors.white, 
+              fontSize: 16,
+              fontWeight: FontWeight.bold
+            )),
         ),
-
+        
+        
         const SizedBox(height: 18),
-
-        // Social button: Google (placeholder icon with 'G')
-        ElevatedButton(
-          onPressed: () {},
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color.fromARGB(255, 48, 44, 44).withOpacity(0.5),
-            elevation: 0,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
-            padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
-          ),
-          child: Row(
-            children: [
-              CircleAvatar(
-                radius: 16,
-                backgroundColor: Colors.white.withOpacity(0.06),
-                child: const Text('G', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
-              ),
-              const SizedBox(width: 12),
-              const Expanded(child: Text('Continuar con Google', style: TextStyle(color: Colors.white70))),
-              Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(color: Colors.white.withOpacity(0.02), shape: BoxShape.circle),
-                child: const Icon(Icons.arrow_forward, color: Colors.white70, size: 18),
-              ),
-            ],
-          ),
-        ),
-
-        const SizedBox(height: 12),
-
-        // Social button: X (placeholder)
-        ElevatedButton(
-          onPressed: () {},
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color.fromARGB(255, 48, 44, 44).withOpacity(0.5),
-            elevation: 0,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(40)),
-            padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
-          ),
-          child: Row(
-            children: [
-              CircleAvatar(
-                radius: 16,
-                backgroundColor: Colors.white.withOpacity(0.06),
-                child: const Text('X', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
-              ),
-              const SizedBox(width: 12),
-              const Expanded(child: Text('Continuar con X', style: TextStyle(color: Colors.white70))),
-              Container(
-                width: 36,
-                height: 36,
-                decoration: BoxDecoration(color: Colors.white.withOpacity(0.02), shape: BoxShape.circle),
-                child: const Icon(Icons.arrow_forward, color: Colors.white70, size: 18),
-              ),
-            ],
-          ),
-        ),
-
-        const SizedBox(height: 18),
-
+      
         // Sign up link
         Row(
           mainAxisAlignment: MainAxisAlignment.center,

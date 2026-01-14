@@ -33,14 +33,14 @@ class HomeViewState extends ConsumerState<HomeView> {
       //los slivers son ciertos widgets que tiene la funcionalidad de realizar comportamientos especiales con el scroll
       slivers: [
 
-        const SliverAppBar(
-          floating: true,
-          flexibleSpace: FlexibleSpaceBar(
-            centerTitle: true,
-            // titlePadding: EdgeInsets.all(0),
-            title: CustomAppbar()
-          ),
-        ),
+        // const SliverAppBar(
+        //   floating: true,
+        //   flexibleSpace: FlexibleSpaceBar(
+        //     centerTitle: true,
+        //     // titlePadding: EdgeInsets.all(0),
+        //     title: CustomAppbar()
+        //   ),
+        // ),
 
         SliverList(
           delegate: SliverChildBuilderDelegate(

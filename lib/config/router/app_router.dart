@@ -9,28 +9,25 @@ final appRouter = GoRouter(
       name: 'login-screen',
       builder: (context, state) => const LoginScreen(),
     ),
-    // GoRoute(
-    //   path: '/home/:page',
-    //   name: HomeScreen.name,
-    //   builder: (context, state) {
-    //     final pageIndex = state.pathParameters['page'] ?? '0';
-    //     return HomeScreen(pageIndex: int.parse(pageIndex));
-    //   },
-    //   // routes: [
-    //   //   GoRoute(
-    //   //     path: 'movie/:id',
-    //   //     name: MovieScreen.name,
-    //   //     builder: (context, state) {
-    //   //       final movieID = state.pathParameters['id'] ?? 'no-id';
-    //   //       return MovieScreen(movieId: movieID);
-    //   //     }
-    //   //   )
-    //   // ]
-    // ),
+    GoRoute(
+      path: '/home',
+      name: HomeScreen.name,
+      builder: (context, state) => const HomeScreen(),
+    ),
+      // routes: [
+      //   GoRoute(
+      //     path: 'movie/:id',
+      //     name: MovieScreen.name,
+      //     builder: (context, state) {
+      //       final movieID = state.pathParameters['id'] ?? 'no-id';
+      //       return MovieScreen(movieId: movieID);
+      //     }
+      //   )
+      // ]
 
     GoRoute(
       path: '/',
-      redirect: (_, __) => '/home/0',
+      redirect: (_, __) => '/home',
     )
 
   ]

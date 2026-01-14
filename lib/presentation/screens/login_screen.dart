@@ -13,7 +13,7 @@ class LoginScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     return Container(
-       decoration: const BoxDecoration(
+      decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
@@ -21,10 +21,11 @@ class LoginScreen extends StatelessWidget {
             Color.fromARGB(255, 14, 170, 170),
             Color.fromARGB(255, 5, 7, 7),
           ],
-          stops: [0.1,0.4]
+          stops: [0.1, 0.4],
         ),
       ),
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         backgroundColor: Colors.transparent,
         appBar: PreferredSize(
           preferredSize: const Size.fromHeight(60),
@@ -47,42 +48,53 @@ class LoginScreen extends StatelessWidget {
               height: double.infinity,
               child: Stack(
                 children: [
-                Positioned(
-                  top: 50,
-                  left: 0,
-                  right: 0,
-                  child: Center(
-                    child: Image.asset(
-                      'lib/assets/images/zentinel-logo.png',
-                      width: 200,
-                      height: 40,
-                      fit: BoxFit.contain,
+                  Positioned(
+                    top: 80,
+                    left: 0,
+                    right: 0,
+                    child: Center(
+                      child: Image.asset(
+                        'lib/assets/images/zentinel-logo.png',
+                        width: 200,
+                        height: 40,
+                        fit: BoxFit.contain,
+                      ),
                     ),
                   ),
-                ),
-      
-                // Centered, scrollable card
-                Positioned.fill(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.only(top: 120, bottom: 100, left: 20, right: 20),
-                    child: Center(
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(maxWidth: size.width < 600 ? size.width : 520),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(24),
-                          child: BackdropFilter(
-                            filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
-                            child: Container(
-                              decoration: BoxDecoration(),
-                              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 28),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const SizedBox(height: 6),
-                                  const _Header(),
-                                  const SizedBox(height: 18),
-                                  const LoginForm(),
-                                ],
+
+                  // Centered, scrollable card
+                  Positioned.fill(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.only(
+                        top: 120,
+                        bottom: 100,
+                        left: 20,
+                        right: 20,
+                      ),
+                      child: Center(
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(
+                            maxWidth: size.width < 600 ? size.width : 520,
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(24),
+                            child: BackdropFilter(
+                              filter: ImageFilter.blur(sigmaX: 8, sigmaY: 8),
+                              child: Container(
+                                decoration: BoxDecoration(),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 28,
+                                  vertical: 28,
+                                ),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    const SizedBox(height: 6),
+                                    const _Header(),
+                                    const SizedBox(height: 18),
+                                    const LoginForm(),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
@@ -90,27 +102,27 @@ class LoginScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                ),
-      
-                // Fixed footer powered image
-                Positioned(
-                  bottom: 30,
-                  left: 0,
-                  right: 0,
-                  child: Center(
-                    child: Image.asset(
-                      'lib/assets/images/powered.png',
-                      width: 150,
-                      height: 20,
-                      fit: BoxFit.contain,
+
+                  // Fixed footer powered image
+                  Positioned(
+                    bottom: 30,
+                    left: 0,
+                    right: 0,
+                    child: Center(
+                      child: Image.asset(
+                        'lib/assets/images/powered.png',
+                        width: 150,
+                        height: 20,
+                        fit: BoxFit.contain,
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),
-      )),
+      ),
     );
   }
 }
@@ -121,22 +133,28 @@ class _Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: [
-        
-        // const SizedBox(height: 60),
-        Text(
-          'Bienvenido/a', 
-          textAlign: TextAlign.center, 
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 30,
-            fontWeight: FontWeight.w900
-          )
-        ),
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 20),
+          Text(
+            'Bienvenido/a',
+            textAlign: TextAlign.start,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 30,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
           // style: Theme.of(context).textTheme.titleLarge?.copyWith(color: Colors.white, fontWeight: FontWeight.w800)),
-        const SizedBox(height: 15),
-        Text('Iniciar sesión', textAlign: TextAlign.center, style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.white70)),
-      ],
-    );
+          const SizedBox(height: 5),
+          Text(
+            'Iniciar sesión',
+            textAlign: TextAlign.center,
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: Colors.white70),
+          ),
+        ],
+      );
   }
 }
