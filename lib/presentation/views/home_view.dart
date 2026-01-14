@@ -51,7 +51,8 @@ class HomeViewState extends ConsumerState<HomeView> {
               
                   
 
-                  const SizedBox(height: 10,)
+                  const SizedBox(height: 10,),
+                  const Text('Inicio App')
                   
                   // Expanded(
                   //   child: ListView.builder(

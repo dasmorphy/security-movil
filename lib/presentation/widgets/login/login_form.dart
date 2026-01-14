@@ -117,7 +117,7 @@ class _LoginFormState extends State<LoginForm> {
             const Text("¿No tienes una cuenta?", style: TextStyle(color: Colors.white54)),
             TextButton(
               onPressed: () {},
-              child: const Text('Registrarse', style: TextStyle(color: Colors.greenAccent)),
+              child: const Text('Registrarse', style: TextStyle(color: Color.fromARGB(255, 14, 170, 170))),
             )
           ],
         ),

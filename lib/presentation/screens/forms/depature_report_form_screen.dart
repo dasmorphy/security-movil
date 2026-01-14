@@ -3,10 +3,10 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
-class LoginScreen extends StatelessWidget {
-  static const name = 'login-screen';
+class DepatureReportFormScreen extends StatelessWidget {
+  static const name = 'depature-report-form-screen';
 
-  const LoginScreen({super.key});
+  const DepatureReportFormScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -24,9 +24,12 @@ class LoginScreen extends StatelessWidget {
         ),
       ),
       child: Scaffold(
-        resizeToAvoidBottomInset: false,
+        // resizeToAvoidBottomInset: false,
         backgroundColor: Colors.transparent,
-        // No appBar here: login_screen should not show the global header
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(60),
+          child: const CustomAppbar(),
+        ),
         body: SafeArea(
           child: Container(
             width: double.infinity,
@@ -44,20 +47,6 @@ class LoginScreen extends StatelessWidget {
               height: double.infinity,
               child: Stack(
                 children: [
-                  Positioned(
-                    top: 80,
-                    left: 0,
-                    right: 0,
-                    child: Center(
-                      child: Image.asset(
-                        'lib/assets/images/zentinel-logo.png',
-                        width: 200,
-                        height: 40,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                  ),
-
                   // Centered, scrollable card
                   Positioned.fill(
                     child: SingleChildScrollView(
@@ -85,31 +74,14 @@ class LoginScreen extends StatelessWidget {
                                 child: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    const SizedBox(height: 6),
-                                    const _Header(),
                                     const SizedBox(height: 18),
-                                    const LoginForm(),
+                                    // const DepatureReportForm(),
                                   ],
                                 ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                    ),
-                  ),
-
-                  // Fixed footer powered image
-                  Positioned(
-                    bottom: 30,
-                    left: 0,
-                    right: 0,
-                    child: Center(
-                      child: Image.asset(
-                        'lib/assets/images/powered.png',
-                        width: 150,
-                        height: 20,
-                        fit: BoxFit.contain,
                       ),
                     ),
                   ),
@@ -120,43 +92,5 @@ class LoginScreen extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-class _Header extends StatelessWidget {
-  const _Header({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 15),
-          SizedBox(
-            width: double.infinity,
-            child: Text(
-              'Bienvenido/a',
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 30,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          // style: Theme.of(context).textTheme.titleLarge?.copyWith(color: Colors.white, fontWeight: FontWeight.w800)),
-          const SizedBox(height: 5),
-          SizedBox(
-            width: double.infinity,
-            child: Text(
-              'Iniciar sesión',
-              textAlign: TextAlign.center,
-              style: Theme.of(
-                context,
-              ).textTheme.bodyMedium?.copyWith(color: Colors.white70),
-            ),
-          ),
-        ],
-      );
   }
 }
