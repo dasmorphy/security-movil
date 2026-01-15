@@ -17,7 +17,7 @@ final appRouter = GoRouter(
         GoRoute(
           path: 'depature-report',
           name: DepatureReportFormScreen.name,
-          // builder: (context, state) => DepatureReportFormScreen()
+          builder: (context, state) => DepatureReportFormScreen()
         )
       ]
     ),

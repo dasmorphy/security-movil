@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:zentinel/presentation/widgets/widgets.dart';
 
 class CustomAppbar extends ConsumerWidget {
   const CustomAppbar({super.key});
@@ -10,52 +11,57 @@ class CustomAppbar extends ConsumerWidget {
 
     return SafeArea(
       bottom: false,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        child: Row(
+      child: SizedBox(
+        height: double.infinity,
+        width: double.infinity,
+        child: Stack(
+          fit: StackFit.expand,
           children: [
-            // Logo
-            Image.asset(
-              'lib/assets/images/zentinel-logo.png',
-              width: 140,
-              height: 36,
-              fit: BoxFit.contain,
-            ),
+            // Video de fondo
+            const AutoPlayLocalVideo(),
 
-            const Spacer(),
+            // Contenido arriba
+            Positioned(
+              top: 30,
+              left: 0,
+              right: 0,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 8,
+                ),
+                child: Row(
+                  children: [
+                    Image.asset(
+                      'lib/assets/images/zentinel-logo.png',
+                      width: 120,
+                      height: 36,
+                      fit: BoxFit.contain,
+                    ),
 
-            InkWell(
-              borderRadius: BorderRadius.circular(20),
-              onTap: () {},
-              child: Padding(
-                padding: const EdgeInsets.all(7),
-                child: Icon(Icons.search, color: Colors.white),
+                    const Spacer(),
+
+                    InkWell(
+                      borderRadius: BorderRadius.circular(20),
+                      onTap: () {},
+                      child: const Padding(
+                        padding: EdgeInsets.all(7),
+                        child: Icon(Icons.search, color: Colors.white),
+                      ),
+                    ),
+
+                    InkWell(
+                      borderRadius: BorderRadius.circular(20),
+                      onTap: () {},
+                      child: const Padding(
+                        padding: EdgeInsets.all(7),
+                        child: Icon(Icons.help_outline, color: Colors.white),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
-
-            InkWell(
-              borderRadius: BorderRadius.circular(20),
-              onTap: () {},
-              child: Padding(
-                padding: const EdgeInsets.all(7),
-                child: Icon(Icons.help_outline, color: Colors.white),
-              ),
-            ),
-
-            // IconButton(
-            //   onPressed: () {},
-            //   icon: const Icon(Icons.search, color: Colors.white),
-            //   padding: EdgeInsets.zero,
-            //   constraints: const BoxConstraints(),
-            // ),
-            // IconButton(
-            //   onPressed: () {},
-            //   icon: const Icon(Icons.help_outline, color: Colors.white),
-            //   padding: EdgeInsets.zero,
-            //   constraints: const BoxConstraints(),
-            // ),
-            const SizedBox(width: 3),
-            // const Text('Ayuda', style: TextStyle(color: Colors.white)),
           ],
         ),
       ),

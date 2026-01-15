@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:zentinel/presentation/views/views.dart';
-import 'package:zentinel/presentation/widgets/shared/custom_bottom_navigation.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -21,11 +21,16 @@ class _HomeScreenState extends State<HomeScreen> {
     Center(child: Text('Categorías')),
     Center(child: Text('Favoritos')),
     Center(child: Text('Perfil')),
+    // Center(child: Text('Perfil')),
     DepatureReportForm()
   ];
 
-  void _onTabTapped(int index) {
+  void _onTabTapped(int index, BuildContext context) {
     print(index);
+    // if (index == 4) {
+    //   context.go('/home/depature-report');
+    //   return;
+    // }
     setState(() {
       _currentIndex = index;
     });
@@ -35,7 +40,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(60),
+        preferredSize: const Size.fromHeight(300),
         child: const CustomAppbar(),
       ),
       // resizeToAvoidBottomInset: false,
@@ -46,7 +51,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       bottomNavigationBar: CustomBottomNavigation(
         currentIndex: _currentIndex,
-        onTap: _onTabTapped,
+        onTap: (index) => _onTabTapped(index, context),
       ),
     );
   }
