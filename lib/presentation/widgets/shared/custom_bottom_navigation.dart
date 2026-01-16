@@ -75,11 +75,6 @@ class CustomBottomNavigation extends StatelessWidget {
               activeIcon: Icon(Icons.person),
               label: 'Perfil',
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person_outline),
-              activeIcon: Icon(Icons.person),
-              label: 'Formulario de salida',
-            ),
           ],
         ),
       ),

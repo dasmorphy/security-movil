@@ -18,7 +18,7 @@ class CustomAppbar extends ConsumerWidget {
           fit: StackFit.expand,
           children: [
             // Video de fondo
-            const AutoPlayLocalVideo(),
+            // const AutoPlayLocalVideo(),
 
             // Contenido arriba
             Positioned(

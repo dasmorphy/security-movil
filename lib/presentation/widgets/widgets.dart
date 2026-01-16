@@ -5,3 +5,7 @@ export 'package:zentinel/presentation/widgets/login/login_form.dart';
 export 'package:zentinel/presentation/widgets/inputs/glow_text_form_field.dart';
 export 'package:zentinel/presentation/widgets/inputs/custom_field_label_required.dart';
 export 'package:zentinel/presentation/widgets/media/autoplay_local_video.dart';
+export 'package:zentinel/presentation/widgets/headers/header_category.dart';
+export 'package:zentinel/presentation/widgets/cards/basic_service_card.dart';
+export 'package:zentinel/presentation/widgets/sections/basic_services_section.dart';
+export 'package:zentinel/presentation/widgets/modals/animated_modal.dart';

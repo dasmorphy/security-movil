@@ -4,14 +4,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../widgets/widgets.dart';
 
 
-class HomeView extends ConsumerStatefulWidget {
-  const HomeView({super.key});
+class CategoryView extends ConsumerStatefulWidget {
+  const CategoryView({super.key});
 
   @override
-  HomeViewState createState() => HomeViewState();
+  CategoryViewState createState() => CategoryViewState();
 }
 
-class HomeViewState extends ConsumerState<HomeView> {
+class CategoryViewState extends ConsumerState<CategoryView> {
 
   //SINO SE ESPECIFICA NOTIFIER DEVUELVE EL ESTADO POR DEFECTO, ES DECIR EL VALOR DE ESE PROVIDER
 
@@ -32,17 +32,14 @@ class HomeViewState extends ConsumerState<HomeView> {
       child: Column(
         children: [
           // 🔥 HEADER CON VIDEO
-          const VideoHeader(),
+          const HeaderCategory(),
 
           // 📦 CONTENIDO DE LA PÁGINA
           Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
               children: const [
-                Text(
-                  'Contenido principal',
-                  style: TextStyle(fontSize: 18),
-                ),
+                BasicServicesSection(),
               ],
             ),
           ),

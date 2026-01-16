@@ -18,11 +18,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
   final viewRoutes = const <Widget> [
     HomeView(),
-    Center(child: Text('Categorías')),
+    CategoryView(),
     Center(child: Text('Favoritos')),
     Center(child: Text('Perfil')),
-    // Center(child: Text('Perfil')),
-    DepatureReportForm()
   ];
 
   void _onTabTapped(int index, BuildContext context) {
@@ -39,10 +37,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(300),
-        child: const CustomAppbar(),
-      ),
+      // appBar: PreferredSize(
+      //   preferredSize: const Size.fromHeight(300),
+      //   child: const CustomAppbar(),
+      // ),
       // resizeToAvoidBottomInset: false,
       backgroundColor: Colors.transparent,
       body: IndexedStack( //Widget para conservar el estado de la pagina (ej Si hace scroll dejarlo tal cual)
