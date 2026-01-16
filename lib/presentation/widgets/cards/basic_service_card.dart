@@ -28,15 +28,15 @@ class BasicServiceCard extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 48, color: Colors.white),
+            Icon(icon, size: 25, color: Colors.white),
             const SizedBox(height: 12),
             Text(
               label,
               textAlign: TextAlign.center,
               style: const TextStyle(
                 color: Colors.white,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
+                fontSize: 12,
+                fontWeight: FontWeight.w800,
               ),
             ),
           ],

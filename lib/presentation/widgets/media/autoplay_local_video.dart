@@ -32,7 +32,7 @@ class _VideoHeaderState extends State<VideoHeader> {
 
   @override
   Widget build(BuildContext context) {
-    final headerHeight = MediaQuery.of(context).size.height * 0.17;
+    final headerHeight = MediaQuery.of(context).size.height * 0.20;
 
     return SizedBox(
       height: headerHeight,
@@ -43,15 +43,15 @@ class _VideoHeaderState extends State<VideoHeader> {
           // 🔹 VIDEO DE FONDO
           if (_controller.value.isInitialized)
             Positioned(
-              top: 250, // 🔽 ajusta este valor
+              top: 10, // 🔽 ajusta este valor
               left: 0,
               right: 0,
-              bottom: -200, // opcional para compensar
+              bottom: -150, // opcional para compensar
               child: FittedBox(
                 fit: BoxFit.cover,
                 child: SizedBox(
                   width: _controller.value.size.width,
-                  height: _controller.value.size.height,
+                  height: 650,
                   child: VideoPlayer(_controller),
                 ),
               ),

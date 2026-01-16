@@ -99,6 +99,7 @@ class _DepatureReportFormState extends State<DepatureReportForm> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                const SizedBox(height: 40),
                 Align(
                   alignment: Alignment.centerLeft,
                   child: SizedBox(

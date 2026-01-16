@@ -14,11 +14,11 @@ final appRouter = GoRouter(
       name: HomeScreen.name,
       builder: (context, state) => const HomeScreen(),
       routes: [
-        GoRoute(
-          path: 'depature-report',
-          name: DepatureReportFormScreen.name,
-          builder: (context, state) => DepatureReportFormScreen()
-        )
+        // GoRoute(
+        //   path: 'depature-report',
+        //   name: DepatureReportFormScreen.name,
+        //   builder: (context, state) => DepatureReportFormScreen()
+        // )
       ]
     ),
 

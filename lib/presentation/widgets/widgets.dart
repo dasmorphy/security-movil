@@ -1,4 +1,4 @@
-export 'package:zentinel/presentation/widgets/report_form/depature_report_form.dart';
+export 'package:zentinel/presentation/widgets/forms/depature_report_form.dart';
 export 'package:zentinel/presentation/widgets/shared/custom_bottom_navigation.dart';
 export 'package:zentinel/presentation/widgets/shared/custom_appbar.dart';
 export 'package:zentinel/presentation/widgets/login/login_form.dart';
@@ -9,3 +9,6 @@ export 'package:zentinel/presentation/widgets/headers/header_category.dart';
 export 'package:zentinel/presentation/widgets/cards/basic_service_card.dart';
 export 'package:zentinel/presentation/widgets/sections/basic_services_section.dart';
 export 'package:zentinel/presentation/widgets/modals/animated_modal.dart';
+export 'package:zentinel/presentation/widgets/report/total_report.dart';
+export 'package:zentinel/presentation/widgets/report/transaction_list_view.dart';
+export 'package:zentinel/presentation/widgets/forms/exit_report_form.dart';

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:video_player/video_player.dart';
 
 class HeaderCategory extends StatefulWidget {
   const HeaderCategory({super.key});
@@ -9,7 +8,6 @@ class HeaderCategory extends StatefulWidget {
 }
 
 class _HeaderCategoryState extends State<HeaderCategory> {
-  late VideoPlayerController _controller;
 
   @override
   void initState() {
@@ -18,7 +16,6 @@ class _HeaderCategoryState extends State<HeaderCategory> {
 
   @override
   void dispose() {
-    _controller.dispose();
     super.dispose();
   }
 

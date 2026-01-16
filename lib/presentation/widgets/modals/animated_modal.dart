@@ -7,10 +7,10 @@ class AnimatedModal extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final height = MediaQuery.of(context).size.height * 0.9;
+    final height = MediaQuery.of(context).size.height * 0.89;
 
     return TweenAnimationBuilder(
-      duration: const Duration(milliseconds: 250),
+      duration: const Duration(milliseconds: 700),
       curve: Curves.easeOut,
       tween: Tween(begin: 1.0, end: 0.0),
       builder: (context, value, _) {
