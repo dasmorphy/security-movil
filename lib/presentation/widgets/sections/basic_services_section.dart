@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:zentinel/presentation/widgets/forms/exit_report_form.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
 class BasicServicesSection extends StatelessWidget {
@@ -8,7 +7,8 @@ class BasicServicesSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+      // padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
+      padding: const EdgeInsetsGeometry.only(left: 15, right: 15, bottom: 20, top: 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

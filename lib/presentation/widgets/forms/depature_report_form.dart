@@ -95,11 +95,19 @@ class _DepatureReportFormState extends State<DepatureReportForm> {
         key: _formKey,
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+            padding: const EdgeInsets.only(top: 12, bottom: 20, left: 16, right: 16),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const SizedBox(height: 40),
+                Container(
+                  width: 50,
+                  height: 5,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                const SizedBox(height: 30),
                 Align(
                   alignment: Alignment.centerLeft,
                   child: SizedBox(

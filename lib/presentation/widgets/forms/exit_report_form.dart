@@ -99,7 +99,15 @@ class _ExitReportFormState extends State<ExitReportForm> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const SizedBox(height: 40),
+                Container(
+                  width: 50,
+                  height: 5,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                const SizedBox(height: 30),
                 Align(
                   alignment: Alignment.centerLeft,
                   child: SizedBox(
