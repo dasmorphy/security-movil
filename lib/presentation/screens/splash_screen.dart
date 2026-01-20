@@ -19,11 +19,11 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
     super.initState();
      _controller = AnimationController(vsync: this);
     // Después de 4 segundos, navega a login
-    // Future.delayed(const Duration(seconds: 4), () {
-    //   if (mounted) {
-    //     context.goNamed('login-screen');
-    //   }
-    // });
+    Future.delayed(const Duration(seconds: 4), () {
+      if (mounted) {
+        context.goNamed('login-screen');
+      }
+    });
   }
 
   @override
@@ -35,15 +35,15 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
+      // backgroundColor: const Color.fromARGB(255, 43, 41, 41),
+      // backgroundColor: const Color.fromARGB(255, 36, 34, 34),
+      // backgroundColor: const Color.fromARGB(190, 58, 199, 199),
+      backgroundColor: const Color.fromARGB(153, 58, 199, 199),
       body: Center(
-        child: Lottie.asset(
-          'lib/assets/lottie/loader.json',
-          height: double.infinity,
-          // fit: BoxFit.contain,
-          // width: MediaQuery.of(context).size.width * 0.8,
-
-          
+        child: Container(
+          child: Lottie.asset(
+            'lib/assets/lottie/zentinel.json',
+          ),
         ),
       ),
     );
