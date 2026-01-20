@@ -27,8 +27,8 @@ class BasicServicesSection extends StatelessWidget {
             crossAxisCount: 3,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            mainAxisSpacing: 12,
-            crossAxisSpacing: 7,
+            mainAxisSpacing: 10,
+            crossAxisSpacing: 11,
             childAspectRatio: 0.9,
             children: const [
               BasicServiceCard(
@@ -69,7 +69,7 @@ class BasicServicesSection extends StatelessWidget {
           GridView.count(
             crossAxisCount: 3,
             shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
+            physics: const BouncingScrollPhysics(),
             mainAxisSpacing: 12,
             crossAxisSpacing: 7,
             childAspectRatio: 0.9,

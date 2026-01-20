@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../widgets/widgets.dart';
-
+import 'package:zentinel/presentation/widgets/widgets.dart';
 
 class CategoryView extends ConsumerStatefulWidget {
   const CategoryView({super.key});
@@ -12,9 +10,7 @@ class CategoryView extends ConsumerStatefulWidget {
 }
 
 class CategoryViewState extends ConsumerState<CategoryView> {
-
   //SINO SE ESPECIFICA NOTIFIER DEVUELVE EL ESTADO POR DEFECTO, ES DECIR EL VALOR DE ESE PROVIDER
-
 
   @override
   void initState() {
@@ -28,23 +24,79 @@ class CategoryViewState extends ConsumerState<CategoryView> {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
+    return DefaultTabController(
+      length: 2,
       child: Column(
         children: [
-          // 🔥 HEADER CON VIDEO
+          //HEADER CON VIDEO
           const HeaderCategory(),
-
-          // 📦 CONTENIDO DE LA PÁGINA
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              children: const [
-                BasicServicesSection(),
+      
+          SizedBox(height: 20),
+          _buildTabBar(),
+          SizedBox(height: 12),
+      
+          // 👇 CONTENIDO CAMBIA SEGÚN TAB
+          Expanded(
+            child: TabBarView(
+              physics: const BouncingScrollPhysics(
+                parent: AlwaysScrollableScrollPhysics(),
+              ),
+              children: [
+                // TAB 1
+                SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  physics: const BouncingScrollPhysics(
+                    parent: AlwaysScrollableScrollPhysics(),
+                  ),
+                  child: BasicServicesSection(),
+                ),
+      
+                // TAB 2
+                SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  physics: const BouncingScrollPhysics(
+                    parent: AlwaysScrollableScrollPhysics(),
+                  ),
+                  child: FavoritesCategorySection(),
+                ),
               ],
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildTabBar() {
+    return Container(
+        margin: const EdgeInsets.symmetric(horizontal: 17.0),
+        height: 35.0,
+        decoration: BoxDecoration(
+          color: Colors.white24,
+          borderRadius: BorderRadius.circular(25.0),
+        ),
+        child: TabBar(
+          // physics: BouncingScrollPhysics(),
+          dividerColor: Colors.transparent,
+          indicatorSize: TabBarIndicatorSize.tab,
+          indicatorPadding: EdgeInsets.zero,
+          indicator: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(25),
+          ),
+          indicatorColor: Colors.white,
+          labelColor: Colors.black,
+          labelStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
+          unselectedLabelColor: Colors.white,
+          tabs: [
+            Tab(
+              child: SizedBox(child: Center(child: Text('Servicios'))),
+            ),
+            Tab(
+              child: SizedBox.expand(child: Center(child: Text('Favoritos'))),
+            ),
+          ],
+        ),
     );
   }
 }

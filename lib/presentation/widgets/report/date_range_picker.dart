@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
-/// A visual-only date range picker widget resembling the provided design.
-/// Usage: showModalBottomSheet(context: ..., builder: (_) => DateRangePicker(onApply: (start,end){...}));
 class DateRangePicker extends StatefulWidget {
   final DateTime? initialStart;
   final DateTime? initialEnd;
@@ -21,19 +19,12 @@ class DateRangePicker extends StatefulWidget {
 }
 
 class _DateRangePickerState extends State<DateRangePicker> {
-  DateTime _now = DateTime.now();
   DateTime? _start;
   DateTime? _end;
-
-  String _selectedDate = '';
-  String _dateCount = '';
-  String _range = '';
-  String _rangeCount = '';
 
   @override
   void initState() {
     super.initState();
-    _now = DateTime.now();
     _start = widget.initialStart;
     _end = widget.initialEnd;
   }
@@ -61,63 +52,104 @@ class _DateRangePickerState extends State<DateRangePicker> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final double dayFontSize = theme.textTheme.bodyMedium?.fontSize ?? 14;
+
+    final double headerFontSize = theme.textTheme.titleMedium?.fontSize ?? 16;
+
+    final double rangeFontSize = theme.textTheme.bodySmall?.fontSize ?? 12;
     return SafeArea(
       child: Container(
         height: MediaQuery.of(context).size.height * 0.78,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        color: Theme.of(context).scaffoldBackgroundColor,
+        color: Colors.transparent,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Expanded(
               child: SfDateRangePicker(
+                backgroundColor: Colors.transparent,
                 onSelectionChanged: _onSelectionChanged,
                 selectionMode: DateRangePickerSelectionMode.range,
-                initialSelectedRange: PickerDateRange(
-                  DateTime.now().subtract(const Duration(days: 4)),
-                  DateTime.now().add(const Duration(days: 3)),
+                allowViewNavigation: false,
+                monthViewSettings: const DateRangePickerMonthViewSettings(
+                  firstDayOfWeek: 1,
+                  viewHeaderStyle: DateRangePickerViewHeaderStyle(
+                    textStyle: TextStyle(
+                      color: Color.fromARGB(255, 48, 51, 51),
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                startRangeSelectionColor: const Color.fromARGB(
+                  190,
+                  58,
+                  199,
+                  199,
+                ),
+                endRangeSelectionColor: const Color.fromARGB(190, 58, 199, 199),
+                rangeSelectionColor: const Color.fromARGB(255, 58, 199, 199),
+                todayHighlightColor: const Color.fromARGB(190, 58, 199, 199),
+
+                monthCellStyle: DateRangePickerMonthCellStyle(
+                  textStyle: TextStyle(
+                    color: Colors.white,
+                    fontSize: dayFontSize,
+                    fontFamily: theme.textTheme.bodyMedium?.fontFamily,
+                  ),
+                  todayTextStyle: TextStyle(
+                    color: Colors.white,
+                    fontSize: dayFontSize,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  weekendTextStyle: TextStyle(
+                    color: Colors.white,
+                    fontSize: dayFontSize,
+                  ),
+                ),
+
+                headerStyle: DateRangePickerHeaderStyle(
+                  textAlign: TextAlign.center,
+                  backgroundColor: Colors.transparent,
+                  textStyle: TextStyle(
+                    color: Colors.white,
+                    fontSize: headerFontSize,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: theme.textTheme.titleMedium?.fontFamily,
+                  ),
+                ),
+
+                rangeTextStyle: TextStyle(
+                  color: Colors.white,
+                  fontSize: rangeFontSize, // 👈 theme
+                  fontFamily: theme.textTheme.bodySmall?.fontFamily,
                 ),
               ),
             ),
             const SizedBox(height: 8),
-
-            // Text('Selecciona una fecha de inicio y fin', style: Theme.of(context).textTheme.titleMedium),
-            // const SizedBox(height: 8),
-            // _buildWeekdays(),
-            // const SizedBox(height: 6),
-            // Expanded(
-            //   child: SingleChildScrollView(
-            //     child: Column(
-            //       children: [
-            //         _buildMonth(firstMonth),
-            //         _buildMonth(secondMonth),
-            //         const SizedBox(height: 18),
-            //       ],
-            //     ),
-            //   ),
-            // ),
             const Divider(height: 1),
             const SizedBox(height: 8),
             Text(
               _formatRange(),
-              style: const TextStyle(fontWeight: FontWeight.w600),
+              style: const TextStyle(
+                fontWeight: FontWeight.w600,
+                color: Colors.white,
+              ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 25),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFFFD400),
-                  foregroundColor: Colors.black,
+                  backgroundColor: Color.fromARGB(190, 58, 199, 199),
+                  foregroundColor: Colors.white,
                 ),
                 onPressed: () {
                   if (_start != null && _end != null) {
-                    Navigator.of(context).pop(
-                      DateTimeRange(
-                        start: _start!,
-                        end: _end!,
-                      ),
-                    );
+                    Navigator.of(
+                      context,
+                    ).pop(DateTimeRange(start: _start!, end: _end!));
                   } else {
                     Navigator.of(context).pop(null);
                   }
@@ -126,7 +158,7 @@ class _DateRangePickerState extends State<DateRangePicker> {
                   padding: EdgeInsets.symmetric(vertical: 14),
                   child: Text(
                     'Ver registros',
-                    style: TextStyle(fontWeight: FontWeight.w700),
+                    style: TextStyle(fontWeight: FontWeight.w900),
                   ),
                 ),
               ),

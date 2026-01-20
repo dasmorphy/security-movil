@@ -87,11 +87,12 @@ class _TransactionListViewState extends State<TransactionListView> {
 
           // Fixed blue box at bottom center
           Positioned(
-            bottom: 18,
+            bottom: 10,
             left: 0,
             right: 0,
             child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              // crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Center(
                   child: GestureDetector(
@@ -136,25 +137,20 @@ class _TransactionListViewState extends State<TransactionListView> {
                         vertical: 14,
                       ),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF2D77C9),
+                        color: const Color.fromARGB(189, 21, 139, 139),
                         borderRadius: BorderRadius.circular(40),
                         boxShadow: [
                           BoxShadow(
-                            color: const Color.fromARGB(
-                              255,
-                              143,
-                              15,
-                              15,
-                            ).withOpacity(0.2),
+                            color: const Color.fromARGB(255, 46, 175, 132).withOpacity(0.2),
                             blurRadius: 8,
                             offset: const Offset(0, 4),
                           ),
                         ],
                       ),
                       child: Row(
-                        mainAxisSize: MainAxisSize.min,
+                        // mainAxisSize: MainAxisSize.min,
                         children: const [
-                          Icon(Icons.calendar_today, color: Colors.white),
+                          Icon(Icons.calendar_today, color: Colors.white, size: 15,),
                           SizedBox(width: 10),
                           Text(
                             'Filtrar por fechas',
@@ -192,12 +188,12 @@ class _TransactionListViewState extends State<TransactionListView> {
 
   Widget _buildSearchHeader() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 10),
       child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [const SizedBox(width: 12), _buildCategoryDropdown()],
+        // scrollDirection: Axis.horizontal,
+        child: Column(
+          // crossAxisAlignment: CrossAxisAlignment.start,
+          children: [_buildCategoryDropdown()],
         ),
       ),
     );
@@ -299,14 +295,15 @@ class _TransactionListViewState extends State<TransactionListView> {
   Widget _buildCategoryDropdown() {
     final theme = Theme.of(context);
 
-    return Row(
+    return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         SizedBox(
-          width: 220,
+          width: double.infinity,
           child: Align(
             alignment: Alignment.centerLeft,
             child: SizedBox(
-              width: 220, // ajusta a tu diseño
+              // width: 220, // ajusta a tu diseño
               child: Text(
                 'Reportes totalizados ',
                 textAlign: TextAlign.left,
@@ -321,7 +318,8 @@ class _TransactionListViewState extends State<TransactionListView> {
           ),
         ),
 
-        const SizedBox(width: 12),
+        // const SizedBox(width: 12),
+        const SizedBox(height: 20),
       ],
     );
   }

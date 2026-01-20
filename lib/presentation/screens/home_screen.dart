@@ -42,7 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
       //   child: const CustomAppbar(),
       // ),
       // resizeToAvoidBottomInset: false,
-      backgroundColor: const Color.fromARGB(0, 255, 255, 255),
+      backgroundColor: const Color.fromARGB(255, 23, 24, 28),
       body: IndexedStack( //Widget para conservar el estado de la pagina (ej Si hace scroll dejarlo tal cual)
         index: _currentIndex,
         children: viewRoutes,

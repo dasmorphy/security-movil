@@ -24,18 +24,41 @@ class BasicServiceCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: backgroundColor,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.grey.shade700, width: 1),
+          border: Border.all(color: Color.fromARGB(120, 46, 175, 132), width: 1),
+          // border: Border(
+          //   top: BorderSide(
+          //     color: Color.fromARGB(171, 46, 175, 132),
+          //   ),
+          //   right: BorderSide(
+          //     color: const Color.fromARGB(127, 57, 124, 110),
+          //   ),
+          //   bottom: BorderSide(
+          //     color: const Color.fromARGB(255, 34, 60, 82),
+          //   ),
+          //   left: BorderSide(
+          //     color: const Color.fromARGB(255, 37, 52, 65),
+          //   ),
+          // ),
+          boxShadow: [
+            BoxShadow(
+              color: const Color.fromARGB(255, 46, 175, 132).withOpacity(0.2),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
 
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              Icon(icon, size: 25, color: const Color.fromARGB(255, 50, 182, 182)),
+              const SizedBox(height: 12),
               Text(
                 label,
                 textAlign: TextAlign.center,
                 style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 12,
+                  fontSize: 11,
                   fontWeight: FontWeight.w800,
                 ),
               ),
