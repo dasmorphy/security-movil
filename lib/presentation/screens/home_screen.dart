@@ -19,8 +19,7 @@ class _HomeScreenState extends State<HomeScreen> {
   final viewRoutes = const <Widget> [
     HomeView(),
     CategoryView(),
-    Center(child: Text('Favoritos')),
-    Center(child: Text('Perfil')),
+    ProfileView(),
   ];
 
   void _onTabTapped(int index, BuildContext context) {

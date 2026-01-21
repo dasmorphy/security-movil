@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:zentinel/presentation/widgets/widgets.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 
 class BasicServiceCard extends StatelessWidget {
-  final IconData icon;
+  final String iconImage;
   final String label;
   final Color backgroundColor;
   final Widget childWidget;
 
   const BasicServiceCard({
     super.key,
-    required this.icon,
+    required this.iconImage,
     required this.label,
     required this.childWidget,
     this.backgroundColor = const Color(0xFF2a2a2a),
@@ -24,7 +23,7 @@ class BasicServiceCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: backgroundColor,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Color.fromARGB(120, 46, 175, 132), width: 1),
+          border: Border.all(color: Color.fromARGB(255, 75, 83, 83), width: 1),
           // border: Border(
           //   top: BorderSide(
           //     color: Color.fromARGB(171, 46, 175, 132),
@@ -41,7 +40,7 @@ class BasicServiceCard extends StatelessWidget {
           // ),
           boxShadow: [
             BoxShadow(
-              color: const Color.fromARGB(255, 46, 175, 132).withOpacity(0.2),
+              color: const Color.fromARGB(255, 48, 49, 49).withOpacity(0.2),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),
@@ -51,7 +50,13 @@ class BasicServiceCard extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, size: 25, color: const Color.fromARGB(255, 50, 182, 182)),
+              // Icon(icon, size: 25, color: const Color.fromARGB(255, 50, 182, 182)),
+              Image.asset(
+                'lib/assets/images/icons/$iconImage.png',
+                width: 30,
+                height: 30,
+                // fit: BoxFit.contain,
+              ),
               const SizedBox(height: 12),
               Text(
                 label,

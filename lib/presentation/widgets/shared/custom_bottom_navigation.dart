@@ -65,11 +65,11 @@ class CustomBottomNavigation extends StatelessWidget {
               activeIcon: Icon(Icons.category),
               label: 'Categorías',
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.favorite_outline),
-              activeIcon: Icon(Icons.favorite),
-              label: 'Favoritos',
-            ),
+            // BottomNavigationBarItem(
+            //   icon: Icon(Icons.favorite_outline),
+            //   activeIcon: Icon(Icons.favorite),
+            //   label: 'Favoritos',
+            // ),
             BottomNavigationBarItem(
               icon: Icon(Icons.person_outline),
               activeIcon: Icon(Icons.person),

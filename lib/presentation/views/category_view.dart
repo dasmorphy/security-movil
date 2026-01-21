@@ -81,13 +81,13 @@ class CategoryViewState extends ConsumerState<CategoryView> {
           indicatorSize: TabBarIndicatorSize.tab,
           indicatorPadding: EdgeInsets.zero,
           indicator: BoxDecoration(
-            color: Colors.white,
+            color: const Color.fromARGB(255, 30, 145, 139),
             borderRadius: BorderRadius.circular(25),
           ),
           indicatorColor: Colors.white,
-          labelColor: Colors.black,
+          labelColor: const Color.fromARGB(255, 255, 255, 255),
           labelStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
-          unselectedLabelColor: Colors.white,
+          unselectedLabelColor: const Color.fromARGB(255, 46, 45, 45),
           tabs: [
             Tab(
               child: SizedBox(child: Center(child: Text('Servicios'))),

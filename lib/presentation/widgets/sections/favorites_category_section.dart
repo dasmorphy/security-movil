@@ -53,7 +53,7 @@ class FavoritesCategorySection extends StatelessWidget {
                 // Acción del botón
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color.fromARGB(255, 7, 143, 161),
+                backgroundColor: const Color.fromARGB(255, 30, 145, 139),
                 padding: const EdgeInsets.symmetric(vertical: 14),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),

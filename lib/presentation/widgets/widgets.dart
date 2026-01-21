@@ -13,3 +13,4 @@ export 'package:zentinel/presentation/widgets/report/total_report.dart';
 export 'package:zentinel/presentation/widgets/report/transaction_list_view.dart';
 export 'package:zentinel/presentation/widgets/forms/exit_report_form.dart';
 export 'package:zentinel/presentation/widgets/sections/favorites_category_section.dart';
+export 'package:zentinel/presentation/widgets/cards/publicity_card.dart';

@@ -69,6 +69,7 @@ flutter:
   assets:
     - .env
     - lib/assets/images/
+    - lib/assets/images/icons/
     - lib/assets/videos/
     - lib/assets/lottie/
     - lib/assets/gif/
