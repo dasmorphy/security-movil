@@ -49,7 +49,7 @@ class _VideoHeaderState extends State<VideoHeader> {
             // 🔹 VIDEO DE FONDO
             if (_controller.value.isInitialized)
               Positioned(
-                top: 10, // 🔽 ajusta este valor
+                top: 0, // 🔽 ajusta este valor
                 left: 0,
                 right: 0,
                 bottom: -150, // opcional para compensar

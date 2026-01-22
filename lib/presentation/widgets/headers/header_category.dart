@@ -23,6 +23,7 @@ class _HeaderCategoryState extends State<HeaderCategory> {
   Widget build(BuildContext context) {
     return 
           SafeArea(
+            top: true,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               child: Row(

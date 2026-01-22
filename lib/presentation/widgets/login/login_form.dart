@@ -96,12 +96,12 @@ class _LoginFormState extends State<LoginForm> {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(30),
             ),
-            backgroundColor: Color.fromARGB(190, 58, 199, 199),
+            backgroundColor: Color.fromARGB(189, 7, 213, 213),
           ),
           child: const Text(
             'Iniciar sesión', 
             style: TextStyle(
-              color: Colors.white, 
+              color: Color.fromARGB(255, 255, 255, 255), 
               fontSize: 16,
               fontWeight: FontWeight.bold
             )),

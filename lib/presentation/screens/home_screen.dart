@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:zentinel/presentation/views/views.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
@@ -42,9 +41,13 @@ class _HomeScreenState extends State<HomeScreen> {
       // ),
       // resizeToAvoidBottomInset: false,
       backgroundColor: const Color.fromARGB(255, 23, 24, 28),
-      body: IndexedStack( //Widget para conservar el estado de la pagina (ej Si hace scroll dejarlo tal cual)
-        index: _currentIndex,
-        children: viewRoutes,
+      body: SafeArea(
+        top: true,
+        // bottom: false,
+        child: IndexedStack( //Widget para conservar el estado de la pagina (ej Si hace scroll dejarlo tal cual)
+          index: _currentIndex,
+          children: viewRoutes,
+        ),
       ),
       bottomNavigationBar: CustomBottomNavigation(
         currentIndex: _currentIndex,

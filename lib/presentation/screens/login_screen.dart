@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:glass_kit/glass_kit.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -28,6 +29,8 @@ class LoginScreen extends StatelessWidget {
         backgroundColor: Colors.transparent,
         // No appBar here: login_screen should not show the global header
         body: SafeArea(
+          // top: true,
+          // bottom: false,
           child: Container(
             width: double.infinity,
             height: double.infinity,
@@ -79,16 +82,29 @@ class LoginScreen extends StatelessWidget {
                               child: Container(
                                 decoration: BoxDecoration(),
                                 padding: const EdgeInsets.symmetric(
-                                  horizontal: 28,
+                                  horizontal: 10,
                                   vertical: 28,
                                 ),
                                 child: Column(
+                                  
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     const SizedBox(height: 6),
-                                    const _Header(),
-                                    const SizedBox(height: 18),
-                                    const LoginForm(),
+                                    const _GlassCard(
+                                      height: 500,
+                                      width: 650,
+                                      child: Padding(
+                                        padding: EdgeInsets.all(20),
+                                        child: Column(
+                                          children: [
+                                            _Header(),
+                                            SizedBox(height: 18),
+                                            LoginForm(),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    // const _Header(),
                                   ],
                                 ),
                               ),
@@ -124,39 +140,83 @@ class LoginScreen extends StatelessWidget {
 }
 
 class _Header extends StatelessWidget {
-  const _Header({super.key});
+  const _Header();
 
   @override
   Widget build(BuildContext context) {
     return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 15),
-          SizedBox(
-            width: double.infinity,
-            child: Text(
-              'Bienvenido/a',
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 30,
-                fontWeight: FontWeight.bold,
-              ),
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const SizedBox(height: 15),
+        SizedBox(
+          width: double.infinity,
+          child: Text(
+            'Bienvenido/a',
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 30,
+              fontWeight: FontWeight.bold,
             ),
           ),
-          // style: Theme.of(context).textTheme.titleLarge?.copyWith(color: Colors.white, fontWeight: FontWeight.w800)),
-          const SizedBox(height: 5),
-          SizedBox(
-            width: double.infinity,
-            child: Text(
-              'Iniciar sesión',
-              textAlign: TextAlign.center,
-              style: Theme.of(
-                context,
-              ).textTheme.bodyMedium?.copyWith(color: Colors.white70),
-            ),
+        ),
+        const SizedBox(height: 5),
+        SizedBox(
+          width: double.infinity,
+          child: Text(
+            'Iniciar sesión',
+            textAlign: TextAlign.center,
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: Colors.white70),
           ),
+        ),
+      ],
+    );
+  }
+}
+
+class _GlassCard extends StatelessWidget {
+  final Widget child;
+  final double height;
+  final double width;
+
+  const _GlassCard({required this.child, this.height = 200, this.width = 350});
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassContainer(
+      height: height,
+      width: width,
+      gradient: LinearGradient(
+        colors: [
+          const Color.fromARGB(255, 255, 255, 255).withValues(alpha: 0.3),
+          const Color.fromARGB(255, 7, 137, 92).withValues(alpha: 0.1),
+          Colors.white.withValues(alpha: 0.07),
+          // Colors.white.withValues(alpha: 0.07), 
         ],
-      );
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        stops: [0.05, 0.2, 0.4]
+      ),
+      borderGradient: LinearGradient(
+        colors: [
+          Colors.white.withValues(alpha: 0.80),
+          Colors.white.withValues(alpha: 0.10),
+          const Color.fromARGB(158, 2, 79, 58).withValues(alpha: 0.05),
+          const Color.fromARGB(255, 40, 41, 40).withValues(alpha: 0.60),
+        ],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        stops: [0.0, 0.80, 0.40, 1.0],
+      ),
+      blur: 20,
+      borderRadius: BorderRadius.circular(24.0),
+      borderWidth: 1.0,
+      elevation: 3.0,
+      // isFrostedGlass: true,
+      shadowColor: Colors.purple.withValues(alpha: 0.20),
+      child: child,
+    );
   }
 }

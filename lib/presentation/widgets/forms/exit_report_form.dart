@@ -24,7 +24,6 @@ class _ExitReportFormState extends State<ExitReportForm> {
   final _observationsCtrl = TextEditingController();
 
   final FocusNode _guideFocus = FocusNode();
-  final FocusNode _unitFocus = FocusNode();
   final FocusNode _weightFocus = FocusNode();
   final FocusNode _providerFocus = FocusNode();
   final FocusNode _destinyFocus = FocusNode();

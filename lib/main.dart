@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'package:zentinel/config/router/app_router.dart';
 import 'package:zentinel/config/theme/app_theme.dart';
@@ -15,6 +16,15 @@ Future<void> main() async {
   await FlutterLocalization.instance.ensureInitialized();
   await initializeDateFormatting('es_ES', null);
   Intl.defaultLocale = 'es_ES';
+  
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Color.fromARGB(255, 53, 228, 202), // no pinta fondo
+      statusBarIconBrightness: Brightness.light, // Android
+      statusBarBrightness: Brightness.dark, // iOS
+    ),
+  );
+
   runApp(const ProviderScope(child: MyApp()));
 }
 
@@ -35,7 +45,6 @@ class _MyAppState extends State<MyApp> {
     _localization.init(
       mapLocales: const [
         MapLocale('en', AppLocale.EN),
-        MapLocale('ja', AppLocale.JA),
         MapLocale('es', AppLocale.ES),
       ],
       initLanguageCode: 'es',
@@ -70,11 +79,6 @@ mixin AppLocale {
   static const Map<String, dynamic> EN = {
     title: 'Localization',
     thisIs: 'This is %a package, version %a.',
-  };
-
-  static const Map<String, dynamic> JA = {
-    title: 'ローカリゼーション',
-    thisIs: 'これは%aパッケージ、バージョン%aです。',
   };
 
   static const Map<String, dynamic> ES = {
