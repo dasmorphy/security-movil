@@ -1,24 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:zentinel/presentation/views/views.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
-class PersonalDataScreen extends StatefulWidget {
+class PersonalDataScreen extends StatelessWidget {
 
   static const name = 'personal-data-screen';
 
   const PersonalDataScreen({super.key});
 
   @override
-  State<PersonalDataScreen> createState() => _PersonalDataScreenState();
-}
-
-class _PersonalDataScreenState extends State<PersonalDataScreen> {
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(60),
-        child: const HeaderOptionsProfile(),
+        child: const HeaderOptionsProfile(headerTxt: 'Datos personales',),
       ),
       resizeToAvoidBottomInset: false,
       backgroundColor: const Color.fromARGB(255, 23, 24, 28),
@@ -31,6 +27,15 @@ class _PersonalDataScreenState extends State<PersonalDataScreen> {
             // crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
+              PersonalDataItem(
+                icon: Icons.key,
+                title: 'Correo electrónico',
+                subTitle: 'daxxxx@xxxx',
+                onTap: () {
+                  context.push('/change-email');
+                },
+              ),
+              const SizedBox(height: 17,),
               PersonalDataItem(
                 icon: Icons.phone_android_rounded,
                 title: 'Celular',

@@ -16,3 +16,5 @@ export 'package:zentinel/presentation/widgets/sections/favorites_category_sectio
 export 'package:zentinel/presentation/widgets/cards/publicity_card.dart';
 export 'package:zentinel/presentation/widgets/headers/header_options_profile.dart';
 export 'package:zentinel/presentation/widgets/profile_menu/personal_data_item.dart';
+export 'package:zentinel/presentation/widgets/forms/change_password_form.dart';
+export 'package:zentinel/presentation/widgets/forms/change_email_form.dart';

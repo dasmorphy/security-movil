@@ -39,7 +39,7 @@ class PersonalDataItem extends StatelessWidget {
                   Text(
                     title,
                     style: const TextStyle(
-                      fontSize: 16,
+                      fontSize: 13.5,
                       fontWeight: FontWeight.w500,
                       color: Colors.white,
                     ),

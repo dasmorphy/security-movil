@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class HeaderOptionsProfile extends StatelessWidget {
-  const HeaderOptionsProfile({super.key});
+  final String headerTxt;
+  const HeaderOptionsProfile({super.key, required this.headerTxt});
 
   @override
   Widget build(BuildContext context) {
@@ -25,9 +26,9 @@ class HeaderOptionsProfile extends StatelessWidget {
               ),
             ),
 
-            // Title (centro real)
-            const Text(
-              'Datos personales',
+            // Title
+            Text(
+              headerTxt,
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.white,

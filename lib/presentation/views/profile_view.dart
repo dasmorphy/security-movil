@@ -70,17 +70,17 @@ class ProfileViewState extends ConsumerState<ProfileView> {
                       ),
                       const SizedBox(height: 4),
                       // Email
-                      const Text(
-                        'daniel@hotmail.com',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey,
-                        ),
-                      ),
+                      // const Text(
+                      //   'daniel@hotmail.com',
+                      //   style: TextStyle(
+                      //     fontSize: 14,
+                      //     color: Colors.grey,
+                      //   ),
+                      // ),
 
                       // Última conexión
                       const Text(
-                        'Ultima conexion: 22 ene. 2026 | 17:12',
+                        'Última conexión: 22 ene. 2026 | 17:12',
                         style: TextStyle(
                           fontSize: 12,
                           color: Colors.grey,
@@ -95,7 +95,7 @@ class ProfileViewState extends ConsumerState<ProfileView> {
                 const Text(
                   'Información Personal',
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
@@ -114,7 +114,7 @@ class ProfileViewState extends ConsumerState<ProfileView> {
                 const Text(
                   'Configuración',
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
@@ -131,7 +131,7 @@ class ProfileViewState extends ConsumerState<ProfileView> {
                 const Text(
                   'Experiencia en el app',
                   style: TextStyle(
-                    fontSize: 18,
+                    fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
                   ),
@@ -216,7 +216,7 @@ class ProfileViewState extends ConsumerState<ProfileView> {
               child: Text(
                 title,
                 style: const TextStyle(
-                  fontSize: 15,
+                  fontSize: 13,
                   fontWeight: FontWeight.w500,
                   color: Colors.white,
                 ),

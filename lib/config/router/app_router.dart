@@ -23,6 +23,11 @@ final appRouter = GoRouter(
           path: '/personal-data',
           name: PersonalDataScreen.name,
           builder: (context, state) => const PersonalDataScreen()
+        ),
+        GoRoute(
+          path: '/change-email',
+          name: ChangeEmailScreen.name,
+          builder: (context, state) => const ChangeEmailScreen()
         )
       ]
     ),

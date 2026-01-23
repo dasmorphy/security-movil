@@ -1,5 +1,8 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:lottie/lottie.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
 class HomeView extends ConsumerStatefulWidget {
@@ -61,7 +64,7 @@ class HomeViewState extends ConsumerState<HomeView> {
                   ),
                 ),
                 const SizedBox(height: 32),
-                
+
                 // Bitácoras Recientes
                 Container(
                   padding: const EdgeInsets.all(20),
@@ -73,17 +76,18 @@ class HomeViewState extends ConsumerState<HomeView> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
-                        children: [                          
+                        children: [
                           Text(
                             'Bitácoras recientes',
-                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              color: Colors.white,
-                              fontWeight: FontWeight.w600,
-                            ),
+                            style: Theme.of(context).textTheme.titleMedium
+                                ?.copyWith(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.w600,
+                                ),
                           ),
                           Column(
                             children: [
-                              SizedBox(height: 4,),
+                              SizedBox(height: 4),
                               const Icon(
                                 Icons.chevron_right,
                                 color: Colors.white,
@@ -107,61 +111,68 @@ class HomeViewState extends ConsumerState<HomeView> {
   }
 
   Widget _buildCameraCard(BuildContext context, String cameraName) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-      ),
+    return ClipRRect(
+      // decoration: BoxDecoration(
+      //   // color: const Color.fromARGB(255, 255, 255, 255),
+      // ),
+      borderRadius: BorderRadius.circular(12),
       child: Stack(
+        fit: StackFit.expand,
         children: [
+          //Imagen de fondo
+          Image.network(
+            'https://definicion.de/wp-content/uploads/2009/12/paisaje-1.jpg',
+            fit: BoxFit.cover,
+          ),
+
+          //Blur
+          BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+            child: Container(
+              color: Colors.white.withOpacity(0.1), // efecto glass claro
+            ),
+          ),
+          
           // Contenido principal
           Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   cameraName,
                   style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w600,
+                    fontWeight: FontWeight.bold,
                     color: Colors.black,
                   ),
                 ),
+                const Spacer(),
+
+                const Spacer(),
+
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: Lottie.asset(
+                        'lib/assets/lottie/live.json',
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                    // const SizedBox(width: 4),
+                    Text(
+                      'LIVE',
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 10,
+                      ),
+                    ),
+                  ],
+                ),
               ],
-            ),
-          ),
-          // Indicador LIVE
-          Positioned(
-            top: 12,
-            right: 12,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Container(
-                    width: 8,
-                    height: 8,
-                    decoration: const BoxDecoration(
-                      color: Colors.red,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    'LIVE',
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w600,
-                      fontSize: 10,
-                    ),
-                  ),
-                ],
-              ),
             ),
           ),
         ],
@@ -171,68 +182,65 @@ class HomeViewState extends ConsumerState<HomeView> {
 
   List<Widget> _buildBitacoraItems(BuildContext context) {
     final bitacoras = [
-      {'name': 'Daniel Males', 'description': 'Bitacora de ingreso Camanglar 1'},
+      {
+        'name': 'Daniel Males',
+        'description': 'Bitacora de ingreso Camanglar 1',
+      },
       {'name': 'Jhonny', 'description': 'Bitacora de salida Camanglar 2'},
       {'name': 'Francisco', 'description': 'Bitacora de salida Camanglar 1'},
       {'name': 'Juan', 'description': 'Bitacora de ingreso Camanglar 3'},
     ];
 
-    return List.generate(
-      bitacoras.length,
-      (index) {
-        final item = bitacoras[index];
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 12),
-          child: Row(
-            children: [
-              // Icono check
-              Container(
-                width: 24,
-                height: 24,
-                decoration: BoxDecoration(
-                  color: const Color.fromARGB(255, 4, 88, 99),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: const Icon(
-                  Icons.edit_note_sharp,
-                  color: Colors.white,
-                  size: 16,
-                ),
+    return List.generate(bitacoras.length, (index) {
+      final item = bitacoras[index];
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 12),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // Icono check
+            Container(
+              width: 24,
+              height: 24,
+              decoration: BoxDecoration(
+                color: const Color.fromARGB(255, 4, 88, 99),
+                borderRadius: BorderRadius.circular(4),
               ),
-              const SizedBox(width: 12),
-              // Nombre y descripción
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      item['name'] as String,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      item['description'] as String,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: const Color.fromARGB(255, 180, 180, 180),
-                        fontWeight: FontWeight.w400,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              // Chevron
-              const Icon(
-                Icons.chevron_right,
+              child: const Icon(
+                Icons.edit_note_sharp,
                 color: Colors.white,
-                size: 20,
+                size: 16,
               ),
-            ],
-          ),
-        );
-      },
-    );
+            ),
+            const SizedBox(width: 12),
+            // Nombre y descripción
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    item['name'] as String,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    item['description'] as String,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: const Color.fromARGB(255, 180, 180, 180),
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // Chevron
+            const Icon(Icons.chevron_right, color: Colors.white, size: 20),
+          ],
+        ),
+      );
+    });
   }
 }
