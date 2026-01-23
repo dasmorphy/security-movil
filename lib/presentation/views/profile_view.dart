@@ -26,6 +26,7 @@ class ProfileViewState extends ConsumerState<ProfileView> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
+      // physics: ,
       child: Column(
         children: [
           const HeaderCategory(),
@@ -76,7 +77,7 @@ class ProfileViewState extends ConsumerState<ProfileView> {
                           color: Colors.grey,
                         ),
                       ),
-                      const SizedBox(height: 8),
+
                       // Última conexión
                       const Text(
                         'Ultima conexion: 22 ene. 2026 | 17:12',
@@ -103,7 +104,9 @@ class ProfileViewState extends ConsumerState<ProfileView> {
                 _buildMenuTile(
                   icon: Icons.person,
                   title: 'Datos personales',
-                  onTap: () {},
+                  onTap: () {
+                    context.push('/personal-data');
+                  },
                 ),
                 const SizedBox(height: 24),
 
@@ -148,8 +151,10 @@ class ProfileViewState extends ConsumerState<ProfileView> {
                 const SizedBox(height: 12),
                 _buildMenuTile(
                   icon: Icons.description,
-                  title: 'Terminos y condiciones',
-                  onTap: () {},
+                  title: 'Términos y condiciones',
+                  onTap: () {
+                    context.go('/personal-data');
+                  },
                 ),
                 const SizedBox(height: 32),
 
@@ -168,7 +173,7 @@ class ProfileViewState extends ConsumerState<ProfileView> {
                       ),
                     ),
                     child: const Text(
-                      'Cerrar Sesion',
+                      'Cerrar Sesión',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
@@ -204,14 +209,14 @@ class ProfileViewState extends ConsumerState<ProfileView> {
             Icon(
               icon,
               color: const Color.fromARGB(255, 255, 255, 255),
-              size: 24,
+              size: 22,
             ),
             const SizedBox(width: 16),
             Expanded(
               child: Text(
                 title,
                 style: const TextStyle(
-                  fontSize: 16,
+                  fontSize: 15,
                   fontWeight: FontWeight.w500,
                   color: Colors.white,
                 ),

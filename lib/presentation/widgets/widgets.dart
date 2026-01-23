@@ -14,3 +14,5 @@ export 'package:zentinel/presentation/widgets/report/transaction_list_view.dart'
 export 'package:zentinel/presentation/widgets/forms/exit_report_form.dart';
 export 'package:zentinel/presentation/widgets/sections/favorites_category_section.dart';
 export 'package:zentinel/presentation/widgets/cards/publicity_card.dart';
+export 'package:zentinel/presentation/widgets/headers/header_options_profile.dart';
+export 'package:zentinel/presentation/widgets/profile_menu/personal_data_item.dart';

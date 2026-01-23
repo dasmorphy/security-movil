@@ -42,7 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
       // resizeToAvoidBottomInset: false,
       backgroundColor: const Color.fromARGB(255, 23, 24, 28),
       body: SafeArea(
-        top: true,
+        top: false,
         // bottom: false,
         child: IndexedStack( //Widget para conservar el estado de la pagina (ej Si hace scroll dejarlo tal cual)
           index: _currentIndex,

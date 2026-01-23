@@ -90,7 +90,7 @@ class _LoginFormState extends State<LoginForm> {
 
         // Login button
         ElevatedButton(
-          onPressed: () => context.go('/home'),
+          onPressed: () => context.go('/'),
           style: ElevatedButton.styleFrom(
             padding: const EdgeInsets.symmetric(vertical: 16),
             shape: RoundedRectangleBorder(

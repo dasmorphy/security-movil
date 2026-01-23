@@ -32,22 +32,22 @@ class BasicServicesSection extends StatelessWidget {
             childAspectRatio: 0.9,
             children: const [
               BasicServiceCard(
-                iconImage: 'register_form',
+                iconImage: 'iconentrada',
                 label: 'Bitácora de Ingreso',
                 childWidget: DepatureReportForm(),
               ),
               BasicServiceCard(
-                iconImage: 'out_form',
+                iconImage: 'iconsalida',
                 label: 'Bitácora de salida',
                 childWidget: ExitReportForm(),
               ),
               BasicServiceCard(
-                iconImage: 'security_cam',
+                iconImage: 'iconcamara',
                 label: 'Monitoreo de Cámaras',
                 childWidget: DepatureReportForm(),
               ),
               BasicServiceCard(
-                iconImage: 'security_cam',
+                iconImage: 'iconseguridad',
                 label: 'Seguridad',
                 childWidget: DepatureReportForm(),
               ),
@@ -75,7 +75,7 @@ class BasicServicesSection extends StatelessWidget {
             childAspectRatio: 0.9,
             children: const [
               BasicServiceCard(
-                iconImage: 'report_pdf',
+                iconImage: 'iconregistro',
                 label: 'Reporte Totalizado',
                 childWidget: TotalReport(),
               ),

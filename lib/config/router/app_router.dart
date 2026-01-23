@@ -15,21 +15,21 @@ final appRouter = GoRouter(
       builder: (context, state) => const LoginScreen(),
     ),
     GoRoute(
-      path: '/home',
+      path: '/',
       name: HomeScreen.name,
       builder: (context, state) => const HomeScreen(),
       routes: [
-        // GoRoute(
-        //   path: 'depature-report',
-        //   name: DepatureReportFormScreen.name,
-        //   builder: (context, state) => DepatureReportFormScreen()
-        // )
+        GoRoute(
+          path: '/personal-data',
+          name: PersonalDataScreen.name,
+          builder: (context, state) => const PersonalDataScreen()
+        )
       ]
     ),
 
     GoRoute(
       path: '/',
-      redirect: (_, __) => '/home',
+      redirect: (_, __) => '/',
     )
 
   ]
