@@ -16,14 +16,14 @@ class CategoryViewState extends ConsumerState<CategoryView> {
   void initState() {
     //En los metodos llmar el metodo read en los providers (flutter favorite)
     super.initState();
-    // ref.read(nowPlayingMoviesProvider.notifier).loadNextPage();
-    // ref.read(popularMoviesProvider.notifier).loadNextPage();
-    // ref.read(upcomingMoviesProvider.notifier).loadNextPage();
-    // ref.read(topRatedMoviesProvider.notifier).loadNextPage();
+    // ref.read(getAllCategories.notifier).getAllCategories();
   }
 
   @override
   Widget build(BuildContext context) {
+    // final allCategories = ref.watch(getAllCategories);
+    // print(allCategories);
+
     return DefaultTabController(
       length: 2,
       child: Column(
