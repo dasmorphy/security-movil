@@ -19,4 +19,11 @@ class LogbookEntryRepositoryImpl extends LogbookEntryRepository {
     return datasource.getAllUnityWeight();
   }
   
+  @override
+  Future<String> saveLogbookEntry(Map<String, dynamic> data) {
+    print("saveLogbookEntry repository impl");
+    print(data);
+    return datasource.saveLogbookEntry(data);
+  }
+  
 }

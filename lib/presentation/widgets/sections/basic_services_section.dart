@@ -1,8 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class BasicServicesSection extends StatelessWidget {
+class BasicServicesSection extends ConsumerStatefulWidget {
   const BasicServicesSection({super.key});
+
+  @override
+  ConsumerState <BasicServicesSection> createState() => _BasicServicesStionState();
+
+  
+}
+
+class _BasicServicesStionState extends ConsumerState<BasicServicesSection> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -30,11 +49,16 @@ class BasicServicesSection extends StatelessWidget {
             mainAxisSpacing: 10,
             crossAxisSpacing: 11,
             childAspectRatio: 0.9,
-            children: const [
+            children: [
               BasicServiceCard(
                 iconImage: 'iconentrada',
                 label: 'Bitácora de Ingreso',
-                childWidget: DepatureReportForm(),
+                childWidget: DepatureReportForm(
+                  onSubmit: (data) async {
+                    print(data);
+                    await ref.read(saveDepatureReportProvider.notifier).saveLogbookEntry(data);
+                  },
+                ),
               ),
               BasicServiceCard(
                 iconImage: 'iconsalida',

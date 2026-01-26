@@ -39,7 +39,8 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
   @override
   void initState() {
     super.initState();
-    ref.read(getAllCategories.notifier).getAllCategories();
+    ref.read(getAllCategories.notifier).load();
+    ref.read(getAllUnitiesWeight.notifier).load();
   }
 
   @override
@@ -58,12 +59,22 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
   }
 
   void _submit() {
+    print("fdsfds");
     if (!(_formKey.currentState?.validate() ?? false)) return;
     final data = {
-      'status': _categoryEntry,
-      'title': _guideCtrl.text.trim(),
-      'description': _descCtrl.text.trim(),
-      'quantity': int.tryParse(_quantityCtrl.text) ?? 0,
+      "id_unity": int.parse(_unit),
+      "id_category": int.parse(_categoryEntry),
+      "shipping_guide": _guideCtrl.text.trim(),
+      "description": _descCtrl.text.trim(),
+      "quantity": int.tryParse(_quantityCtrl.text) ?? 0,
+      "weight": int.tryParse(_weightCtrl.text) ?? 0,
+      "provider": _providerCtrl.text.trim(),
+      "destiny_intern": _destinyCtrl.text.trim(),
+      "authorized_by": _authorizedCtrl.text.trim(),
+      "observations": _observationsCtrl.text.trim(),
+      // "created_at": DateTime.now(),
+      // "updated_at": DateTime.now(),
+      "created_by": "dmales",
     };
     widget.onSubmit?.call(data);
     ScaffoldMessenger.of(context).showSnackBar(
@@ -77,6 +88,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
   @override
   Widget build(BuildContext context) {
     final categories = ref.watch(getAllCategories);
+    final unitiesWeight = ref.watch(getAllUnitiesWeight);
     final theme = Theme.of(context);
     final messageValidatorEmpty = 'Este campo es obligatorio';
     final fieldFill = const Color.fromARGB(255, 20, 21, 23);
@@ -235,18 +247,17 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                   value: _unit,
                   focusNode: _unitFocus,
                   decoration: styleDecoration(),
-                  items: const [
+                  items: [
                     DropdownMenuItem(
                       value: '0',
                       child: Text('Seleccione una opción'),
                     ),
-                    DropdownMenuItem(value: 'UNIT', child: Text('Unidad')),
-                    DropdownMenuItem(value: 'LB', child: Text('Libras')),
-                    DropdownMenuItem(value: 'KG', child: Text('Kilogramos')),
-                    DropdownMenuItem(value: 'GL', child: Text('Galones')),
-                    DropdownMenuItem(value: 'SA', child: Text('Sacos')),
-                    DropdownMenuItem(value: 'BIN', child: Text('Bines')),
-                    DropdownMenuItem(value: 'TACH', child: Text('Tachos')),
+                    ...unitiesWeight.map(
+                      (c) => DropdownMenuItem(
+                        value: c.idUnity.toString(),
+                        child: Text('${c.name} - ${c.code}'),
+                      ),
+                    ),
                   ],
                   onChanged: (v) {
                     if (v != null) {
