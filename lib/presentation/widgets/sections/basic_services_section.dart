@@ -63,7 +63,12 @@ class _BasicServicesStionState extends ConsumerState<BasicServicesSection> {
               BasicServiceCard(
                 iconImage: 'iconsalida',
                 label: 'Bitácora de salida',
-                childWidget: ExitReportForm(),
+                childWidget: ExitReportForm(
+                  onSubmit: (data) async {
+                    print(data);
+                    await ref.read(saveOutLogbookProvider.notifier).saveLogbookOut(data);
+                  },
+                ),
               ),
               BasicServiceCard(
                 iconImage: 'iconcamara',

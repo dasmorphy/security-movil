@@ -71,5 +71,19 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
     return message;
   }
   
+  @override
+  Future<String> saveLogbookOut(Map<String, dynamic> data) async {
+    final dataBody = {
+      "channel": "ZENTINEL",
+      "externalTransactionId": "fcea920f7412b5da7be0cf42b8c93759",
+      "logbook_out": data
+    };
+
+    final response = await dio.post('/rest/zent-logbook-api/v1.0/post/logbook-out', data: dataBody);
+    print(response);
+    final String message = response.data['message'];
+    return message;
+  }
+  
 
 }

@@ -15,25 +15,25 @@ class ExitReportForm extends ConsumerStatefulWidget {
 class _ExitReportFormState extends ConsumerState<ExitReportForm> {
   final _formKey = GlobalKey<FormState>();
   String _categoryEntry = '0';
-  String _unit = '0';
   final _guideCtrl = TextEditingController();
-  final _descCtrl = TextEditingController();
   final _quantityCtrl = TextEditingController();
   final _weightCtrl = TextEditingController();
-  final _providerCtrl = TextEditingController();
-  final _destinyCtrl = TextEditingController();
+  final _truckLicenseCtrl = TextEditingController();
+  final _nameDriverCtrl = TextEditingController();
   final _authorizedCtrl = TextEditingController();
   final _observationsCtrl = TextEditingController();
+  final _personWithdrawsCtrl = TextEditingController();
 
   final FocusNode _guideFocus = FocusNode();
   final FocusNode _weightFocus = FocusNode();
-  final FocusNode _providerFocus = FocusNode();
-  final FocusNode _destinyFocus = FocusNode();
+  final FocusNode _truckLicenseFocus = FocusNode();
+  final FocusNode _nameDriverFocus = FocusNode();
   final FocusNode _authorizedFocus = FocusNode();
   final FocusNode _quantityFocus = FocusNode();
   final FocusNode _descFocus = FocusNode();
   final FocusNode _observationsFocus = FocusNode();
   final FocusNode _categoryEntryFocus = FocusNode();
+  final FocusNode _personWithdrawsFocus = FocusNode();
 
   @override
   void initState() {
@@ -44,10 +44,9 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
   @override
   void dispose() {
     _guideCtrl.dispose();
-    _descCtrl.dispose();
     _quantityCtrl.dispose();
-    _providerCtrl.dispose();
-    _destinyCtrl.dispose();
+    _truckLicenseCtrl.dispose();
+    _nameDriverCtrl.dispose();
     _authorizedCtrl.dispose();
     _observationsCtrl.dispose();
     _quantityFocus.dispose();
@@ -59,10 +58,17 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
   void _submit() {
     if (!(_formKey.currentState?.validate() ?? false)) return;
     final data = {
-      'status': _categoryEntry,
-      'title': _guideCtrl.text.trim(),
-      'description': _descCtrl.text.trim(),
-      'quantity': int.tryParse(_quantityCtrl.text) ?? 0,
+      "id_category": int.parse(_categoryEntry), //
+      "shipping_guide": _guideCtrl.text.trim(),
+      "name_driver": _nameDriverCtrl.text.trim(),
+      "quantity": int.tryParse(_quantityCtrl.text) ?? 0,
+      "weight": int.tryParse(_weightCtrl.text) ?? 0,
+      "truck_license": _truckLicenseCtrl.text.trim(), //
+      "person_withdraws": _personWithdrawsCtrl.text.trim(), //
+      "destiny": _nameDriverCtrl.text.trim(), //
+      "authorized_by": _authorizedCtrl.text.trim(), //
+      "observations": _observationsCtrl.text.trim(), 
+      "created_by": "dmales", //
     };
     widget.onSubmit?.call(data);
     ScaffoldMessenger.of(context).showSnackBar(
@@ -215,7 +221,6 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                   controller: _weightCtrl,
                   focusNode: _weightFocus,
                   keyboardType: TextInputType.number,
-                  hint: _unit == '0' ? '' : _unit,
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   validator: (v) {
                     if (v == null || v.isEmpty) return messageValidatorEmpty;
@@ -228,8 +233,8 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                 const SizedBox(height: 12),
                 CustomFieldLabelRequired(txtLabel: 'Placa del Camión'),
                 GlowTextFormField(
-                  controller: _providerCtrl,
-                  focusNode: _providerFocus,
+                  controller: _truckLicenseCtrl,
+                  focusNode: _truckLicenseFocus,
                   validator: (v) {
                     if (v == null || v.trim().isEmpty) {
                       return messageValidatorEmpty;
@@ -241,8 +246,8 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                 const SizedBox(height: 12),
                 CustomFieldLabelRequired(txtLabel: 'Nombre del Chofer'),
                 GlowTextFormField(
-                  controller: _destinyCtrl,
-                  focusNode: _destinyFocus,
+                  controller: _nameDriverCtrl,
+                  focusNode: _nameDriverFocus,
                   validator: (v) {
                     if (v == null || v.trim().isEmpty) {
                       return messageValidatorEmpty;
@@ -254,8 +259,8 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                 const SizedBox(height: 12),
                 CustomFieldLabelRequired(txtLabel: 'Custodia que Retira el Producto'),
                 GlowTextFormField(
-                  controller: _authorizedCtrl,
-                  focusNode: _authorizedFocus,
+                  controller: _personWithdrawsCtrl,
+                  focusNode: _personWithdrawsFocus,
                   validator: (v) {
                     if (v == null || v.trim().isEmpty) {
                       return messageValidatorEmpty;
@@ -284,8 +289,8 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                   txtLabel: 'Autorizado por',
                 ),
                 GlowTextFormField(
-                  controller: _observationsCtrl,
-                  focusNode: _observationsFocus,
+                  controller: _authorizedCtrl,
+                  focusNode: _authorizedFocus,
                   validator: (v) {
                     if (v == null || v.trim().isEmpty) {
                       return messageValidatorEmpty;
@@ -318,13 +323,12 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                         onPressed: () {
                           _formKey.currentState?.reset();
                           _categoryEntry = '0';
-                          _unit = '0';
                           _guideCtrl.clear();
-                          _descCtrl.clear();
+                          _nameDriverCtrl.clear();
                           _quantityCtrl.clear();
                           _weightCtrl.clear();
-                          _providerCtrl.clear();
-                          _destinyCtrl.clear();
+                          _truckLicenseCtrl.clear();
+                          _nameDriverCtrl.clear();
                           _authorizedCtrl.clear();
                           _observationsCtrl.clear();
                         },

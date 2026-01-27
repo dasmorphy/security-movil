@@ -22,6 +22,11 @@ final saveDepatureReportProvider =
   return DepatureReportNotifier(repo);
 });
 
+final saveOutLogbookProvider =
+    StateNotifierProvider<OutLogbookNotifier, AsyncValue<void>>((ref) {
+  final repo = ref.watch(logbookEntryRepositoryProvider);
+  return OutLogbookNotifier(repo);
+});
 
 
 typedef FetchListCallback<T> = Future<List<T>> Function();
@@ -55,6 +60,25 @@ class DepatureReportNotifier extends StateNotifier<AsyncValue<void>> {
     print(data);
     try {
       await repository.saveLogbookEntry(data);
+      state = const AsyncData(null);
+    } catch (e, st) {
+      state = AsyncError(e, st);
+    }
+  }
+}
+
+class OutLogbookNotifier extends StateNotifier<AsyncValue<void>> {
+  final LogbookEntryRepository repository;
+
+  OutLogbookNotifier(this.repository)
+      : super(const AsyncData(null));
+
+  Future<void> saveLogbookOut(Map<String, dynamic> data) async {
+    state = const AsyncLoading();
+    print("saveLogbookOut");
+    print(data);
+    try {
+      await repository.saveLogbookOut(data);
       state = const AsyncData(null);
     } catch (e, st) {
       state = AsyncError(e, st);

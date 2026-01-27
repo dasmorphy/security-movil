@@ -26,4 +26,11 @@ class LogbookEntryRepositoryImpl extends LogbookEntryRepository {
     return datasource.saveLogbookEntry(data);
   }
   
+  @override
+  Future<String> saveLogbookOut(Map<String, dynamic> data) {
+    print("saveLogbookEntry repository impl");
+    print(data);
+    return datasource.saveLogbookOut(data);
+  }
+  
 }
