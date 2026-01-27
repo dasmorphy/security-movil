@@ -72,8 +72,6 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
       "destiny_intern": _destinyCtrl.text.trim(),
       "authorized_by": _authorizedCtrl.text.trim(),
       "observations": _observationsCtrl.text.trim(),
-      // "created_at": DateTime.now(),
-      // "updated_at": DateTime.now(),
       "created_by": "dmales",
     };
     widget.onSubmit?.call(data);

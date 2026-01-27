@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
-class ExitReportForm extends StatefulWidget {
+class ExitReportForm extends ConsumerStatefulWidget {
   final void Function(Map<String, dynamic>)? onSubmit;
   const ExitReportForm({super.key, this.onSubmit});
 
   @override
-  State<ExitReportForm> createState() => _ExitReportFormState();
+  ConsumerState<ExitReportForm> createState() => _ExitReportFormState();
 }
 
-class _ExitReportFormState extends State<ExitReportForm> {
+class _ExitReportFormState extends ConsumerState<ExitReportForm> {
   final _formKey = GlobalKey<FormState>();
   String _categoryEntry = '0';
   String _unit = '0';
@@ -33,6 +35,12 @@ class _ExitReportFormState extends State<ExitReportForm> {
   final FocusNode _observationsFocus = FocusNode();
   final FocusNode _categoryEntryFocus = FocusNode();
 
+  @override
+  void initState() {
+    super.initState();
+    ref.read(getAllCategories.notifier).load();
+  }
+  
   @override
   void dispose() {
     _guideCtrl.dispose();
@@ -68,6 +76,7 @@ class _ExitReportFormState extends State<ExitReportForm> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final categories = ref.watch(getAllCategories);
     final messageValidatorEmpty = 'Este campo es obligatorio';
     final fieldFill = const Color.fromARGB(255, 20, 21, 23);
     final borderRadius = BorderRadius.circular(8.0);
@@ -153,41 +162,17 @@ class _ExitReportFormState extends State<ExitReportForm> {
                   value: _categoryEntry,
                   focusNode: _categoryEntryFocus,
                   decoration: styleDecoration(),
-                  items: const [
+                  items: [
                     DropdownMenuItem(
                       value: '0',
                       child: Text('Seleccione una opción'),
                     ),
-                    DropdownMenuItem(
-                      value: 'MAT',
-                      child: Text('Materiales - MAT'),
+                    ...categories.map(
+                      (c) => DropdownMenuItem(
+                        value: c.idCategory.toString(),
+                        child: Text(c.nameCategory),
+                      ),
                     ),
-                    DropdownMenuItem(
-                      value: 'SUM',
-                      child: Text('Suministros - SUM'),
-                    ),
-                    DropdownMenuItem(
-                      value: 'REP',
-                      child: Text('Repuestos - REP'),
-                    ),
-                    DropdownMenuItem(
-                      value: 'BAL',
-                      child: Text('Balanceado - BAL'),
-                    ),
-                    DropdownMenuItem(value: 'LAR', child: Text('Larvas - LAR')),
-                    DropdownMenuItem(
-                      value: 'MAQ',
-                      child: Text('Maquinaria - MAQ'),
-                    ),
-                    DropdownMenuItem(
-                      value: 'EQUI',
-                      child: Text('Equipos - EQUI'),
-                    ),
-                    DropdownMenuItem(
-                      value: 'COMB',
-                      child: Text('Combustibles / Lubricantes'),
-                    ),
-                    DropdownMenuItem(value: 'OTS', child: Text('Otros')),
                   ],
                   onChanged: (v) {
                     if (v != null) {
@@ -206,34 +191,6 @@ class _ExitReportFormState extends State<ExitReportForm> {
                       return messageValidatorEmpty;
                     }
                     return null;
-                  },
-                ),
-
-                const SizedBox(height: 12),
-
-                CustomFieldLabelRequired(txtLabel: 'Producto'),
-                GlowDropdownFormField<String>(
-                  value: _categoryEntry,
-                  focusNode: _categoryEntryFocus,
-                  decoration: styleDecoration(),
-                  items: const [
-                    DropdownMenuItem(
-                      value: '0',
-                      child: Text('Seleccione una opción'),
-                    ),
-                    DropdownMenuItem(
-                      value: 'CAM',
-                      child: Text('Camarón'),
-                    ),
-                    DropdownMenuItem(
-                      value: 'TIL',
-                      child: Text('Tilapia'),
-                    ),
-                  ],
-                  onChanged: (v) {
-                    if (v != null) {
-                      setState(() => _categoryEntry = v);
-                    }
                   },
                 ),
 
