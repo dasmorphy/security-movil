@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:zentinel/config/utils/helper.dart';
+import 'package:zentinel/domain/entities/unity_weight.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
@@ -23,6 +25,7 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
   final _authorizedCtrl = TextEditingController();
   final _observationsCtrl = TextEditingController();
   final _personWithdrawsCtrl = TextEditingController();
+  int? _unityId;
 
   final FocusNode _guideFocus = FocusNode();
   final FocusNode _weightFocus = FocusNode();
@@ -57,7 +60,16 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
 
   void _submit() {
     if (!(_formKey.currentState?.validate() ?? false)) return;
+
+    if (_unityId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Debe seleccionar una categoría válida')),
+      );
+      return;
+    }
+
     final data = {
+      "id_unity": _unityId,
       "id_category": int.parse(_categoryEntry), //
       "shipping_guide": _guideCtrl.text.trim(),
       "name_driver": _nameDriverCtrl.text.trim(),
@@ -83,6 +95,7 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final categories = ref.watch(getAllCategories);
+    final unitiesWeight = ref.watch(getAllUnitiesWeight);
     final messageValidatorEmpty = 'Este campo es obligatorio';
     final fieldFill = const Color.fromARGB(255, 20, 21, 23);
     final borderRadius = BorderRadius.circular(8.0);
@@ -183,6 +196,13 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                   onChanged: (v) {
                     if (v != null) {
                       setState(() => _categoryEntry = v);
+                      _unityId = getUnityIdByCategory(
+                        nameCategory: categories.firstWhere(
+                          (u) => u.idCategory== int.parse(v),
+                          orElse: () => throw Exception('Categoría no encontrada'),
+                        ).nameCategory,
+                        unities: unitiesWeight,
+                      );
                     }
                   },
                 ),

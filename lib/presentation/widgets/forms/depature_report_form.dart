@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 
@@ -15,7 +16,7 @@ class DepatureReportForm extends ConsumerStatefulWidget {
 class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
   final _formKey = GlobalKey<FormState>();
   String _categoryEntry = '0';
-  String _unit = '0';
+  int? _unityId;
   final _guideCtrl = TextEditingController();
   final _descCtrl = TextEditingController();
   final _quantityCtrl = TextEditingController();
@@ -62,7 +63,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
     print("fdsfds");
     if (!(_formKey.currentState?.validate() ?? false)) return;
     final data = {
-      "id_unity": int.parse(_unit),
+      "id_unity": _unityId,
       "id_category": int.parse(_categoryEntry),
       "shipping_guide": _guideCtrl.text.trim(),
       "description": _descCtrl.text.trim(),
@@ -193,6 +194,13 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                   onChanged: (v) {
                     if (v != null) {
                       setState(() => _categoryEntry = v);
+                      _unityId = getUnityIdByCategory(
+                        nameCategory: categories.firstWhere(
+                          (u) => u.idCategory== int.parse(v),
+                          orElse: () => throw Exception('Categoría no encontrada'),
+                        ).nameCategory,
+                        unities: unitiesWeight,
+                      );
                     }
                   },
                 ),
@@ -242,11 +250,13 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                 const SizedBox(height: 12),
                 CustomFieldLabelRequired(txtLabel: 'Unidad'),
                 GlowDropdownFormField<String>(
-                  value: _unit,
+                  enabled: false,
+                  value: _unityId?.toString() ?? '0',
                   focusNode: _unitFocus,
                   decoration: styleDecoration(),
                   items: [
                     DropdownMenuItem(
+                      enabled: false,
                       value: '0',
                       child: Text('Seleccione una opción'),
                     ),
@@ -258,9 +268,9 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                     ),
                   ],
                   onChanged: (v) {
-                    if (v != null) {
-                      setState(() => _unit = v);
-                    }
+                    // if (v != null) {
+                    //   setState(() => _unit = v);
+                    // }
                   },
                 ),
 
@@ -270,7 +280,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                   controller: _weightCtrl,
                   focusNode: _weightFocus,
                   keyboardType: TextInputType.number,
-                  hint: _unit == '0' ? '' : _unit,
+                  // hint: _unit == '0' ? '' : _unit,
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   validator: (v) {
                     if (v == null || v.isEmpty) return messageValidatorEmpty;
@@ -343,7 +353,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                         onPressed: () {
                           _formKey.currentState?.reset();
                           _categoryEntry = '0';
-                          _unit = '0';
+                          _unityId = null;
                           _guideCtrl.clear();
                           _descCtrl.clear();
                           _quantityCtrl.clear();
