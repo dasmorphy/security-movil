@@ -58,7 +58,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
       bottomNavigationBar: CustomBottomNavigation(
         currentIndex: index,
-        onTap: (i) => ref.read(homeTabProvider.notifier).state = i,
+        onTap: (i) {
+          ref.read(homeTabProvider.notifier).state = i;
+          
+          if (i == 0) {
+            ref.read(getHistoryLogbooks.notifier).load();
+          }
+        },
       ),
     );
   }

@@ -31,6 +31,19 @@ final saveOutLogbookProvider =
 });
 
 
+final getHistoryLogbooks = StateNotifierProvider<CatalogNotifier<Map<String, dynamic>>, List<Map<String, dynamic>>>((ref) {
+    final repo = ref.watch(logbookEntryRepositoryProvider);
+    return CatalogNotifier<Map<String, dynamic>>(repo.getHistoryLogbooks);
+});
+
+
+final downloadReport =
+    StateNotifierProvider<ReportDownloadNotifier, void>((ref) {
+  final repo = ref.watch(logbookEntryRepositoryProvider);
+  return ReportDownloadNotifier(repo);
+});
+
+
 typedef FetchListCallback<T> = Future<List<T>> Function();
 
 class CatalogNotifier<T> extends StateNotifier<List<T>> {
@@ -92,3 +105,20 @@ class OutLogbookNotifier extends StateNotifier<AsyncValue<bool>> {
   }
 }
 
+
+class ReportDownloadNotifier extends StateNotifier<void> {
+  final LogbookEntryRepository repository;
+
+  ReportDownloadNotifier(this.repository)
+      : super(const AsyncData(false));
+
+  Future<void> downloadReport() async {
+    print("downloadReport");
+    // print(data);
+    // try {
+      await repository.downloadExcel();
+    // } catch (e, st) {
+    //   return false;
+    // }
+  }
+}

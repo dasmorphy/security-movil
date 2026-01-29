@@ -5,20 +5,28 @@ class BasicServiceCard extends StatelessWidget {
   final String iconImage;
   final String label;
   final Color backgroundColor;
-  final Widget childWidget;
-
+  final Widget? childWidget;
+  final VoidCallback? onTap;
+  
   const BasicServiceCard({
     super.key,
     required this.iconImage,
     required this.label,
-    required this.childWidget,
-    this.backgroundColor = const Color(0xFF2a2a2a),
+    this.childWidget,
+    this.backgroundColor = const Color(0xFF2a2a2a), 
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => _openModal(context, null),
+      onTap: () {
+        if (onTap != null) {
+          onTap!(); // 👉 descarga u otra acción
+        } else if (childWidget != null) {
+          _openModal(context, null); // 👉 abre modal
+        }
+      },
       child: Container(
         decoration: BoxDecoration(
           color: backgroundColor,

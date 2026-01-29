@@ -99,14 +99,21 @@ class _BasicServicesStionState extends ConsumerState<BasicServicesSection> {
             crossAxisCount: 3,
             shrinkWrap: true,
             physics: const BouncingScrollPhysics(),
-            mainAxisSpacing: 12,
-            crossAxisSpacing: 7,
+            mainAxisSpacing: 10,
+            crossAxisSpacing: 11,
             childAspectRatio: 0.9,
-            children: const [
+            children: [
               BasicServiceCard(
                 iconImage: 'iconregistro',
                 label: 'Reporte Totalizado',
                 childWidget: TotalReport(),
+              ),
+              BasicServiceCard(
+                iconImage: 'iconregistro',
+                label: 'Generar Reporte',
+                onTap: () async {
+                  await ref.read(downloadReport.notifier).downloadReport();
+                },
               ),
             ],
           ),

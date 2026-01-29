@@ -3,6 +3,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lottie/lottie.dart';
+import 'package:zentinel/config/utils/helper.dart';
+import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
 class HomeView extends ConsumerStatefulWidget {
@@ -19,7 +21,8 @@ class HomeViewState extends ConsumerState<HomeView> {
   void initState() {
     //En los metodos llmar el metodo read en los providers (flutter favorite)
     super.initState();
-    // ref.read(nowPlayingMoviesProvider.notifier).loadNextPage();
+    ref.read(getHistoryLogbooks.notifier).load();
+
     // ref.read(popularMoviesProvider.notifier).loadNextPage();
     // ref.read(upcomingMoviesProvider.notifier).loadNextPage();
     // ref.read(topRatedMoviesProvider.notifier).loadNextPage();
@@ -120,10 +123,10 @@ class HomeViewState extends ConsumerState<HomeView> {
         fit: StackFit.expand,
         children: [
           //Imagen de fondo
-          Image.network(
-            'https://definicion.de/wp-content/uploads/2009/12/paisaje-1.jpg',
-            fit: BoxFit.cover,
-          ),
+          // Image.network(
+          //   'https://definicion.de/wp-content/uploads/2009/12/paisaje-1.jpg',
+          //   fit: BoxFit.cover,
+          // ),
 
           //Blur
           BackdropFilter(
@@ -181,18 +184,33 @@ class HomeViewState extends ConsumerState<HomeView> {
   }
 
   List<Widget> _buildBitacoraItems(BuildContext context) {
-    final bitacoras = [
-      {
-        'name': 'Daniel Males',
-        'description': 'Bitacora de ingreso Camanglar 1',
-      },
-      {'name': 'Jhonny', 'description': 'Bitacora de salida Camanglar 2'},
-      {'name': 'Francisco', 'description': 'Bitacora de salida Camanglar 1'},
-      {'name': 'Juan', 'description': 'Bitacora de ingreso Camanglar 3'},
-    ];
+    final historyLogbooks = ref.watch(getHistoryLogbooks);
+    final limitedList = historyLogbooks.take(5).toList();
 
-    return List.generate(bitacoras.length, (index) {
-      final item = bitacoras[index];
+    if (historyLogbooks.isEmpty) {
+      return [
+        const Text(
+          'No hay registros',
+          style: TextStyle(color: Colors.white54),
+        )
+      ];
+    }
+
+    return List.generate(limitedList.length, (index) {
+      final item = limitedList[index];
+
+      final isEntry = item.containsKey('id_logbook_entry');
+      final typeText = isEntry ? 'ingreso' : 'salida';
+
+      final createdBy = item['created_by'] ?? '—';
+      final groupName = item['group_name'] ?? '—';
+
+      final description = isEntry
+          ? 'Bitácora de $typeText en $groupName'
+          : 'Bitácora de $typeText en $groupName';
+
+      final formattedDate = formatDate(item['created_at']);
+
       return Padding(
         padding: const EdgeInsets.only(bottom: 12),
         child: Row(
@@ -219,7 +237,7 @@ class HomeViewState extends ConsumerState<HomeView> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    item['name'] as String,
+                    createdBy,
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: Colors.white,
                       fontWeight: FontWeight.w600,
@@ -227,7 +245,15 @@ class HomeViewState extends ConsumerState<HomeView> {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    item['description'] as String,
+                    description,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: const Color.fromARGB(255, 180, 180, 180),
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    formattedDate,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: const Color.fromARGB(255, 180, 180, 180),
                       fontWeight: FontWeight.w400,

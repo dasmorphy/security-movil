@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:zentinel/domain/entities/unity_weight.dart';
+import 'package:intl/intl.dart';
 
 final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
     GlobalKey<ScaffoldMessengerState>();
@@ -109,3 +110,10 @@ Options onlyError() => Options(
 Options successAndError() => Options(
   extra: {'showErrorMessage': true, 'showSuccessMessage': true},
 );
+
+
+String formatDate(String isoDate) {
+  final date = DateTime.parse(isoDate);
+  return DateFormat('dd/MM/yyyy HH:mm').format(date);
+}
+

@@ -33,4 +33,14 @@ class LogbookEntryRepositoryImpl extends LogbookEntryRepository {
     return datasource.saveLogbookOut(data);
   }
   
+  @override
+  Future <List<Map<String, dynamic>>> getHistoryLogbooks() {
+    return datasource.getHistoryLogbooks();
+  }
+  
+  @override
+  Future<void> downloadExcel() {
+    return datasource.downloadExcel();
+  }
+  
 }
