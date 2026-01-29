@@ -70,16 +70,16 @@ class _BasicServicesStionState extends ConsumerState<BasicServicesSection> {
                   },
                 ),
               ),
-              BasicServiceCard(
-                iconImage: 'iconcamara',
-                label: 'Monitoreo de Cámaras',
-                childWidget: DepatureReportForm(),
-              ),
-              BasicServiceCard(
-                iconImage: 'iconseguridad',
-                label: 'Seguridad',
-                childWidget: DepatureReportForm(),
-              ),
+              // BasicServiceCard(
+              //   iconImage: 'iconcamara',
+              //   label: 'Monitoreo de Cámaras',
+              //   childWidget: DepatureReportForm(),
+              // ),
+              // BasicServiceCard(
+              //   iconImage: 'iconseguridad',
+              //   label: 'Seguridad',
+              //   childWidget: DepatureReportForm(),
+              // ),
             ],
           ),
 

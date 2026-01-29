@@ -41,32 +41,31 @@ class HomeViewState extends ConsumerState<HomeView> {
               children: [
                 const SizedBox(height: 10),
 
-                // Publicidad
-                PublicityCard(),
+                
 
-                const SizedBox(height: 32),
-                // Título Monitoreo
-                Text(
-                  'Monitoreo',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 5),
-                // Grilla de Cámaras 2x2
-                GridView.count(
-                  crossAxisCount: 2,
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  crossAxisSpacing: 12,
-                  mainAxisSpacing: 12,
-                  children: List.generate(
-                    4,
-                    (index) => _buildCameraCard(context, 'Cámara ${index + 1}'),
-                  ),
-                ),
-                const SizedBox(height: 32),
+                // const SizedBox(height: 32),
+                // // Título Monitoreo
+                // Text(
+                //   'Monitoreo',
+                //   style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                //     color: Colors.white,
+                //     fontWeight: FontWeight.w600,
+                //   ),
+                // ),
+                // const SizedBox(height: 5),
+                // // Grilla de Cámaras 2x2
+                // GridView.count(
+                //   crossAxisCount: 2,
+                //   shrinkWrap: true,
+                //   physics: const NeverScrollableScrollPhysics(),
+                //   crossAxisSpacing: 12,
+                //   mainAxisSpacing: 12,
+                //   children: List.generate(
+                //     4,
+                //     (index) => _buildCameraCard(context, 'Cámara ${index + 1}'),
+                //   ),
+                // ),
+                // const SizedBox(height: 32),
 
                 // Bitácoras Recientes
                 Container(
@@ -105,6 +104,10 @@ class HomeViewState extends ConsumerState<HomeView> {
                     ],
                   ),
                 ),
+
+                const SizedBox(height: 15),
+                // Publicidad
+                PublicityCard(),
               ],
             ),
           ),
