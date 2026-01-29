@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 
 class DepatureReportForm extends ConsumerStatefulWidget {
-  final void Function(Map<String, dynamic>)? onSubmit;
+  final Future<bool> Function(Map<String, dynamic>)? onSubmit;
   const DepatureReportForm({super.key, this.onSubmit});
 
   @override
@@ -59,9 +60,15 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
     super.dispose();
   }
 
-  void _submit() {
+  void _submit() async {
     print("fdsfds");
     if (!(_formKey.currentState?.validate() ?? false)) return;
+    if (_unityId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Debe seleccionar una categoría válida')),
+      );
+      return;
+    }
     final data = {
       "id_unity": _unityId,
       "id_category": int.parse(_categoryEntry),
@@ -74,14 +81,20 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
       "authorized_by": _authorizedCtrl.text.trim(),
       "observations": _observationsCtrl.text.trim(),
       "created_by": "dmales",
+      "id_group_business": 1,
     };
-    widget.onSubmit?.call(data);
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Formulario enviado'),
-        backgroundColor: Colors.green,
-      ),
-    );
+    
+    final success = await widget.onSubmit?.call(data) ?? false;
+    print('Error apiiiii response: $success');
+    if (success) {
+      if (mounted) {
+        context.go('/check-success');
+      }
+    } else {
+      if (mounted) {
+        context.pop();
+      }
+    }
   }
 
   @override
@@ -181,6 +194,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                   decoration: styleDecoration(),
                   items: [
                     DropdownMenuItem(
+                      enabled: false,
                       value: '0',
                       child: Text('Seleccione una opción'),
                     ),
@@ -338,9 +352,6 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                   controller: _observationsCtrl,
                   focusNode: _observationsFocus,
                   validator: (v) {
-                    if (v == null || v.trim().isEmpty) {
-                      return messageValidatorEmpty;
-                    }
                     return null;
                   },
                 ),

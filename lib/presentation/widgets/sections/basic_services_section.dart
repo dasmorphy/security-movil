@@ -56,7 +56,7 @@ class _BasicServicesStionState extends ConsumerState<BasicServicesSection> {
                 childWidget: DepatureReportForm(
                   onSubmit: (data) async {
                     print(data);
-                    await ref.read(saveDepatureReportProvider.notifier).saveLogbookEntry(data);
+                    return await ref.read(saveDepatureReportProvider.notifier).saveLogbookEntry(data);
                   },
                 ),
               ),
@@ -66,7 +66,7 @@ class _BasicServicesStionState extends ConsumerState<BasicServicesSection> {
                 childWidget: ExitReportForm(
                   onSubmit: (data) async {
                     print(data);
-                    await ref.read(saveOutLogbookProvider.notifier).saveLogbookOut(data);
+                    return await ref.read(saveOutLogbookProvider.notifier).saveLogbookOut(data);
                   },
                 ),
               ),

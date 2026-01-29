@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/domain/entities/unity_weight.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
 class ExitReportForm extends ConsumerStatefulWidget {
-  final void Function(Map<String, dynamic>)? onSubmit;
+  final Future<bool> Function(Map<String, dynamic>)? onSubmit;
   const ExitReportForm({super.key, this.onSubmit});
 
   @override
@@ -37,6 +38,7 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
   final FocusNode _observationsFocus = FocusNode();
   final FocusNode _categoryEntryFocus = FocusNode();
   final FocusNode _personWithdrawsFocus = FocusNode();
+  final FocusNode _unitFocus = FocusNode();
 
   @override
   void initState() {
@@ -58,7 +60,7 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
     super.dispose();
   }
 
-  void _submit() {
+  void _submit() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
     if (_unityId == null) {
@@ -81,14 +83,19 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
       "authorized_by": _authorizedCtrl.text.trim(), //
       "observations": _observationsCtrl.text.trim(), 
       "created_by": "dmales", //
+      "id_group_business": 1,
     };
-    widget.onSubmit?.call(data);
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Formulario enviado'),
-        backgroundColor: Colors.green,
-      ),
-    );
+    final success = await widget.onSubmit?.call(data) ?? false;
+    
+    if (success) {
+      if (mounted) {
+        context.go('/check-success');
+      }
+    } else {
+        if (mounted) {
+          context.pop();
+        }
+    }
   }
 
   @override
@@ -236,7 +243,34 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                 ),
 
                 const SizedBox(height: 12),
-                CustomFieldLabelRequired(txtLabel: 'Peso (Libras)'),
+                CustomFieldLabelRequired(txtLabel: 'Unidad'),
+                GlowDropdownFormField<String>(
+                  enabled: false,
+                  value: _unityId?.toString() ?? '0',
+                  focusNode: _unitFocus,
+                  decoration: styleDecoration(),
+                  items: [
+                    DropdownMenuItem(
+                      enabled: false,
+                      value: '0',
+                      child: Text('Seleccione una opción'),
+                    ),
+                    ...unitiesWeight.map(
+                      (c) => DropdownMenuItem(
+                        value: c.idUnity.toString(),
+                        child: Text('${c.name} - ${c.code}'),
+                      ),
+                    ),
+                  ],
+                  onChanged: (v) {
+                    // if (v != null) {
+                    //   setState(() => _unit = v);
+                    // }
+                  },
+                ),
+
+                const SizedBox(height: 12),
+                CustomFieldLabelRequired(txtLabel: 'Peso'),
                 GlowTextFormField(
                   controller: _weightCtrl,
                   focusNode: _weightFocus,
@@ -328,9 +362,6 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                   controller: _observationsCtrl,
                   focusNode: _observationsFocus,
                   validator: (v) {
-                    if (v == null || v.trim(). isEmpty) {
-                      return messageValidatorEmpty;
-                    }
                     return null;
                   },
                 ),

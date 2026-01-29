@@ -1,39 +1,45 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:zentinel/config/utils/helper.dart';
+import 'package:zentinel/presentation/providers/logbook/logbook_provider.dart';
+import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/views/views.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
-class HomeScreen extends StatefulWidget {
-
+class HomeScreen extends ConsumerStatefulWidget {
   static const name = 'home-screen';
 
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
-  int _currentIndex = 0;
+class _HomeScreenState extends ConsumerState<HomeScreen> {
+  final viewRoutes = const <Widget>[HomeView(), CategoryView(), ProfileView()];
 
-  final viewRoutes = const <Widget> [
-    HomeView(),
-    CategoryView(),
-    ProfileView(),
-  ];
-
-  void _onTabTapped(int index, BuildContext context) {
-    print(index);
-    // if (index == 4) {
-    //   context.go('/home/depature-report');
-    //   return;
-    // }
-    setState(() {
-      _currentIndex = index;
-    });
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<GlobalInterceptorDioProvider?>(globalMessageProvider, (prev, next) {
+      if (next != null) {
+        scaffoldMessengerKey.currentState?.showSnackBar(
+          SnackBar(
+            content: Text(next.text),
+            backgroundColor: next.isError ? Colors.red : Colors.green,
+            duration: const Duration(seconds: 7),
+          ),
+        );
+
+        ref.read(globalMessageProvider.notifier).clear();
+      }
+    });
+
+    final index = ref.watch(homeTabProvider);
     return Scaffold(
       // appBar: PreferredSize(
       //   preferredSize: const Size.fromHeight(300),
@@ -44,14 +50,15 @@ class _HomeScreenState extends State<HomeScreen> {
       body: SafeArea(
         top: false,
         // bottom: false,
-        child: IndexedStack( //Widget para conservar el estado de la pagina (ej Si hace scroll dejarlo tal cual)
-          index: _currentIndex,
+        child: IndexedStack(
+          //Widget para conservar el estado de la pagina (ej Si hace scroll dejarlo tal cual)
+          index: index,
           children: viewRoutes,
         ),
       ),
       bottomNavigationBar: CustomBottomNavigation(
-        currentIndex: _currentIndex,
-        onTap: (index) => _onTabTapped(index, context),
+        currentIndex: index,
+        onTap: (i) => ref.read(homeTabProvider.notifier).state = i,
       ),
     );
   }

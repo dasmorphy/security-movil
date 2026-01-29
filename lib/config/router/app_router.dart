@@ -28,6 +28,11 @@ final appRouter = GoRouter(
           path: '/change-email',
           name: ChangeEmailScreen.name,
           builder: (context, state) => const ChangeEmailScreen()
+        ),
+        GoRoute(
+          path: '/check-success',
+          name: CheckSuccessScreen.name,
+          builder: (context, state) => const CheckSuccessScreen()
         )
       ]
     ),

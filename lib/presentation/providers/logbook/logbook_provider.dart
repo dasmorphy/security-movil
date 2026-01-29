@@ -4,6 +4,8 @@ import 'package:zentinel/domain/entities/unity_weight.dart';
 import 'package:zentinel/domain/repositories/logbook_entry_repository.dart';
 import 'package:zentinel/presentation/providers/logbook/logbook_repository_provider.dart';
 
+final homeTabProvider = StateProvider<int>((ref) => 0);
+
 final getAllCategories =
     StateNotifierProvider<CatalogNotifier<Category>, List<Category>>((ref) {
   final repo = ref.watch(logbookEntryRepositoryProvider);
@@ -17,13 +19,13 @@ final getAllUnitiesWeight =
 });
 
 final saveDepatureReportProvider =
-    StateNotifierProvider<DepatureReportNotifier, AsyncValue<void>>((ref) {
+    StateNotifierProvider<DepatureReportNotifier, AsyncValue<bool>>((ref) {
   final repo = ref.watch(logbookEntryRepositoryProvider);
   return DepatureReportNotifier(repo);
 });
 
 final saveOutLogbookProvider =
-    StateNotifierProvider<OutLogbookNotifier, AsyncValue<void>>((ref) {
+    StateNotifierProvider<OutLogbookNotifier, AsyncValue<bool>>((ref) {
   final repo = ref.watch(logbookEntryRepositoryProvider);
   return OutLogbookNotifier(repo);
 });
@@ -48,40 +50,44 @@ class CatalogNotifier<T> extends StateNotifier<List<T>> {
   }
 }
 
-class DepatureReportNotifier extends StateNotifier<AsyncValue<void>> {
+class DepatureReportNotifier extends StateNotifier<AsyncValue<bool>> {
   final LogbookEntryRepository repository;
 
   DepatureReportNotifier(this.repository)
-      : super(const AsyncData(null));
+      : super(const AsyncData(false));
 
-  Future<void> saveLogbookEntry(Map<String, dynamic> data) async {
+  Future<bool> saveLogbookEntry(Map<String, dynamic> data) async {
     state = const AsyncLoading();
     print("saveLogbookEntry");
     print(data);
     try {
-      await repository.saveLogbookEntry(data);
-      state = const AsyncData(null);
+      final success = await repository.saveLogbookEntry(data);
+      state = AsyncData(success);
+      return success;
     } catch (e, st) {
       state = AsyncError(e, st);
+      return false;
     }
   }
 }
 
-class OutLogbookNotifier extends StateNotifier<AsyncValue<void>> {
+class OutLogbookNotifier extends StateNotifier<AsyncValue<bool>> {
   final LogbookEntryRepository repository;
 
   OutLogbookNotifier(this.repository)
-      : super(const AsyncData(null));
+      : super(const AsyncData(false));
 
-  Future<void> saveLogbookOut(Map<String, dynamic> data) async {
+  Future<bool> saveLogbookOut(Map<String, dynamic> data) async {
     state = const AsyncLoading();
     print("saveLogbookOut");
     print(data);
     try {
-      await repository.saveLogbookOut(data);
-      state = const AsyncData(null);
+      final success = await repository.saveLogbookOut(data);
+      state = AsyncData(success);
+      return success;
     } catch (e, st) {
       state = AsyncError(e, st);
+      return false;
     }
   }
 }

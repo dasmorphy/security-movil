@@ -9,6 +9,7 @@ import 'package:flutter_localization/flutter_localization.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
+import 'package:zentinel/config/utils/helper.dart';
 
 Future<void> main() async {
   await dotenv.load(fileName: '.env');
@@ -37,6 +38,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   final FlutterLocalization _localization = FlutterLocalization.instance;
+  // final scaffoldMessengerKeyy = GlobalKey<ScaffoldMessengerState>();
 
   @override
   void initState() {
@@ -58,6 +60,7 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
+      scaffoldMessengerKey: scaffoldMessengerKey,
       routerConfig: appRouter,
       debugShowCheckedModeBanner: false,
       supportedLocales: _localization.supportedLocales,

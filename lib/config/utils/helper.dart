@@ -1,5 +1,9 @@
+import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:zentinel/domain/entities/unity_weight.dart';
 
+final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
+    GlobalKey<ScaffoldMessengerState>();
 
 int getUnityIdByCategory({
   required String nameCategory,
@@ -85,7 +89,6 @@ int getUnityIdByCategory({
     return unity.idUnity;
   }
 
-
   // fallback o regla por defecto
   final defaultUnity = unities.firstWhere(
     (u) => u.name == 'LIBRAS',
@@ -94,3 +97,15 @@ int getUnityIdByCategory({
 
   return defaultUnity.idUnity;
 }
+
+Options noMessages() => Options(
+  extra: {'showErrorMessage': false, 'showSuccessMessage': false},
+);
+
+Options onlyError() => Options(
+  extra: {'showErrorMessage': true, 'showSuccessMessage': false},
+);
+
+Options successAndError() => Options(
+  extra: {'showErrorMessage': true, 'showSuccessMessage': true},
+);

@@ -111,7 +111,7 @@ class _VideoHeaderState extends State<VideoHeader> {
                             InkWell(
                               borderRadius: BorderRadius.circular(20),
                               onTap: () {
-                                print('jjkjj');
+                                context.go('/check-success');
                               },
                               child: const Padding(
                                 padding: EdgeInsets.all(7),
