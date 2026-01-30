@@ -88,17 +88,17 @@ class _LoginFormState extends ConsumerState<LoginForm> {
             // prefixIcon: const Icon(Icons.lock, color: Colors.white70),
           ),
         ),
-        const SizedBox(height: 12),
-        Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: const Text(
-              'Ingrese un usuario y contraseña válidos.', 
-            style: TextStyle(
-              color: Color.fromARGB(255, 162, 15, 15), 
-              fontSize: 14,
-              fontWeight: FontWeight.bold
-            )),
-        ),
+        // const SizedBox(height: 12),
+        // Padding(
+        //   padding: const EdgeInsets.all(8.0),
+        //   child: const Text(
+        //       'Ingrese un usuario y contraseña válidos.', 
+        //     style: TextStyle(
+        //       color: Color.fromARGB(255, 162, 15, 15), 
+        //       fontSize: 14,
+        //       fontWeight: FontWeight.bold
+        //     )),
+        // ),
 
         const SizedBox(height: 30),
         
@@ -149,7 +149,7 @@ void validateUser(BuildContext context, String password, String email, WidgetRef
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Ingrese un usuario y contraseña válidos.'),
-        backgroundColor: Color.fromARGB(255, 212, 219, 19),
+        backgroundColor: Color.fromARGB(255, 219, 66, 19),
         duration: Duration(seconds: 3),
       ),
     );
@@ -159,12 +159,14 @@ void validateUser(BuildContext context, String password, String email, WidgetRef
       'email': email,
       'name': 'Administrador',
       'user': email,
+      'group_business': 1,
+      'name_group_business': 'Camanglar 1',
       'role': 'admin',
       'business': 'Expalsa'
     };
     ref.read(authProvider.notifier).authUser(dataUser);
     context.go('/');
-  } else if (email == 'dmales@hotmail.com' && password == '123456') {
+  } else if (email == 'camanglar1@hotmail.com' && password == '123456') {
     final dataUser = {
       'email': email,
       'name': 'Daniel Males',
@@ -175,7 +177,7 @@ void validateUser(BuildContext context, String password, String email, WidgetRef
     };
     ref.read(authProvider.notifier).authUser(dataUser);
     context.go('/');
-  } else if (email == 'dcedeno@hotmail.com' && password == '123456') {
+  } else if (email == 'camanglar2@hotmail.com' && password == '123456') {
     final dataUser = {
       'email': email,
       'user': email,
@@ -186,7 +188,7 @@ void validateUser(BuildContext context, String password, String email, WidgetRef
     };
     ref.read(authProvider.notifier).authUser(dataUser);
     context.go('/');
-  } else if (email == 'dvillamar@hotmail.com' && password == '123456') {
+  } else if (email == 'camanglar3@hotmail.com' && password == '123456') {
     final dataUser = {
       'email': email,
       'user': email,
@@ -201,7 +203,7 @@ void validateUser(BuildContext context, String password, String email, WidgetRef
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
         content: Text('Usuario o contraseña incorrectos.'),
-        backgroundColor: Color.fromARGB(255, 212, 19, 19),
+        backgroundColor: Color.fromARGB(255, 219, 66, 19),
         duration: Duration(seconds: 3),
       ),
     );

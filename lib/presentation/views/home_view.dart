@@ -205,7 +205,7 @@ class HomeViewState extends ConsumerState<HomeView> {
       final isEntry = item.containsKey('id_logbook_entry');
       final typeText = isEntry ? 'ingreso' : 'salida';
 
-      final createdBy = item['created_by'] ?? '—';
+      final createdBy = item['name_user'] ?? '—';
       final groupName = item['group_name'] ?? '—';
 
       final description = isEntry

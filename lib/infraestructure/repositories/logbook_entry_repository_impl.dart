@@ -34,8 +34,8 @@ class LogbookEntryRepositoryImpl extends LogbookEntryRepository {
   }
   
   @override
-  Future <List<Map<String, dynamic>>> getHistoryLogbooks() {
-    return datasource.getHistoryLogbooks();
+  Future <List<Map<String, dynamic>>> getHistoryLogbooks(Map<String, dynamic> filters) {
+    return datasource.getHistoryLogbooks(filters);
   }
   
   @override

@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zentinel/domain/entities/category.dart';
 import 'package:zentinel/domain/entities/unity_weight.dart';
 import 'package:zentinel/domain/repositories/logbook_entry_repository.dart';
+import 'package:zentinel/presentation/providers/auth/auth_provider.dart';
 import 'package:zentinel/presentation/providers/logbook/logbook_repository_provider.dart';
 
 final homeTabProvider = StateProvider<int>((ref) => 0);
@@ -9,14 +10,22 @@ final homeTabProvider = StateProvider<int>((ref) => 0);
 final getAllCategories =
     StateNotifierProvider<CatalogNotifier<Category>, List<Category>>((ref) {
   final repo = ref.watch(logbookEntryRepositoryProvider);
-  return CatalogNotifier<Category>(repo.getAllCategory);
+
+  return CatalogNotifier<Category>(
+    (_) => repo.getAllCategory(),
+  );
 });
+
 
 final getAllUnitiesWeight =
     StateNotifierProvider<CatalogNotifier<UnityWeight>, List<UnityWeight>>((ref) {
   final repo = ref.watch(logbookEntryRepositoryProvider);
-  return CatalogNotifier<UnityWeight>(repo.getAllUnitsWeight);
+
+  return CatalogNotifier<UnityWeight>(
+    (_) => repo.getAllUnitsWeight(),
+  );
 });
+
 
 final saveDepatureReportProvider =
     StateNotifierProvider<DepatureReportNotifier, AsyncValue<bool>>((ref) {
@@ -31,10 +40,27 @@ final saveOutLogbookProvider =
 });
 
 
-final getHistoryLogbooks = StateNotifierProvider<CatalogNotifier<Map<String, dynamic>>, List<Map<String, dynamic>>>((ref) {
+final getHistoryLogbooks =
+    StateNotifierProvider<CatalogNotifier<Map<String, dynamic>>, List<Map<String, dynamic>>>(
+  (ref) {
     final repo = ref.watch(logbookEntryRepositoryProvider);
-    return CatalogNotifier<Map<String, dynamic>>(repo.getHistoryLogbooks);
-});
+    final userData = ref.watch(authProvider);
+
+    return CatalogNotifier<Map<String, dynamic>>(
+      (filters) {
+        final mergedFilters = {
+          // Solo agregar el filtro 'user' si el rol NO es admin
+          if (userData['role'] != 'admin') 'user': userData['name'],
+          ...?filters,
+        };
+        print("Fetching history logbooks with filters:");
+        print(mergedFilters);
+        print(userData);
+        return repo.getHistoryLogbooks(mergedFilters);
+      },
+    );
+  },
+);
 
 
 final downloadReport =
@@ -44,7 +70,9 @@ final downloadReport =
 });
 
 
-typedef FetchListCallback<T> = Future<List<T>> Function();
+typedef FetchListCallback<T> = Future<List<T>> Function(
+  Map<String, dynamic>? filters,
+);
 
 class CatalogNotifier<T> extends StateNotifier<List<T>> {
   final FetchListCallback<T> fetch;
@@ -52,11 +80,11 @@ class CatalogNotifier<T> extends StateNotifier<List<T>> {
 
   CatalogNotifier(this.fetch) : super(const []);
 
-  Future<void> load() async {
+  Future<void> load({Map<String, dynamic>? filters}) async {
     if (_isLoading) return;
     _isLoading = true;
 
-    final data = await fetch();
+    final data = await fetch(filters);
     state = data;
 
     _isLoading = false;

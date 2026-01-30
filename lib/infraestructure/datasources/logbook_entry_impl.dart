@@ -75,7 +75,7 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
   }
 
   @override
-  Future<List<Map<String, dynamic>>> getHistoryLogbooks() async {
+  Future<List<Map<String, dynamic>>> getHistoryLogbooks(filter) async {
     // final userData = ref.read(authProvider);
     final response = await dio.get(
       '/rest/zent-logbook-api/v1.0/get/history-logbook',
@@ -83,7 +83,7 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
         headers: {
           'externalTransactionId': 'fcea920f7412b5da7be0cf42b8c93759',
           'channel': 'ZENTINEL',
-          // 'user': userData['name'],
+          'user': filter['user'],
         },
       ),
     );

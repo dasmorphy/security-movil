@@ -6,6 +6,6 @@ abstract class LogbookEntryRepository {
   Future<List<UnityWeight>> getAllUnitsWeight();
   Future<bool> saveLogbookOut(Map<String, dynamic> data);
   Future<bool> saveLogbookEntry(Map<String, dynamic> data);
-  Future <List<Map<String, dynamic>>> getHistoryLogbooks();
+  Future <List<Map<String, dynamic>>> getHistoryLogbooks(Map<String, dynamic> filters);
   Future<void> downloadExcel();
 }
