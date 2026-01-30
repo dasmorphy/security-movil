@@ -89,6 +89,7 @@ class GlowDropdownFormField<T> extends StatelessWidget {
   final FocusNode focusNode;
   final List<DropdownMenuItem<T>> items;
   final ValueChanged<T?> onChanged;
+  final String? Function(T?)? validator; // ✅ AQUÍ
   final InputDecoration decoration;
   final Color glowColor;
 
@@ -100,7 +101,8 @@ class GlowDropdownFormField<T> extends StatelessWidget {
     required this.onChanged,
     required this.decoration,
     this.enabled = true,
-    this.glowColor = const Color.fromARGB(190, 58, 199, 199),
+    this.glowColor = const Color.fromARGB(190, 58, 199, 199), 
+    this.validator,
   });
 
   @override
@@ -129,6 +131,7 @@ class GlowDropdownFormField<T> extends StatelessWidget {
             dropdownColor: decoration.fillColor,
             decoration: decoration,
             items: items,
+            validator: validator,
             onChanged: enabled ? onChanged : null,
             selectedItemBuilder: (context) {
               return items.map((item) {

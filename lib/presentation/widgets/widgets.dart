@@ -9,6 +9,7 @@ export 'package:zentinel/presentation/widgets/headers/header_category.dart';
 export 'package:zentinel/presentation/widgets/cards/basic_service_card.dart';
 export 'package:zentinel/presentation/widgets/sections/basic_services_section.dart';
 export 'package:zentinel/presentation/widgets/modals/animated_modal.dart';
+export 'package:zentinel/presentation/widgets/modals/bitacora_detail_modal.dart';
 export 'package:zentinel/presentation/widgets/report/total_report.dart';
 export 'package:zentinel/presentation/widgets/report/transaction_list_view.dart';
 export 'package:zentinel/presentation/widgets/forms/exit_report_form.dart';

@@ -103,26 +103,6 @@ class LoginScreen extends StatelessWidget {
                                       );
                                     },
                                   ),
-
-                                  // const _GlassCard(
-                                  //   height: 500,
-                                  //   width: 650,
-                                  //   child: Padding(
-                                  //     padding: EdgeInsets.symmetric(
-                                  //       horizontal: 20,
-                                  //     ),
-                                  //     child: Column(
-                                  //       mainAxisAlignment:
-                                  //           MainAxisAlignment.center,
-                                  //       children: [
-                                  //         _Header(),
-                                  //         SizedBox(height: 18),
-                                  //         LoginForm(),
-                                  //       ],
-                                  //     ),
-                                  //   ),
-                                  // ),
-                                  // const _Header(),
                                 ],
                               ),
                             ),

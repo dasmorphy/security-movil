@@ -21,6 +21,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   void initState() {
     super.initState();
+
+    Future.microtask(() {
+      ref.read(homeTabProvider.notifier).state = 0;
+    });
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 
   @override

@@ -5,6 +5,7 @@ import 'package:zentinel/domain/datasources/logbook_entry_datasource.dart';
 import 'package:zentinel/domain/entities/category.dart';
 import 'package:zentinel/domain/entities/unity_weight.dart';
 import 'package:open_filex/open_filex.dart';
+import 'package:zentinel/presentation/providers/auth/auth_provider.dart';
 
 class LogbookEntryImpl extends LogbookEntryDatasource {
   final Dio dio;
@@ -75,12 +76,14 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
 
   @override
   Future<List<Map<String, dynamic>>> getHistoryLogbooks() async {
+    // final userData = ref.read(authProvider);
     final response = await dio.get(
       '/rest/zent-logbook-api/v1.0/get/history-logbook',
       options: Options(
         headers: {
           'externalTransactionId': 'fcea920f7412b5da7be0cf42b8c93759',
           'channel': 'ZENTINEL',
+          // 'user': userData['name'],
         },
       ),
     );

@@ -117,3 +117,14 @@ String formatDate(String isoDate) {
   return DateFormat('dd/MM/yyyy HH:mm').format(date);
 }
 
+String formatDateDetails(String dateString) {
+  try {
+    final normalized = dateString.replaceFirst(' ', 'T');
+    final date = DateTime.parse(normalized);
+    return DateFormat('dd/MM/yyyy HH:mm').format(date);
+  } catch (_) {
+    return dateString; // fallback seguro
+  }
+}
+
+

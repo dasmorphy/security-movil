@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:zentinel/presentation/widgets/modals/animated_modal.dart';
 
 class BasicServiceCard extends StatelessWidget {
   final String iconImage;
@@ -24,7 +25,7 @@ class BasicServiceCard extends StatelessWidget {
         if (onTap != null) {
           onTap!(); // 👉 descarga u otra acción
         } else if (childWidget != null) {
-          _openModal(context, null); // 👉 abre modal
+          _openModal(context); // 👉 abre modal
         }
       },
       child: Container(
@@ -81,21 +82,15 @@ class BasicServiceCard extends StatelessWidget {
     );
   }
 
-  void _openModal(BuildContext context, double? height) {
-    final double heightModal =
-      height ?? MediaQuery.of(context).size.height * 0.89;
-    showMaterialModalBottomSheet(
+  void _openModal(BuildContext context) {
+    showModalBottomSheet(
       context: context,
-      backgroundColor: Color(0xFF1E1E1E),
-      duration: Duration(milliseconds: 600),
-      expand: false,
-      builder: (context) => SingleChildScrollView(
-        controller: ModalScrollController.of(context),
-        child: SizedBox(
-          height: heightModal,
-          child: childWidget
-        ),
-      ),
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      barrierColor: Colors.black54,
+      builder: (_) {
+        return AnimatedModal(child: childWidget ?? const Placeholder());
+      },
     );
   }
 }

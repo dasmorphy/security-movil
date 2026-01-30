@@ -61,8 +61,8 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
   }
 
   void _submit() async {
-    print("fdsfds");
     if (!(_formKey.currentState?.validate() ?? false)) return;
+    final userData = ref.read(authProvider);
     if (_unityId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Debe seleccionar una categoría válida')),
@@ -80,8 +80,9 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
       "destiny_intern": _destinyCtrl.text.trim(),
       "authorized_by": _authorizedCtrl.text.trim(),
       "observations": _observationsCtrl.text.trim(),
-      "created_by": "dmales",
-      "id_group_business": 1,
+      "created_by": userData['user'], //
+      "name_user": userData['name'], //
+      "id_group_business": userData['group_business'], //
     };
     
     final success = await widget.onSubmit?.call(data) ?? false;
@@ -99,6 +100,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
 
   @override
   Widget build(BuildContext context) {
+    final userData = ref.watch(authProvider);
     final categories = ref.watch(getAllCategories);
     final unitiesWeight = ref.watch(getAllUnitiesWeight);
     final theme = Theme.of(context);
@@ -176,8 +178,8 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                       child: Row(
                         children: [
                           const Icon(Icons.location_on, color: Colors.red,),
-                          const Text(
-                            'Camanglar 3',
+                          Text(
+                            userData['name_group_business'] ?? 'Empresa no asignada',
                             style: TextStyle(color: Colors.white),
                           ),
                         ],
@@ -216,6 +218,12 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                         unities: unitiesWeight,
                       );
                     }
+                  },
+                  validator: (v) {
+                    if (v=='0' || v == null || v.trim().isEmpty) {
+                      return messageValidatorEmpty;
+                    }
+                    return null;
                   },
                 ),
 
@@ -283,8 +291,14 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                   ],
                   onChanged: (v) {
                     // if (v != null) {
-                    //   setState(() => _unit = v);
+                    //   return messageValidatorEmpty;
                     // }
+                  },
+                  validator: (v) {
+                    if (v == null || v.trim().isEmpty) {
+                      return messageValidatorEmpty;
+                    }
+                    return null;
                   },
                 ),
 
@@ -297,9 +311,6 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                   // hint: _unit == '0' ? '' : _unit,
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   validator: (v) {
-                    if (v == null || v.isEmpty) return messageValidatorEmpty;
-                    final n = int.tryParse(v);
-                    if (n == null) return 'Cantidad inválida';
                     return null;
                   },
                 ),
@@ -383,7 +394,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                         ),
                         child: const Text(
                           'Cancelar',
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(color: Colors.white, fontSize: 15),
                         ),
                       ),
                     ),
@@ -392,14 +403,14 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                       child: ElevatedButton(
                         onPressed: _submit,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: Colors.black,
+                          backgroundColor: const Color.fromARGB(189, 7, 213, 213),
+                          foregroundColor: const Color.fromARGB(255, 255, 255, 255),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
                           padding: const EdgeInsets.symmetric(vertical: 14),
                         ),
-                        child: const Text('Guardar'),
+                        child: const Text('Guardar', style: TextStyle(fontSize: 15)),
                       ),
                     ),
                   ],

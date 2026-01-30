@@ -24,6 +24,7 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
   final _truckLicenseCtrl = TextEditingController();
   final _nameDriverCtrl = TextEditingController();
   final _authorizedCtrl = TextEditingController();
+  final _destinyCtrl = TextEditingController();
   final _observationsCtrl = TextEditingController();
   final _personWithdrawsCtrl = TextEditingController();
   int? _unityId;
@@ -62,7 +63,7 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
 
   void _submit() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
-
+    final userData = ref.read(authProvider);
     if (_unityId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Debe seleccionar una categoría válida')),
@@ -82,8 +83,9 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
       "destiny": _nameDriverCtrl.text.trim(), //
       "authorized_by": _authorizedCtrl.text.trim(), //
       "observations": _observationsCtrl.text.trim(), 
-      "created_by": "dmales", //
-      "id_group_business": 1,
+      "created_by": userData['user'], //
+      "name_user": userData['name'], //
+      "id_group_business": userData['group_business'], //
     };
     final success = await widget.onSubmit?.call(data) ?? false;
     
@@ -101,8 +103,10 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final userData = ref.watch(authProvider);
     final categories = ref.watch(getAllCategories);
     final unitiesWeight = ref.watch(getAllUnitiesWeight);
+    // final test = ref.watch(getAllUnitiesWeight);
     final messageValidatorEmpty = 'Este campo es obligatorio';
     final fieldFill = const Color.fromARGB(255, 20, 21, 23);
     final borderRadius = BorderRadius.circular(8.0);
@@ -128,6 +132,8 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
       child: Form(
         key: _formKey,
         child: SingleChildScrollView(
+          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
             child: Column(
@@ -171,13 +177,54 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                       ),
                       child: Row(
                         children: [
-                          const Icon(Icons.location_on, color: Colors.red,),
-                          const Text(
-                            'Camanglar 3',
-                            style: TextStyle(color: Colors.white),
-                          ),
+                          if (userData['name_group_business'] != null) ...[
+                            const Icon(Icons.location_on, color: Colors.red),
+                            const SizedBox(width: 6),
+                            Text(
+                              userData['name_group_business'],
+                              style: const TextStyle(color: Colors.white),
+                            ),
+                          ] else ...[
+                            GlowDropdownFormField<String>(
+                              value: _categoryEntry,
+                              focusNode: _categoryEntryFocus,
+                              decoration: styleDecoration(),
+                              items: [
+                                const DropdownMenuItem(
+                                  value: '0',
+                                  child: Text('Seleccione una opción'),
+                                ),
+                                ...categories.map(
+                                  (c) => DropdownMenuItem(
+                                    value: c.idCategory.toString(),
+                                    child: Text(c.nameCategory),
+                                  ),
+                                ),
+                              ],
+                              onChanged: (v) {
+                                if (v != null) {
+                                  setState(() => _categoryEntry = v);
+
+                                  _unityId = getUnityIdByCategory(
+                                    nameCategory: categories.firstWhere(
+                                      (u) => u.idCategory == int.parse(v),
+                                      orElse: () => throw Exception('Categoría no encontrada'),
+                                    ).nameCategory,
+                                    unities: unitiesWeight,
+                                  );
+                                }
+                              },
+                              validator: (v) {
+                                if (v == '0' || v == null || v.trim().isEmpty) {
+                                  return messageValidatorEmpty;
+                                }
+                                return null;
+                              },
+                            ),
+                          ],
                         ],
                       ),
+
                     ),
                   ),
                 ),
@@ -211,6 +258,12 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                         unities: unitiesWeight,
                       );
                     }
+                  },
+                  validator: (v) {
+                    if (v=='0' || v == null || v.trim().isEmpty) {
+                      return messageValidatorEmpty;
+                    }
+                    return null;
                   },
                 ),
 
@@ -328,8 +381,8 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                   txtLabel: 'Destino',
                 ),
                 GlowTextFormField(
-                  controller: _observationsCtrl,
-                  focusNode: _observationsFocus,
+                  controller: _destinyCtrl,
+                  focusNode: _descFocus,
                   validator: (v) {
                     if (v == null || v.trim().isEmpty) {
                       return messageValidatorEmpty;
@@ -392,7 +445,7 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                         ),
                         child: const Text(
                           'Cancelar',
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(color: Colors.white, fontSize: 15),
                         ),
                       ),
                     ),
@@ -401,14 +454,14 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                       child: ElevatedButton(
                         onPressed: _submit,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: Colors.black,
+                          backgroundColor: const Color.fromARGB(189, 7, 213, 213),
+                          foregroundColor: const Color.fromARGB(255, 255, 255, 255),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
                           padding: const EdgeInsets.symmetric(vertical: 14),
                         ),
-                        child: const Text('Guardar'),
+                        child: const Text('Guardar', style: TextStyle(fontSize: 15)),
                       ),
                     ),
                   ],

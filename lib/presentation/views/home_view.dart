@@ -216,7 +216,10 @@ class HomeViewState extends ConsumerState<HomeView> {
 
       return Padding(
         padding: const EdgeInsets.only(bottom: 12),
-        child: Row(
+        child: InkWell(
+          borderRadius: BorderRadius.circular(8),
+          onTap: () => _openModal(context, BitacoraDetailModal(item: item)),
+          child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             // Icono check
@@ -269,7 +272,20 @@ class HomeViewState extends ConsumerState<HomeView> {
             const Icon(Icons.chevron_right, color: Colors.white, size: 20),
           ],
         ),
+        ),
       );
     });
+  }
+
+  void _openModal(BuildContext context, Widget childWidget) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      barrierColor: Colors.black54,
+      builder: (_) {
+        return AnimatedModal(child: childWidget);
+      },
+    );
   }
 }
