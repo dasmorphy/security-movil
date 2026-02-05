@@ -103,7 +103,7 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final userData = ref.watch(authProvider);
+    final userData = ref.watch(userSessionProvider);
     final categories = ref.watch(getAllCategories);
     final unitiesWeight = ref.watch(getAllUnitiesWeight);
     // final test = ref.watch(getAllUnitiesWeight);
@@ -177,7 +177,7 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                       ),
                       child: Row(
                         children: [
-                          if (userData['name_group_business'] != null) ...[
+                          if (userData?.nameGroupBusiness != null) ...[
                             const Icon(Icons.location_on, color: Colors.red),
                             const SizedBox(width: 6),
                             Text(

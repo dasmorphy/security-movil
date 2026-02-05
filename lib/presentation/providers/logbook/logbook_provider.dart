@@ -44,13 +44,13 @@ final getHistoryLogbooks =
     StateNotifierProvider<CatalogNotifier<Map<String, dynamic>>, List<Map<String, dynamic>>>(
   (ref) {
     final repo = ref.watch(logbookEntryRepositoryProvider);
-    final userData = ref.watch(authProvider);
+    final userData = ref.watch(userSessionProvider);
 
     return CatalogNotifier<Map<String, dynamic>>(
       (filters) {
         final mergedFilters = {
           // Solo agregar el filtro 'user' si el rol NO es admin
-          if (userData['role'] != 'admin') 'user': userData['name'],
+          // if (userData['role'] != 'admin') 'user': userData['name'],
           ...?filters,
         };
         print("Fetching history logbooks with filters:");

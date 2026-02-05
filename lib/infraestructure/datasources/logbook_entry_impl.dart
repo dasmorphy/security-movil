@@ -5,7 +5,6 @@ import 'package:zentinel/domain/datasources/logbook_entry_datasource.dart';
 import 'package:zentinel/domain/entities/category.dart';
 import 'package:zentinel/domain/entities/unity_weight.dart';
 import 'package:open_filex/open_filex.dart';
-import 'package:zentinel/presentation/providers/auth/auth_provider.dart';
 
 class LogbookEntryImpl extends LogbookEntryDatasource {
   final Dio dio;

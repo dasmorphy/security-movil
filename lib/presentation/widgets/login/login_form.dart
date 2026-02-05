@@ -164,7 +164,7 @@ void validateUser(BuildContext context, String password, String email, WidgetRef
       'role': 'admin',
       'business': 'Expalsa'
     };
-    ref.read(authProvider.notifier).authUser(dataUser);
+    ref.read(userSessionProvider.notifier).signin(dataUser);
     context.go('/');
   } else if (email == 'camanglar1@hotmail.com' && password == '123456') {
     final dataUser = {
