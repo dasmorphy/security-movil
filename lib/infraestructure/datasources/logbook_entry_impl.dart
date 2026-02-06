@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/domain/datasources/logbook_entry_datasource.dart';
 import 'package:zentinel/domain/entities/category.dart';
+import 'package:zentinel/domain/entities/group_business.dart';
 import 'package:zentinel/domain/entities/unity_weight.dart';
 import 'package:open_filex/open_filex.dart';
 
@@ -75,7 +76,6 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
 
   @override
   Future<List<Map<String, dynamic>>> getHistoryLogbooks(filter) async {
-    // final userData = ref.read(authProvider);
     final response = await dio.get(
       '/rest/zent-logbook-api/v1.0/get/history-logbook',
       options: Options(
@@ -111,5 +111,21 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
 
     // Abrir el archivo automáticamente
     await OpenFilex.open(filePath);
+  }
+  
+  @override
+  Future<List<GroupBusiness>> getGroupBusinessByIdBusiness(int idBusinness) async {
+    final response = await dio.get(
+      '/rest/zent-logbook-api/v1.0/get/group-business-by-id-business/$idBusinness',
+      options: Options(
+        headers: {
+          'externalTransactionId': 'fcea920f7412b5da7be0cf42b8c93759',
+          'channel': 'ZENTINEL',
+        },
+      ),
+    );
+
+    final List groupBusinessJson = response.data['data'];
+    return groupBusinessJson.map((json) => GroupBusiness.fromJson(json)).toList();
   }
 }

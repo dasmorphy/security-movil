@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:zentinel/domain/entities/unity_weight.dart';
 import 'package:intl/intl.dart';
+import 'package:zentinel/domain/entities/user_session.dart';
 
 final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
     GlobalKey<ScaffoldMessengerState>();
@@ -99,18 +100,14 @@ int getUnityIdByCategory({
   return defaultUnity.idUnity;
 }
 
-Options noMessages() => Options(
-  extra: {'showErrorMessage': false, 'showSuccessMessage': false},
-);
+Options noMessages() =>
+    Options(extra: {'showErrorMessage': false, 'showSuccessMessage': false});
 
-Options onlyError() => Options(
-  extra: {'showErrorMessage': true, 'showSuccessMessage': false},
-);
+Options onlyError() =>
+    Options(extra: {'showErrorMessage': true, 'showSuccessMessage': false});
 
-Options successAndError() => Options(
-  extra: {'showErrorMessage': true, 'showSuccessMessage': true},
-);
-
+Options successAndError() =>
+    Options(extra: {'showErrorMessage': true, 'showSuccessMessage': true});
 
 String formatDate(String isoDate) {
   final date = DateTime.parse(isoDate);
@@ -127,4 +124,18 @@ String formatDateDetails(String dateString) {
   }
 }
 
+extension UserPermissions on User {
+  bool hasPermission(String permission) {
+    return attributes['permissions']?.contains(permission) ?? false;
+  }
 
+  bool hasAny(List<String> permissions) {
+    final userPerms = attributes['permissions'] as List<dynamic>? ?? [];
+    return permissions.any(userPerms.contains);
+  }
+
+  bool hasAll(List<String> permissions) {
+    final userPerms = attributes['permissions'] as List<dynamic>? ?? [];
+    return permissions.every(userPerms.contains);
+  }
+}

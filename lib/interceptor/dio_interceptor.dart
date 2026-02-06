@@ -26,7 +26,7 @@ class DioInterceptor extends Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
     final showError = err.requestOptions.extra['showErrorMessage'] ?? true;
-
+  print(err);
     if (showError) {
       final message =
           err.response?.data?['message'] ?? 'Error inesperado en el servidor';

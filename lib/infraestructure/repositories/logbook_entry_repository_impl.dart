@@ -1,5 +1,6 @@
 import 'package:zentinel/domain/datasources/logbook_entry_datasource.dart';
 import 'package:zentinel/domain/entities/category.dart';
+import 'package:zentinel/domain/entities/group_business.dart';
 import 'package:zentinel/domain/entities/unity_weight.dart';
 import 'package:zentinel/domain/repositories/logbook_entry_repository.dart';
 
@@ -41,6 +42,11 @@ class LogbookEntryRepositoryImpl extends LogbookEntryRepository {
   @override
   Future<void> downloadExcel() {
     return datasource.downloadExcel();
+  }
+  
+  @override
+  Future<List<GroupBusiness>> getGroupBusinessByIdBusiness(int idBusinness) {
+    return datasource.getGroupBusinessByIdBusiness(idBusinness);
   }
   
 }

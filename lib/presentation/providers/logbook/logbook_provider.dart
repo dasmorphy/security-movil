@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zentinel/domain/entities/category.dart';
+import 'package:zentinel/domain/entities/group_business.dart';
 import 'package:zentinel/domain/entities/unity_weight.dart';
 import 'package:zentinel/domain/repositories/logbook_entry_repository.dart';
 import 'package:zentinel/presentation/providers/auth/auth_provider.dart';
@@ -44,19 +45,45 @@ final getHistoryLogbooks =
     StateNotifierProvider<CatalogNotifier<Map<String, dynamic>>, List<Map<String, dynamic>>>(
   (ref) {
     final repo = ref.watch(logbookEntryRepositoryProvider);
-    final userData = ref.watch(userSessionProvider);
+    final authState = ref.read(userSessionProvider);
+
+    //Usuario no cargado o sesión inválida
+    if (!authState.hasValue || authState.value == null) {
+      throw Exception('Usuario no esta en sesión');
+    }
+
+    final userData = authState.value!;
 
     return CatalogNotifier<Map<String, dynamic>>(
       (filters) {
         final mergedFilters = {
           // Solo agregar el filtro 'user' si el rol NO es admin
-          // if (userData['role'] != 'admin') 'user': userData['name'],
+          if (userData.role != 'admin') 'user' : userData.attributes['fullname'],
           ...?filters,
         };
-        print("Fetching history logbooks with filters:");
-        print(mergedFilters);
-        print(userData);
         return repo.getHistoryLogbooks(mergedFilters);
+      },
+    );
+  },
+);
+
+final getGroupBusinessByIdBusiness =
+    StateNotifierProvider<CatalogNotifier<GroupBusiness>, List<GroupBusiness>>(
+  (ref) {
+    final repo = ref.watch(logbookEntryRepositoryProvider);
+    final authState = ref.read(userSessionProvider);
+
+    //Usuario no cargado o sesión inválida
+    if (!authState.hasValue || authState.value == null) {
+      throw Exception('Usuario no esta en sesión');
+    }
+
+    final userData = authState.value!;
+
+    return CatalogNotifier<GroupBusiness>(
+      (filters) {
+        final idBusiness = userData.attributes['id_business'] ?? 0;
+        return repo.getGroupBusinessByIdBusiness(idBusiness);
       },
     );
   },
@@ -99,8 +126,6 @@ class DepatureReportNotifier extends StateNotifier<AsyncValue<bool>> {
 
   Future<bool> saveLogbookEntry(Map<String, dynamic> data) async {
     state = const AsyncLoading();
-    print("saveLogbookEntry");
-    print(data);
     try {
       final success = await repository.saveLogbookEntry(data);
       state = AsyncData(success);
@@ -120,8 +145,6 @@ class OutLogbookNotifier extends StateNotifier<AsyncValue<bool>> {
 
   Future<bool> saveLogbookOut(Map<String, dynamic> data) async {
     state = const AsyncLoading();
-    print("saveLogbookOut");
-    print(data);
     try {
       final success = await repository.saveLogbookOut(data);
       state = AsyncData(success);
@@ -141,12 +164,6 @@ class ReportDownloadNotifier extends StateNotifier<void> {
       : super(const AsyncData(false));
 
   Future<void> downloadReport() async {
-    print("downloadReport");
-    // print(data);
-    // try {
-      await repository.downloadExcel();
-    // } catch (e, st) {
-    //   return false;
-    // }
+    await repository.downloadExcel();
   }
 }

@@ -17,13 +17,12 @@ class AuthImpl extends AuthDatasource {
     };
 
     final response = await dio.post(
-      '/rest/zent-logbook-api/v1.0/post/logbook-entry',
+      '/rest/zent-logbook-api/v1.0/post/login',
       data: dataBody,
       options: onlyError(),
     );
 
-
-    return User.fromJson(response.data);
+    return User.fromJson(response.data['data']);
   }
 
 }

@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zentinel/config/utils/helper.dart';
-import 'package:zentinel/domain/entities/unity_weight.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
@@ -18,6 +17,7 @@ class ExitReportForm extends ConsumerStatefulWidget {
 class _ExitReportFormState extends ConsumerState<ExitReportForm> {
   final _formKey = GlobalKey<FormState>();
   String _categoryEntry = '0';
+  String _groupBusiness = '0';
   final _guideCtrl = TextEditingController();
   final _quantityCtrl = TextEditingController();
   final _weightCtrl = TextEditingController();
@@ -36,6 +36,7 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
   final FocusNode _authorizedFocus = FocusNode();
   final FocusNode _quantityFocus = FocusNode();
   final FocusNode _descFocus = FocusNode();
+  final FocusNode _groupBusinessFocus = FocusNode();
   final FocusNode _observationsFocus = FocusNode();
   final FocusNode _categoryEntryFocus = FocusNode();
   final FocusNode _personWithdrawsFocus = FocusNode();
@@ -45,6 +46,8 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
   void initState() {
     super.initState();
     ref.read(getAllCategories.notifier).load();
+    ref.read(getGroupBusinessByIdBusiness.notifier).load();
+    ref.read(getAllUnitiesWeight.notifier).load();
   }
   
   @override
@@ -63,7 +66,18 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
 
   void _submit() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
-    final userData = ref.read(authProvider);
+    final authState = ref.read(userSessionProvider);
+
+    //Usuario no cargado o sesión inválida
+    if (!authState.hasValue || authState.value == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Sesión no válida. Vuelva a iniciar sesión')),
+      );
+      return;
+    }
+
+    final userData = authState.value!;
+
     if (_unityId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Debe seleccionar una categoría válida')),
@@ -83,9 +97,9 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
       "destiny": _nameDriverCtrl.text.trim(), //
       "authorized_by": _authorizedCtrl.text.trim(), //
       "observations": _observationsCtrl.text.trim(), 
-      "created_by": userData['user'], //
-      "name_user": userData['name'], //
-      "id_group_business": userData['group_business'], //
+      "created_by": userData.user, //
+      "name_user": userData.attributes['fullname'], //
+      "id_group_business": userData.attributes['group_business'] ?? int.parse(_groupBusiness), //
     };
     final success = await widget.onSubmit?.call(data) ?? false;
     
@@ -103,10 +117,19 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final userData = ref.watch(userSessionProvider);
+    final authState = ref.read(userSessionProvider);
+
+    //Usuario no cargado o sesión inválida
+    if (!authState.hasValue || authState.value == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Sesión no válida. Vuelva a iniciar sesión')),
+      );
+    }
+
+    final userData = authState.value!;
     final categories = ref.watch(getAllCategories);
-    final unitiesWeight = ref.watch(getAllUnitiesWeight);
-    // final test = ref.watch(getAllUnitiesWeight);
+    final group_business = ref.watch(getGroupBusinessByIdBusiness);
+    final unitiesWeight = ref.watch(getAllUnitiesWeight);    
     final messageValidatorEmpty = 'Este campo es obligatorio';
     final fieldFill = const Color.fromARGB(255, 20, 21, 23);
     final borderRadius = BorderRadius.circular(8.0);
@@ -166,70 +189,68 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                 ),
                 const SizedBox(height: 20),
 
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: SizedBox(
-                    width: 280, // ajusta a tu diseño
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        // vertical: 6,
-                        // horizontal: 12,
-                      ),
-                      child: Row(
-                        children: [
-                          if (userData?.nameGroupBusiness != null) ...[
-                            const Icon(Icons.location_on, color: Colors.red),
-                            const SizedBox(width: 6),
+                SizedBox(
+                  width: double.infinity,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      // vertical: 6,
+                      // horizontal: 12,
+                    ),
+                    child: Row(
+                      children: [
+                        if (userData.attributes['name_group_business'] != null) ...[
+                          const Icon(Icons.location_on, color: Colors.red),
+                          const SizedBox(width: 8),
                             Text(
-                              userData['name_group_business'],
+                              userData.attributes['name_group_business'],
                               style: const TextStyle(color: Colors.white),
-                            ),
-                          ] else ...[
-                            GlowDropdownFormField<String>(
-                              value: _categoryEntry,
-                              focusNode: _categoryEntryFocus,
-                              decoration: styleDecoration(),
-                              items: [
-                                const DropdownMenuItem(
-                                  value: '0',
-                                  child: Text('Seleccione una opción'),
-                                ),
-                                ...categories.map(
-                                  (c) => DropdownMenuItem(
-                                    value: c.idCategory.toString(),
-                                    child: Text(c.nameCategory),
-                                  ),
+                          ),
+                        ] 
+                        else ...[
+                          Expanded(
+                            child: Column(
+                              children: [
+                                CustomFieldLabelRequired(txtLabel: 'Localidad'),
+                                const SizedBox(height: 6),
+                                GlowDropdownFormField<String>(
+                                  value: _groupBusiness,
+                                  focusNode: _groupBusinessFocus,
+                                  decoration: styleDecoration(),
+                                  items: [
+                                    const DropdownMenuItem(
+                                      value: '0',
+                                      child: Text('Seleccione una opción'),
+                                    ),
+                                    ...group_business.map(
+                                      (c) => DropdownMenuItem(
+                                        value: c.idGroupBusiness.toString(),
+                                        child: Text(c.name),
+                                      ),
+                                    ),
+                                  ],
+                                  onChanged: (v) {
+                                    if (v != null) {
+                                      setState(() => _groupBusiness = v);
+                                    }
+                                  },
+                                  validator: (v) {
+                                    if (v == '0' || v == null || v.trim().isEmpty) {
+                                      return messageValidatorEmpty;
+                                    }
+                                    return null;
+                                  },
                                 ),
                               ],
-                              onChanged: (v) {
-                                if (v != null) {
-                                  setState(() => _categoryEntry = v);
-
-                                  _unityId = getUnityIdByCategory(
-                                    nameCategory: categories.firstWhere(
-                                      (u) => u.idCategory == int.parse(v),
-                                      orElse: () => throw Exception('Categoría no encontrada'),
-                                    ).nameCategory,
-                                    unities: unitiesWeight,
-                                  );
-                                }
-                              },
-                              validator: (v) {
-                                if (v == '0' || v == null || v.trim().isEmpty) {
-                                  return messageValidatorEmpty;
-                                }
-                                return null;
-                              },
                             ),
-                          ],
-                        ],
-                      ),
+                          ),
 
+                        ],
+                      ],
                     ),
                   ),
                 ),
 
-                const SizedBox(height: 25),
+                const SizedBox(height: 12),
                 CustomFieldLabelRequired(txtLabel: 'Categoría de ingreso'),
                 GlowDropdownFormField<String>(
                   value: _categoryEntry,

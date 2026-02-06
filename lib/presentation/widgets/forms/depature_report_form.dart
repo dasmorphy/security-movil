@@ -62,7 +62,19 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
 
   void _submit() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
-    final userData = ref.read(authProvider);
+
+    final authState = ref.read(userSessionProvider);
+
+    //Usuario no cargado o sesión inválida
+    if (!authState.hasValue || authState.value == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Sesión no válida. Vuelva a iniciar sesión')),
+      );
+      return;
+    }
+
+    final userData = authState.value!;
+
     if (_unityId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Debe seleccionar una categoría válida')),
@@ -80,9 +92,9 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
       "destiny_intern": _destinyCtrl.text.trim(),
       "authorized_by": _authorizedCtrl.text.trim(),
       "observations": _observationsCtrl.text.trim(),
-      "created_by": userData['user'], //
-      "name_user": userData['name'], //
-      "id_group_business": userData['group_business'], //
+      "created_by": userData.user, //
+      "name_user": userData.attributes['fullname'], //
+      "id_group_business": userData.attributes['group_business'], //
     };
     
     final success = await widget.onSubmit?.call(data) ?? false;
@@ -100,7 +112,16 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
 
   @override
   Widget build(BuildContext context) {
-    final userData = ref.watch(authProvider);
+    final authState = ref.read(userSessionProvider);
+
+    //Usuario no cargado o sesión inválida
+    if (!authState.hasValue || authState.value == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Sesión no válida. Vuelva a iniciar sesión')),
+      );
+    }
+
+    final userData = authState.value!;
     final categories = ref.watch(getAllCategories);
     final unitiesWeight = ref.watch(getAllUnitiesWeight);
     final theme = Theme.of(context);
@@ -179,7 +200,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                         children: [
                           const Icon(Icons.location_on, color: Colors.red,),
                           Text(
-                            userData['name_group_business'] ?? 'Empresa no asignada',
+                            userData.attributes['name_group_business'] ?? 'Empresa no asignada',
                             style: TextStyle(color: Colors.white),
                           ),
                         ],

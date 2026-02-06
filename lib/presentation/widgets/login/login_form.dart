@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:zentinel/config/utils/helper.dart';
+import 'package:zentinel/domain/entities/user_session.dart';
 import 'package:zentinel/presentation/providers/auth/auth_provider.dart';
 
 class LoginForm extends ConsumerStatefulWidget {
@@ -25,6 +27,36 @@ class _LoginFormState extends ConsumerState<LoginForm> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<AsyncValue<User?>>(userSessionProvider, (prev, next) {
+      next.whenOrNull(
+        data: (user) {
+          print(user);
+          if (user != null) {
+            context.go('/');
+          }
+        },
+        error: (error, _) {
+          print(error);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(error.toString()),
+              backgroundColor: const Color.fromARGB(255, 219, 66, 19),
+            ),
+          );
+        },
+      );
+    });
+
+    // final authState = ref.watch(userSessionProvider);
+
+    // if (authState.isLoading) {
+    //   return const Scaffold(
+    //     body: Center(
+    //       child: CircularProgressIndicator(),
+    //     ),
+    //   );
+    // }
+
     final inputDecoration = InputDecoration(
       filled: true,
       fillColor: Colors.white.withOpacity(0.02),
@@ -153,59 +185,12 @@ void validateUser(BuildContext context, String password, String email, WidgetRef
         duration: Duration(seconds: 3),
       ),
     );
+    return;
   }
-  else if (email == 'admin' && password == '123456') {
-    final dataUser = {
-      'email': email,
-      'name': 'Administrador',
-      'user': email,
-      'group_business': 1,
-      'name_group_business': 'Camanglar 1',
-      'role': 'admin',
-      'business': 'Expalsa'
-    };
-    ref.read(userSessionProvider.notifier).signin(dataUser);
-    context.go('/');
-  } else if (email == 'camanglar1@hotmail.com' && password == '123456') {
-    final dataUser = {
-      'email': email,
-      'name': 'Daniel Males',
-      'user': email,
-      'group_business': 1,
-      'name_group_business': 'Camanglar 1',
-      'role': 'guardia',
-    };
-    ref.read(authProvider.notifier).authUser(dataUser);
-    context.go('/');
-  } else if (email == 'camanglar2@hotmail.com' && password == '123456') {
-    final dataUser = {
-      'email': email,
-      'user': email,
-      'name': 'David Cedeño',
-      'group_business': 2,
-      'name_group_business': 'Camanglar 2',
-      'role': 'guardia',
-    };
-    ref.read(authProvider.notifier).authUser(dataUser);
-    context.go('/');
-  } else if (email == 'camanglar3@hotmail.com' && password == '123456') {
-    final dataUser = {
-      'email': email,
-      'user': email,
-      'name': 'David Villamar',
-      'group_business': 3,
-      'name_group_business': 'Camanglar 3',
-      'role': 'guardia',
-    };
-    ref.read(authProvider.notifier).authUser(dataUser);
-    context.go('/');
-  }else {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Usuario o contraseña incorrectos.'),
-        backgroundColor: Color.fromARGB(255, 219, 66, 19),
-        duration: Duration(seconds: 3),
-      ),
-    );
-  }
+
+  ref.read(userSessionProvider.notifier).signin({
+    "user": email,
+    "password": password,
+  });
 }
+
