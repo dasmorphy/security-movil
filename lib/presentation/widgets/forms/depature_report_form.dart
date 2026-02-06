@@ -131,7 +131,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
       return;
     }
 
-    final authState = ref.read(userSessionProvider);
+    final authState = ref.watch(userSessionProvider);
 
     //Usuario no cargado o sesión inválida
     if (!authState.hasValue || authState.value == null) {
@@ -173,6 +173,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
     print('Error apiiiii response: $success');
     if (success) {
       if (mounted) {
+        _clearCntrl();
         context.push('/check-success');
       }
     } else {
@@ -203,7 +204,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
 
   @override
   Widget build(BuildContext context) {
-    final authState = ref.read(userSessionProvider);
+    final authState = ref.watch(userSessionProvider);
 
     //Usuario no cargado o sesión inválida
     if (!authState.hasValue || authState.value == null) {

@@ -123,7 +123,7 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
       return;
     }
 
-    final authState = ref.read(userSessionProvider);
+    final authState = ref.watch(userSessionProvider);
 
     //Usuario no cargado o sesión inválida
     if (!authState.hasValue || authState.value == null) {
@@ -164,6 +164,7 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
     
     if (success) {
       if (mounted) {
+        _clearCntrl();
         context.go('/check-success');
       }
     } else {
@@ -194,7 +195,7 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final authState = ref.read(userSessionProvider);
+    final authState = ref.watch(userSessionProvider);
 
     //Usuario no cargado o sesión inválida
     if (!authState.hasValue || authState.value == null) {

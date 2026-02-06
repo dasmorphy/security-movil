@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:zentinel/presentation/providers/auth/auth_provider.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
 class ProfileView extends ConsumerStatefulWidget {
@@ -24,7 +25,7 @@ class ProfileViewState extends ConsumerState<ProfileView> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) {    
     return SingleChildScrollView(
       // physics: ,
       child: Column(
@@ -61,7 +62,7 @@ class ProfileViewState extends ConsumerState<ProfileView> {
                       const SizedBox(height: 12),
                       // Nombre
                       const Text(
-                        'Daniel',
+                        'Usuario',
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -163,6 +164,7 @@ class ProfileViewState extends ConsumerState<ProfileView> {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () {
+                      ref.invalidate(userSessionProvider);
                       context.go('/login');
                     },
                     style: ElevatedButton.styleFrom(

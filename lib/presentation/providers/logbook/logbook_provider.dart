@@ -42,14 +42,15 @@ final saveOutLogbookProvider =
 
 
 final getHistoryLogbooks =
-    StateNotifierProvider<CatalogNotifier<Map<String, dynamic>>, List<Map<String, dynamic>>>(
+    StateNotifierProvider.autoDispose<
+        CatalogNotifier<Map<String, dynamic>>,
+        List<Map<String, dynamic>>>(
   (ref) {
     final repo = ref.watch(logbookEntryRepositoryProvider);
-    final authState = ref.read(userSessionProvider);
+    final authState = ref.watch(userSessionProvider);
 
-    //Usuario no cargado o sesión inválida
     if (!authState.hasValue || authState.value == null) {
-      throw Exception('Usuario no esta en sesión');
+      return CatalogNotifier<Map<String, dynamic>>((_) async => []);
     }
 
     final userData = authState.value!;
@@ -57,13 +58,10 @@ final getHistoryLogbooks =
     return CatalogNotifier<Map<String, dynamic>>(
       (filters) {
         final mergedFilters = {
-          // Admin → busca por sector
           if (userData.role == 'admin')
             'id_business': userData.attributes['id_business']
-          // No admin → busca por usuario
           else
             'user': userData.user,
-
           ...?filters,
         };
         return repo.getHistoryLogbooks(mergedFilters);
@@ -72,11 +70,12 @@ final getHistoryLogbooks =
   },
 );
 
+
 final getGroupBusinessByIdBusiness =
     StateNotifierProvider<CatalogNotifier<GroupBusiness>, List<GroupBusiness>>(
   (ref) {
     final repo = ref.watch(logbookEntryRepositoryProvider);
-    final authState = ref.read(userSessionProvider);
+    final authState = ref.watch(userSessionProvider);
 
     //Usuario no cargado o sesión inválida
     if (!authState.hasValue || authState.value == null) {
@@ -113,15 +112,26 @@ class CatalogNotifier<T> extends StateNotifier<List<T>> {
   CatalogNotifier(this.fetch) : super(const []);
 
   Future<void> load({Map<String, dynamic>? filters}) async {
-    if (_isLoading) return;
+    if (_isLoading || !mounted) return;
+
     _isLoading = true;
 
-    final data = await fetch(filters);
-    state = data;
+    try {
+      final data = await fetch(filters);
 
-    _isLoading = false;
+      if (!mounted) return; // 🔥 CLAVE
+
+      state = data;
+    } catch (e) {
+      if (mounted) {
+        state = [];
+      }
+    } finally {
+      _isLoading = false;
+    }
   }
 }
+
 
 class DepatureReportNotifier extends StateNotifier<AsyncValue<bool>> {
   final LogbookEntryRepository repository;
