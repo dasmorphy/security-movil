@@ -57,8 +57,13 @@ final getHistoryLogbooks =
     return CatalogNotifier<Map<String, dynamic>>(
       (filters) {
         final mergedFilters = {
-          // Solo agregar el filtro 'user' si el rol NO es admin
-          if (userData.role != 'admin') 'user' : userData.attributes['fullname'],
+          // Admin → busca por sector
+          if (userData.role == 'admin')
+            'id_business': userData.attributes['id_business']
+          // No admin → busca por usuario
+          else
+            'user': userData.user,
+
           ...?filters,
         };
         return repo.getHistoryLogbooks(mergedFilters);

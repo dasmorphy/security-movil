@@ -100,7 +100,7 @@ class _VideoHeaderState extends State<VideoHeader> {
                             InkWell(
                               borderRadius: BorderRadius.circular(20),
                               onTap: () {
-                                context.go('/splash');
+                                // context.go('/splash');
                               },
                               child: const Padding(
                                 padding: EdgeInsets.all(7),
@@ -111,7 +111,7 @@ class _VideoHeaderState extends State<VideoHeader> {
                             InkWell(
                               borderRadius: BorderRadius.circular(20),
                               onTap: () {
-                                context.go('/check-success');
+                                // context.go('/check-success');
                               },
                               child: const Padding(
                                 padding: EdgeInsets.all(7),

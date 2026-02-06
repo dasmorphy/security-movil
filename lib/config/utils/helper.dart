@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:http_parser/http_parser.dart';
 import 'package:zentinel/domain/entities/unity_weight.dart';
 import 'package:intl/intl.dart';
 import 'package:zentinel/domain/entities/user_session.dart';
@@ -137,5 +138,22 @@ extension UserPermissions on User {
   bool hasAll(List<String> permissions) {
     final userPerms = attributes['permissions'] as List<dynamic>? ?? [];
     return permissions.every(userPerms.contains);
+  }
+}
+
+MediaType getMediaType(String path) {
+  final extension = path.split('.').last.toLowerCase();
+  switch (extension) {
+    case 'jpg':
+    case 'jpeg':
+      return MediaType('image', 'jpeg');
+    case 'png':
+      return MediaType('image', 'png');
+    case 'gif':
+      return MediaType('image', 'gif');
+    case 'webp':
+      return MediaType('image', 'webp');
+    default:
+      return MediaType('image', 'jpeg');
   }
 }

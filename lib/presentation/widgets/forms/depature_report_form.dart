@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
@@ -17,6 +20,8 @@ class DepatureReportForm extends ConsumerStatefulWidget {
 class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
   final _formKey = GlobalKey<FormState>();
   String _categoryEntry = '0';
+  String _groupBusiness = '0';
+  String _workday = '0';
   int? _unityId;
   final _guideCtrl = TextEditingController();
   final _descCtrl = TextEditingController();
@@ -26,14 +31,23 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
   final _destinyCtrl = TextEditingController();
   final _authorizedCtrl = TextEditingController();
   final _observationsCtrl = TextEditingController();
+  final _truckLicenseCtrl = TextEditingController();
+  final _nameDriverCtrl = TextEditingController();
+
+  List<File> _selectedImages = [];
+  final ImagePicker _imagePicker = ImagePicker();
 
   final FocusNode _guideFocus = FocusNode();
   final FocusNode _unitFocus = FocusNode();
+  final FocusNode _workdayFocus = FocusNode();
+  final FocusNode _truckLicenseFocus = FocusNode();
+  final FocusNode _nameDriverFocus = FocusNode();
   final FocusNode _weightFocus = FocusNode();
   final FocusNode _providerFocus = FocusNode();
   final FocusNode _destinyFocus = FocusNode();
   final FocusNode _authorizedFocus = FocusNode();
   final FocusNode _quantityFocus = FocusNode();
+  final FocusNode _groupBusinessFocus = FocusNode();
   final FocusNode _descFocus = FocusNode();
   final FocusNode _observationsFocus = FocusNode();
   final FocusNode _categoryEntryFocus = FocusNode();
@@ -43,6 +57,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
     super.initState();
     ref.read(getAllCategories.notifier).load();
     ref.read(getAllUnitiesWeight.notifier).load();
+    ref.read(getGroupBusinessByIdBusiness.notifier).load();
   }
 
   @override
@@ -53,15 +68,68 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
     _providerCtrl.dispose();
     _destinyCtrl.dispose();
     _authorizedCtrl.dispose();
+    _nameDriverCtrl.dispose();
+    _truckLicenseCtrl.dispose();
     _observationsCtrl.dispose();
     _quantityFocus.dispose();
     _descFocus.dispose();
     _categoryEntryFocus.dispose();
+    _groupBusinessFocus.dispose();
+    _truckLicenseFocus.dispose();
+    _nameDriverFocus.dispose();
     super.dispose();
+  }
+
+  Future<void> _captureImageFromCamera() async {
+    if (_selectedImages.length >= 10) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Máximo 10 imágenes permitidas')),
+      );
+      return;
+    }
+
+    try {
+      final XFile? image = await _imagePicker.pickImage(
+        source: ImageSource.camera,
+      );
+
+      if (image != null) {
+        setState(() {
+          _selectedImages.add(File(image.path));
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al capturar imagen: $e')),
+        );
+      }
+    }
+  }
+
+  void _removeImage(int index) {
+    setState(() {
+      _selectedImages.removeAt(index);
+    });
   }
 
   void _submit() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
+
+    // Validar cantidad de imágenes
+    if (_selectedImages.length < 5) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Debe seleccionar mínimo 5 imágenes')),
+      );
+      return;
+    }
+
+    if (_selectedImages.length > 10) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Máximo 10 imágenes permitidas')),
+      );
+      return;
+    }
 
     final authState = ref.read(userSessionProvider);
 
@@ -92,22 +160,45 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
       "destiny_intern": _destinyCtrl.text.trim(),
       "authorized_by": _authorizedCtrl.text.trim(),
       "observations": _observationsCtrl.text.trim(),
+      "name_driver": _nameDriverCtrl.text.trim(),
+      "truck_license": _truckLicenseCtrl.text.trim(), //
       "created_by": userData.user, //
       "name_user": userData.attributes['fullname'], //
-      "id_group_business": userData.attributes['group_business'], //
+      "workday": _workday.trim(),
+      "id_group_business": userData.attributes['group_business'] ?? int.parse(_groupBusiness), //
+      "images": _selectedImages,
     };
     
     final success = await widget.onSubmit?.call(data) ?? false;
     print('Error apiiiii response: $success');
     if (success) {
       if (mounted) {
-        context.go('/check-success');
+        context.push('/check-success');
       }
     } else {
       if (mounted) {
         context.pop();
       }
     }
+  }
+  
+  void _clearCntrl () {
+    _selectedImages = [];
+    _formKey.currentState?.reset();
+    _categoryEntry = '0';
+    _workday = '0';
+    _groupBusiness = '0';
+    _unityId = null;
+    _guideCtrl.clear();
+    _descCtrl.clear();
+    _quantityCtrl.clear();
+    _weightCtrl.clear();
+    _providerCtrl.clear();
+    _destinyCtrl.clear();
+    _nameDriverCtrl.clear();
+    _truckLicenseCtrl.clear();
+    _authorizedCtrl.clear();
+    _observationsCtrl.clear();
   }
 
   @override
@@ -123,6 +214,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
 
     final userData = authState.value!;
     final categories = ref.watch(getAllCategories);
+    final group_business = ref.watch(getGroupBusinessByIdBusiness);
     final unitiesWeight = ref.watch(getAllUnitiesWeight);
     final theme = Theme.of(context);
     final messageValidatorEmpty = 'Este campo es obligatorio';
@@ -182,34 +274,101 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                 ),
                 const SizedBox(height: 20),
 
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: SizedBox(
-                    width: 280, // ajusta a tu diseño
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        // vertical: 6,
-                        // horizontal: 12,
-                      ),
-                      // decoration: BoxDecoration(
-                      //   color: fieldFill,
-                      //   borderRadius: borderRadius,
-                      //   border: Border.all(color: Colors.white12, width: 1),
-                      // ),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.location_on, color: Colors.red,),
-                          Text(
-                            userData.attributes['name_group_business'] ?? 'Empresa no asignada',
-                            style: TextStyle(color: Colors.white),
+                SizedBox(
+                  width: double.infinity,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      // vertical: 6,
+                      // horizontal: 12,
+                    ),
+                    child: Row(
+                      children: [
+                        if (userData.attributes['name_group_business'] != null) ...[
+                          const Icon(Icons.location_on, color: Colors.red),
+                          const SizedBox(width: 8),
+                            Text(
+                              userData.attributes['name_group_business'],
+                              style: const TextStyle(color: Colors.white),
                           ),
+                        ] 
+                        else ...[
+                          Expanded(
+                            child: Column(
+                              children: [
+                                CustomFieldLabelRequired(txtLabel: 'Localidad'),
+                                const SizedBox(height: 6),
+                                GlowDropdownFormField<String>(
+                                  value: _groupBusiness,
+                                  focusNode: _groupBusinessFocus,
+                                  decoration: styleDecoration(),
+                                  items: [
+                                    const DropdownMenuItem(
+                                      value: '0',
+                                      child: Text('Seleccione una opción'),
+                                    ),
+                                    ...group_business.map(
+                                      (c) => DropdownMenuItem(
+                                        value: c.idGroupBusiness.toString(),
+                                        child: Text(c.name),
+                                      ),
+                                    ),
+                                  ],
+                                  onChanged: (v) {
+                                    if (v != null) {
+                                      setState(() => _groupBusiness = v);
+                                    }
+                                  },
+                                  validator: (v) {
+                                    if (v == '0' || v == null || v.trim().isEmpty) {
+                                      return messageValidatorEmpty;
+                                    }
+                                    return null;
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+
                         ],
-                      ),
+                      ],
                     ),
                   ),
                 ),
 
-                const SizedBox(height: 25),
+                const SizedBox(height: 12),
+                CustomFieldLabelRequired(txtLabel: 'Jornada'),
+                GlowDropdownFormField<String>(
+                  value: _workday,
+                  focusNode: _workdayFocus,
+                  decoration: styleDecoration(),
+                  items: [
+                    DropdownMenuItem(
+                      value: '0',
+                      child: Text('Seleccione una opción'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'Diurna',
+                      child: Text('Diurna'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'Nocturna',
+                      child: Text('Nocturna'),
+                    ),
+                  ],
+                  onChanged: (v) {
+                    if (v != null) {
+                      setState(() => _workday = v);
+                    }
+                  },
+                  validator: (v) {
+                    if (v=='0' || v == null || v.trim().isEmpty) {
+                      return messageValidatorEmpty;
+                    }
+                    return null;
+                  },
+                ),
+
+                const SizedBox(height: 12),
                 CustomFieldLabelRequired(txtLabel: 'Categoría de ingreso'),
                 GlowDropdownFormField<String>(
                   value: _categoryEntry,
@@ -350,6 +509,32 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                 ),
 
                 const SizedBox(height: 12),
+                CustomFieldLabelRequired(txtLabel: 'Placa del Camión'),
+                GlowTextFormField(
+                  controller: _truckLicenseCtrl,
+                  focusNode: _truckLicenseFocus,
+                  validator: (v) {
+                    if (v == null || v.trim().isEmpty) {
+                      return messageValidatorEmpty;
+                    }
+                    return null;
+                  },
+                ),
+
+                const SizedBox(height: 12),
+                CustomFieldLabelRequired(txtLabel: 'Nombre del Chofer'),
+                GlowTextFormField(
+                  controller: _nameDriverCtrl,
+                  focusNode: _nameDriverFocus,
+                  validator: (v) {
+                    if (v == null || v.trim().isEmpty) {
+                      return messageValidatorEmpty;
+                    }
+                    return null;
+                  },
+                ),
+
+                const SizedBox(height: 12),
                 CustomFieldLabelRequired(txtLabel: 'Destino Interno'),
                 GlowTextFormField(
                   controller: _destinyCtrl,
@@ -389,22 +574,89 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                 ),
 
                 const SizedBox(height: 26),
+                CustomFieldLabelRequired(
+                  txtLabel: 'Imágenes desde Cámara (${_selectedImages.length}/10)',
+                ),
+                const SizedBox(height: 8),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: _captureImageFromCamera,
+                    icon: const Icon(Icons.camera_alt, color: Color.fromARGB(189, 7, 213, 213)),
+                    label: const Text(
+                      'Capturar Imagen',
+                      style: TextStyle(color: Color.fromARGB(189, 7, 213, 213)),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: Color.fromARGB(189, 7, 213, 213)),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                if (_selectedImages.isNotEmpty)
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.white12),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3,
+                        crossAxisSpacing: 8,
+                        mainAxisSpacing: 8,
+                      ),
+                      itemCount: _selectedImages.length,
+                      itemBuilder: (context, index) {
+                        return Stack(
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                image: DecorationImage(
+                                  image: FileImage(_selectedImages[index]),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              top: -8,
+                              right: -8,
+                              child: IconButton(
+                                onPressed: () => _removeImage(index),
+                                icon: const Icon(Icons.close, color: Colors.red),
+                                style: IconButton.styleFrom(
+                                  backgroundColor: Colors.black54,
+                                  iconSize: 16,
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  )
+                else
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 20),
+                      child: Text(
+                        'No hay imágenes capturadas',
+                        style: TextStyle(color: Colors.white54),
+                      ),
+                    ),
+                  ),
+
+                const SizedBox(height: 26),
                 Row(
                   children: [
                     Expanded(
                       child: OutlinedButton(
                         onPressed: () {
-                          _formKey.currentState?.reset();
-                          _categoryEntry = '0';
-                          _unityId = null;
-                          _guideCtrl.clear();
-                          _descCtrl.clear();
-                          _quantityCtrl.clear();
-                          _weightCtrl.clear();
-                          _providerCtrl.clear();
-                          _destinyCtrl.clear();
-                          _authorizedCtrl.clear();
-                          _observationsCtrl.clear();
+                          _clearCntrl();
                         },
                         style: OutlinedButton.styleFrom(
                           side: const BorderSide(color: Colors.white24),

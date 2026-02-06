@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
@@ -17,6 +19,7 @@ class ExitReportForm extends ConsumerStatefulWidget {
 class _ExitReportFormState extends ConsumerState<ExitReportForm> {
   final _formKey = GlobalKey<FormState>();
   String _categoryEntry = '0';
+  String _workday = '0';
   String _groupBusiness = '0';
   final _guideCtrl = TextEditingController();
   final _quantityCtrl = TextEditingController();
@@ -28,10 +31,14 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
   final _observationsCtrl = TextEditingController();
   final _personWithdrawsCtrl = TextEditingController();
   int? _unityId;
+  
+  List<File> _selectedImages = [];
+  final ImagePicker _imagePicker = ImagePicker();
 
   final FocusNode _guideFocus = FocusNode();
   final FocusNode _weightFocus = FocusNode();
   final FocusNode _truckLicenseFocus = FocusNode();
+  final FocusNode _workdayFocus = FocusNode();
   final FocusNode _nameDriverFocus = FocusNode();
   final FocusNode _authorizedFocus = FocusNode();
   final FocusNode _quantityFocus = FocusNode();
@@ -61,11 +68,61 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
     _quantityFocus.dispose();
     _descFocus.dispose();
     _categoryEntryFocus.dispose();
+    _groupBusinessFocus.dispose();
     super.dispose();
+  }
+
+  Future<void> _captureImageFromCamera() async {
+    if (_selectedImages.length >= 10) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Máximo 10 imágenes permitidas')),
+      );
+      return;
+    }
+
+    try {
+      final XFile? image = await _imagePicker.pickImage(
+        source: ImageSource.camera,
+      );
+
+      if (image != null) {
+        setState(() {
+          _selectedImages.add(File(image.path));
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error al capturar imagen: $e')),
+        );
+      }
+    }
+  }
+
+  void _removeImage(int index) {
+    setState(() {
+      _selectedImages.removeAt(index);
+    });
   }
 
   void _submit() async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
+    
+    // Validar cantidad de imágenes
+    if (_selectedImages.length < 5) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Debe seleccionar mínimo 5 imágenes')),
+      );
+      return;
+    }
+
+    if (_selectedImages.length > 10) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Máximo 10 imágenes permitidas')),
+      );
+      return;
+    }
+
     final authState = ref.read(userSessionProvider);
 
     //Usuario no cargado o sesión inválida
@@ -89,6 +146,7 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
       "id_unity": _unityId,
       "id_category": int.parse(_categoryEntry), //
       "shipping_guide": _guideCtrl.text.trim(),
+      "workday": _workday.trim(),
       "name_driver": _nameDriverCtrl.text.trim(),
       "quantity": int.tryParse(_quantityCtrl.text) ?? 0,
       "weight": int.tryParse(_weightCtrl.text) ?? 0,
@@ -96,10 +154,11 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
       "person_withdraws": _personWithdrawsCtrl.text.trim(), //
       "destiny": _nameDriverCtrl.text.trim(), //
       "authorized_by": _authorizedCtrl.text.trim(), //
-      "observations": _observationsCtrl.text.trim(), 
+      "observations": _observationsCtrl.text.trim(),
       "created_by": userData.user, //
       "name_user": userData.attributes['fullname'], //
       "id_group_business": userData.attributes['group_business'] ?? int.parse(_groupBusiness), //
+      "images": _selectedImages,
     };
     final success = await widget.onSubmit?.call(data) ?? false;
     
@@ -112,6 +171,24 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
           context.pop();
         }
     }
+  }
+
+  void _clearCntrl() {
+    _selectedImages = [];
+    _formKey.currentState?.reset();
+    _categoryEntry = '0';
+    _workday = '0';
+    _unityId = null;
+    _groupBusiness = '0';
+    _guideCtrl.clear();
+    _nameDriverCtrl.clear();
+    _quantityCtrl.clear();
+    _weightCtrl.clear();
+    _truckLicenseCtrl.clear();
+    _authorizedCtrl.clear();
+    _observationsCtrl.clear();
+    _personWithdrawsCtrl.clear();
+    _destinyCtrl.clear();
   }
 
   @override
@@ -248,6 +325,40 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                       ],
                     ),
                   ),
+                ),
+
+
+                const SizedBox(height: 12),
+                CustomFieldLabelRequired(txtLabel: 'Jornada'),
+                GlowDropdownFormField<String>(
+                  value: _workday,
+                  focusNode: _workdayFocus,
+                  decoration: styleDecoration(),
+                  items: [
+                    DropdownMenuItem(
+                      value: '0',
+                      child: Text('Seleccione una opción'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'Diurna',
+                      child: Text('Diurna'),
+                    ),
+                    DropdownMenuItem(
+                      value: 'Nocturna',
+                      child: Text('Nocturna'),
+                    ),
+                  ],
+                  onChanged: (v) {
+                    if (v != null) {
+                      setState(() => _workday = v);
+                    }
+                  },
+                  validator: (v) {
+                    if (v=='0' || v == null || v.trim().isEmpty) {
+                      return messageValidatorEmpty;
+                    }
+                    return null;
+                  },
                 ),
 
                 const SizedBox(height: 12),
@@ -441,21 +552,89 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                 ),
 
                 const SizedBox(height: 26),
+                CustomFieldLabelRequired(
+                  txtLabel: 'Imágenes desde Cámara (${_selectedImages.length}/10)',
+                ),
+                const SizedBox(height: 8),
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: _captureImageFromCamera,
+                    icon: const Icon(Icons.camera_alt, color: Color.fromARGB(189, 7, 213, 213)),
+                    label: const Text(
+                      'Capturar Imagen',
+                      style: TextStyle(color: Color.fromARGB(189, 7, 213, 213)),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: Color.fromARGB(189, 7, 213, 213)),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                if (_selectedImages.isNotEmpty)
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.white12),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: GridView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3,
+                        crossAxisSpacing: 8,
+                        mainAxisSpacing: 8,
+                      ),
+                      itemCount: _selectedImages.length,
+                      itemBuilder: (context, index) {
+                        return Stack(
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                image: DecorationImage(
+                                  image: FileImage(_selectedImages[index]),
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              top: -8,
+                              right: -8,
+                              child: IconButton(
+                                onPressed: () => _removeImage(index),
+                                icon: const Icon(Icons.close, color: Colors.red),
+                                style: IconButton.styleFrom(
+                                  backgroundColor: Colors.black54,
+                                  iconSize: 16,
+                                ),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    ),
+                  )
+                else
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 20),
+                      child: Text(
+                        'No hay imágenes capturadas',
+                        style: TextStyle(color: Colors.white54),
+                      ),
+                    ),
+                  ),
+
+                const SizedBox(height: 26),
                 Row(
                   children: [
                     Expanded(
                       child: OutlinedButton(
                         onPressed: () {
-                          _formKey.currentState?.reset();
-                          _categoryEntry = '0';
-                          _guideCtrl.clear();
-                          _nameDriverCtrl.clear();
-                          _quantityCtrl.clear();
-                          _weightCtrl.clear();
-                          _truckLicenseCtrl.clear();
-                          _nameDriverCtrl.clear();
-                          _authorizedCtrl.clear();
-                          _observationsCtrl.clear();
+                          _clearCntrl();
                         },
                         style: OutlinedButton.styleFrom(
                           side: const BorderSide(color: Colors.white24),

@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:path_provider/path_provider.dart';
 import 'package:dio/dio.dart';
 import 'package:zentinel/config/utils/helper.dart';
@@ -6,21 +9,21 @@ import 'package:zentinel/domain/entities/category.dart';
 import 'package:zentinel/domain/entities/group_business.dart';
 import 'package:zentinel/domain/entities/unity_weight.dart';
 import 'package:open_filex/open_filex.dart';
+import 'package:uuid/uuid.dart';
+import 'package:http_parser/http_parser.dart';
 
 class LogbookEntryImpl extends LogbookEntryDatasource {
   final Dio dio;
 
   LogbookEntryImpl({required this.dio});
+  final uuid = Uuid().v4();
 
   @override
   Future<List<Category>> getAllCategory() async {
     final response = await dio.get(
       '/rest/zent-logbook-api/v1.0/get/allCategories',
       options: Options(
-        headers: {
-          'externalTransactionId': 'fcea920f7412b5da7be0cf42b8c93759',
-          'channel': 'ZENTINEL',
-        },
+        headers: {'externalTransactionId': uuid, 'channel': 'ZENTINEL'},
       ),
     );
     final List categoriesJson = response.data['data'];
@@ -32,10 +35,7 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
     final response = await dio.get(
       '/rest/zent-logbook-api/v1.0/get/allUnitiesWeight',
       options: Options(
-        headers: {
-          'externalTransactionId': 'fcea920f7412b5da7be0cf42b8c93759',
-          'channel': 'ZENTINEL',
-        },
+        headers: {'externalTransactionId': uuid, 'channel': 'ZENTINEL'},
       ),
     );
     final List unitiesJson = response.data['data'];
@@ -44,33 +44,105 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
 
   @override
   Future<bool> saveLogbookEntry(Map<String, dynamic> data) async {
-    final dataBody = {
-      "channel": "ZENTINEL",
-      "externalTransactionId": "fcea920f7412b5da7be0cf42b8c93759",
-      "logbook_entry": data,
-    };
+    final images = data['images'] as List<File>?;
+    final logbookData = Map<String, dynamic>.from(data);
+    logbookData.remove('images');
+
+    logbookData['channel'] = 'ZENTINEL';
+    logbookData['external_transaction_id'] = Uuid().v4();
+
+    final logbookJson = jsonEncode(logbookData);
+    final logbookBytes = utf8.encode(logbookJson);
+
+    final formData = FormData();
+
+    // Agregar logbook_entry
+    formData.files.add(
+      MapEntry(
+        'logbook_entry',
+        MultipartFile.fromBytes(
+          logbookBytes,
+          filename: 'logbook_entry.json',
+          contentType: MediaType('application', 'json'),
+        ),
+      ),
+    );
+
+    // Agregar imágenes
+    if (images != null && images.isNotEmpty) {
+      for (var i = 0; i < images.length; i++) {
+        final image = images[i];
+        formData.files.add(
+          MapEntry(
+            'images',
+            await MultipartFile.fromFile(
+              image.path,
+              filename: image.path.split('/').last,
+              contentType: getMediaType(image.path),
+            ),
+          ),
+        );
+      }
+    }
 
     final response = await dio.post(
       '/rest/zent-logbook-api/v1.0/post/logbook-entry',
-      data: dataBody,
+      data: formData,
       options: onlyError(),
     );
+
     return response.statusCode == 200;
   }
 
   @override
   Future<bool> saveLogbookOut(Map<String, dynamic> data) async {
-    final dataBody = {
-      "channel": "ZENTINEL",
-      "externalTransactionId": "fcea920f7412b5da7be0cf42b8c93759",
-      "logbook_out": data,
-    };
+    final images = data['images'] as List<File>?;
+    final logbookData = Map<String, dynamic>.from(data);
+    logbookData.remove('images');
+
+    logbookData['channel'] = 'ZENTINEL';
+    logbookData['external_transaction_id'] = Uuid().v4();
+
+    final logbookJson = jsonEncode(logbookData);
+    final logbookBytes = utf8.encode(logbookJson);
+
+    final formData = FormData();
+
+    // Agregar logbook_out
+    formData.files.add(
+      MapEntry(
+        'logbook_out',
+        MultipartFile.fromBytes(
+          logbookBytes,
+          filename: 'logbook_out.json',
+          contentType: MediaType('application', 'json'),
+        ),
+      ),
+    );
+
+    // Agregar imágenes
+    if (images != null && images.isNotEmpty) {
+      for (var i = 0; i < images.length; i++) {
+        final image = images[i];
+        formData.files.add(
+          MapEntry(
+            'images',
+            await MultipartFile.fromFile(
+              image.path,
+              filename: image.path.split('/').last,
+              contentType: getMediaType(image.path),
+            ),
+          ),
+        );
+      }
+    }
 
     final response = await dio.post(
       '/rest/zent-logbook-api/v1.0/post/logbook-out',
-      data: dataBody,
+      data: formData,
       options: onlyError(),
     );
+
     return response.statusCode == 200;
   }
 
@@ -80,7 +152,7 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
       '/rest/zent-logbook-api/v1.0/get/history-logbook',
       options: Options(
         headers: {
-          'externalTransactionId': 'fcea920f7412b5da7be0cf42b8c93759',
+          'externalTransactionId': uuid,
           'channel': 'ZENTINEL',
           'user': filter['user'],
         },
@@ -101,10 +173,7 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
       filePath,
       options: Options(
         responseType: ResponseType.bytes,
-        headers: {
-          'externalTransactionId': 'fcea920f7412b5da7be0cf42b8c93759',
-          'channel': 'ZENTINEL',
-        },
+        headers: {'externalTransactionId': uuid, 'channel': 'ZENTINEL'},
         extra: {'showSuccessMessage': true},
       ),
     );
@@ -112,20 +181,21 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
     // Abrir el archivo automáticamente
     await OpenFilex.open(filePath);
   }
-  
+
   @override
-  Future<List<GroupBusiness>> getGroupBusinessByIdBusiness(int idBusinness) async {
+  Future<List<GroupBusiness>> getGroupBusinessByIdBusiness(
+    int idBusinness,
+  ) async {
     final response = await dio.get(
       '/rest/zent-logbook-api/v1.0/get/group-business-by-id-business/$idBusinness',
       options: Options(
-        headers: {
-          'externalTransactionId': 'fcea920f7412b5da7be0cf42b8c93759',
-          'channel': 'ZENTINEL',
-        },
+        headers: {'externalTransactionId': uuid, 'channel': 'ZENTINEL'},
       ),
     );
 
     final List groupBusinessJson = response.data['data'];
-    return groupBusinessJson.map((json) => GroupBusiness.fromJson(json)).toList();
+    return groupBusinessJson
+        .map((json) => GroupBusiness.fromJson(json))
+        .toList();
   }
 }
