@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:zentinel/domain/entities/unity_weight.dart';
 import 'package:intl/intl.dart';
 import 'package:zentinel/domain/entities/user_session.dart';
@@ -156,4 +157,46 @@ MediaType getMediaType(String path) {
     default:
       return MediaType('image', 'jpeg');
   }
+}
+
+Future<bool> requestCameraPermission(BuildContext context) async {
+  var status = await Permission.camera.status;
+  
+  // Si ya está concedido, retorna true
+  if (status.isGranted) {
+    return true;
+  }
+  
+  // Si está permanentemente denegado, guía al usuario
+  if (status.isPermanentlyDenied) {
+    final result = await showDialog<bool>(
+      context: context, // Necesitarás pasar el context como parámetro
+      builder: (context) => AlertDialog(
+        title: const Text('Permiso de cámara requerido'),
+        content: const Text(
+          'El acceso a la cámara está deshabilitado. '
+          'Por favor, ve a Ajustes para habilitarlo.'
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () {
+              openAppSettings();
+              Navigator.pop(context, true);
+            },
+            child: const Text('Abrir Ajustes'),
+          ),
+        ],
+      ),
+    );
+    return result ?? false;
+  }
+  
+  // Solicita el permiso
+  status = await Permission.camera.request();
+  print('Estado del permiso: $status');
+  return status.isGranted;
 }

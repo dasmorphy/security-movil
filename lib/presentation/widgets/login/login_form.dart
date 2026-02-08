@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/domain/entities/user_session.dart';
 import 'package:zentinel/presentation/providers/auth/auth_provider.dart';
 
@@ -30,13 +29,11 @@ class _LoginFormState extends ConsumerState<LoginForm> {
     ref.listen<AsyncValue<User?>>(userSessionProvider, (prev, next) {
       next.whenOrNull(
         data: (user) {
-          print(user);
           if (user != null) {
             context.go('/');
           }
         },
         error: (error, _) {
-          print(error);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(error.toString()),
@@ -47,15 +44,8 @@ class _LoginFormState extends ConsumerState<LoginForm> {
       );
     });
 
-    // final authState = ref.watch(userSessionProvider);
-
-    // if (authState.isLoading) {
-    //   return const Scaffold(
-    //     body: Center(
-    //       child: CircularProgressIndicator(),
-    //     ),
-    //   );
-    // }
+    final authState = ref.watch(userSessionProvider);
+    final isLoading = authState.isLoading;
 
     final inputDecoration = InputDecoration(
       filled: true,
@@ -67,19 +57,13 @@ class _LoginFormState extends ConsumerState<LoginForm> {
       // Borde normal
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(30),
-        borderSide: BorderSide(
-          color: Colors.white.withOpacity(0.12),
-          width: 1,
-        ),
+        borderSide: BorderSide(color: Colors.white.withOpacity(0.12), width: 1),
       ),
 
       // Borde cuando está enfocado
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(30),
-        borderSide: BorderSide(
-          color: Colors.white.withOpacity(0.12),
-          width: 1,
-        ),
+        borderSide: BorderSide(color: Colors.white.withOpacity(0.12), width: 1),
       ),
 
       // Quita el border por defecto
@@ -96,13 +80,8 @@ class _LoginFormState extends ConsumerState<LoginForm> {
         TextField(
           controller: _emailController,
           keyboardType: TextInputType.emailAddress,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 14
-          ),
-          decoration: inputDecoration.copyWith(
-            hintText: 'Correo electrónico',
-          ),
+          style: const TextStyle(color: Colors.white, fontSize: 14),
+          decoration: inputDecoration.copyWith(hintText: 'Correo electrónico'),
         ),
 
         const SizedBox(height: 12),
@@ -111,64 +90,79 @@ class _LoginFormState extends ConsumerState<LoginForm> {
         TextField(
           controller: _passwordController,
           obscureText: true,
-          style: const TextStyle(
-            color: Colors.white,
-            fontSize: 14
-          ),
+          style: const TextStyle(color: Colors.white, fontSize: 14),
           decoration: inputDecoration.copyWith(
             hintText: 'Contraseña',
             // prefixIcon: const Icon(Icons.lock, color: Colors.white70),
           ),
         ),
-        // const SizedBox(height: 12),
-        // Padding(
-        //   padding: const EdgeInsets.all(8.0),
-        //   child: const Text(
-        //       'Ingrese un usuario y contraseña válidos.', 
-        //     style: TextStyle(
-        //       color: Color.fromARGB(255, 162, 15, 15), 
-        //       fontSize: 14,
-        //       fontWeight: FontWeight.bold
-        //     )),
-        // ),
 
         const SizedBox(height: 30),
-        
 
         // Login button
         ElevatedButton(
-          onPressed: () {
-            validateUser(context, _passwordController.text, _emailController.text, ref);
-            // context.go('/');
-          },
+          onPressed: isLoading
+            ? null
+            : () {
+                FocusScope.of(context).unfocus(); //cerrar teclado
+                validateUser(
+                  context,
+                  _passwordController.text,
+                  _emailController.text,
+                  ref,
+                );
+              },
           style: ElevatedButton.styleFrom(
             padding: const EdgeInsets.symmetric(vertical: 16),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(30),
             ),
-            backgroundColor: Color.fromARGB(189, 7, 213, 213),
+            backgroundColor: const Color.fromARGB(189, 7, 213, 213),
+            disabledBackgroundColor: const Color.fromARGB(120, 7, 213, 213),
           ),
-          child: const Text(
-            'Iniciar sesión', 
-            style: TextStyle(
-              color: Color.fromARGB(255, 255, 255, 255), 
-              fontSize: 16,
-              fontWeight: FontWeight.bold
-            )),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (isLoading) ...[
+                const SizedBox(
+                  width: 14,
+                  height: 14,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(width: 12),
+              ],
+              const Text(
+                'Iniciar sesión',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
         ),
-        
-        
+
         const SizedBox(height: 18),
-      
+
         // Sign up link
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text("¿No tienes una cuenta?", style: TextStyle(color: Colors.white54)),
+            const Text(
+              "¿No tienes una cuenta?",
+              style: TextStyle(color: Colors.white54),
+            ),
             TextButton(
               onPressed: () {},
-              child: const Text('Registrarse', style: TextStyle(color: Color.fromARGB(255, 14, 170, 170))),
-            )
+              child: const Text(
+                'Registrarse',
+                style: TextStyle(color: Color.fromARGB(255, 14, 170, 170)),
+              ),
+            ),
           ],
         ),
       ],
@@ -176,7 +170,12 @@ class _LoginFormState extends ConsumerState<LoginForm> {
   }
 }
 
-void validateUser(BuildContext context, String password, String email, WidgetRef ref) {
+void validateUser(
+  BuildContext context,
+  String password,
+  String email,
+  WidgetRef ref,
+) {
   if (email.isEmpty || password.isEmpty) {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -193,4 +192,3 @@ void validateUser(BuildContext context, String password, String email, WidgetRef
     "password": password,
   });
 }
-

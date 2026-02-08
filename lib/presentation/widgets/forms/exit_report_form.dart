@@ -21,6 +21,10 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
   String _categoryEntry = '0';
   String _workday = '0';
   String _groupBusiness = '0';
+  bool isLoading = false;
+  bool imagesMinError = false;
+  bool imagesMaxError = false;
+
   final _guideCtrl = TextEditingController();
   final _quantityCtrl = TextEditingController();
   final _weightCtrl = TextEditingController();
@@ -73,11 +77,26 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
   }
 
   Future<void> _captureImageFromCamera() async {
+    if (_selectedImages.length >= 5) {
+      if (mounted) {
+        setState(() {
+          imagesMinError = false;
+          imagesMaxError = false;
+        });
+      }
+    }
+
     if (_selectedImages.length >= 10) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Máximo 10 imágenes permitidas')),
-      );
+      if (mounted) {
+        setState(() {
+          imagesMaxError = true;
+        });
+      }
       return;
+    }
+
+    if (_selectedImages.length == 10) {
+      imagesMaxError = false;
     }
 
     try {
@@ -85,7 +104,7 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
         source: ImageSource.camera,
       );
 
-      if (image != null) {
+      if (image != null && mounted) {
         setState(() {
           _selectedImages.add(File(image.path));
         });
@@ -106,20 +125,16 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
   }
 
   void _submit() async {
+    FocusScope.of(context).unfocus();
     if (!(_formKey.currentState?.validate() ?? false)) return;
     
-    // Validar cantidad de imágenes
     if (_selectedImages.length < 5) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Debe seleccionar mínimo 5 imágenes')),
-      );
+      imagesMinError = true;
       return;
     }
 
     if (_selectedImages.length > 10) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Máximo 10 imágenes permitidas')),
-      );
+      imagesMaxError = true;
       return;
     }
 
@@ -160,7 +175,10 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
       "id_group_business": userData.attributes['group_business'] ?? int.parse(_groupBusiness), //
       "images": _selectedImages,
     };
+
+    isLoading = true;
     final success = await widget.onSubmit?.call(data) ?? false;
+    isLoading = false;
     
     if (success) {
       if (mounted) {
@@ -190,6 +208,8 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
     _observationsCtrl.clear();
     _personWithdrawsCtrl.clear();
     _destinyCtrl.clear();
+    imagesMinError = false;
+    imagesMaxError = false;
   }
 
   @override
@@ -560,7 +580,20 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                 SizedBox(
                   width: double.infinity,
                   child: OutlinedButton.icon(
-                    onPressed: _captureImageFromCamera,
+                    onPressed: () async {
+                      final granted = await requestCameraPermission(context);
+
+                      if (!granted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Permiso de cámara denegado'),
+                          ),
+                        );
+                        return;
+                      }
+
+                      _captureImageFromCamera();
+                    },
                     icon: const Icon(Icons.camera_alt, color: Color.fromARGB(189, 7, 213, 213)),
                     label: const Text(
                       'Capturar Imagen',
@@ -628,7 +661,16 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                       ),
                     ),
                   ),
-
+                if (imagesMinError || imagesMaxError)
+                  SizedBox(
+                    width: double.infinity,
+                    child: Text(
+                      imagesMinError
+                          ? 'Debe subir mínimo 5 imagenes'
+                          : 'Debe subir máximo 10 imagenes',
+                      style: TextStyle(color: Color.fromARGB(255, 185, 28, 16)),
+                    ),
+                  ),
                 const SizedBox(height: 26),
                 Row(
                   children: [
@@ -646,23 +688,50 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                         ),
                         child: const Text(
                           'Cancelar',
-                          style: TextStyle(color: Colors.white, fontSize: 15),
+                          style: TextStyle(
+                            color: Colors.white, 
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: ElevatedButton(
-                        onPressed: _submit,
+                        onPressed: isLoading ? null : _submit,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color.fromARGB(189, 7, 213, 213),
-                          foregroundColor: const Color.fromARGB(255, 255, 255, 255),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          backgroundColor: const Color.fromARGB(189, 7, 213, 213),
+                          disabledBackgroundColor: const Color.fromARGB(120, 7, 213, 213),
                         ),
-                        child: const Text('Guardar', style: TextStyle(fontSize: 15)),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            if (isLoading) ...[
+                              const SizedBox(
+                                width: 14,
+                                height: 14,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                            ],
+                            const Text(
+                              'Guardar',
+                              style: TextStyle(
+                                fontSize: 15, 
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],

@@ -36,17 +36,6 @@ class _VideoHeaderState extends ConsumerState<VideoHeader> {
 
   @override
   Widget build(BuildContext context) {
-    ref.listen<AsyncValue<User?>>(userSessionProvider, (previous, next) {
-      if (previous?.value != null && next.value == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Sesión no válida. Vuelva a iniciar sesión'),
-          ),
-        );
-
-        context.go('/login');
-      }
-    });
 
     final authState = ref.watch(userSessionProvider);
 

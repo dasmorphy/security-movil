@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:zentinel/config/utils/helper.dart';
+import 'package:zentinel/domain/entities/user_session.dart';
 import 'package:zentinel/presentation/providers/logbook/logbook_provider.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/views/views.dart';
@@ -34,6 +36,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+
+    ref.listen<AsyncValue<User?>>(userSessionProvider, (previous, next) {
+      if (previous?.value != null && next.value == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Sesión no válida. Vuelva a iniciar sesión'),
+          ),
+        );
+
+        context.go('/login');
+      }
+    });
+
+    
     ref.listen<GlobalInterceptorDioProvider?>(globalMessageProvider, (prev, next) {
       if (next != null) {
         scaffoldMessengerKey.currentState?.showSnackBar(

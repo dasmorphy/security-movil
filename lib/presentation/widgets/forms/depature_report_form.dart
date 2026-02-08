@@ -14,7 +14,7 @@ class DepatureReportForm extends ConsumerStatefulWidget {
   const DepatureReportForm({super.key, this.onSubmit});
 
   @override
-  ConsumerState <DepatureReportForm> createState() => _DepatureReportFormState();
+  ConsumerState<DepatureReportForm> createState() => _DepatureReportFormState();
 }
 
 class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
@@ -22,6 +22,10 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
   String _categoryEntry = '0';
   String _groupBusiness = '0';
   String _workday = '0';
+  bool isLoading = false;
+  bool imagesMinError = false;
+  bool imagesMaxError = false;
+
   int? _unityId;
   final _guideCtrl = TextEditingController();
   final _descCtrl = TextEditingController();
@@ -81,11 +85,26 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
   }
 
   Future<void> _captureImageFromCamera() async {
+    if (_selectedImages.length >= 5) {
+      if (mounted) {
+        setState(() {
+          imagesMinError = false;
+          imagesMaxError = false;
+        });
+      }
+    }
+
     if (_selectedImages.length >= 10) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Máximo 10 imágenes permitidas')),
-      );
+      if (mounted) {
+        setState(() {
+          imagesMaxError = true;
+        });
+      }
       return;
+    }
+
+    if (_selectedImages.length == 10) {
+      imagesMaxError = false;
     }
 
     try {
@@ -93,16 +112,16 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
         source: ImageSource.camera,
       );
 
-      if (image != null) {
+      if (image != null && mounted) {
         setState(() {
           _selectedImages.add(File(image.path));
         });
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al capturar imagen: $e')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error al capturar imagen: $e')));
       }
     }
   }
@@ -114,20 +133,16 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
   }
 
   void _submit() async {
+    FocusScope.of(context).unfocus();
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
-    // Validar cantidad de imágenes
     if (_selectedImages.length < 5) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Debe seleccionar mínimo 5 imágenes')),
-      );
+      imagesMinError = true;
       return;
     }
 
     if (_selectedImages.length > 10) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Máximo 10 imágenes permitidas')),
-      );
+      imagesMaxError = true;
       return;
     }
 
@@ -136,7 +151,9 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
     //Usuario no cargado o sesión inválida
     if (!authState.hasValue || authState.value == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Sesión no válida. Vuelva a iniciar sesión')),
+        const SnackBar(
+          content: Text('Sesión no válida. Vuelva a iniciar sesión'),
+        ),
       );
       return;
     }
@@ -168,8 +185,10 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
       "id_group_business": userData.attributes['group_business'] ?? int.parse(_groupBusiness), //
       "images": _selectedImages,
     };
-    
+
+    isLoading = true;
     final success = await widget.onSubmit?.call(data) ?? false;
+    isLoading = false;
     print('Error apiiiii response: $success');
     if (success) {
       if (mounted) {
@@ -182,8 +201,8 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
       }
     }
   }
-  
-  void _clearCntrl () {
+
+  void _clearCntrl() {
     _selectedImages = [];
     _formKey.currentState?.reset();
     _categoryEntry = '0';
@@ -200,6 +219,8 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
     _truckLicenseCtrl.clear();
     _authorizedCtrl.clear();
     _observationsCtrl.clear();
+    imagesMinError = false;
+    imagesMaxError = false;
   }
 
   @override
@@ -244,7 +265,12 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
         key: _formKey,
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.only(top: 12, bottom: 20, left: 16, right: 16),
+            padding: const EdgeInsets.only(
+              top: 12,
+              bottom: 20,
+              left: 16,
+              right: 16,
+            ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -284,15 +310,15 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                     ),
                     child: Row(
                       children: [
-                        if (userData.attributes['name_group_business'] != null) ...[
+                        if (userData.attributes['name_group_business'] !=
+                            null) ...[
                           const Icon(Icons.location_on, color: Colors.red),
                           const SizedBox(width: 8),
-                            Text(
-                              userData.attributes['name_group_business'],
-                              style: const TextStyle(color: Colors.white),
+                          Text(
+                            userData.attributes['name_group_business'],
+                            style: const TextStyle(color: Colors.white),
                           ),
-                        ] 
-                        else ...[
+                        ] else ...[
                           Expanded(
                             child: Column(
                               children: [
@@ -320,7 +346,9 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                                     }
                                   },
                                   validator: (v) {
-                                    if (v == '0' || v == null || v.trim().isEmpty) {
+                                    if (v == '0' ||
+                                        v == null ||
+                                        v.trim().isEmpty) {
                                       return messageValidatorEmpty;
                                     }
                                     return null;
@@ -329,7 +357,6 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                               ],
                             ),
                           ),
-
                         ],
                       ],
                     ),
@@ -347,10 +374,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                       value: '0',
                       child: Text('Seleccione una opción'),
                     ),
-                    DropdownMenuItem(
-                      value: 'Diurna',
-                      child: Text('Diurna'),
-                    ),
+                    DropdownMenuItem(value: 'Diurna', child: Text('Diurna')),
                     DropdownMenuItem(
                       value: 'Nocturna',
                       child: Text('Nocturna'),
@@ -362,7 +386,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                     }
                   },
                   validator: (v) {
-                    if (v=='0' || v == null || v.trim().isEmpty) {
+                    if (v == '0' || v == null || v.trim().isEmpty) {
                       return messageValidatorEmpty;
                     }
                     return null;
@@ -392,16 +416,19 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                     if (v != null) {
                       setState(() => _categoryEntry = v);
                       _unityId = getUnityIdByCategory(
-                        nameCategory: categories.firstWhere(
-                          (u) => u.idCategory== int.parse(v),
-                          orElse: () => throw Exception('Categoría no encontrada'),
-                        ).nameCategory,
+                        nameCategory: categories
+                            .firstWhere(
+                              (u) => u.idCategory == int.parse(v),
+                              orElse: () =>
+                                  throw Exception('Categoría no encontrada'),
+                            )
+                            .nameCategory,
                         unities: unitiesWeight,
                       );
                     }
                   },
                   validator: (v) {
-                    if (v=='0' || v == null || v.trim().isEmpty) {
+                    if (v == '0' || v == null || v.trim().isEmpty) {
                       return messageValidatorEmpty;
                     }
                     return null;
@@ -576,14 +603,31 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
 
                 const SizedBox(height: 26),
                 CustomFieldLabelRequired(
-                  txtLabel: 'Imágenes desde Cámara (${_selectedImages.length}/10)',
+                  txtLabel:
+                      'Imágenes desde Cámara (${_selectedImages.length}/10)',
                 ),
                 const SizedBox(height: 8),
                 SizedBox(
                   width: double.infinity,
                   child: OutlinedButton.icon(
-                    onPressed: _captureImageFromCamera,
-                    icon: const Icon(Icons.camera_alt, color: Color.fromARGB(189, 7, 213, 213)),
+                    onPressed: () async {
+                      final granted = await requestCameraPermission(context);
+
+                      if (!granted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Permiso de cámara denegado'),
+                          ),
+                        );
+                        return;
+                      }
+
+                      _captureImageFromCamera();
+                    },
+                    icon: const Icon(
+                      Icons.camera_alt,
+                      color: Color.fromARGB(189, 7, 213, 213),
+                    ),
                     label: const Text(
                       'Capturar Imagen',
                       style: TextStyle(color: Color.fromARGB(189, 7, 213, 213)),
@@ -605,11 +649,12 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                     child: GridView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3,
-                        crossAxisSpacing: 8,
-                        mainAxisSpacing: 8,
-                      ),
+                      gridDelegate:
+                          const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 3,
+                            crossAxisSpacing: 8,
+                            mainAxisSpacing: 8,
+                          ),
                       itemCount: _selectedImages.length,
                       itemBuilder: (context, index) {
                         return Stack(
@@ -628,7 +673,10 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                               right: -8,
                               child: IconButton(
                                 onPressed: () => _removeImage(index),
-                                icon: const Icon(Icons.close, color: Colors.red),
+                                icon: const Icon(
+                                  Icons.close,
+                                  color: Colors.red,
+                                ),
                                 style: IconButton.styleFrom(
                                   backgroundColor: Colors.black54,
                                   iconSize: 16,
@@ -651,6 +699,16 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                     ),
                   ),
 
+                if (imagesMinError || imagesMaxError)
+                  SizedBox(
+                    width: double.infinity,
+                    child: Text(
+                      imagesMinError
+                          ? 'Debe subir mínimo 5 imagenes'
+                          : 'Debe subir máximo 10 imagenes',
+                      style: TextStyle(color: Color.fromARGB(255, 185, 28, 16)),
+                    ),
+                  ),
                 const SizedBox(height: 26),
                 Row(
                   children: [
@@ -668,23 +726,50 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                         ),
                         child: const Text(
                           'Cancelar',
-                          style: TextStyle(color: Colors.white, fontSize: 15),
+                          style: TextStyle(
+                            color: Colors.white, 
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: ElevatedButton(
-                        onPressed: _submit,
+                        onPressed: isLoading ? null : _submit,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color.fromARGB(189, 7, 213, 213),
-                          foregroundColor: const Color.fromARGB(255, 255, 255, 255),
+                          padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          backgroundColor: const Color.fromARGB(189, 7, 213, 213),
+                          disabledBackgroundColor: const Color.fromARGB(120, 7, 213, 213),
                         ),
-                        child: const Text('Guardar', style: TextStyle(fontSize: 15)),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            if (isLoading) ...[
+                              const SizedBox(
+                                width: 14,
+                                height: 14,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              const SizedBox(width: 12),
+                            ],
+                            const Text(
+                              'Guardar',
+                              style: TextStyle(
+                                fontSize: 15, 
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],
