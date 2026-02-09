@@ -84,6 +84,7 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
         );
       }
     }
+    final stopwatch = Stopwatch()..start();
 
     final response = await dio.post(
       '/rest/zent-logbook-api/v1.0/post/logbook-entry',
@@ -91,6 +92,8 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
       options: onlyError(),
     );
 
+    stopwatch.stop();
+    print('⏱️ Tiempo total request: ${stopwatch.elapsedMilliseconds} ms');
     return response.statusCode == 200;
   }
 
@@ -136,13 +139,15 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
         );
       }
     }
+    final stopwatch = Stopwatch()..start();
 
     final response = await dio.post(
       '/rest/zent-logbook-api/v1.0/post/logbook-out',
       data: formData,
       options: onlyError(),
     );
-
+stopwatch.stop();
+    print('⏱️ Tiempo total request: ${stopwatch.elapsedMilliseconds} ms');
     return response.statusCode == 200;
   }
 

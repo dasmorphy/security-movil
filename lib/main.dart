@@ -10,6 +10,12 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:zentinel/config/utils/helper.dart';
+import 'package:zentinel/service/local_storage.dart';
+import 'package:zentinel/service/pending_request_service.dart';
+import 'package:zentinel/presentation/widgets/shared/sync_listener.dart';
+import 'package:zentinel/presentation/providers/sync_pending/sync_pending_provider.dart';
+
+final syncService = SyncService();
 
 Future<void> main() async {
   await dotenv.load(fileName: '.env');
@@ -17,6 +23,7 @@ Future<void> main() async {
   await FlutterLocalization.instance.ensureInitialized();
   await initializeDateFormatting('es_ES', null);
   Intl.defaultLocale = 'es_ES';
+  await initHive();
   
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
@@ -26,18 +33,19 @@ Future<void> main() async {
     ),
   );
 
-  runApp(const ProviderScope(child: MyApp()));
+    runApp(const ProviderScope(child: MyApp()));
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends ConsumerStatefulWidget {
   const MyApp({super.key});
 
   @override
-  State<MyApp> createState() => _MyAppState();
+  ConsumerState<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends ConsumerState<MyApp> {
   final FlutterLocalization _localization = FlutterLocalization.instance;
+  late AppLifecycleObserver _lifecycleObserver;
   // final scaffoldMessengerKeyy = GlobalKey<ScaffoldMessengerState>();
 
   @override
@@ -55,22 +63,44 @@ class _MyAppState extends State<MyApp> {
     _localization.onTranslatedLanguage = (_) {
       setState(() {});
     };
+
+    // 🔄 Callback para sincronizar cuando hay internet
+    void onSyncNeeded() {
+      print('📡 Internet disponible, iniciando sincronización...');
+      ref.read(syncPendingProvider.notifier).sync();
+    }
+
+    // 🔄 Inicializar el SyncService con el callback
+    syncService.start(onSyncNeeded: onSyncNeeded);
+
+    // 👁️ Registrar el lifecycle observer para sincronizar cuando el app vuelve a primer plano
+    _lifecycleObserver = AppLifecycleObserver(onResume: onSyncNeeded);
+    WidgetsBinding.instance.addObserver(_lifecycleObserver);
+  }
+
+  @override
+  void dispose() {
+    syncService.dispose();
+    WidgetsBinding.instance.removeObserver(_lifecycleObserver);
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      scaffoldMessengerKey: scaffoldMessengerKey,
-      routerConfig: appRouter,
-      debugShowCheckedModeBanner: false,
-      supportedLocales: _localization.supportedLocales,
-      localizationsDelegates: [
-        ..._localization.localizationsDelegates,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      theme: AppTheme().getTheme(),
+    return SyncListener(
+      child: MaterialApp.router(
+        scaffoldMessengerKey: scaffoldMessengerKey,
+        routerConfig: appRouter,
+        debugShowCheckedModeBanner: false,
+        supportedLocales: _localization.supportedLocales,
+        localizationsDelegates: [
+          ..._localization.localizationsDelegates,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        theme: AppTheme().getTheme(),
+      ),
     );
   }
 }

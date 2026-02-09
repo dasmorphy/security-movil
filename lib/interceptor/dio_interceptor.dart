@@ -26,10 +26,27 @@ class DioInterceptor extends Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
     final showError = err.requestOptions.extra['showErrorMessage'] ?? true;
-  print(err);
+
     if (showError) {
-      final message =
-          err.response?.data?['message'] ?? 'Error inesperado en el servidor';
+      String message;
+
+      switch (err.type) {
+        case DioExceptionType.connectionTimeout:
+        case DioExceptionType.receiveTimeout:
+          message = 'Tiempo de espera agotado';
+          break;
+
+        case DioExceptionType.connectionError:
+          message = 'Revisa tu conexión a internet';
+          break;
+
+        case DioExceptionType.badResponse:
+          message = err.response?.data?['message'] ?? 'Error del servidor';
+          break;
+
+        default:
+          message = 'Error inesperado';
+      }
 
       ref.read(globalMessageProvider.notifier).showError(message);
     }

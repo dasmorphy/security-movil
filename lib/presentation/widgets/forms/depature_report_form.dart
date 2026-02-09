@@ -8,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
+import 'package:zentinel/service/pending_request_service.dart';
 
 class DepatureReportForm extends ConsumerStatefulWidget {
   final Future<bool> Function(Map<String, dynamic>)? onSubmit;
@@ -59,9 +60,9 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
   @override
   void initState() {
     super.initState();
-    ref.read(getAllCategories.notifier).load();
-    ref.read(getAllUnitiesWeight.notifier).load();
-    ref.read(getGroupBusinessByIdBusiness.notifier).load();
+    // ref.read(getAllCategories.notifier).load();
+    // ref.read(getAllUnitiesWeight.notifier).load();
+    // ref.read(getGroupBusinessByIdBusiness.notifier).load();
   }
 
   @override
@@ -137,12 +138,12 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
     if (_selectedImages.length < 5) {
-      imagesMinError = true;
+      setState(() => imagesMinError = true);
       return;
     }
 
     if (_selectedImages.length > 10) {
-      imagesMaxError = true;
+      setState(() => imagesMaxError = true);
       return;
     }
 
@@ -166,6 +167,8 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
       );
       return;
     }
+
+    // Construir los datos del formulario
     final data = {
       "id_unity": _unityId,
       "id_category": int.parse(_categoryEntry),
@@ -178,27 +181,92 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
       "authorized_by": _authorizedCtrl.text.trim(),
       "observations": _observationsCtrl.text.trim(),
       "name_driver": _nameDriverCtrl.text.trim(),
-      "truck_license": _truckLicenseCtrl.text.trim(), //
-      "created_by": userData.user, //
-      "name_user": userData.attributes['fullname'], //
+      "truck_license": _truckLicenseCtrl.text.trim(),
+      "created_by": userData.user,
+      "name_user": userData.attributes['fullname'],
       "workday": _workday.trim(),
-      "id_group_business": userData.attributes['group_business'] ?? int.parse(_groupBusiness), //
-      "images": _selectedImages,
+      "id_group_business": userData.attributes['group_business'] ?? int.parse(_groupBusiness),
+      "images": _selectedImages, // Archivos serán convertidos a Base64 antes de guardar
     };
 
-    isLoading = true;
+    // Mostrar un diálogo de procesamiento
+    if (mounted) {
+      // showDialog(
+      //   context: context,
+      //   barrierDismissible: false,
+      //   builder: (context) => const AlertDialog(
+      //     content: Row(
+      //       children: [
+      //         CircularProgressIndicator(),
+      //         SizedBox(width: 16),
+      //         Text('Procesando formulario...'),
+      //       ],
+      //     ),
+      //   ),
+      // );
+    }
+
+    // Verificar conexión a internet
+    final internetAvailable = await hasInternet();
+
+    if (!internetAvailable) {
+      // 🔴 SIN INTERNET: Guardar localmente
+      print('❌ Sin conexión, guardando localmente...');
+      await savePendingRequest(data, 'logbook_entry');
+
+      if (mounted) {
+        // Navigator.pop(context); // Cerrar dialog de procesamiento
+        _clearCntrl();
+        context.pop(); // Cerrar el formulario
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            duration: Duration(seconds: 6),
+            content: Text(
+              '📱 Sin conexión. Tu información se guardará localmente y se enviará automáticamente cuando recuperes conexión.',
+              style: TextStyle(color: Colors.white),
+            ),
+            backgroundColor: Color.fromARGB(255, 255, 152, 0),
+          ),
+        );
+      }
+      return;
+    }
+
+    // 🟢 CON INTERNET: Enviar al servidor
+    print('✅ Conexión disponible, enviando al servidor...');
     final success = await widget.onSubmit?.call(data) ?? false;
     isLoading = false;
-    print('Error apiiiii response: $success');
-    if (success) {
-      if (mounted) {
+
+    if (!success) {
+      await savePendingRequest(data, 'logbook_entry');
+    }
+
+    if (mounted) {
+      // Navigator.pop(context); // Cerrar dialog de procesamiento
+      
+      if (success) {
         _clearCntrl();
+        context.pop(); // Cerrar el formulario
         context.push('/check-success');
+      } else {
+        // saveLocal(data);
+        context.pop(); // Cerrar el formulario
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('❌ Error al enviar el formulario. Por favor intenta de nuevo.'),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
-    } else {
-      if (mounted) {
-        context.pop();
-      }
+    }
+  }
+
+  void saveLocal(Map<String, dynamic> data) async {
+    try {
+      await savePendingRequest(data, 'logbook_entry');
+    } catch (e) {
+      print('Error al guardar la data en cache');
     }
   }
 
@@ -611,16 +679,16 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                   width: double.infinity,
                   child: OutlinedButton.icon(
                     onPressed: () async {
-                      final granted = await requestCameraPermission(context);
+                      // final granted = await requestCameraPermission(context);
 
-                      if (!granted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Permiso de cámara denegado'),
-                          ),
-                        );
-                        return;
-                      }
+                      // if (!granted) {
+                      //   ScaffoldMessenger.of(context).showSnackBar(
+                      //     const SnackBar(
+                      //       content: Text('Permiso de cámara denegado'),
+                      //     ),
+                      //   );
+                      //   return;
+                      // }
 
                       _captureImageFromCamera();
                     },

@@ -7,6 +7,7 @@ import 'dart:io';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
+import 'package:zentinel/service/pending_request_service.dart';
 
 class ExitReportForm extends ConsumerStatefulWidget {
   final Future<bool> Function(Map<String, dynamic>)? onSubmit;
@@ -56,9 +57,6 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
   @override
   void initState() {
     super.initState();
-    ref.read(getAllCategories.notifier).load();
-    ref.read(getGroupBusinessByIdBusiness.notifier).load();
-    ref.read(getAllUnitiesWeight.notifier).load();
   }
   
   @override
@@ -129,12 +127,12 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
     if (!(_formKey.currentState?.validate() ?? false)) return;
     
     if (_selectedImages.length < 5) {
-      imagesMinError = true;
+      setState(() => imagesMinError = true);
       return;
     }
 
     if (_selectedImages.length > 10) {
-      imagesMaxError = true;
+      setState(() => imagesMaxError = true);
       return;
     }
 
@@ -159,36 +157,91 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
 
     final data = {
       "id_unity": _unityId,
-      "id_category": int.parse(_categoryEntry), //
+      "id_category": int.parse(_categoryEntry),
       "shipping_guide": _guideCtrl.text.trim(),
       "workday": _workday.trim(),
       "name_driver": _nameDriverCtrl.text.trim(),
       "quantity": int.tryParse(_quantityCtrl.text) ?? 0,
       "weight": int.tryParse(_weightCtrl.text) ?? 0,
-      "truck_license": _truckLicenseCtrl.text.trim(), //
-      "person_withdraws": _personWithdrawsCtrl.text.trim(), //
-      "destiny": _nameDriverCtrl.text.trim(), //
-      "authorized_by": _authorizedCtrl.text.trim(), //
+      "truck_license": _truckLicenseCtrl.text.trim(),
+      "person_withdraws": _personWithdrawsCtrl.text.trim(),
+      "destiny": _nameDriverCtrl.text.trim(),
+      "authorized_by": _authorizedCtrl.text.trim(),
       "observations": _observationsCtrl.text.trim(),
-      "created_by": userData.user, //
-      "name_user": userData.attributes['fullname'], //
-      "id_group_business": userData.attributes['group_business'] ?? int.parse(_groupBusiness), //
-      "images": _selectedImages,
+      "created_by": userData.user,
+      "name_user": userData.attributes['fullname'],
+      "id_group_business": userData.attributes['group_business'] ?? int.parse(_groupBusiness),
+      "images": _selectedImages, // Archivos serán convertidos a Base64 antes de guardar
     };
 
+    // Mostrar un diálogo de procesamiento
+    if (mounted) {
+      // showDialog(
+      //   context: context,
+      //   barrierDismissible: false,
+      //   builder: (context) => const AlertDialog(
+      //     content: Row(
+      //       children: [
+      //         CircularProgressIndicator(),
+      //         SizedBox(width: 16),
+      //         Text('Procesando formulario...'),
+      //       ],
+      //     ),
+      //   ),
+      // );
+    }
+
+    // Verificar conexión a internet
+    final internetAvailable = await hasInternet();
+
+    if (!internetAvailable) {
+      // 🔴 SIN INTERNET: Guardar localmente
+      print('❌ Sin conexión, guardando localmente...');
+      await savePendingRequest(data, 'logbook_out');
+
+      if (mounted) {
+        // Navigator.pop(context); // Cerrar dialog de procesamiento
+        _clearCntrl();
+        context.pop(); // Cerrar el formulario
+        
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            duration: Duration(seconds: 4),
+            content: Text(
+              '📱 Sin conexión. Tu información se guardará localmente y se enviará automáticamente cuando recuperes conexión.',
+              style: TextStyle(color: Colors.white),
+            ),
+            backgroundColor: Color.fromARGB(255, 255, 152, 0),
+          ),
+        );
+      }
+      return;
+    }
+
+    // 🟢 CON INTERNET: Enviar al servidor
+    print('✅ Conexión disponible, enviando al servidor...');
     isLoading = true;
     final success = await widget.onSubmit?.call(data) ?? false;
     isLoading = false;
-    
-    if (success) {
-      if (mounted) {
+
+    if (!success) {
+      await savePendingRequest(data, 'logbook_out');
+    }
+
+    if (mounted) {
+      Navigator.pop(context); // Cerrar dialog de procesamiento
+      
+      if (success) {
         _clearCntrl();
         context.go('/check-success');
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('❌ Error al enviar el formulario. Por favor intenta de nuevo.'),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
-    } else {
-        if (mounted) {
-          context.pop();
-        }
     }
   }
 
@@ -581,16 +634,16 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                   width: double.infinity,
                   child: OutlinedButton.icon(
                     onPressed: () async {
-                      final granted = await requestCameraPermission(context);
+                      // final granted = await requestCameraPermission(context);
 
-                      if (!granted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Permiso de cámara denegado'),
-                          ),
-                        );
-                        return;
-                      }
+                      // if (!granted) {
+                      //   ScaffoldMessenger.of(context).showSnackBar(
+                      //     const SnackBar(
+                      //       content: Text('Permiso de cámara denegado'),
+                      //     ),
+                      //   );
+                      //   return;
+                      // }
 
                       _captureImageFromCamera();
                     },

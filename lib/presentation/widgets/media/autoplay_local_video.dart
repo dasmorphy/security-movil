@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:video_player/video_player.dart';
-import 'package:zentinel/domain/entities/user_session.dart';
 import 'package:zentinel/presentation/providers/auth/auth_provider.dart';
 
 class VideoHeader extends ConsumerStatefulWidget {

@@ -7,6 +7,7 @@ import 'package:zentinel/presentation/providers/logbook/logbook_provider.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/views/views.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
+import 'package:zentinel/service/pending_request_service.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   static const name = 'home-screen';
@@ -23,7 +24,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   void initState() {
     super.initState();
-
+    WidgetsBinding.instance.addObserver(AppLifecycleObserver());
     Future.microtask(() {
       ref.read(homeTabProvider.notifier).state = 0;
     });
@@ -36,6 +37,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+
+    ref.listen(connectivityProvider, (prev, next) {
+      next.whenData((online) {
+        if (online) {
+          ref.read(syncPendingProvider.notifier).sync();
+        }
+      });
+    });
+
 
     ref.listen<AsyncValue<User?>>(userSessionProvider, (previous, next) {
       if (previous?.value != null && next.value == null) {
