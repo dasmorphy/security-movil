@@ -19,3 +19,5 @@ export 'package:zentinel/presentation/widgets/headers/header_options_profile.dar
 export 'package:zentinel/presentation/widgets/profile_menu/personal_data_item.dart';
 export 'package:zentinel/presentation/widgets/forms/change_password_form.dart';
 export 'package:zentinel/presentation/widgets/forms/change_email_form.dart';
+export 'package:zentinel/presentation/widgets/modals/logbooks_offline_list_modal.dart';
+export 'package:zentinel/presentation/widgets/headers/header_logbooks_offline.dart';

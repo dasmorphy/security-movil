@@ -200,3 +200,15 @@ Future<bool> requestCameraPermission(BuildContext context) async {
   print('Estado del permiso: $status');
   return status.isGranted;
 }
+
+Map<String, dynamic> mapPendingToUI(Map<String, dynamic> raw) {
+  final bool processing = raw['processing'] == true;
+
+  return {
+    "name": raw['endpoint'] == 'logbook_entry'
+        ? 'Bitácora entrada'
+        : 'Bitácora salida',
+    "subtitle": raw['payload']['shipping_guide'] ?? 'Desconocido',
+    "statusText": processing ? 'Subiendo...' : 'Pendiente'
+  };
+}

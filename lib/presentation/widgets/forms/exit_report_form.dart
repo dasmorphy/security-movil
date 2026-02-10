@@ -429,20 +429,20 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                 ),
 
                 const SizedBox(height: 12),
-                CustomFieldLabelRequired(txtLabel: 'Categoría de ingreso'),
-                GlowDropdownFormField<String>(
+                CustomFieldLabelRequired(txtLabel: 'Categoría de salida'),
+                GlowDropdownFormField2<String>(
                   value: _categoryEntry,
                   focusNode: _categoryEntryFocus,
                   decoration: styleDecoration(),
                   items: [
                     DropdownMenuItem(
                       value: '0',
-                      child: Text('Seleccione una opción'),
+                      child: Text('Seleccione una opción', style: TextStyle(color: Colors.white),),
                     ),
                     ...categories.map(
                       (c) => DropdownMenuItem(
                         value: c.idCategory.toString(),
-                        child: Text(c.nameCategory),
+                        child: Text(c.nameCategory, style: TextStyle(color: Colors.white),),
                       ),
                     ),
                   ],
@@ -490,7 +490,6 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                 const SizedBox(height: 12),
                 CustomFieldLabelRequired(txtLabel: 'Unidad'),
                 GlowDropdownFormField<String>(
-                  enabled: false,
                   value: _unityId,
                   focusNode: _unitFocus,
                   decoration: styleDecoration(),

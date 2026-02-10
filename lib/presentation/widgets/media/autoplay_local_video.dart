@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:video_player/video_player.dart';
 import 'package:zentinel/presentation/providers/auth/auth_provider.dart';
+import 'package:zentinel/presentation/widgets/widgets.dart';
 
 class VideoHeader extends ConsumerStatefulWidget {
   const VideoHeader({super.key});
@@ -45,7 +46,7 @@ class _VideoHeaderState extends ConsumerState<VideoHeader> {
           return const SizedBox(); // evita crash mientras navega
         }
 
-        final headerHeight = MediaQuery.of(context).size.height * 0.26;
+        final headerHeight = MediaQuery.of(context).size.height * 0.24;
 
         return SizedBox(
           height: headerHeight,
@@ -84,12 +85,27 @@ class _VideoHeaderState extends ConsumerState<VideoHeader> {
                     ),
                     child: Column(
                       children: [
-                        const SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            InkWell(
+                              borderRadius: BorderRadius.circular(20),
+                              onTap: () => _openModal(context, LogbooksOfflineListModal()),
+                              child: const Padding(
+                                padding: EdgeInsets.all(7),
+                                child: Icon(Icons.upload_file_rounded, color: Colors.white),
+                              ),
+                            ),
+                          ],
+                        ),
+                        
                         Align(
                           alignment: Alignment.centerLeft,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
                             children: [
+                              const SizedBox(height: 15,),
                               const Text(
                                 'Hola,',
                                 style: TextStyle(
@@ -117,6 +133,18 @@ class _VideoHeaderState extends ConsumerState<VideoHeader> {
             ),
           ),
         );
+      },
+    );
+  }
+
+  void _openModal(BuildContext context, Widget childWidget) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      barrierColor: Colors.black54,
+      builder: (_) {
+        return AnimatedModal(child: childWidget);
       },
     );
   }

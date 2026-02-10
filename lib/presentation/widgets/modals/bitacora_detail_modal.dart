@@ -17,15 +17,6 @@ class BitacoraDetailModal extends StatelessWidget {
   Widget build(BuildContext context) {
     final entries = item.entries.toList();
 
-    final Map<String, String> keyTranslations = {
-      'shipping_guide': 'Guía de remisión',
-      'quantity': 'Cantidad',
-      'weight': 'Peso',
-      'authorized_by': 'Autorizado por',
-      'observation': 'Observaciones',
-    };
-
-
     return SafeArea(
       child: Container(
         margin: const EdgeInsets.only(top: 40),

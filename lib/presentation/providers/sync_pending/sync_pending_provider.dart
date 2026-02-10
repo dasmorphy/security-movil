@@ -4,19 +4,37 @@ import 'package:hive/hive.dart';
 import 'package:zentinel/presentation/providers/logbook/logbook_provider.dart';
 import 'package:zentinel/service/pending_request_service.dart';
 
-
-final syncPendingProvider =
-    StateNotifierProvider<SyncPendingNotifier, bool>((ref) {
+final syncPendingProvider = StateNotifierProvider<SyncPendingNotifier, bool>((
+  ref,
+) {
   return SyncPendingNotifier(ref);
 });
 
 final connectivityProvider = StreamProvider<bool>((ref) {
-  return Connectivity()
-      .onConnectivityChanged
-      .map((result) => result != ConnectivityResult.none);
+  return Connectivity().onConnectivityChanged.map(
+    (result) => result != ConnectivityResult.none,
+  );
 });
 
+final pendingRequestsProvider = StreamProvider<List<Map<String, dynamic>>>((
+  ref,
+) async* {
+  final box = Hive.box('pending_requests');
 
+  // emite estado inicial
+  yield box.values
+    .whereType<Map>()
+    .map((e) => Map<String, dynamic>.from(e))
+    .toList();
+
+  // escucha cambios
+  await for (final _ in box.watch()) {
+    yield box.values
+      .whereType<Map>()
+      .map((e) => Map<String, dynamic>.from(e))
+      .toList();
+  }
+});
 
 class SyncPendingNotifier extends StateNotifier<bool> {
   final Ref ref;
@@ -25,7 +43,9 @@ class SyncPendingNotifier extends StateNotifier<bool> {
   SyncPendingNotifier(this.ref) : super(false);
 
   Future<bool> providerEntry(Map<String, dynamic> data) async {
-    return await ref.read(saveDepatureReportProvider.notifier).saveLogbookEntry(data);
+    return await ref
+        .read(saveDepatureReportProvider.notifier)
+        .saveLogbookEntry(data);
   }
 
   Future<bool> providerOut(Map<String, dynamic> data) async {
@@ -38,10 +58,12 @@ class SyncPendingNotifier extends StateNotifier<bool> {
       print('⏳ Sincronización ya en progreso...');
       return;
     }
-    
+
     // Valida que haya internet disponible
     if (!await hasInternet()) {
-      print('❌ Sin conexión a internet. La sincronización será reintentada cuando haya conexión.');
+      print(
+        '❌ Sin conexión a internet. La sincronización será reintentada cuando haya conexión.',
+      );
       return;
     }
 
@@ -58,14 +80,16 @@ class SyncPendingNotifier extends StateNotifier<bool> {
       return;
     }
 
-    print('🔄 Iniciando sincronización de $totalPending request(s) pendiente(s)...');
+    print(
+      '🔄 Iniciando sincronización de $totalPending request(s) pendiente(s)...',
+    );
 
     int synced = 0;
     int failed = 0;
 
     // Itera sobre una copia de las keys para evitar problemas de iteración durante la eliminación
     final keysList = List.from(box.keys);
-    
+
     for (final key in keysList) {
       final data = box.get(key);
       if (data == null) continue;
@@ -78,7 +102,9 @@ class SyncPendingNotifier extends StateNotifier<bool> {
 
       try {
         // Marcar como processing antes de enviar para evitar race conditions
-        final Map<String, dynamic> mark = Map<String, dynamic>.from(data as Map);
+        final Map<String, dynamic> mark = Map<String, dynamic>.from(
+          data as Map,
+        );
         mark['processing'] = true;
         await box.put(key, mark);
 
@@ -112,7 +138,6 @@ class SyncPendingNotifier extends StateNotifier<bool> {
           failed++;
           print('❌ Request $key falló y se mantendrá para reintento.');
         }
-
       } catch (e) {
         failed++;
         print('❌ Error sincronizando request $key: $e');
@@ -131,7 +156,7 @@ class SyncPendingNotifier extends StateNotifier<bool> {
     }
 
     print('🎉 Sincronización completada: $synced enviados, $failed fallidos');
-    
+
     state = false;
     _running = false;
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
 
 class GlowTextFormField extends StatelessWidget {
   final TextEditingController controller;
@@ -101,7 +102,7 @@ class GlowDropdownFormField<T> extends StatelessWidget {
     required this.onChanged,
     required this.decoration,
     this.enabled = true,
-    this.glowColor = const Color.fromARGB(190, 58, 199, 199), 
+    this.glowColor = const Color.fromARGB(190, 58, 199, 199),
     this.validator,
   });
 
@@ -137,15 +138,72 @@ class GlowDropdownFormField<T> extends StatelessWidget {
               return items.map((item) {
                 return Text(
                   item.child is Text ? (item.child as Text).data ?? '' : '',
-                  style: TextStyle(color: enabled 
-                    ? Color.fromARGB(255, 255, 255, 255) 
-                    : Color.fromARGB(255, 84, 81, 81) 
+                  style: TextStyle(
+                    color: enabled
+                        ? Color.fromARGB(255, 255, 255, 255)
+                        : Color.fromARGB(255, 84, 81, 81),
                   ),
                 );
               }).toList();
             },
           ),
         );
+      },
+    );
+  }
+}
+
+class GlowDropdownFormField2<T> extends StatelessWidget {
+  final T value;
+  final bool enabled;
+  final FocusNode focusNode;
+  final List<DropdownMenuItem<T>> items;
+  final ValueChanged<T?> onChanged;
+  final String? Function(T?)? validator; // ✅ AQUÍ
+  final InputDecoration decoration;
+  final Color glowColor;
+
+  const GlowDropdownFormField2({
+    super.key,
+    required this.value,
+    required this.focusNode,
+    required this.items,
+    required this.onChanged,
+    required this.decoration,
+    this.enabled = true,
+    this.glowColor = const Color.fromARGB(190, 58, 199, 199),
+    this.validator,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return DropdownButtonFormField2<T>(
+      value: value,
+      focusNode: focusNode,
+      isExpanded: true,
+      decoration: decoration,
+      items: items,
+      validator: validator,
+      onChanged: enabled ? onChanged : null,
+      dropdownStyleData: DropdownStyleData(
+        maxHeight: 250,
+        decoration: BoxDecoration(
+          color: decoration.fillColor,
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
+      menuItemStyleData: const MenuItemStyleData(height: 48),
+      selectedItemBuilder: (context) {
+        return items.map((item) {
+          return Text(
+            item.child is Text ? (item.child as Text).data ?? '' : '',
+            style: TextStyle(
+              color: enabled
+                  ? Colors.white
+                  : const Color.fromARGB(255, 84, 81, 81),
+            ),
+          );
+        }).toList();
       },
     );
   }

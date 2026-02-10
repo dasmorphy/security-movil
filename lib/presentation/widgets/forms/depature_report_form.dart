@@ -447,7 +447,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
 
                 const SizedBox(height: 12),
                 CustomFieldLabelRequired(txtLabel: 'Categoría de ingreso'),
-                GlowDropdownFormField<String>(
+                GlowDropdownFormField2<String>(
                   value: _categoryEntry,
                   focusNode: _categoryEntryFocus,
                   decoration: styleDecoration(),
@@ -455,12 +455,12 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                     DropdownMenuItem(
                       enabled: false,
                       value: '0',
-                      child: Text('Seleccione una opción'),
+                      child: Text('Seleccione una opción', style: TextStyle(color: Colors.white),),
                     ),
                     ...categories.map(
                       (c) => DropdownMenuItem(
                         value: c.idCategory.toString(),
-                        child: Text(c.nameCategory),
+                        child: Text(c.nameCategory, style: TextStyle(color: Colors.white),),
                       ),
                     ),
                   ],
