@@ -220,9 +220,9 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
 
     // 🟢 CON INTERNET: Enviar al servidor
     print('✅ Conexión disponible, enviando al servidor...');
-    isLoading = true;
+    setState(() => isLoading = true);
     final success = await widget.onSubmit?.call(data) ?? false;
-    isLoading = false;
+    setState(() => isLoading = false);
 
     if (!success) {
       await savePendingRequest(data, 'logbook_out');

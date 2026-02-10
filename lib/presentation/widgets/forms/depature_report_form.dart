@@ -235,8 +235,9 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
 
     // 🟢 CON INTERNET: Enviar al servidor
     print('✅ Conexión disponible, enviando al servidor...');
+    setState(() => isLoading = true);
     final success = await widget.onSubmit?.call(data) ?? false;
-    isLoading = false;
+    setState(() => isLoading = false);
 
     if (!success) {
       await savePendingRequest(data, 'logbook_entry');
@@ -250,7 +251,6 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
         context.pop(); // Cerrar el formulario
         context.push('/check-success');
       } else {
-        // saveLocal(data);
         context.pop(); // Cerrar el formulario
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -259,14 +259,6 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
           ),
         );
       }
-    }
-  }
-
-  void saveLocal(Map<String, dynamic> data) async {
-    try {
-      await savePendingRequest(data, 'logbook_entry');
-    } catch (e) {
-      print('Error al guardar la data en cache');
     }
   }
 

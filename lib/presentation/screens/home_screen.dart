@@ -37,16 +37,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-
-    ref.listen(connectivityProvider, (prev, next) {
-      next.whenData((online) {
-        if (online) {
-          ref.read(syncPendingProvider.notifier).sync();
-        }
-      });
-    });
-
-
     ref.listen<AsyncValue<User?>>(userSessionProvider, (previous, next) {
       if (previous?.value != null && next.value == null) {
         ScaffoldMessenger.of(context).showSnackBar(

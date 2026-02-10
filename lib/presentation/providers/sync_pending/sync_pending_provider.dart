@@ -119,7 +119,7 @@ class SyncPendingNotifier extends StateNotifier<bool> {
         try {
           // Intentar desmarcar processing en caso de excepción
           if (data is Map) {
-            final Map<String, dynamic> unmark = Map<String, dynamic>.from(data as Map);
+            final Map<String, dynamic> unmark = Map<String, dynamic>.from(data);
             unmark['processing'] = false;
             await box.put(key, unmark);
           }

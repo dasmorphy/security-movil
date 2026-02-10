@@ -71,16 +71,20 @@ class _MyAppState extends ConsumerState<MyApp> {
     }
 
     // 🔄 Inicializar el SyncService con el callback
-    syncService.start(onSyncNeeded: onSyncNeeded);
+    // syncService.start(onSyncNeeded: onSyncNeeded);
 
     // 👁️ Registrar el lifecycle observer para sincronizar cuando el app vuelve a primer plano
-    _lifecycleObserver = AppLifecycleObserver(onResume: onSyncNeeded);
+    _lifecycleObserver = AppLifecycleObserver(
+      onResume: () {
+      print('📱 App resumed, verificando sincronización...');
+      onSyncNeeded;
+    });
     WidgetsBinding.instance.addObserver(_lifecycleObserver);
   }
 
   @override
   void dispose() {
-    syncService.dispose();
+    // syncService.dispose();
     WidgetsBinding.instance.removeObserver(_lifecycleObserver);
     super.dispose();
   }

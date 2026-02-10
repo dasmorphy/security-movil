@@ -146,6 +146,8 @@ class DepatureReportNotifier extends StateNotifier<AsyncValue<bool>> {
       state = AsyncData(success);
       return success;
     } catch (e, st) {
+      print('Error entry E, $e');
+      print('Error entry ST, $st');
       state = AsyncError(e, st);
       return false;
     }
@@ -165,6 +167,8 @@ class OutLogbookNotifier extends StateNotifier<AsyncValue<bool>> {
       state = AsyncData(success);
       return success;
     } catch (e, st) {
+      print('Error out E, $e');
+      print('Error out ST, $st');
       state = AsyncError(e, st);
       return false;
     }
