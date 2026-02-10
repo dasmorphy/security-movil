@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/service/pending_request_service.dart';
@@ -27,7 +26,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
   bool imagesMinError = false;
   bool imagesMaxError = false;
 
-  int? _unityId;
+  String _unityId = '0';
   final _guideCtrl = TextEditingController();
   final _descCtrl = TextEditingController();
   final _quantityCtrl = TextEditingController();
@@ -161,16 +160,9 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
 
     final userData = authState.value!;
 
-    if (_unityId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Debe seleccionar una categoría válida')),
-      );
-      return;
-    }
-
     // Construir los datos del formulario
     final data = {
-      "id_unity": _unityId,
+      "id_unity": int.parse(_unityId),
       "id_category": int.parse(_categoryEntry),
       "shipping_guide": _guideCtrl.text.trim(),
       "description": _descCtrl.text.trim(),
@@ -268,7 +260,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
     _categoryEntry = '0';
     _workday = '0';
     _groupBusiness = '0';
-    _unityId = null;
+    _unityId = '0';
     _guideCtrl.clear();
     _descCtrl.clear();
     _quantityCtrl.clear();
@@ -475,16 +467,6 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                   onChanged: (v) {
                     if (v != null) {
                       setState(() => _categoryEntry = v);
-                      _unityId = getUnityIdByCategory(
-                        nameCategory: categories
-                            .firstWhere(
-                              (u) => u.idCategory == int.parse(v),
-                              orElse: () =>
-                                  throw Exception('Categoría no encontrada'),
-                            )
-                            .nameCategory,
-                        unities: unitiesWeight,
-                      );
                     }
                   },
                   validator: (v) {
@@ -540,8 +522,8 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                 const SizedBox(height: 12),
                 CustomFieldLabelRequired(txtLabel: 'Unidad'),
                 GlowDropdownFormField<String>(
-                  enabled: false,
-                  value: _unityId?.toString() ?? '0',
+                  // enabled: false,
+                  value: _unityId,
                   focusNode: _unitFocus,
                   decoration: styleDecoration(),
                   items: [
@@ -558,12 +540,12 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                     ),
                   ],
                   onChanged: (v) {
-                    // if (v != null) {
-                    //   return messageValidatorEmpty;
-                    // }
+                    if (v != null) {
+                      setState(() => _unityId = v);
+                    }
                   },
                   validator: (v) {
-                    if (v == null || v.trim().isEmpty) {
+                    if (v == '0' || v == null || v.trim().isEmpty) {
                       return messageValidatorEmpty;
                     }
                     return null;

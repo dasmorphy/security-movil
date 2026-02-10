@@ -22,6 +22,7 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
   String _categoryEntry = '0';
   String _workday = '0';
   String _groupBusiness = '0';
+  String _unityId = '0';
   bool isLoading = false;
   bool imagesMinError = false;
   bool imagesMaxError = false;
@@ -35,7 +36,6 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
   final _destinyCtrl = TextEditingController();
   final _observationsCtrl = TextEditingController();
   final _personWithdrawsCtrl = TextEditingController();
-  int? _unityId;
   
   List<File> _selectedImages = [];
   final ImagePicker _imagePicker = ImagePicker();
@@ -148,15 +148,8 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
 
     final userData = authState.value!;
 
-    if (_unityId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Debe seleccionar una categoría válida')),
-      );
-      return;
-    }
-
     final data = {
-      "id_unity": _unityId,
+      "id_unity": int.parse(_unityId),
       "id_category": int.parse(_categoryEntry),
       "shipping_guide": _guideCtrl.text.trim(),
       "workday": _workday.trim(),
@@ -250,7 +243,7 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
     _formKey.currentState?.reset();
     _categoryEntry = '0';
     _workday = '0';
-    _unityId = null;
+    _unityId = '0';
     _groupBusiness = '0';
     _guideCtrl.clear();
     _nameDriverCtrl.clear();
@@ -456,13 +449,6 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                   onChanged: (v) {
                     if (v != null) {
                       setState(() => _categoryEntry = v);
-                      _unityId = getUnityIdByCategory(
-                        nameCategory: categories.firstWhere(
-                          (u) => u.idCategory== int.parse(v),
-                          orElse: () => throw Exception('Categoría no encontrada'),
-                        ).nameCategory,
-                        unities: unitiesWeight,
-                      );
                     }
                   },
                   validator: (v) {
@@ -505,7 +491,7 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                 CustomFieldLabelRequired(txtLabel: 'Unidad'),
                 GlowDropdownFormField<String>(
                   enabled: false,
-                  value: _unityId?.toString() ?? '0',
+                  value: _unityId,
                   focusNode: _unitFocus,
                   decoration: styleDecoration(),
                   items: [
@@ -522,9 +508,15 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                     ),
                   ],
                   onChanged: (v) {
-                    // if (v != null) {
-                    //   setState(() => _unit = v);
-                    // }
+                    if (v != null) {
+                      setState(() => _unityId = v);
+                    }
+                  },
+                  validator: (v) {
+                    if (v == '0' || v == null || v.trim().isEmpty) {
+                      return messageValidatorEmpty;
+                    }
+                    return null;
                   },
                 ),
 
