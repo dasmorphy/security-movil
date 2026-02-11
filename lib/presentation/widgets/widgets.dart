@@ -21,3 +21,4 @@ export 'package:zentinel/presentation/widgets/forms/change_password_form.dart';
 export 'package:zentinel/presentation/widgets/forms/change_email_form.dart';
 export 'package:zentinel/presentation/widgets/modals/logbooks_offline_list_modal.dart';
 export 'package:zentinel/presentation/widgets/headers/header_logbooks_offline.dart';
+export 'package:zentinel/presentation/widgets/shared/show_dialog_widget.dart';

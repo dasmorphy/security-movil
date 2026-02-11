@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/service/pending_request_service.dart';
@@ -38,7 +39,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
   final _truckLicenseCtrl = TextEditingController();
   final _nameDriverCtrl = TextEditingController();
 
-  List<File> _selectedImages = [];
+  List<File?> _selectedImages = [];
   final ImagePicker _imagePicker = ImagePicker();
 
   final FocusNode _guideFocus = FocusNode();
@@ -113,15 +114,61 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
       );
 
       if (image != null && mounted) {
+        // Agregar placeholder nulo para mostrar progreso en la UI
         setState(() {
-          _selectedImages.add(File(image.path));
+          _selectedImages.add(null);
         });
+
+        final placeholderIndex = _selectedImages.length - 1;
+
+        final originalFile = File(image.path);
+
+        // Convertir a WebP
+        final webpFile = await convertToWebP(originalFile);
+
+        if (webpFile == null) {
+          if (mounted) {
+            // Remover placeholder
+            setState(() {
+              if (placeholderIndex < _selectedImages.length &&
+                  _selectedImages[placeholderIndex] == null) {
+                _selectedImages.removeAt(placeholderIndex);
+              }
+            });
+
+            showDialog(
+              context: context,
+              builder: (_) =>
+                  ShowDialogWidget(title: 'Error al convertir imagen'),
+            );
+          }
+          return;
+        }
+
+        final bytes = await webpFile.length();
+        final mb = bytes / 1024 / 1024;
+
+        print("Peso después de WebP: ${mb.toStringAsFixed(2)} MB");
+
+        if (mounted) {
+          setState(() {
+            _selectedImages[placeholderIndex] = webpFile;
+          });
+        }
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error al capturar imagen: $e')));
+        // Remover último placeholder si existe
+        if (_selectedImages.isNotEmpty && _selectedImages.last == null) {
+          setState(() => _selectedImages.removeLast());
+        }
+        showDialog(
+          context: context,
+          builder: (_) => ShowDialogWidget(
+            title: 'Error al capturar imagen',
+            content: '$e',
+          ),
+        );
       }
     }
   }
@@ -177,8 +224,11 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
       "created_by": userData.user,
       "name_user": userData.attributes['fullname'],
       "workday": _workday.trim(),
-      "id_group_business": userData.attributes['group_business'] ?? int.parse(_groupBusiness),
-      "images": _selectedImages, // Archivos serán convertidos a Base64 antes de guardar
+      "id_group_business":
+          userData.attributes['group_business'] ?? int.parse(_groupBusiness),
+      "images": _selectedImages
+          .whereType<File>()
+          .toList(), // Archivos serán convertidos a Base64 antes de guardar
     };
 
     // Mostrar un diálogo de procesamiento
@@ -210,7 +260,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
         // Navigator.pop(context); // Cerrar dialog de procesamiento
         _clearCntrl();
         context.pop(); // Cerrar el formulario
-        
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             duration: Duration(seconds: 6),
@@ -237,7 +287,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
 
     if (mounted) {
       // Navigator.pop(context); // Cerrar dialog de procesamiento
-      
+
       if (success) {
         _clearCntrl();
         context.pop(); // Cerrar el formulario
@@ -246,7 +296,9 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
         context.pop(); // Cerrar el formulario
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('❌ Error al enviar el formulario. Por favor intenta de nuevo.'),
+            content: Text(
+              '❌ Error al enviar el formulario. Por favor intenta de nuevo.',
+            ),
             backgroundColor: Colors.red,
           ),
         );
@@ -282,7 +334,9 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
     //Usuario no cargado o sesión inválida
     if (!authState.hasValue || authState.value == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Sesión no válida. Vuelva a iniciar sesión')),
+        const SnackBar(
+          content: Text('Sesión no válida. Vuelva a iniciar sesión'),
+        ),
       );
     }
 
@@ -455,12 +509,18 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                     DropdownMenuItem(
                       enabled: false,
                       value: '0',
-                      child: Text('Seleccione una opción', style: TextStyle(color: Colors.white),),
+                      child: Text(
+                        'Seleccione una opción',
+                        style: TextStyle(color: Colors.white),
+                      ),
                     ),
                     ...categories.map(
                       (c) => DropdownMenuItem(
                         value: c.idCategory.toString(),
-                        child: Text(c.nameCategory, style: TextStyle(color: Colors.white),),
+                        child: Text(
+                          c.nameCategory,
+                          style: TextStyle(color: Colors.white),
+                        ),
                       ),
                     ),
                   ],
@@ -675,7 +735,9 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                       style: TextStyle(color: Color.fromARGB(189, 7, 213, 213)),
                     ),
                     style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Color.fromARGB(189, 7, 213, 213)),
+                      side: const BorderSide(
+                        color: Color.fromARGB(189, 7, 213, 213),
+                      ),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                   ),
@@ -701,15 +763,36 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                       itemBuilder: (context, index) {
                         return Stack(
                           children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                image: DecorationImage(
-                                  image: FileImage(_selectedImages[index]),
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
+                            // Mostrar indicador de progreso cuando la imagen está siendo convertida (placeholder null)
+                            _selectedImages[index] != null
+                                ? Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8),
+                                      image: DecorationImage(
+                                        image: FileImage(
+                                          _selectedImages[index]!,
+                                        ),
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  )
+                                : Container(
+                                    height: double.infinity,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8),
+                                      color: Colors.black26,
+                                    ),
+                                    child: const Center(
+                                      child: SizedBox(
+                                        width: 28,
+                                        height: 28,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2.5,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
                             Positioned(
                               top: -8,
                               right: -8,
@@ -769,7 +852,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                         child: const Text(
                           'Cancelar',
                           style: TextStyle(
-                            color: Colors.white, 
+                            color: Colors.white,
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
                           ),
@@ -785,8 +868,18 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          backgroundColor: const Color.fromARGB(189, 7, 213, 213),
-                          disabledBackgroundColor: const Color.fromARGB(120, 7, 213, 213),
+                          backgroundColor: const Color.fromARGB(
+                            189,
+                            7,
+                            213,
+                            213,
+                          ),
+                          disabledBackgroundColor: const Color.fromARGB(
+                            120,
+                            7,
+                            213,
+                            213,
+                          ),
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -805,7 +898,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                             const Text(
                               'Guardar',
                               style: TextStyle(
-                                fontSize: 15, 
+                                fontSize: 15,
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
                               ),

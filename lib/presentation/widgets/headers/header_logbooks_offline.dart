@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
+import 'package:zentinel/presentation/widgets/widgets.dart';
 
 class HeaderLogbooksOffline extends ConsumerWidget {
   final String headerTxt;
@@ -75,29 +76,13 @@ class HeaderLogbooksOffline extends ConsumerWidget {
   }
 
   void _showNoPendingDialog(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (_) => AlertDialog(
-      backgroundColor: const Color(0xFF2A2A2A),
-      title: const Text(
-        'Nada para reintentar',
-        style: TextStyle(color: Colors.white),
+    showDialog(
+      context: context,
+      builder: (_) => const ShowDialogWidget(
+        title: 'Nada para reintentar',
+        content: 'No hay bitácoras pendientes de sincronizar.',
       ),
-      content: const Text(
-        'No hay bitácoras pendientes de sincronizar.',
-        style: TextStyle(color: Colors.white70),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text(
-            'OK',
-            style: TextStyle(color: Colors.greenAccent),
-          ),
-        ),
-      ],
-    ),
-  );
-}
+    );
+  }
 
 }

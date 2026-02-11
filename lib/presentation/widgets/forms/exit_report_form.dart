@@ -37,7 +37,7 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
   final _observationsCtrl = TextEditingController();
   final _personWithdrawsCtrl = TextEditingController();
   
-  List<File> _selectedImages = [];
+  List<File?> _selectedImages = [];
   final ImagePicker _imagePicker = ImagePicker();
 
   final FocusNode _guideFocus = FocusNode();
@@ -103,14 +103,60 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
       );
 
       if (image != null && mounted) {
+        // Agregar placeholder nulo para mostrar progreso en la UI
         setState(() {
-          _selectedImages.add(File(image.path));
+          _selectedImages.add(null);
         });
+
+        final placeholderIndex = _selectedImages.length - 1;
+
+        final originalFile = File(image.path);
+
+        // Convertir a WebP
+        final webpFile = await convertToWebP(originalFile);
+
+        if (webpFile == null) {
+          if (mounted) {
+            // Remover placeholder
+            setState(() {
+              if (placeholderIndex < _selectedImages.length &&
+                  _selectedImages[placeholderIndex] == null) {
+                _selectedImages.removeAt(placeholderIndex);
+              }
+            });
+
+            showDialog(
+              context: context,
+              builder: (_) =>
+                  ShowDialogWidget(title: 'Error al convertir imagen'),
+            );
+          }
+          return;
+        }
+
+        final bytes = await webpFile.length();
+        final mb = bytes / 1024 / 1024;
+
+        print("Peso después de WebP: ${mb.toStringAsFixed(2)} MB");
+
+        if (mounted) {
+          setState(() {
+            _selectedImages[placeholderIndex] = webpFile;
+          });
+        }
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al capturar imagen: $e')),
+        // Remover último placeholder si existe
+        if (_selectedImages.isNotEmpty && _selectedImages.last == null) {
+          setState(() => _selectedImages.removeLast());
+        }
+        showDialog(
+          context: context,
+          builder: (_) => ShowDialogWidget(
+            title: 'Error al capturar imagen',
+            content: '$e',
+          ),
         );
       }
     }
@@ -222,12 +268,14 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
     }
 
     if (mounted) {
-      Navigator.pop(context); // Cerrar dialog de procesamiento
+      // Navigator.pop(context); // Cerrar dialog de procesamiento
       
       if (success) {
         _clearCntrl();
-        context.go('/check-success');
+        context.pop(); // Cerrar el formulario
+        context.push('/check-success');
       } else {
+        context.pop(); // Cerrar el formulario
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('❌ Error al enviar el formulario. Por favor intenta de nuevo.'),
@@ -669,15 +717,36 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                       itemBuilder: (context, index) {
                         return Stack(
                           children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(8),
-                                image: DecorationImage(
-                                  image: FileImage(_selectedImages[index]),
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
+                            // Mostrar indicador de progreso cuando la imagen está siendo convertida (placeholder null)
+                            _selectedImages[index] != null
+                                ? Container(
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8),
+                                      image: DecorationImage(
+                                        image: FileImage(
+                                          _selectedImages[index]!,
+                                        ),
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  )
+                                : Container(
+                                    height: double.infinity,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(8),
+                                      color: Colors.black26,
+                                    ),
+                                    child: const Center(
+                                      child: SizedBox(
+                                        width: 28,
+                                        height: 28,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2.5,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
                             Positioned(
                               top: -8,
                               right: -8,

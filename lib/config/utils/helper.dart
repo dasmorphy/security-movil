@@ -1,10 +1,16 @@
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:zentinel/domain/entities/unity_weight.dart';
 import 'package:intl/intl.dart';
 import 'package:zentinel/domain/entities/user_session.dart';
+import 'package:path/path.dart' as p;
+import 'package:flutter_image_compress/flutter_image_compress.dart';
+
 
 final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
     GlobalKey<ScaffoldMessengerState>();
@@ -211,4 +217,23 @@ Map<String, dynamic> mapPendingToUI(Map<String, dynamic> raw) {
     "subtitle": raw['payload']['shipping_guide'] ?? 'Desconocido',
     "statusText": processing ? 'Subiendo...' : 'Pendiente'
   };
+}
+
+Future<File?> convertToWebP(File file) async {
+  final dir = await getTemporaryDirectory();
+  final targetPath = p.join(
+    dir.path,
+    "${DateTime.now().millisecondsSinceEpoch}.webp",
+  );
+
+  final result = await FlutterImageCompress.compressAndGetFile(
+    file.absolute.path,
+    targetPath,
+    format: CompressFormat.webp,
+    quality: 75, // Puedes bajar a 70 si quieres más compresión
+  );
+
+  if (result == null) return null;
+
+  return File(result.path);
 }
