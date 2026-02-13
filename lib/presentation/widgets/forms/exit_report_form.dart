@@ -23,6 +23,8 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
   String _workday = '0';
   String _groupBusiness = '0';
   String _unityId = '0';
+  double _latitude = -0.1865936;
+  double _longitude = -78.5953478;
   bool isLoading = false;
   bool imagesMinError = false;
   bool imagesMaxError = false;
@@ -57,6 +59,7 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
   @override
   void initState() {
     super.initState();
+    _getUserLocation();
   }
   
   @override
@@ -72,6 +75,26 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
     _categoryEntryFocus.dispose();
     _groupBusinessFocus.dispose();
     super.dispose();
+  }
+
+  void _getUserLocation() async {
+    final pos = await getLocation();
+
+    if (pos == null) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (_) => const AlertDialog(
+            title: Text("Ubicación no disponible"),
+            content: Text("Activa el GPS o concede permisos."),
+          ),
+        );
+      }
+      return;
+    }
+
+    _latitude = pos.latitude;
+    _longitude = pos.longitude;
   }
 
   Future<void> _captureImageFromCamera() async {
@@ -171,6 +194,19 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
   void _submit() async {
     FocusScope.of(context).unfocus();
     if (!(_formKey.currentState?.validate() ?? false)) return;
+
+    if (_latitude ==  -0.1865936 || _longitude == -78.5953478) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (_) => const AlertDialog(
+            title: Text("Ubicación no disponible"),
+            content: Text("Activa el GPS o concede permisos."),
+          ),
+        );
+      }
+      return;
+    }
     
     if (_selectedImages.length < 5) {
       setState(() => imagesMinError = true);
@@ -203,6 +239,8 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
       "quantity": int.tryParse(_quantityCtrl.text) ?? 0,
       "weight": int.tryParse(_weightCtrl.text) ?? 0,
       "truck_license": _truckLicenseCtrl.text.trim(),
+      "lat": _latitude.toString(),
+      "long": _longitude.toString(),
       "person_withdraws": _personWithdrawsCtrl.text.trim(),
       "destiny": _nameDriverCtrl.text.trim(),
       "authorized_by": _authorizedCtrl.text.trim(),

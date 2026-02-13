@@ -10,7 +10,7 @@ import 'package:intl/intl.dart';
 import 'package:zentinel/domain/entities/user_session.dart';
 import 'package:path/path.dart' as p;
 import 'package:flutter_image_compress/flutter_image_compress.dart';
-
+import 'package:geolocator/geolocator.dart';
 
 final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
     GlobalKey<ScaffoldMessengerState>();
@@ -167,12 +167,12 @@ MediaType getMediaType(String path) {
 
 Future<bool> requestCameraPermission(BuildContext context) async {
   var status = await Permission.camera.status;
-  
+
   // Si ya está concedido, retorna true
   if (status.isGranted) {
     return true;
   }
-  
+
   // Si está permanentemente denegado, guía al usuario
   if (status.isPermanentlyDenied) {
     final result = await showDialog<bool>(
@@ -181,7 +181,7 @@ Future<bool> requestCameraPermission(BuildContext context) async {
         title: const Text('Permiso de cámara requerido'),
         content: const Text(
           'El acceso a la cámara está deshabilitado. '
-          'Por favor, ve a Ajustes para habilitarlo.'
+          'Por favor, ve a Ajustes para habilitarlo.',
         ),
         actions: [
           TextButton(
@@ -200,7 +200,7 @@ Future<bool> requestCameraPermission(BuildContext context) async {
     );
     return result ?? false;
   }
-  
+
   // Solicita el permiso
   status = await Permission.camera.request();
   print('Estado del permiso: $status');
@@ -215,7 +215,7 @@ Map<String, dynamic> mapPendingToUI(Map<String, dynamic> raw) {
         ? 'Bitácora entrada'
         : 'Bitácora salida',
     "subtitle": raw['payload']['shipping_guide'] ?? 'Desconocido',
-    "statusText": processing ? 'Subiendo...' : 'Pendiente'
+    "statusText": processing ? 'Subiendo...' : 'Pendiente',
   };
 }
 
@@ -236,4 +236,33 @@ Future<File?> convertToWebP(File file) async {
   if (result == null) return null;
 
   return File(result.path);
+}
+
+Future<Position?> getLocation() async {
+  bool serviceEnabled;
+  LocationPermission permission;
+
+  // Verificar si el GPS está activo
+  serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  if (!serviceEnabled) {
+    return null;
+  }
+
+  // Verificar permisos
+  permission = await Geolocator.checkPermission();
+  if (permission == LocationPermission.denied) {
+    permission = await Geolocator.requestPermission();
+    if (permission == LocationPermission.denied) {
+      return null;
+    }
+  }
+
+  if (permission == LocationPermission.deniedForever) {
+    return null;
+  }
+
+  // Obtener ubicación actual
+  return await Geolocator.getCurrentPosition(
+    desiredAccuracy: LocationAccuracy.high,
+  );
 }

@@ -28,6 +28,8 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
   bool imagesMaxError = false;
 
   String _unityId = '0';
+  double _latitude = -0.1865936;
+  double _longitude = -78.5953478;
   final _guideCtrl = TextEditingController();
   final _descCtrl = TextEditingController();
   final _quantityCtrl = TextEditingController();
@@ -60,9 +62,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
   @override
   void initState() {
     super.initState();
-    // ref.read(getAllCategories.notifier).load();
-    // ref.read(getAllUnitiesWeight.notifier).load();
-    // ref.read(getGroupBusinessByIdBusiness.notifier).load();
+    _getUserLocation();
   }
 
   @override
@@ -83,6 +83,26 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
     _truckLicenseFocus.dispose();
     _nameDriverFocus.dispose();
     super.dispose();
+  }
+
+  void _getUserLocation() async {
+    final pos = await getLocation();
+
+    if (pos == null) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (_) => const AlertDialog(
+            title: Text("Ubicación no disponible"),
+            content: Text("Activa el GPS o concede permisos."),
+          ),
+        );
+      }
+      return;
+    }
+
+    _latitude = pos.latitude;
+    _longitude = pos.longitude;
   }
 
   Future<void> _captureImageFromCamera() async {
@@ -183,6 +203,19 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
     FocusScope.of(context).unfocus();
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
+    if (_latitude ==  -0.1865936 || _longitude == -78.5953478) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (_) => const AlertDialog(
+            title: Text("Ubicación no disponible"),
+            content: Text("Activa el GPS o concede permisos."),
+          ),
+        );
+      }
+      return;
+    }
+
     if (_selectedImages.length < 5) {
       setState(() => imagesMinError = true);
       return;
@@ -221,6 +254,8 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
       "observations": _observationsCtrl.text.trim(),
       "name_driver": _nameDriverCtrl.text.trim(),
       "truck_license": _truckLicenseCtrl.text.trim(),
+      "lat": _latitude.toString(),
+      "long": _longitude.toString(),
       "created_by": userData.user,
       "name_user": userData.attributes['fullname'],
       "workday": _workday.trim(),
