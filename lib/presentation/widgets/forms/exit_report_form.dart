@@ -248,7 +248,9 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
       "created_by": userData.user,
       "name_user": userData.attributes['fullname'],
       "id_group_business": userData.attributes['group_business'] ?? int.parse(_groupBusiness),
-      "images": _selectedImages, // Archivos serán convertidos a Base64 antes de guardar
+      "images": _selectedImages
+        .whereType<File>()
+        .toList(), // Archivos serán convertidos a Base64 antes de guardar, // Archivos serán convertidos a Base64 antes de guardar
     };
 
     // Mostrar un diálogo de procesamiento
