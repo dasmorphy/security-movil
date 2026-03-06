@@ -5,7 +5,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:dio/dio.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/domain/datasources/logbook_entry_datasource.dart';
+import 'package:zentinel/domain/entities/authorized.dart';
 import 'package:zentinel/domain/entities/category.dart';
+import 'package:zentinel/domain/entities/destiny_intern.dart';
 import 'package:zentinel/domain/entities/group_business.dart';
 import 'package:zentinel/domain/entities/unity_weight.dart';
 import 'package:open_filex/open_filex.dart';
@@ -202,5 +204,29 @@ stopwatch.stop();
     return groupBusinessJson
         .map((json) => GroupBusiness.fromJson(json))
         .toList();
+  }
+
+  @override
+  Future<List<Authorized>> getAllAuthorized() async {
+    final response = await dio.get(
+      '/rest/zent-logbook-api/v1.0/get/allAuthorized',
+      options: Options(
+        headers: {'externalTransactionId': uuid, 'channel': 'ZENTINEL'},
+      ),
+    );
+    final List authorizedJson = response.data['data'];
+    return authorizedJson.map((json) => Authorized.fromJson(json)).toList();
+  }
+
+  @override
+  Future<List<DestinyIntern>> getAllDestinyIntern() async {
+    final response = await dio.get(
+      '/rest/zent-logbook-api/v1.0/get/allDestinyIntern',
+      options: Options(
+        headers: {'externalTransactionId': uuid, 'channel': 'ZENTINEL'},
+      ),
+    );
+    final List destinyJson = response.data['data'];
+    return destinyJson.map((json) => DestinyIntern.fromJson(json)).toList();
   }
 }

@@ -3,8 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:io';
 import 'package:zentinel/config/utils/helper.dart';
+import 'dart:io';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 import 'package:zentinel/service/pending_request_service.dart';
@@ -20,7 +20,6 @@ class ExitReportForm extends ConsumerStatefulWidget {
 class _ExitReportFormState extends ConsumerState<ExitReportForm> {
   final _formKey = GlobalKey<FormState>();
   String _categoryEntry = '0';
-  String _workday = '0';
   String _groupBusiness = '0';
   String _unityId = '0';
   double _latitude = -0.1865936;
@@ -28,13 +27,13 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
   bool isLoading = false;
   bool imagesMinError = false;
   bool imagesMaxError = false;
+  String _authorized = '0';
 
   final _guideCtrl = TextEditingController();
   final _quantityCtrl = TextEditingController();
   final _weightCtrl = TextEditingController();
   final _truckLicenseCtrl = TextEditingController();
   final _nameDriverCtrl = TextEditingController();
-  final _authorizedCtrl = TextEditingController();
   final _destinyCtrl = TextEditingController();
   final _observationsCtrl = TextEditingController();
   final _personWithdrawsCtrl = TextEditingController();
@@ -45,7 +44,6 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
   final FocusNode _guideFocus = FocusNode();
   final FocusNode _weightFocus = FocusNode();
   final FocusNode _truckLicenseFocus = FocusNode();
-  final FocusNode _workdayFocus = FocusNode();
   final FocusNode _nameDriverFocus = FocusNode();
   final FocusNode _authorizedFocus = FocusNode();
   final FocusNode _quantityFocus = FocusNode();
@@ -68,7 +66,6 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
     _quantityCtrl.dispose();
     _truckLicenseCtrl.dispose();
     _nameDriverCtrl.dispose();
-    _authorizedCtrl.dispose();
     _observationsCtrl.dispose();
     _quantityFocus.dispose();
     _descFocus.dispose();
@@ -234,16 +231,15 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
       "id_unity": int.parse(_unityId),
       "id_category": int.parse(_categoryEntry),
       "shipping_guide": _guideCtrl.text.trim(),
-      "workday": _workday.trim(),
       "name_driver": _nameDriverCtrl.text.trim(),
-      "quantity": int.tryParse(_quantityCtrl.text) ?? 0,
-      "weight": int.tryParse(_weightCtrl.text) ?? 0,
+      "quantity": int.tryParse(_quantityCtrl.text),
+      "weight": int.tryParse(_weightCtrl.text),
       "truck_license": _truckLicenseCtrl.text.trim(),
       "lat": _latitude.toString(),
       "long": _longitude.toString(),
       "person_withdraws": _personWithdrawsCtrl.text.trim(),
       "destiny": _nameDriverCtrl.text.trim(),
-      "authorized_by": _authorizedCtrl.text.trim(),
+      "authorized_by": _authorized,
       "observations": _observationsCtrl.text.trim(),
       "created_by": userData.user,
       "name_user": userData.attributes['fullname'],
@@ -330,7 +326,6 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
     _selectedImages = [];
     _formKey.currentState?.reset();
     _categoryEntry = '0';
-    _workday = '0';
     _unityId = '0';
     _groupBusiness = '0';
     _guideCtrl.clear();
@@ -338,7 +333,7 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
     _quantityCtrl.clear();
     _weightCtrl.clear();
     _truckLicenseCtrl.clear();
-    _authorizedCtrl.clear();
+    _authorized = '0';
     _observationsCtrl.clear();
     _personWithdrawsCtrl.clear();
     _destinyCtrl.clear();
@@ -360,11 +355,32 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
 
     final userData = authState.value!;
     final categories = ref.watch(getAllCategories);
-    final group_business = ref.watch(getGroupBusinessByIdBusiness);
+    final authorized = ref.watch(getAllAuthorized);
+    final groupBusiness = ref.watch(getGroupBusinessByIdBusiness);
     final unitiesWeight = ref.watch(getAllUnitiesWeight);    
     final messageValidatorEmpty = 'Este campo es obligatorio';
     final fieldFill = const Color.fromARGB(255, 20, 21, 23);
     final borderRadius = BorderRadius.circular(8.0);
+
+    final categoryMap = {
+      for (var c in categories) c.idCategory.toString(): c
+    };
+
+    final categoryName = categoryMap[_categoryEntry]?.nameCategory;    
+    const hiddenWeightCategories = {
+      'Ejecutivos de expalsa',
+      'Personal interno',
+      'Personal externo',
+      'Cuadrillas para pesca'
+    };
+
+    const hiddenQuantityCategories = {
+      'Camarón',
+      'Tilapia'
+    };
+
+    final hideWeight = hiddenWeightCategories.contains(categoryName);
+    final hideQuantity = hiddenQuantityCategories.contains(categoryName);
 
     InputDecoration styleDecoration() => InputDecoration(
       filled: true,
@@ -453,7 +469,7 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                                       value: '0',
                                       child: Text('Seleccione una opción'),
                                     ),
-                                    ...group_business.map(
+                                    ...groupBusiness.map(
                                       (c) => DropdownMenuItem(
                                         value: c.idGroupBusiness.toString(),
                                         child: Text(c.name),
@@ -480,40 +496,6 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                       ],
                     ),
                   ),
-                ),
-
-
-                const SizedBox(height: 12),
-                CustomFieldLabelRequired(txtLabel: 'Jornada'),
-                GlowDropdownFormField<String>(
-                  value: _workday,
-                  focusNode: _workdayFocus,
-                  decoration: styleDecoration(),
-                  items: [
-                    DropdownMenuItem(
-                      value: '0',
-                      child: Text('Seleccione una opción'),
-                    ),
-                    DropdownMenuItem(
-                      value: 'Diurna',
-                      child: Text('Diurna'),
-                    ),
-                    DropdownMenuItem(
-                      value: 'Nocturna',
-                      child: Text('Nocturna'),
-                    ),
-                  ],
-                  onChanged: (v) {
-                    if (v != null) {
-                      setState(() => _workday = v);
-                    }
-                  },
-                  validator: (v) {
-                    if (v=='0' || v == null || v.trim().isEmpty) {
-                      return messageValidatorEmpty;
-                    }
-                    return null;
-                  },
                 ),
 
                 const SizedBox(height: 12),
@@ -547,33 +529,37 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                   },
                 ),
 
-                const SizedBox(height: 12),
-                CustomFieldLabelRequired(txtLabel: 'Guía / Documento'),
-                GlowTextFormField(
-                  controller: _guideCtrl,
-                  focusNode: _guideFocus,
-                  validator: (v) {
-                    if (v == null || v.trim().isEmpty) {
-                      return messageValidatorEmpty;
-                    }
-                    return null;
-                  },
-                ),
+                if (!hideWeight) ...[
+                  const SizedBox(height: 12),
+                  CustomFieldLabelRequired(txtLabel: 'Guía / Documento'),
+                  GlowTextFormField(
+                    controller: _guideCtrl,
+                    focusNode: _guideFocus,
+                    validator: (v) {
+                      if (v == null || v.trim().isEmpty) {
+                        return messageValidatorEmpty;
+                      }
+                      return null;
+                    },
+                  ),
+                ],
 
-                const SizedBox(height: 12),
-                CustomFieldLabelRequired(txtLabel: 'Cantidad de Bines'),
-                GlowTextFormField(
-                  controller: _quantityCtrl,
-                  focusNode: _quantityFocus,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  validator: (v) {
-                    if (v == null || v.isEmpty) return messageValidatorEmpty;
-                    final n = int.tryParse(v);
-                    if (n == null) return 'Cantidad inválida';
-                    return null;
-                  },
-                ),
+                if (hideQuantity) ...[
+                  const SizedBox(height: 12),
+                  CustomFieldLabelRequired(txtLabel: 'Cantidad de Bines'),
+                  GlowTextFormField(
+                    controller: _quantityCtrl,
+                    focusNode: _quantityFocus,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    validator: (v) {
+                      if (v == null || v.isEmpty) return messageValidatorEmpty;
+                      final n = int.tryParse(v);
+                      if (n == null) return 'Cantidad inválida';
+                      return null;
+                    },
+                  ),
+                ],
 
                 const SizedBox(height: 12),
                 CustomFieldLabelRequired(txtLabel: 'Unidad'),
@@ -607,24 +593,25 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                   },
                 ),
 
-                const SizedBox(height: 12),
-                CustomFieldLabelRequired(txtLabel: 'Peso'),
-                GlowTextFormField(
-                  controller: _weightCtrl,
-                  focusNode: _weightFocus,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  validator: (v) {
-                    if (v == null || v.isEmpty) return messageValidatorEmpty;
-                    final n = int.tryParse(v);
-                    if (n == null) return 'Cantidad inválida';
-                    return null;
-                  },
-                ),
+                if (!hideWeight) ...[
+                  const SizedBox(height: 12),
+                  CustomFieldLabelRequired(txtLabel: 'Peso', isRequired: false),
+                  GlowTextFormField(
+                    controller: _weightCtrl,
+                    focusNode: _weightFocus,
+                    keyboardType: TextInputType.number,
+                    // hint: _unit == '0' ? '' : _unit,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    validator: (v) {
+                      return null;
+                    },
+                  ),
+                ],
 
                 const SizedBox(height: 12),
                 CustomFieldLabelRequired(txtLabel: 'Placa del Camión'),
                 GlowTextFormField(
+                  maxLength: 8,
                   controller: _truckLicenseCtrl,
                   focusNode: _truckLicenseFocus,
                   validator: (v) {
@@ -680,11 +667,30 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                 CustomFieldLabelRequired(
                   txtLabel: 'Autorizado por',
                 ),
-                GlowTextFormField(
-                  controller: _authorizedCtrl,
+                GlowDropdownFormField2<String>(
+                  value: _authorized,
                   focusNode: _authorizedFocus,
+                  decoration: styleDecoration(),
+                  items: [
+                    DropdownMenuItem(
+                      enabled: false,
+                      value: '0',
+                      child: Text('Seleccione una opción', style: TextStyle(color: Colors.white),),
+                    ),
+                    ...authorized.map(
+                      (c) => DropdownMenuItem(
+                        value: c.name,
+                        child: Text(c.name, style: TextStyle(color: Colors.white),),
+                      ),
+                    ),
+                  ],
+                  onChanged: (v) {
+                    if (v != null) {
+                      setState(() => _authorized = v);
+                    }
+                  },
                   validator: (v) {
-                    if (v == null || v.trim().isEmpty) {
+                    if (v == '0' || v == null || v.trim().isEmpty) {
                       return messageValidatorEmpty;
                     }
                     return null;

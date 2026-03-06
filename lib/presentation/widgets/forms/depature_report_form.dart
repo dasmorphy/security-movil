@@ -22,10 +22,11 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
   final _formKey = GlobalKey<FormState>();
   String _categoryEntry = '0';
   String _groupBusiness = '0';
-  String _workday = '0';
   bool isLoading = false;
   bool imagesMinError = false;
   bool imagesMaxError = false;
+  String _authorized = '0';
+  String _destiny = '0';
 
   String _unityId = '0';
   double _latitude = -0.1865936;
@@ -35,8 +36,6 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
   final _quantityCtrl = TextEditingController();
   final _weightCtrl = TextEditingController();
   final _providerCtrl = TextEditingController();
-  final _destinyCtrl = TextEditingController();
-  final _authorizedCtrl = TextEditingController();
   final _observationsCtrl = TextEditingController();
   final _truckLicenseCtrl = TextEditingController();
   final _nameDriverCtrl = TextEditingController();
@@ -46,7 +45,6 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
 
   final FocusNode _guideFocus = FocusNode();
   final FocusNode _unitFocus = FocusNode();
-  final FocusNode _workdayFocus = FocusNode();
   final FocusNode _truckLicenseFocus = FocusNode();
   final FocusNode _nameDriverFocus = FocusNode();
   final FocusNode _weightFocus = FocusNode();
@@ -71,8 +69,6 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
     _descCtrl.dispose();
     _quantityCtrl.dispose();
     _providerCtrl.dispose();
-    _destinyCtrl.dispose();
-    _authorizedCtrl.dispose();
     _nameDriverCtrl.dispose();
     _truckLicenseCtrl.dispose();
     _observationsCtrl.dispose();
@@ -247,10 +243,10 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
       "shipping_guide": _guideCtrl.text.trim(),
       "description": _descCtrl.text.trim(),
       "quantity": int.tryParse(_quantityCtrl.text) ?? 0,
-      "weight": int.tryParse(_weightCtrl.text) ?? 0,
+      "weight": int.tryParse(_weightCtrl.text),
       "provider": _providerCtrl.text.trim(),
-      "destiny_intern": _destinyCtrl.text.trim(),
-      "authorized_by": _authorizedCtrl.text.trim(),
+      "destiny_intern": _destiny,
+      "authorized_by": _authorized,
       "observations": _observationsCtrl.text.trim(),
       "name_driver": _nameDriverCtrl.text.trim(),
       "truck_license": _truckLicenseCtrl.text.trim(),
@@ -258,7 +254,6 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
       "long": _longitude.toString(),
       "created_by": userData.user,
       "name_user": userData.attributes['fullname'],
-      "workday": _workday.trim(),
       "id_group_business":
           userData.attributes['group_business'] ?? int.parse(_groupBusiness),
       "images": _selectedImages
@@ -345,18 +340,17 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
     _selectedImages = [];
     _formKey.currentState?.reset();
     _categoryEntry = '0';
-    _workday = '0';
     _groupBusiness = '0';
     _unityId = '0';
+    _destiny = '0';
     _guideCtrl.clear();
     _descCtrl.clear();
     _quantityCtrl.clear();
     _weightCtrl.clear();
     _providerCtrl.clear();
-    _destinyCtrl.clear();
     _nameDriverCtrl.clear();
     _truckLicenseCtrl.clear();
-    _authorizedCtrl.clear();
+    _authorized = '0';
     _observationsCtrl.clear();
     imagesMinError = false;
     imagesMaxError = false;
@@ -377,12 +371,29 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
 
     final userData = authState.value!;
     final categories = ref.watch(getAllCategories);
-    final group_business = ref.watch(getGroupBusinessByIdBusiness);
+    final authorized = ref.watch(getAllAuthorized);
+    final destinyIntern = ref.watch(getAllDestinyIntern);
+    final groupBusiness = ref.watch(getGroupBusinessByIdBusiness);
     final unitiesWeight = ref.watch(getAllUnitiesWeight);
     final theme = Theme.of(context);
     final messageValidatorEmpty = 'Este campo es obligatorio';
     final fieldFill = const Color.fromARGB(255, 20, 21, 23);
     final borderRadius = BorderRadius.circular(8.0);
+
+    final categoryMap = {
+      for (var c in categories) c.idCategory.toString(): c
+    };
+
+    final categoryName = categoryMap[_categoryEntry]?.nameCategory;    
+    const hiddenWeightCategories = {
+      'Ejecutivos de expalsa',
+      'Personal interno',
+      'Personal externo',
+      'Cuadrillas para pesca'
+    };
+
+    final hideWeight = hiddenWeightCategories.contains(categoryName);
+
 
     InputDecoration styleDecoration() => InputDecoration(
       filled: true,
@@ -474,7 +485,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                                       value: '0',
                                       child: Text('Seleccione una opción'),
                                     ),
-                                    ...group_business.map(
+                                    ...groupBusiness.map(
                                       (c) => DropdownMenuItem(
                                         value: c.idGroupBusiness.toString(),
                                         child: Text(c.name),
@@ -502,36 +513,6 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                       ],
                     ),
                   ),
-                ),
-
-                const SizedBox(height: 12),
-                CustomFieldLabelRequired(txtLabel: 'Jornada'),
-                GlowDropdownFormField<String>(
-                  value: _workday,
-                  focusNode: _workdayFocus,
-                  decoration: styleDecoration(),
-                  items: [
-                    DropdownMenuItem(
-                      value: '0',
-                      child: Text('Seleccione una opción'),
-                    ),
-                    DropdownMenuItem(value: 'Diurna', child: Text('Diurna')),
-                    DropdownMenuItem(
-                      value: 'Nocturna',
-                      child: Text('Nocturna'),
-                    ),
-                  ],
-                  onChanged: (v) {
-                    if (v != null) {
-                      setState(() => _workday = v);
-                    }
-                  },
-                  validator: (v) {
-                    if (v == '0' || v == null || v.trim().isEmpty) {
-                      return messageValidatorEmpty;
-                    }
-                    return null;
-                  },
                 ),
 
                 const SizedBox(height: 12),
@@ -572,18 +553,20 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                   },
                 ),
 
-                const SizedBox(height: 12),
-                CustomFieldLabelRequired(txtLabel: 'OC/ Guia de remision'),
-                GlowTextFormField(
-                  controller: _guideCtrl,
-                  focusNode: _guideFocus,
-                  validator: (v) {
-                    if (v == null || v.trim().isEmpty) {
-                      return messageValidatorEmpty;
-                    }
-                    return null;
-                  },
-                ),
+                if (!hideWeight) ...[
+                  const SizedBox(height: 12),
+                  CustomFieldLabelRequired(txtLabel: 'OC/ Guia de remision'),
+                  GlowTextFormField(
+                    controller: _guideCtrl,
+                    focusNode: _guideFocus,
+                    validator: (v) {
+                      if (v == null || v.trim().isEmpty) {
+                        return messageValidatorEmpty;
+                      }
+                      return null;
+                    },
+                  ),
+                ],
 
                 const SizedBox(height: 12),
 
@@ -647,19 +630,21 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                   },
                 ),
 
-                const SizedBox(height: 12),
-                CustomFieldLabelRequired(txtLabel: 'Peso', isRequired: false),
-                GlowTextFormField(
-                  controller: _weightCtrl,
-                  focusNode: _weightFocus,
-                  keyboardType: TextInputType.number,
-                  // hint: _unit == '0' ? '' : _unit,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  validator: (v) {
-                    return null;
-                  },
-                ),
-
+                if (!hideWeight) ...[
+                  const SizedBox(height: 12),
+                  CustomFieldLabelRequired(txtLabel: 'Peso', isRequired: false),
+                  GlowTextFormField(
+                    controller: _weightCtrl,
+                    focusNode: _weightFocus,
+                    keyboardType: TextInputType.number,
+                    // hint: _unit == '0' ? '' : _unit,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    validator: (v) {
+                      return null;
+                    },
+                  ),
+                ],
+                
                 const SizedBox(height: 12),
                 CustomFieldLabelRequired(txtLabel: 'Proveedor / Origen'),
                 GlowTextFormField(
@@ -676,6 +661,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                 const SizedBox(height: 12),
                 CustomFieldLabelRequired(txtLabel: 'Placa del Camión'),
                 GlowTextFormField(
+                  maxLength: 8,
                   controller: _truckLicenseCtrl,
                   focusNode: _truckLicenseFocus,
                   validator: (v) {
@@ -701,11 +687,30 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
 
                 const SizedBox(height: 12),
                 CustomFieldLabelRequired(txtLabel: 'Destino Interno'),
-                GlowTextFormField(
-                  controller: _destinyCtrl,
+                GlowDropdownFormField2<String>(
+                  value: _destiny,
                   focusNode: _destinyFocus,
+                  decoration: styleDecoration(),
+                  items: [
+                    DropdownMenuItem(
+                      enabled: false,
+                      value: '0',
+                      child: Text('Seleccione una opción', style: TextStyle(color: Colors.white),),
+                    ),
+                    ...destinyIntern.map(
+                      (c) => DropdownMenuItem(
+                        value: c.name,
+                        child: Text(c.name, style: TextStyle(color: Colors.white),),
+                      ),
+                    ),
+                  ],
+                  onChanged: (v) {
+                    if (v != null) {
+                      setState(() => _destiny = v);
+                    }
+                  },
                   validator: (v) {
-                    if (v == null || v.trim().isEmpty) {
+                    if (v == '0' || v == null || v.trim().isEmpty) {
                       return messageValidatorEmpty;
                     }
                     return null;
@@ -714,11 +719,30 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
 
                 const SizedBox(height: 12),
                 CustomFieldLabelRequired(txtLabel: 'Autorizado por'),
-                GlowTextFormField(
-                  controller: _authorizedCtrl,
+                GlowDropdownFormField2<String>(
+                  value: _authorized,
                   focusNode: _authorizedFocus,
+                  decoration: styleDecoration(),
+                  items: [
+                    DropdownMenuItem(
+                      enabled: false,
+                      value: '0',
+                      child: Text('Seleccione una opción', style: TextStyle(color: Colors.white),),
+                    ),
+                    ...authorized.map(
+                      (c) => DropdownMenuItem(
+                        value: c.name,
+                        child: Text(c.name, style: TextStyle(color: Colors.white),),
+                      ),
+                    ),
+                  ],
+                  onChanged: (v) {
+                    if (v != null) {
+                      setState(() => _authorized = v);
+                    }
+                  },
                   validator: (v) {
-                    if (v == null || v.trim().isEmpty) {
+                    if (v == '0' || v == null || v.trim().isEmpty) {
                       return messageValidatorEmpty;
                     }
                     return null;
