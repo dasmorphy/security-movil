@@ -559,6 +559,19 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                       return null;
                     },
                   ),
+
+                  const SizedBox(height: 12),
+                  CustomFieldLabelRequired(txtLabel: 'Custodia que Retira el Producto'),
+                  GlowTextFormField(
+                    controller: _personWithdrawsCtrl,
+                    focusNode: _personWithdrawsFocus,
+                    validator: (v) {
+                      if (v == null || v.trim().isEmpty) {
+                        return messageValidatorEmpty;
+                      }
+                      return null;
+                    },
+                  ),
                 ],
 
                 const SizedBox(height: 12),
@@ -627,19 +640,6 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                 GlowTextFormField(
                   controller: _nameDriverCtrl,
                   focusNode: _nameDriverFocus,
-                  validator: (v) {
-                    if (v == null || v.trim().isEmpty) {
-                      return messageValidatorEmpty;
-                    }
-                    return null;
-                  },
-                ),
-
-                const SizedBox(height: 12),
-                CustomFieldLabelRequired(txtLabel: 'Custodia que Retira el Producto'),
-                GlowTextFormField(
-                  controller: _personWithdrawsCtrl,
-                  focusNode: _personWithdrawsFocus,
                   validator: (v) {
                     if (v == null || v.trim().isEmpty) {
                       return messageValidatorEmpty;
