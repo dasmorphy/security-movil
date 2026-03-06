@@ -25,6 +25,8 @@ class HomeViewState extends ConsumerState<HomeView> {
     ref.read(getAllCategories.notifier).load();
     ref.read(getGroupBusinessByIdBusiness.notifier).load();
     ref.read(getAllUnitiesWeight.notifier).load();
+    ref.read(getAllAuthorized.notifier).load();
+    ref.read(getAllDestinyIntern.notifier).load();
     // ref.read(popularMoviesProvider.notifier).loadNextPage();
     // ref.read(upcomingMoviesProvider.notifier).loadNextPage();
     // ref.read(topRatedMoviesProvider.notifier).loadNextPage();

@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:zentinel/domain/entities/authorized.dart';
 import 'package:zentinel/domain/entities/category.dart';
+import 'package:zentinel/domain/entities/destiny_intern.dart';
 import 'package:zentinel/domain/entities/group_business.dart';
 import 'package:zentinel/domain/entities/unity_weight.dart';
 import 'package:zentinel/domain/repositories/logbook_entry_repository.dart';
@@ -24,6 +26,24 @@ final getAllUnitiesWeight =
 
   return CatalogNotifier<UnityWeight>(
     (_) => repo.getAllUnitsWeight(),
+  );
+});
+
+final getAllAuthorized =
+    StateNotifierProvider<CatalogNotifier<Authorized>, List<Authorized>>((ref) {
+  final repo = ref.watch(logbookEntryRepositoryProvider);
+
+  return CatalogNotifier<Authorized>(
+    (_) => repo.getAllAuthorized(),
+  );
+});
+
+final getAllDestinyIntern =
+    StateNotifierProvider<CatalogNotifier<DestinyIntern>, List<DestinyIntern>>((ref) {
+  final repo = ref.watch(logbookEntryRepositoryProvider);
+
+  return CatalogNotifier<DestinyIntern>(
+    (_) => repo.getAllDestinyIntern(),
   );
 });
 
