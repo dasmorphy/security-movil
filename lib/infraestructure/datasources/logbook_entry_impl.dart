@@ -5,6 +5,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:dio/dio.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/domain/datasources/logbook_entry_datasource.dart';
+import 'package:zentinel/domain/entities/all_logbook.dart';
 import 'package:zentinel/domain/entities/authorized.dart';
 import 'package:zentinel/domain/entities/category.dart';
 import 'package:zentinel/domain/entities/destiny_intern.dart';
@@ -154,19 +155,28 @@ stopwatch.stop();
   }
 
   @override
-  Future<List<Map<String, dynamic>>> getHistoryLogbooks(filter) async {
-    final response = await dio.get(
-      '/rest/zent-logbook-api/v1.0/get/history-logbook',
-      options: Options(
-        headers: {
-          'externalTransactionId': uuid,
-          'channel': 'ZENTINEL',
-          'user': filter['user'],
-        },
-      ),
-    );
+  Future<List<AllLogbook>> getHistoryLogbooks(filter) async {
+    List allLogJson = [];
+    try {
+      final response = await dio.get(
+        '/rest/zent-logbook-api/v1.0/get/all-logbooks',
+        options: Options(
+          headers: {
+            'externalTransactionId': uuid,
+            'channel': 'ZENTINEL',
+            'user': filter['user'],
+          },
+        ),
+      );
 
-    return List<Map<String, dynamic>>.from(response.data['data']);
+      allLogJson = response.data['data']; 
+      
+      return allLogJson.map((json) => AllLogbook.fromJson(json)).toList();
+      
+    } catch (e) {
+      print(e);
+      return [];
+    }
   }
 
   @override

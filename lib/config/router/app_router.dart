@@ -33,6 +33,11 @@ final appRouter = GoRouter(
           path: '/check-success',
           name: CheckSuccessScreen.name,
           builder: (context, state) => const CheckSuccessScreen()
+        ),
+        GoRoute(
+          path: '/list-logbooks',
+          name: LogbookListScreen.name,
+          builder: (context, state) => const LogbookListScreen()
         )
       ]
     ),

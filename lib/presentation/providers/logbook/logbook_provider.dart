@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:zentinel/domain/entities/all_logbook.dart';
 import 'package:zentinel/domain/entities/authorized.dart';
 import 'package:zentinel/domain/entities/category.dart';
 import 'package:zentinel/domain/entities/destiny_intern.dart';
@@ -63,19 +64,19 @@ final saveOutLogbookProvider =
 
 final getHistoryLogbooks =
     StateNotifierProvider.autoDispose<
-        CatalogNotifier<Map<String, dynamic>>,
-        List<Map<String, dynamic>>>(
+        CatalogNotifier<AllLogbook>,
+        List<AllLogbook>>(
   (ref) {
     final repo = ref.watch(logbookEntryRepositoryProvider);
     final authState = ref.watch(userSessionProvider);
 
     if (!authState.hasValue || authState.value == null) {
-      return CatalogNotifier<Map<String, dynamic>>((_) async => []);
+      return CatalogNotifier<AllLogbook>((_) async => []);
     }
 
     final userData = authState.value!;
 
-    return CatalogNotifier<Map<String, dynamic>>(
+    return CatalogNotifier<AllLogbook>(
       (filters) {
         final mergedFilters = {
           if (userData.role == 'admin')

@@ -1,8 +1,6 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:lottie/lottie.dart';
+import 'package:go_router/go_router.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
@@ -27,13 +25,12 @@ class HomeViewState extends ConsumerState<HomeView> {
     ref.read(getAllUnitiesWeight.notifier).load();
     ref.read(getAllAuthorized.notifier).load();
     ref.read(getAllDestinyIntern.notifier).load();
-    // ref.read(popularMoviesProvider.notifier).loadNextPage();
-    // ref.read(upcomingMoviesProvider.notifier).loadNextPage();
-    // ref.read(topRatedMoviesProvider.notifier).loadNextPage();
   }
 
   @override
   Widget build(BuildContext context) {
+    final historyLogbooks = ref.watch(getHistoryLogbooks);
+
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -44,32 +41,6 @@ class HomeViewState extends ConsumerState<HomeView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 10),
-
-                
-
-                // const SizedBox(height: 32),
-                // // Título Monitoreo
-                // Text(
-                //   'Monitoreo',
-                //   style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                //     color: Colors.white,
-                //     fontWeight: FontWeight.w600,
-                //   ),
-                // ),
-                // const SizedBox(height: 5),
-                // // Grilla de Cámaras 2x2
-                // GridView.count(
-                //   crossAxisCount: 2,
-                //   shrinkWrap: true,
-                //   physics: const NeverScrollableScrollPhysics(),
-                //   crossAxisSpacing: 12,
-                //   mainAxisSpacing: 12,
-                //   children: List.generate(
-                //     4,
-                //     (index) => _buildCameraCard(context, 'Cámara ${index + 1}'),
-                //   ),
-                // ),
-                // const SizedBox(height: 32),
 
                 // Bitácoras Recientes
                 Container(
@@ -94,10 +65,16 @@ class HomeViewState extends ConsumerState<HomeView> {
                           Column(
                             children: [
                               SizedBox(height: 4),
-                              const Icon(
-                                Icons.chevron_right,
-                                color: Colors.white,
-                                size: 20,
+                              InkWell(
+                                borderRadius: BorderRadius.circular(20),
+                                onTap: () => context.push('/list-logbooks'),
+                                child: const Padding(
+                                  padding: EdgeInsets.all(7),
+                                  child: Icon(
+                                    Icons.chevron_right,
+                                    color: Colors.white,
+                                  ),
+                                ),
                               ),
                             ],
                           ),
@@ -112,76 +89,6 @@ class HomeViewState extends ConsumerState<HomeView> {
                 const SizedBox(height: 15),
                 // Publicidad
                 PublicityCard(),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCameraCard(BuildContext context, String cameraName) {
-    return ClipRRect(
-      // decoration: BoxDecoration(
-      //   // color: const Color.fromARGB(255, 255, 255, 255),
-      // ),
-      borderRadius: BorderRadius.circular(12),
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          //Imagen de fondo
-          // Image.network(
-          //   'https://definicion.de/wp-content/uploads/2009/12/paisaje-1.jpg',
-          //   fit: BoxFit.cover,
-          // ),
-
-          //Blur
-          BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-            child: Container(
-              color: Colors.white.withOpacity(0.1), // efecto glass claro
-            ),
-          ),
-          
-          // Contenido principal
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  cameraName,
-                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-                const Spacer(),
-
-                const Spacer(),
-
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                      width: 24,
-                      height: 24,
-                      child: Lottie.asset(
-                        'lib/assets/lottie/live.json',
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                    // const SizedBox(width: 4),
-                    Text(
-                      'LIVE',
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 10,
-                      ),
-                    ),
-                  ],
-                ),
               ],
             ),
           ),
@@ -206,17 +113,17 @@ class HomeViewState extends ConsumerState<HomeView> {
     return List.generate(limitedList.length, (index) {
       final item = limitedList[index];
 
-      final isEntry = item.containsKey('id_logbook_entry');
-      final typeText = isEntry ? 'ingreso' : 'salida';
+      final isEntry = item.idLogbookEntry;
+      final typeText = isEntry != null ? 'ingreso' : 'salida';
 
-      final createdBy = item['name_user'] ?? '—';
-      final groupName = item['group_name'] ?? '—';
+      final createdBy = item.nameUser;
+      final groupName = item.groupName;
 
-      final description = isEntry
+      final description = isEntry != null
           ? 'Bitácora de $typeText en $groupName'
           : 'Bitácora de $typeText en $groupName';
 
-      final formattedDate = formatDate(item['created_at']);
+      final formattedDate = formatDate(item.createdAt);
 
       return Padding(
         padding: const EdgeInsets.only(bottom: 12),

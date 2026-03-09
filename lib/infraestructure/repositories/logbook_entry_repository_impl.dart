@@ -1,4 +1,5 @@
 import 'package:zentinel/domain/datasources/logbook_entry_datasource.dart';
+import 'package:zentinel/domain/entities/all_logbook.dart';
 import 'package:zentinel/domain/entities/authorized.dart';
 import 'package:zentinel/domain/entities/category.dart';
 import 'package:zentinel/domain/entities/destiny_intern.dart';
@@ -37,7 +38,7 @@ class LogbookEntryRepositoryImpl extends LogbookEntryRepository {
   }
   
   @override
-  Future <List<Map<String, dynamic>>> getHistoryLogbooks(Map<String, dynamic> filters) {
+  Future <List<AllLogbook>> getHistoryLogbooks(Map<String, dynamic> filters) {
     return datasource.getHistoryLogbooks(filters);
   }
   
