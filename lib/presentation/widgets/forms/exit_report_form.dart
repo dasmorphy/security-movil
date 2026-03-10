@@ -3,15 +3,18 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:uuid/uuid.dart';
 import 'package:zentinel/config/utils/helper.dart';
+import 'package:zentinel/domain/entities/all_logbook.dart';
 import 'dart:io';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 import 'package:zentinel/service/pending_request_service.dart';
 
 class ExitReportForm extends ConsumerStatefulWidget {
+  final AllLogbook? preloadedData;
   final Future<bool> Function(Map<String, dynamic>)? onSubmit;
-  const ExitReportForm({super.key, this.onSubmit});
+  const ExitReportForm({super.key, this.onSubmit, this.preloadedData});
 
   @override
   ConsumerState<ExitReportForm> createState() => _ExitReportFormState();
@@ -58,6 +61,10 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
   void initState() {
     super.initState();
     _getUserLocation();
+
+    if (widget.preloadedData != null && mounted) {
+      _loadPreloadedData(widget.preloadedData!);
+    }
   }
   
   @override
@@ -182,6 +189,62 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
     }
   }
 
+  void _loadPreloadedData(AllLogbook data) {
+    if (!mounted) return;
+
+    setState(() {
+      // Cargar fecha del movimiento
+      // if (data.exitDate != null) {
+      //   try {
+      //     movementDateTime = DateTime.parse(data.exitDate.toString());
+      //     _movementDateController.text = movementDateTime.toString();
+      //   } catch (e) {
+      //     debugPrint('Error al parsear fecha: $e');
+      //   }
+      // }
+
+      _categoryEntry = data.categoryId.toString();
+
+      _guideCtrl.text = data.shippingGuide ?? '';
+
+      _unityId = data.unityId.toString();
+
+      _truckLicenseCtrl.text = data.truckLicense;
+
+      _nameDriverCtrl.text = data.nameDriver ?? '';
+
+      _authorized = data.authorizedBy;
+
+
+
+      // // Cargar kilometraje inicial
+      // _initialKmController.text = data.initialKm.toString();
+
+      // // Cargar combustible inicial
+      // selectedFuel = data.initialGasolineId;
+
+      // // Cargar conductor (búscar el ID en driverOptions)
+      // if (data.nameDriver != null && driverOptions.isNotEmpty) {
+      //   for (var driver in driverOptions) {
+      //     if (driver['name'] == data.nameDriver) {
+      //       selectedDriver = driver['id_driver'];
+      //       break;
+      //     }
+      //   }
+      // }
+
+      // // Cargar puntos de origen y destino
+      // _originController.text = data.exitPoint?.toString() ?? '';
+      // _destinationController.text = data.destiny ?? '';
+
+      // // Cargar observaciones (si existen)
+      // _observationsController.text = '';
+
+      // // Ubicar en el paso 4 (Cierre/Resumen)
+      // _currentStep = 4;
+    });
+  }
+
   void _removeImage(int index) {
     setState(() {
       _selectedImages.removeAt(index);
@@ -205,10 +268,10 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
       return;
     }
     
-    if (_selectedImages.length < 5) {
-      setState(() => imagesMinError = true);
-      return;
-    }
+    // if (_selectedImages.length < 5) {
+    //   setState(() => imagesMinError = true);
+    //   return;
+    // }
 
     if (_selectedImages.length > 10) {
       setState(() => imagesMaxError = true);
@@ -228,6 +291,8 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
     final userData = authState.value!;
 
     final data = {
+      "id_logbook_entry": widget.preloadedData?.idLogbookEntry,
+      "external_transaction_id": Uuid().v4(),
       "id_unity": int.parse(_unityId),
       "id_category": int.parse(_categoryEntry),
       "shipping_guide": _guideCtrl.text.trim(),
@@ -238,7 +303,7 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
       "lat": _latitude.toString(),
       "long": _longitude.toString(),
       "person_withdraws": _personWithdrawsCtrl.text.trim(),
-      "destiny": _nameDriverCtrl.text.trim(),
+      "destiny": _destinyCtrl.text.trim(),
       "authorized_by": _authorized,
       "observations": _observationsCtrl.text.trim(),
       "created_by": userData.user,
@@ -311,7 +376,7 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
         context.pop(); // Cerrar el formulario
         context.push('/check-success');
       } else {
-        context.pop(); // Cerrar el formulario
+        // context.pop(); // Cerrar el formulario
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('❌ Error al enviar el formulario. Por favor intenta de nuevo.'),
@@ -837,6 +902,7 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                       child: OutlinedButton(
                         onPressed: () {
                           _clearCntrl();
+                          context.pop();
                         },
                         style: OutlinedButton.styleFrom(
                           side: const BorderSide(color: Colors.white24),

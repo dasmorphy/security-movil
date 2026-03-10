@@ -71,6 +71,21 @@ class SyncPendingNotifier extends StateNotifier<bool> {
     state = true;
 
     final box = Hive.box('pending_requests');
+
+    // limpiar requests que quedaron en processing por crash
+    for (final key in box.keys) {
+      final data = box.get(key);
+
+      if (data is Map && data['processing'] == true) {
+        final Map<String, dynamic> reset = Map<String, dynamic>.from(data);
+        reset['processing'] = false;
+
+        await box.put(key, reset);
+
+        print("♻️ Reset processing para request $key");
+      }
+    }
+
     final totalPending = box.length;
 
     if (totalPending == 0) {

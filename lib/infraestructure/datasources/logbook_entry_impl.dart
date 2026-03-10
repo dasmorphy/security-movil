@@ -47,111 +47,130 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
 
   @override
   Future<bool> saveLogbookEntry(Map<String, dynamic> data) async {
-    final images = data['images'] as List<File>?;
-    final logbookData = Map<String, dynamic>.from(data);
-    logbookData.remove('images');
+    try {
+      
+      final images = data['images'] as List<File>?;
+      final logbookData = Map<String, dynamic>.from(data);
+      logbookData.remove('images');
 
-    logbookData['channel'] = 'ZENTINEL';
-    logbookData['external_transaction_id'] = Uuid().v4();
+      logbookData['channel'] = 'ZENTINEL';
+      // logbookData['external_transaction_id'] = "1947d6c4-af59-4c26-ae20-e6e935eb7544";
 
-    final logbookJson = jsonEncode(logbookData);
-    final logbookBytes = utf8.encode(logbookJson);
+      final logbookJson = jsonEncode(logbookData);
+      final logbookBytes = utf8.encode(logbookJson);
 
-    final formData = FormData();
+      final formData = FormData();
 
-    // Agregar logbook_entry
-    formData.files.add(
-      MapEntry(
-        'logbook_entry',
-        MultipartFile.fromBytes(
-          logbookBytes,
-          filename: 'logbook_entry.json',
-          contentType: MediaType('application', 'json'),
-        ),
-      ),
-    );
-
-    // Agregar imágenes
-    if (images != null && images.isNotEmpty) {
-      for (var i = 0; i < images.length; i++) {
-        final image = images[i];
-        formData.files.add(
-          MapEntry(
-            'images',
-            await MultipartFile.fromFile(
-              image.path,
-              filename: image.path.split('/').last,
-              contentType: getMediaType(image.path),
-            ),
+      // Agregar logbook_entry
+      formData.files.add(
+        MapEntry(
+          'logbook_entry',
+          MultipartFile.fromBytes(
+            logbookBytes,
+            filename: 'logbook_entry.json',
+            contentType: MediaType('application', 'json'),
           ),
-        );
+        ),
+      );
+
+      // Agregar imágenes
+      if (images != null && images.isNotEmpty) {
+        for (var i = 0; i < images.length; i++) {
+          final image = images[i];
+          formData.files.add(
+            MapEntry(
+              'images',
+              await MultipartFile.fromFile(
+                image.path,
+                filename: image.path.split('/').last,
+                contentType: getMediaType(image.path),
+              ),
+            ),
+          );
+        }
       }
+      final stopwatch = Stopwatch()..start();
+
+      final response = await dio.post(
+        '/rest/zent-logbook-api/v1.0/post/logbook-entry',
+        data: formData,
+        options: onlyError(),
+      );
+
+      stopwatch.stop();
+      print('⏱️ Tiempo total request: ${stopwatch.elapsedMilliseconds} ms');
+      return response.statusCode == 200 || response.statusCode == 409;
+    } on DioException catch (e) {
+      print("❌ Error enviando logbook: ${e.message}");
+      if (e.response?.statusCode == 409) {
+        return true;
+      }
+      return false;
     }
-    final stopwatch = Stopwatch()..start();
-
-    final response = await dio.post(
-      '/rest/zent-logbook-api/v1.0/post/logbook-entry',
-      data: formData,
-      options: onlyError(),
-    );
-
-    stopwatch.stop();
-    print('⏱️ Tiempo total request: ${stopwatch.elapsedMilliseconds} ms');
-    return response.statusCode == 200;
   }
 
   @override
   Future<bool> saveLogbookOut(Map<String, dynamic> data) async {
-    final images = data['images'] as List<File>?;
-    final logbookData = Map<String, dynamic>.from(data);
-    logbookData.remove('images');
 
-    logbookData['channel'] = 'ZENTINEL';
-    logbookData['external_transaction_id'] = Uuid().v4();
+    try {
+      
+      final images = data['images'] as List<File>?;
+      final logbookData = Map<String, dynamic>.from(data);
+      logbookData.remove('images');
 
-    final logbookJson = jsonEncode(logbookData);
-    final logbookBytes = utf8.encode(logbookJson);
+      logbookData['channel'] = 'ZENTINEL';
+      // logbookData['external_transaction_id'] = "3067dc66-ac5e-49d7-8ef9-eb62c51d4bc6";
 
-    final formData = FormData();
+      final logbookJson = jsonEncode(logbookData);
+      final logbookBytes = utf8.encode(logbookJson);
 
-    // Agregar logbook_out
-    formData.files.add(
-      MapEntry(
-        'logbook_out',
-        MultipartFile.fromBytes(
-          logbookBytes,
-          filename: 'logbook_out.json',
-          contentType: MediaType('application', 'json'),
-        ),
-      ),
-    );
+      final formData = FormData();
 
-    // Agregar imágenes
-    if (images != null && images.isNotEmpty) {
-      for (var i = 0; i < images.length; i++) {
-        final image = images[i];
-        formData.files.add(
-          MapEntry(
-            'images',
-            await MultipartFile.fromFile(
-              image.path,
-              filename: image.path.split('/').last,
-              contentType: getMediaType(image.path),
-            ),
+      // Agregar logbook_out
+      formData.files.add(
+        MapEntry(
+          'logbook_out',
+          MultipartFile.fromBytes(
+            logbookBytes,
+            filename: 'logbook_out.json',
+            contentType: MediaType('application', 'json'),
           ),
-        );
-      }
-    }
-    final stopwatch = Stopwatch()..start();
+        ),
+      );
 
-    final response = await dio.post(
-      '/rest/zent-logbook-api/v1.0/post/logbook-out',
-      data: formData,
-      options: onlyError(),
-    );
-stopwatch.stop();
-    print('⏱️ Tiempo total request: ${stopwatch.elapsedMilliseconds} ms');
-    return response.statusCode == 200;
+      // Agregar imágenes
+      if (images != null && images.isNotEmpty) {
+        for (var i = 0; i < images.length; i++) {
+          final image = images[i];
+          formData.files.add(
+            MapEntry(
+              'images',
+              await MultipartFile.fromFile(
+                image.path,
+                filename: image.path.split('/').last,
+                contentType: getMediaType(image.path),
+              ),
+            ),
+          );
+        }
+      }
+      final stopwatch = Stopwatch()..start();
+
+      final response = await dio.post(
+        '/rest/zent-logbook-api/v1.0/post/logbook-out',
+        data: formData,
+        options: onlyError(),
+      );
+      stopwatch.stop();
+      print('⏱️ Tiempo total request: ${stopwatch.elapsedMilliseconds} ms');
+      return response.statusCode == 200 || response.statusCode == 409;
+    } on DioException catch (e) {
+      print("❌ Error enviando logbook: ${e.message}");
+      if (e.response?.statusCode == 409) {
+        return true;
+      }
+      return false;
+    }
   }
 
   @override

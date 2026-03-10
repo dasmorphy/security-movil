@@ -1,15 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:zentinel/config/constants/environment.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/domain/entities/all_logbook.dart';
 import 'package:zentinel/presentation/models/detail_log_label.dart';
+import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
-class BitacoraDetailModal extends StatelessWidget {
+class BitacoraDetailModal extends ConsumerStatefulWidget {
   final AllLogbook item;
 
   const BitacoraDetailModal({super.key, required this.item});
 
+  @override
+  ConsumerState<BitacoraDetailModal> createState() => _BitacoraDetailModalState();
+}
+
+class _BitacoraDetailModalState extends ConsumerState<BitacoraDetailModal> {
   String _prettyKey(String key) {
     return key.replaceAll('_', ' ').splitMapJoin(RegExp(r'\w+'), onMatch: (m) {
       final s = m.group(0)!;
@@ -32,16 +40,16 @@ class BitacoraDetailModal extends StatelessWidget {
       'images_out'
     };
 
-    final entries = item
+    final entries = widget.item
         .toJson()
         .entries
         .where((e) => !hiddenFields.contains(e.key))
         .toList();
 
 
-    final images = (item.imagesEntry?.isNotEmpty ?? false)
-    ? item.imagesEntry!
-    : item.imagesOut;
+    final images = (widget.item.imagesEntry?.isNotEmpty ?? false)
+    ? widget.item.imagesEntry!
+    : widget.item.imagesOut;
 
     return SafeArea(
       child: Container(
@@ -52,7 +60,7 @@ class BitacoraDetailModal extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const SizedBox(width: 24),
                 Text(
@@ -61,10 +69,6 @@ class BitacoraDetailModal extends StatelessWidget {
                         color: Colors.white,
                         fontWeight: FontWeight.w700,
                       ),
-                ),
-                IconButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  icon: const Icon(Icons.close, color: Colors.white),
                 ),
               ],
             ),
@@ -193,30 +197,60 @@ class BitacoraDetailModal extends StatelessWidget {
               ),
             ),
 
-            if (item.status == 'Pendiente Salida')
-              const SizedBox(height: 18),
+            const SizedBox(height: 28),
+
+            if (widget.item.status == 'Pendiente Salida')
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF444444),
+                  backgroundColor: const Color.fromARGB(255, 36, 83, 168),
                   padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
-                onPressed: () => Navigator.of(context).pop(),
-                child: const Text('Continuar', style: TextStyle(color: Colors.white),),
+                onPressed: () async {
+                  await Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => ExitReportForm(
+                      preloadedData: widget.item,
+                        onSubmit: (data) async {
+                          return await ref
+                            .read(saveOutLogbookProvider.notifier)
+                            .saveLogbookOut(data);
+                        },
+                      ),
+                    ),
+                  );
+
+                  // if (!context.mounted) return;
+
+                  // context.go('/');
+                  
+                },
+                child: const Text(
+                  'Continuar',
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
 
-
-            const SizedBox(height: 28),
+              const SizedBox(height: 8),
 
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF444444),
                 padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cerrar', style: TextStyle(color: Colors.white),),
+              child: const Text(
+                'Cerrar',
+                style: TextStyle(color: Colors.white),
+              ),
             ),
+
+            const SizedBox(height: 14),
           ],
         ),
       ),
@@ -231,5 +265,4 @@ class BitacoraDetailModal extends StatelessWidget {
       ),
     );
   }
-
 }

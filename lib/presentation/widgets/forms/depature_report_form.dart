@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:uuid/uuid.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
@@ -238,6 +239,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
 
     // Construir los datos del formulario
     final data = {
+      "external_transaction_id": Uuid().v4(),
       "id_unity": int.parse(_unityId),
       "id_category": int.parse(_categoryEntry),
       "shipping_guide": _guideCtrl.text.trim(),
@@ -315,24 +317,24 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
       await savePendingRequest(data, 'logbook_entry');
     }
 
-    if (mounted) {
-      // Navigator.pop(context); // Cerrar dialog de procesamiento
+    if (!mounted) return;
 
-      if (success) {
-        _clearCntrl();
-        context.pop(); // Cerrar el formulario
-        context.push('/check-success');
-      } else {
-        context.pop(); // Cerrar el formulario
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              '❌ Error al enviar el formulario. Por favor intenta de nuevo.',
-            ),
-            backgroundColor: Colors.red,
+    _clearCntrl();
+    context.pop();
+
+    if (success) {
+      context.push('/check-success');
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          duration: Duration(seconds: 6),
+          content: Text(
+            '📱 Error al enviar el formulario. La información se guardará localmente y se enviará automáticamente.',
+            style: TextStyle(color: Colors.white),
           ),
-        );
-      }
+          backgroundColor: Color.fromARGB(255, 255, 152, 0),
+        ),
+      );
     }
   }
 
