@@ -901,6 +901,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                     Expanded(
                       child: OutlinedButton(
                         onPressed: () {
+                          context.pop();
                           _clearCntrl();
                         },
                         style: OutlinedButton.styleFrom(

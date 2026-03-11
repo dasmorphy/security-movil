@@ -37,7 +37,8 @@ class _BitacoraDetailModalState extends ConsumerState<BitacoraDetailModal> {
       'category_id',
       'unity_id',
       'images_entry',
-      'images_out'
+      'images_out',
+      'out'
     };
 
     final entries = widget.item

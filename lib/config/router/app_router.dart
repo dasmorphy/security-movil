@@ -32,7 +32,12 @@ final appRouter = GoRouter(
         GoRoute(
           path: '/check-success',
           name: CheckSuccessScreen.name,
-          builder: (context, state) => const CheckSuccessScreen()
+          builder: (context, state) {
+            final redirect = state.uri.queryParameters['redirect'];
+            return CheckSuccessScreen(
+              redirectRoute: redirect,
+            );
+          },
         ),
         GoRoute(
           path: '/list-logbooks',

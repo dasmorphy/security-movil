@@ -6,7 +6,8 @@ import 'package:lottie/lottie.dart';
 
 class CheckSuccessScreen extends ConsumerStatefulWidget {
   static const name = 'check-success-screen';
-  const CheckSuccessScreen({super.key});
+  final String? redirectRoute;
+  const CheckSuccessScreen({super.key, this.redirectRoute});
 
   @override
   ConsumerState<CheckSuccessScreen> createState() => _CheckSuccessScreenState();
@@ -73,7 +74,11 @@ class _CheckSuccessScreenState extends ConsumerState<CheckSuccessScreen> {
                     height: 56,
                     child: ElevatedButton(
                       onPressed: () {
-                        context.pop();
+                        if (widget.redirectRoute != null) {
+                          context.go(widget.redirectRoute!);
+                        }else {
+                          context.pop();
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color.fromARGB(255, 63, 81, 181),

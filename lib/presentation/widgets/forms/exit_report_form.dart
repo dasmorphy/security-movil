@@ -193,55 +193,12 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
     if (!mounted) return;
 
     setState(() {
-      // Cargar fecha del movimiento
-      // if (data.exitDate != null) {
-      //   try {
-      //     movementDateTime = DateTime.parse(data.exitDate.toString());
-      //     _movementDateController.text = movementDateTime.toString();
-      //   } catch (e) {
-      //     debugPrint('Error al parsear fecha: $e');
-      //   }
-      // }
-
       _categoryEntry = data.categoryId.toString();
-
       _guideCtrl.text = data.shippingGuide ?? '';
-
       _unityId = data.unityId.toString();
-
       _truckLicenseCtrl.text = data.truckLicense;
-
       _nameDriverCtrl.text = data.nameDriver ?? '';
-
       _authorized = data.authorizedBy;
-
-
-
-      // // Cargar kilometraje inicial
-      // _initialKmController.text = data.initialKm.toString();
-
-      // // Cargar combustible inicial
-      // selectedFuel = data.initialGasolineId;
-
-      // // Cargar conductor (búscar el ID en driverOptions)
-      // if (data.nameDriver != null && driverOptions.isNotEmpty) {
-      //   for (var driver in driverOptions) {
-      //     if (driver['name'] == data.nameDriver) {
-      //       selectedDriver = driver['id_driver'];
-      //       break;
-      //     }
-      //   }
-      // }
-
-      // // Cargar puntos de origen y destino
-      // _originController.text = data.exitPoint?.toString() ?? '';
-      // _destinationController.text = data.destiny ?? '';
-
-      // // Cargar observaciones (si existen)
-      // _observationsController.text = '';
-
-      // // Ubicar en el paso 4 (Cierre/Resumen)
-      // _currentStep = 4;
     });
   }
 
@@ -374,7 +331,13 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
       if (success) {
         _clearCntrl();
         context.pop(); // Cerrar el formulario
-        context.push('/check-success');
+        if (widget.preloadedData != null) {
+          ref.read(getHistoryLogbooks.notifier).load();
+          context.push('/check-success?redirect=/');
+        }else{
+          context.push('/check-success');
+        }
+
       } else {
         // context.pop(); // Cerrar el formulario
         ScaffoldMessenger.of(context).showSnackBar(

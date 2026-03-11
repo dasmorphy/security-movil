@@ -24,3 +24,4 @@ export 'package:zentinel/presentation/widgets/headers/header_logbooks_offline.da
 export 'package:zentinel/presentation/widgets/shared/show_dialog_widget.dart';
 export 'package:zentinel/presentation/widgets/shared/image_viewer_state.dart';
 export 'package:zentinel/presentation/widgets/logbook/logbooks_list.dart';
+export 'package:zentinel/presentation/widgets/shared/search_bar.dart';

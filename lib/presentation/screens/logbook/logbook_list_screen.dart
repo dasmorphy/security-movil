@@ -14,6 +14,7 @@ class LogbookListScreen extends ConsumerStatefulWidget  {
 }
 
 class _LogbookListScreenState extends ConsumerState<LogbookListScreen> {
+  String searchText = '';
 
   @override
   void initState() {
@@ -25,6 +26,16 @@ class _LogbookListScreenState extends ConsumerState<LogbookListScreen> {
   @override
   Widget build(BuildContext context) {
     final historyLogbooks = ref.watch(getHistoryLogbooks);
+    final filtered = historyLogbooks.where((item) {
+      final text = searchText.toLowerCase();
+
+      final shippingGuide = (item.shippingGuide ?? '').toLowerCase();
+      final truckLicense = (item.truckLicense).toLowerCase();
+      final nameDriver = (item.nameDriver ?? '').toLowerCase();
+
+      return nameDriver.contains(text) || shippingGuide.contains(text) || shippingGuide.contains(truckLicense);
+    }).toList();
+
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(60),
@@ -37,7 +48,19 @@ class _LogbookListScreenState extends ConsumerState<LogbookListScreen> {
         // bottom: false,
         child: Padding(
           padding: const EdgeInsets.all(16),
-          child: LogbooksList(items: historyLogbooks)
+          child: Column(
+            children: [
+              SearchBarWidget(
+                onChanged: (value) {
+                  setState(() {
+                    searchText = value;
+                  });
+                },
+              ),
+              const SizedBox(height: 30,),
+              Expanded(child: LogbooksList(items: filtered)),
+            ],
+          )
         ),
       ),
     );
