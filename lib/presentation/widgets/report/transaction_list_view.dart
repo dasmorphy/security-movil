@@ -101,10 +101,6 @@ class _TransactionListViewState extends State<TransactionListView> {
                         context,
                         DateRangePicker(
                           onApply: (start, end) {
-                            print('DDDDDDDDD');
-
-                            print(start);
-                            print(end);
                             Navigator.of(context).pop();
                           },
                         ),

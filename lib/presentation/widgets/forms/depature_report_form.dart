@@ -286,6 +286,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
     if (!internetAvailable) {
       // 🔴 SIN INTERNET: Guardar localmente
       print('❌ Sin conexión, guardando localmente...');
+      data['created_at'] = DateTime.now().toString();
       await savePendingRequest(data, 'logbook_entry');
 
       if (mounted) {

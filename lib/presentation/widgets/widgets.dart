@@ -25,3 +25,8 @@ export 'package:zentinel/presentation/widgets/shared/show_dialog_widget.dart';
 export 'package:zentinel/presentation/widgets/shared/image_viewer_state.dart';
 export 'package:zentinel/presentation/widgets/logbook/logbooks_list.dart';
 export 'package:zentinel/presentation/widgets/shared/search_bar.dart';
+export 'package:zentinel/presentation/widgets/shared/images_grid.dart';
+export 'package:zentinel/presentation/widgets/logbook/out_details.dart';
+export 'package:zentinel/presentation/widgets/logbook/entry_details.dart';
+export 'package:zentinel/presentation/widgets/logbook/detail_row.dart';
+export 'package:zentinel/presentation/widgets/report/date_range_picker.dart';

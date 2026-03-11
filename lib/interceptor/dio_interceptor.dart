@@ -37,7 +37,7 @@ class DioInterceptor extends Interceptor {
           break;
 
         case DioExceptionType.connectionError:
-          message = 'Revisa tu conexión a internet';
+          message = 'Revise su conexión a internet';
           break;
 
         case DioExceptionType.badResponse:

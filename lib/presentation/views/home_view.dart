@@ -20,6 +20,8 @@ class HomeViewState extends ConsumerState<HomeView> {
     //En los metodos llmar el metodo read en los providers (flutter favorite)
     super.initState();
     ref.read(getHistoryLogbooks.notifier).load();
+
+    //Se llama los catalogos desde el home para escenarios offline
     ref.read(getAllCategories.notifier).load();
     ref.read(getGroupBusinessByIdBusiness.notifier).load();
     ref.read(getAllUnitiesWeight.notifier).load();
@@ -29,8 +31,6 @@ class HomeViewState extends ConsumerState<HomeView> {
 
   @override
   Widget build(BuildContext context) {
-    final historyLogbooks = ref.watch(getHistoryLogbooks);
-
     return SingleChildScrollView(
       child: Column(
         children: [

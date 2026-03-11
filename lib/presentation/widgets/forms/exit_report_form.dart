@@ -198,7 +198,6 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
       _unityId = data.unityId.toString();
       _truckLicenseCtrl.text = data.truckLicense;
       _nameDriverCtrl.text = data.nameDriver ?? '';
-      _authorized = data.authorizedBy;
     });
   }
 
@@ -225,10 +224,10 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
       return;
     }
     
-    // if (_selectedImages.length < 5) {
-    //   setState(() => imagesMinError = true);
-    //   return;
-    // }
+    if (_selectedImages.length < 5) {
+      setState(() => imagesMinError = true);
+      return;
+    }
 
     if (_selectedImages.length > 10) {
       setState(() => imagesMaxError = true);
@@ -294,6 +293,7 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
     if (!internetAvailable) {
       // 🔴 SIN INTERNET: Guardar localmente
       print('❌ Sin conexión, guardando localmente...');
+      data['created_at'] = DateTime.now().toString();
       await savePendingRequest(data, 'logbook_out');
 
       if (mounted) {
@@ -326,11 +326,10 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
     }
 
     if (mounted) {
-      // Navigator.pop(context); // Cerrar dialog de procesamiento
+      _clearCntrl();
+      context.pop(); // Cerrar el formulario
       
       if (success) {
-        _clearCntrl();
-        context.pop(); // Cerrar el formulario
         if (widget.preloadedData != null) {
           ref.read(getHistoryLogbooks.notifier).load();
           context.push('/check-success?redirect=/');
@@ -339,11 +338,14 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
         }
 
       } else {
-        // context.pop(); // Cerrar el formulario
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('❌ Error al enviar el formulario. Por favor intenta de nuevo.'),
-            backgroundColor: Colors.red,
+            duration: Duration(seconds: 6),
+            content: Text(
+              '📱 Error al enviar el formulario. La información se guardará localmente y se enviará automáticamente.',
+              style: TextStyle(color: Colors.white),
+            ),
+            backgroundColor: Color.fromARGB(255, 255, 152, 0),
           ),
         );
       }
@@ -384,6 +386,17 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
     final userData = authState.value!;
     final categories = ref.watch(getAllCategories);
     final authorized = ref.watch(getAllAuthorized);
+
+    if (widget.preloadedData != null && widget.preloadedData!.authorizedBy.isNotEmpty) {
+      final authorizedExists = authorized.any(
+        (item) => item.name == widget.preloadedData!.authorizedBy,
+      );
+
+      setState(() {
+        _authorized = authorizedExists ? widget.preloadedData!.authorizedBy : '0';
+      });
+    }
+
     final groupBusiness = ref.watch(getGroupBusinessByIdBusiness);
     final unitiesWeight = ref.watch(getAllUnitiesWeight);    
     final messageValidatorEmpty = 'Este campo es obligatorio';
