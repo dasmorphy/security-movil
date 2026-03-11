@@ -63,48 +63,54 @@ class BitacoraDetailModal extends ConsumerWidget {
 
             /// BOTÓN CONTINUAR
             if (item.status == 'Pendiente Salida')
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(255, 36, 83, 168),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                onPressed: () async {
-                  await Navigator.of(context).push(
-                    MaterialPageRoute(
-                      builder: (context) => ExitReportForm(
-                        preloadedData: item,
-                        onSubmit: (data) async {
-                          return await ref
-                              .read(saveOutLogbookProvider.notifier)
-                              .saveLogbookOut(data);
-                        },
-                      ),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(188, 25, 156, 156),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                  );
-                },
-                child: const Text(
-                  'Continuar',
-                  style: TextStyle(color: Colors.white),
+                  ),
+                  onPressed: () async {
+                    await Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => ExitReportForm(
+                          preloadedData: item,
+                          onSubmit: (data) async {
+                            return await ref
+                                .read(saveOutLogbookProvider.notifier)
+                                .saveLogbookOut(data);
+                          },
+                        ),
+                      ),
+                    );
+                  },
+                  child: const Text(
+                    'Continuar',
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
               ),
 
             const SizedBox(height: 8),
 
-            ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF444444),
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF444444),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                 ),
-              ),
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text(
-                'Cerrar',
-                style: TextStyle(color: Colors.white),
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text(
+                  'Cerrar',
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
             ),
 
