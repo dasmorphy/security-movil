@@ -32,3 +32,5 @@ export 'package:zentinel/presentation/widgets/logbook/detail_row.dart';
 export 'package:zentinel/presentation/widgets/report/date_range_picker.dart';
 export 'package:zentinel/presentation/widgets/onboarding/step_name.dart';
 export 'package:zentinel/presentation/widgets/onboarding/step_photo.dart';
+export 'package:zentinel/presentation/widgets/onboarding/pulsing_logo.dart';
+export 'package:zentinel/presentation/widgets/onboarding/step_complete.dart';
