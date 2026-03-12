@@ -1,11 +1,14 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:zentinel/data/models/hive/user_profile_model.dart';
+import 'package:zentinel/data/models/hive/user_session_model.dart';
 
 Future<void> initHive() async {
   await Hive.initFlutter();
   Hive.registerAdapter(UserProfileModelAdapter());
+  Hive.registerAdapter(UserSessionModelAdapter());
   await Hive.openBox('pending_requests');
   await Hive.openBox<UserProfileModel>('user_profile');
+  await Hive.openBox<UserSessionModel>('user_session');
 }
 
 Future<void> saveSession({

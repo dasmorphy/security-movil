@@ -190,7 +190,7 @@ class ProfileViewState extends ConsumerState<ProfileView> {
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton(
-                            onPressed: () {
+                            onPressed: () async {
                               // Eliminar datos del onboarding
                               final hiveService =
                                   ref.read(hiveServiceProvider);
@@ -200,8 +200,13 @@ class ProfileViewState extends ConsumerState<ProfileView> {
                               // Limpiar providers en caché
                               ref.invalidate(userProfileProvider);
                               ref.invalidate(userNameProvider);
-                              ref.invalidate(userSessionProvider);
                               
+                              // Logout (elimina sesión de Hive)
+                              await ref
+                                  .read(userSessionProvider.notifier)
+                                  .logout();
+                              
+                              ref.invalidate(userSessionProvider);
                               context.go('/login');
                             },
                             style: ElevatedButton.styleFrom(

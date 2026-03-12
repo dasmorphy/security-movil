@@ -25,17 +25,17 @@ final appRouter = GoRouter(
       builder: (context, state) => const HomeScreen(),
       routes: [
         GoRoute(
-          path: '/personal-data',
+          path: 'personal-data',
           name: PersonalDataScreen.name,
           builder: (context, state) => const PersonalDataScreen()
         ),
         GoRoute(
-          path: '/change-email',
+          path: 'change-email',
           name: ChangeEmailScreen.name,
           builder: (context, state) => const ChangeEmailScreen()
         ),
         GoRoute(
-          path: '/check-success',
+          path: 'check-success',
           name: CheckSuccessScreen.name,
           builder: (context, state) {
             final redirect = state.uri.queryParameters['redirect'];
@@ -45,17 +45,11 @@ final appRouter = GoRouter(
           },
         ),
         GoRoute(
-          path: '/list-logbooks',
+          path: 'list-logbooks',
           name: LogbookListScreen.name,
           builder: (context, state) => const LogbookListScreen()
         )
       ]
     ),
-
-    GoRoute(
-      path: '/',
-      redirect: (_, __) => '/',
-    )
-
   ]
 );

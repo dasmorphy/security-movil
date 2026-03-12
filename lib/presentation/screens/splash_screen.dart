@@ -1,28 +1,59 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:zentinel/presentation/providers/auth/auth_provider.dart';
+import 'package:zentinel/presentation/providers/onboarding/onboarding_provider.dart';
+import 'package:zentinel/presentation/screens/home_screen.dart';
+import 'package:zentinel/presentation/screens/login_screen.dart';
+import 'package:zentinel/presentation/screens/onboarding/onboarding_screen.dart';
 
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends ConsumerStatefulWidget {
   static const name = 'splash-screen';
 
   const SplashScreen({super.key});
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMixin {
-    late final AnimationController _controller;
+class _SplashScreenState extends ConsumerState<SplashScreen>
+    with TickerProviderStateMixin {
+  late final AnimationController _controller;
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(vsync: this);
-    // Después de 4 segundos, navega a login
-    Future.delayed(const Duration(seconds: 4), () {
-      if (mounted) {
-        context.goNamed('login-screen');
-      }
+    
+    // Después de 2 segundos, validar sesión y navegar
+    Future.delayed(const Duration(seconds: 2), () {
+      if (!mounted) return;
+      
+      // Validar si hay sesión persistida
+      final authState = ref.read(userSessionProvider);
+      authState.maybeWhen(
+        data: (user) {
+          if (user != null) {
+            // Hay sesión, validar si tiene perfil de onboarding
+            final hiveService = ref.read(hiveServiceProvider);
+            final hasProfile = hiveService.hasUserProfile(user.email);
+            
+            if (hasProfile) {
+              context.goNamed(HomeScreen.name);
+            } else {
+              context.goNamed(OnboardingScreen.name);
+            }
+          } else {
+            // No hay sesión, ir a login
+            context.goNamed(LoginScreen.name);
+          }
+        },
+        orElse: () {
+          // Error o loading, ir a login
+          context.goNamed(LoginScreen.name);
+        },
+      );
     });
   }
 
@@ -36,9 +67,6 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 6, 8, 15),
-      // backgroundColor: const Color.fromARGB(255, 36, 34, 34),
-      // backgroundColor: const Color.fromARGB(190, 58, 199, 199),
-      // backgroundColor: const Color.fromARGB(153, 58, 199, 199),
       body: Center(
         child: Container(
           child: Lottie.asset(
