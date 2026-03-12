@@ -30,3 +30,5 @@ export 'package:zentinel/presentation/widgets/logbook/out_details.dart';
 export 'package:zentinel/presentation/widgets/logbook/entry_details.dart';
 export 'package:zentinel/presentation/widgets/logbook/detail_row.dart';
 export 'package:zentinel/presentation/widgets/report/date_range_picker.dart';
+export 'package:zentinel/presentation/widgets/onboarding/step_name.dart';
+export 'package:zentinel/presentation/widgets/onboarding/step_photo.dart';

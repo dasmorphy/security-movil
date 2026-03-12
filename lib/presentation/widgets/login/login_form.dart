@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zentinel/domain/entities/user_session.dart';
 import 'package:zentinel/presentation/providers/auth/auth_provider.dart';
+import 'package:zentinel/presentation/providers/onboarding/onboarding_provider.dart';
 
 class LoginForm extends ConsumerStatefulWidget {
   final String? Function(Map<String, dynamic>? data)? onTap;
@@ -30,7 +31,16 @@ class _LoginFormState extends ConsumerState<LoginForm> {
       next.whenOrNull(
         data: (user) {
           if (user != null) {
-            context.go('/');
+            final hiveService = ref.read(hiveServiceProvider);
+            final hasProfile = hiveService.hasUserProfile(user.email);
+            
+            if (!hasProfile) {
+              // Limpiar nombre anterior antes de ir al onboarding
+              ref.read(userNameProvider.notifier).state = '';
+              context.go('/onboarding');
+            } else {
+              context.go('/');
+            }
           }
         },
         error: (error, _) {

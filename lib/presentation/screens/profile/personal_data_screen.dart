@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:zentinel/presentation/views/views.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
 class PersonalDataScreen extends StatelessWidget {

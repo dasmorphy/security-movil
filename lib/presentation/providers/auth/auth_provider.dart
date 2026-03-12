@@ -6,8 +6,7 @@ import 'package:zentinel/presentation/providers/auth/auth_repository_provider.da
 
 /// Provider
 final userSessionProvider =
-    StateNotifierProvider.autoDispose<UserSessionNotifier, AsyncValue<User?>>(
-        (ref) {
+    StateNotifierProvider<UserSessionNotifier, AsyncValue<User?>>((ref) {
   final authRepository = ref.read(authRepositoryProvider);
   return UserSessionNotifier(authRepository);
 });
