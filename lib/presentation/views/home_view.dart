@@ -176,6 +176,19 @@ class HomeViewState extends ConsumerState<HomeView> {
                       fontWeight: FontWeight.w400,
                     ),
                   ),
+                  const SizedBox(height: 2),
+                  Chip(
+                    label: Text(item.status),
+                    backgroundColor: item.status == 'Finalizado'
+                        ? const Color.fromARGB(255, 34, 197, 94)
+                        : const Color.fromARGB(255, 224, 157, 49),
+                    padding: EdgeInsets.zero,
+                    labelStyle: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ],
               ),
             ),

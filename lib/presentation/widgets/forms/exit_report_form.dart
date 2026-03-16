@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/domain/entities/all_logbook.dart';
+import 'package:zentinel/presentation/providers/onboarding/onboarding_provider.dart';
 import 'dart:io';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
@@ -245,6 +246,7 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
     }
 
     final userData = authState.value!;
+    final userHive = ref.watch(userProfileProvider(userData.email));
 
     final data = {
       "id_logbook_entry": widget.preloadedData?.idLogbookEntry,
@@ -263,7 +265,7 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
       "authorized_by": _authorized,
       "observations": _observationsCtrl.text.trim(),
       "created_by": userData.user,
-      "name_user": userData.attributes['fullname'],
+      "name_user": userHive.value?.name ?? userData.attributes['fullname'],
       "id_group_business": userData.attributes['group_business'] ?? int.parse(_groupBusiness),
       "images": _selectedImages
         .whereType<File>()
@@ -417,11 +419,11 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
 
     const hiddenQuantityCategories = {
       'Camarón',
-      'Tilapia'
     };
 
     final hideWeight = hiddenWeightCategories.contains(categoryName);
     final hideQuantity = hiddenQuantityCategories.contains(categoryName);
+    final isDestinyRequired = categoryName == 'Camarón';
 
     InputDecoration styleDecoration() => InputDecoration(
       filled: true,
@@ -692,12 +694,13 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                 const SizedBox(height: 12),
                 CustomFieldLabelRequired(
                   txtLabel: 'Destino',
+                  isRequired: isDestinyRequired,
                 ),
                 GlowTextFormField(
                   controller: _destinyCtrl,
                   focusNode: _descFocus,
                   validator: (v) {
-                    if (v == null || v.trim().isEmpty) {
+                    if (isDestinyRequired && (v == null || v.trim().isEmpty)) {
                       return messageValidatorEmpty;
                     }
                     return null;
