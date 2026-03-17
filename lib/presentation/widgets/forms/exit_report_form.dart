@@ -562,6 +562,15 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                   onChanged: (v) {
                     if (v != null) {
                       setState(() => _categoryEntry = v);
+
+                      if (hideWeight) {
+                        _guideCtrl.clear();
+                        _weightCtrl.clear();
+                      }
+                      if (hideQuantity) {
+                        _quantityCtrl.clear();
+                        _personWithdrawsCtrl.clear();
+                      }
                     }
                   },
                   validator: (v) {

@@ -548,6 +548,11 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                   onChanged: (v) {
                     if (v != null) {
                       setState(() => _categoryEntry = v);
+
+                      if (hideWeight) {
+                        _guideCtrl.clear();
+                        _weightCtrl.clear();
+                      }
                     }
                   },
                   validator: (v) {
