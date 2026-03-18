@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -218,23 +219,18 @@ Map<String, dynamic> mapPendingToUI(Map<String, dynamic> raw) {
   };
 }
 
-Future<File?> convertToWebP(File file) async {
-  final dir = await getTemporaryDirectory();
-  final targetPath = p.join(
-    dir.path,
-    "${DateTime.now().millisecondsSinceEpoch}.webp",
-  );
-
-  final result = await FlutterImageCompress.compressAndGetFile(
+Future<Uint8List?> convertToWebP(File file) async {
+  final result = await FlutterImageCompress.compressWithFile(
     file.absolute.path,
-    targetPath,
     format: CompressFormat.webp,
-    quality: 75, // Puedes bajar a 70 si quieres más compresión
+    quality: 60,
+    minWidth: 800,   // mínimo
+    minHeight: 800,
+    // No uses minWidth como si fuera maxWidth
   );
-
-  if (result == null) return null;
-
-  return File(result.path);
+  // Eliminar el archivo temporal de cámara inmediatamente
+  try { await file.delete(); } catch (_) {}
+  return result; // retorna Uint8List directamente
 }
 
 Future<Position?> getLocation() async {

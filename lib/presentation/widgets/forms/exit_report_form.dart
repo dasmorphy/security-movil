@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -42,7 +44,7 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
   final _observationsCtrl = TextEditingController();
   final _personWithdrawsCtrl = TextEditingController();
   
-  List<File?> _selectedImages = [];
+  List<Uint8List?> _selectedImages = [];
   final ImagePicker _imagePicker = ImagePicker();
 
   final FocusNode _guideFocus = FocusNode();
@@ -128,12 +130,17 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
     try {
       final XFile? image = await _imagePicker.pickImage(
         source: ImageSource.camera,
+        imageQuality: 60,//reduce peso
+        maxWidth: 1024,
+        maxHeight: 1024
       );
 
       if (image != null && mounted) {
         // Agregar placeholder nulo para mostrar progreso en la UI
         setState(() {
           _selectedImages.add(null);
+          imagesMinError = false;
+          imagesMaxError = false;
         });
 
         final placeholderIndex = _selectedImages.length - 1;
@@ -142,6 +149,8 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
 
         // Convertir a WebP
         final webpFile = await convertToWebP(originalFile);
+
+        if (!mounted) return;
 
         if (webpFile == null) {
           if (mounted) {
@@ -162,10 +171,10 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
           return;
         }
 
-        final bytes = await webpFile.length();
-        final mb = bytes / 1024 / 1024;
+        // final bytes = await webpFile.length();
+        // final mb = bytes / 1024 / 1024;
 
-        print("Peso después de WebP: ${mb.toStringAsFixed(2)} MB");
+        print("Peso WebP: ${(webpFile.length / 1024 / 1024).toStringAsFixed(2)} MB");
 
         if (mounted) {
           setState(() {
@@ -209,8 +218,14 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
   }
 
   void _submit() async {
+    if (isLoading) return;
+    setState(() => isLoading = true);
+
     FocusScope.of(context).unfocus();
-    if (!(_formKey.currentState?.validate() ?? false)) return;
+    if (!(_formKey.currentState?.validate() ?? false)) {
+      setState(() => isLoading = false);
+      return;
+    }
 
     if (_latitude ==  -0.1865936 || _longitude == -78.5953478) {
       if (mounted) {
@@ -222,16 +237,23 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
           ),
         );
       }
+      setState(() => isLoading = false);
       return;
     }
     
     if (_selectedImages.length < 5) {
-      setState(() => imagesMinError = true);
+      setState(() {
+        imagesMinError = true;
+        isLoading = false;
+      });
       return;
     }
 
     if (_selectedImages.length > 10) {
-      setState(() => imagesMaxError = true);
+      setState(() {
+        imagesMaxError = true;
+        isLoading = false;
+      });
       return;
     }
 
@@ -242,6 +264,7 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Sesión no válida. Vuelva a iniciar sesión')),
       );
+      setState(() => isLoading = false);
       return;
     }
 
@@ -268,26 +291,9 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
       "name_user": userHive.value?.name ?? userData.attributes['fullname'],
       "id_group_business": userData.attributes['group_business'] ?? int.parse(_groupBusiness),
       "images": _selectedImages
-        .whereType<File>()
-        .toList(), // Archivos serán convertidos a Base64 antes de guardar, // Archivos serán convertidos a Base64 antes de guardar
+        .whereType<Uint8List>()
+        .toList(), // Lista de Uint8List directo, sin base64
     };
-
-    // Mostrar un diálogo de procesamiento
-    if (mounted) {
-      // showDialog(
-      //   context: context,
-      //   barrierDismissible: false,
-      //   builder: (context) => const AlertDialog(
-      //     content: Row(
-      //       children: [
-      //         CircularProgressIndicator(),
-      //         SizedBox(width: 16),
-      //         Text('Procesando formulario...'),
-      //       ],
-      //     ),
-      //   ),
-      // );
-    }
 
     // Verificar conexión a internet
     final internetAvailable = await hasInternet();
@@ -301,7 +307,9 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
       if (mounted) {
         // Navigator.pop(context); // Cerrar dialog de procesamiento
         _clearCntrl();
-        context.pop(); // Cerrar el formulario
+        if (Navigator.canPop(context)) {
+          context.pop(); // Cerrar el formulario
+        }
         
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -314,12 +322,12 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
           ),
         );
       }
+      setState(() => isLoading = false);
       return;
     }
 
     // 🟢 CON INTERNET: Enviar al servidor
     print('✅ Conexión disponible, enviando al servidor...');
-    setState(() => isLoading = true);
     final success = await widget.onSubmit?.call(data) ?? false;
     setState(() => isLoading = false);
 
@@ -329,7 +337,9 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
 
     if (mounted) {
       _clearCntrl();
-      context.pop(); // Cerrar el formulario
+      if (Navigator.canPop(context)) {
+        context.pop(); // Cerrar el formulario
+      }
       
       if (success) {
         if (widget.preloadedData != null) {
@@ -822,9 +832,7 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(8),
                                       image: DecorationImage(
-                                        image: FileImage(
-                                          _selectedImages[index]!,
-                                        ),
+                                        image: MemoryImage(_selectedImages[index]!), // directo desde bytes
                                         fit: BoxFit.cover,
                                       ),
                                     ),

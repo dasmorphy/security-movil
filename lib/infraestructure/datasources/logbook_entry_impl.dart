@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:path_provider/path_provider.dart';
 import 'package:dio/dio.dart';
@@ -49,7 +50,7 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
   Future<bool> saveLogbookEntry(Map<String, dynamic> data) async {
     try {
       
-      final images = data['images'] as List<File>?;
+      final images = data['images'] as List<Uint8List>?;
       final logbookData = Map<String, dynamic>.from(data);
       logbookData.remove('images');
 
@@ -74,16 +75,16 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
       );
 
       // Agregar imágenes
+      // NUEVO: usar Uint8List directamente
       if (images != null && images.isNotEmpty) {
         for (var i = 0; i < images.length; i++) {
-          final image = images[i];
           formData.files.add(
             MapEntry(
               'images',
-              await MultipartFile.fromFile(
-                image.path,
-                filename: image.path.split('/').last,
-                contentType: getMediaType(image.path),
+              MultipartFile.fromBytes(
+                images[i],
+                filename: 'image_$i.webp',         // nombre con índice
+                contentType: MediaType('image', 'webp'),
               ),
             ),
           );
@@ -114,7 +115,7 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
 
     try {
       
-      final images = data['images'] as List<File>?;
+      final images = data['images'] as List<Uint8List>?;
       final logbookData = Map<String, dynamic>.from(data);
       logbookData.remove('images');
 
@@ -138,17 +139,16 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
         ),
       );
 
-      // Agregar imágenes
+      // NUEVO: usar Uint8List directamente
       if (images != null && images.isNotEmpty) {
         for (var i = 0; i < images.length; i++) {
-          final image = images[i];
           formData.files.add(
             MapEntry(
               'images',
-              await MultipartFile.fromFile(
-                image.path,
-                filename: image.path.split('/').last,
-                contentType: getMediaType(image.path),
+              MultipartFile.fromBytes(
+                images[i],
+                filename: 'image_$i.webp',         // nombre con índice
+                contentType: MediaType('image', 'webp'),
               ),
             ),
           );
