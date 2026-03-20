@@ -32,8 +32,10 @@ class _LogbookListScreenState extends ConsumerState<LogbookListScreen> {
       final shippingGuide = (item.shippingGuide ?? '').toLowerCase();
       final truckLicense = (item.truckLicense).toLowerCase();
       final nameDriver = (item.nameDriver ?? '').toLowerCase();
+      final nameCategory = (item.nameCategory ?? '').toLowerCase();
 
-      return nameDriver.contains(text) || shippingGuide.contains(text) || truckLicense.contains(text);
+      return nameDriver.contains(text) || shippingGuide.contains(text) || truckLicense.contains(text)
+      || nameCategory.contains(text);
     }).toList();
 
     return Scaffold(
