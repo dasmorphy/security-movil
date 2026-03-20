@@ -42,13 +42,24 @@ class CategoryViewState extends ConsumerState<CategoryView> {
                 parent: AlwaysScrollableScrollPhysics(),
               ),
               children: [
+
+
+                // TAB 1
+                // SingleChildScrollView(
+                //   padding: const EdgeInsets.all(16),
+                //   physics: const BouncingScrollPhysics(
+                //     parent: AlwaysScrollableScrollPhysics(),
+                //   ),
+                //   child: BasicServicesSection(),
+                // ),
+
                 // TAB 1
                 SingleChildScrollView(
                   padding: const EdgeInsets.all(16),
                   physics: const BouncingScrollPhysics(
                     parent: AlwaysScrollableScrollPhysics(),
                   ),
-                  child: BasicServicesSection(),
+                  child: ServicesBiomar(),
                 ),
       
                 // TAB 2
