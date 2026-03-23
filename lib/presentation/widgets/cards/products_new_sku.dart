@@ -1,31 +1,36 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:zentinel/presentation/widgets/forms/dispatch.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
 class ProductsNewSku extends StatelessWidget {
-  final dynamic productos;
+  final List<ProductoItem> productos;
+  final List<SkuItem> skus;
   final String tipoSku;
+  final bool flagNewSku;
   final bool esMultiple;
   final void Function(int, String) onCantidadChanged;
-  final void Function(int) onEliminar;
+  final void Function(int) onDeleteProduct;
+  final void Function(int) onDeleteSku;
   final VoidCallback onAgregarProducto;
+  final VoidCallback onAddSku;
 
   const ProductsNewSku({
-    super.key, 
+    super.key,
     required this.productos,
     required this.tipoSku,
     required this.esMultiple,
     required this.onCantidadChanged,
-    required this.onEliminar,
-    required this.onAgregarProducto,
+    required this.onDeleteProduct,
+    required this.onAgregarProducto, 
+    required this.flagNewSku, 
+    required this.onAddSku, 
+    required this.skus, 
+    required this.onDeleteSku
   });
-
 
   @override
   Widget build(BuildContext context) {
-
-
-
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -49,21 +54,26 @@ class ProductsNewSku extends StatelessWidget {
                     letterSpacing: 0.8,
                   ),
                 ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: esMultiple ? kNavyLight : kGreenLight,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    tipoSku,
-                    style: TextStyle(
-                      color: esMultiple ? kNavy : kGreen,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
+                if (flagNewSku) ...[
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: esMultiple ? kNavyLight : kGreenLight,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      tipoSku,
+                      style: TextStyle(
+                        color: esMultiple ? kNavy : kGreen,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
-                ),
+                ],
               ],
             ),
           ),
@@ -72,16 +82,130 @@ class ProductsNewSku extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
-                ...List.generate(productos.length, (i) => _ProductoRow(
-                  index: i,
-                  item: productos[i],
-                  onCantidadChanged: (val) => onCantidadChanged(i, val),
-                  onEliminar: productos.length > 1 ? () => onEliminar(i) : null,
-                )),
-                const SizedBox(height: 8),
-                _AgregarProductoBtn(onTap: onAgregarProducto),
+                if (flagNewSku) ...[
+                  ...List.generate(
+                    productos.length,
+                    (i) => _ProductoRow(
+                      index: i,
+                      item: productos[i],
+                      onCantidadChanged: (val) => onCantidadChanged(i, val),
+                      onDeleteProduct: productos.length > 1
+                          ? () => onDeleteProduct(i)
+                          : null,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  _AgregarProductoBtn(onTap: onAgregarProducto),
+                ]
+                else ...[
+                  ...List.generate(
+                    skus.length,
+                    (i) => _SkuExist(
+                      index: i,
+                      item: skus[i],
+                      onDeleteSku: skus.length > 1
+                          ? () => onDeleteSku(i)
+                          : null,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  _AddSkuBtn(onTap: onAddSku)
+                ], 
               ],
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _SkuExist extends StatelessWidget {
+  final int index;
+  final SkuItem item;
+  final VoidCallback? onDeleteSku;
+
+  const _SkuExist({
+    required this.index, 
+    required this.item, 
+    this.onDeleteSku,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                'SKU ${(index + 1).toString().padLeft(2, '0')}',
+                style: TextStyle(
+                  color: kNavy,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.5,
+                ),
+              ),
+              const Spacer(),
+              if (onDeleteSku != null)
+                GestureDetector(
+                  onTap: onDeleteSku,
+                  child: const Icon(
+                    Icons.close_rounded,
+                    size: 16,
+                    color: kTextHint,
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          Row(
+            children: [
+              Expanded(
+                flex: 3,
+                child: GlowDropdownFormField2<String>(
+                  value: item.skuId ?? '0',
+                  textColor: Colors.black,
+                  items: [
+                    DropdownMenuItem(
+                      enabled: false,
+                      value: '0',
+                      child: Text(
+                        'Seleccione una opción',
+                        style: TextStyle(
+                          color: const Color.fromARGB(255, 0, 0, 0),
+                        ),
+                      ),
+                    ),
+                    ...skuAvailable.map(
+                      (c) => DropdownMenuItem(
+                        value: c['id']?.toString(),
+                        child: Text(
+                          c['nombre'],
+                          style: TextStyle(
+                            color: const Color.fromARGB(255, 0, 0, 0),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                  onChanged: (id) {
+                    if (id != null && id != '0') {
+                      item.skuId = id;
+                    }
+                  },
+                  validator: (v) {
+                    if (v == '0' || v == null || v.trim().isEmpty) {
+                      return messageValidatorEmpty;
+                    }
+                    return null;
+                  },
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -93,13 +217,13 @@ class _ProductoRow extends StatelessWidget {
   final int index;
   final ProductoItem item;
   final void Function(String) onCantidadChanged;
-  final VoidCallback? onEliminar;
+  final VoidCallback? onDeleteProduct;
 
   const _ProductoRow({
     required this.index,
     required this.item,
     required this.onCantidadChanged,
-    this.onEliminar,
+    this.onDeleteProduct, 
   });
 
   @override
@@ -121,10 +245,14 @@ class _ProductoRow extends StatelessWidget {
                 ),
               ),
               const Spacer(),
-              if (onEliminar != null)
+              if (onDeleteProduct != null)
                 GestureDetector(
-                  onTap: onEliminar,
-                  child: const Icon(Icons.close_rounded, size: 16, color: kTextHint),
+                  onTap: onDeleteProduct,
+                  child: const Icon(
+                    Icons.close_rounded,
+                    size: 16,
+                    color: kTextHint,
+                  ),
                 ),
             ],
           ),
@@ -133,59 +261,60 @@ class _ProductoRow extends StatelessWidget {
             children: [
               Expanded(
                 flex: 3,
-                child: 
-                // _DropdownProducto(
-                //   valorActual: item.productoId,
-                //   onChanged: (id) {
-                //     item.productoId = id;
-                //   },
-                // ),
-
-                GlowDropdownFormField2<String>(
-                  value: item.productoId ?? '0',
-                  textColor: Colors.black,
-                  items: [
-                    DropdownMenuItem(
-                      enabled: false,
-                      value: '0',
-                      child: Text(
-                        'Seleccione una opción',
-                        style: TextStyle(color: const Color.fromARGB(255, 0, 0, 0)),
-                      ),
-                    ),
-                    ...catalogoProductos.map(
-                      (c) => DropdownMenuItem(
-                        value: c.id,
-                        child: Text(
-                          c.nombre,
-                          style: TextStyle(color: const Color.fromARGB(255, 0, 0, 0)),
+                child:
+                    // _DropdownProducto(
+                    //   valorActual: item.productoId,
+                    //   onChanged: (id) {
+                    //     item.productoId = id;
+                    //   },
+                    // ),
+                    GlowDropdownFormField2<String>(
+                      value: item.productoId ?? '0',
+                      textColor: Colors.black,
+                      items: [
+                        DropdownMenuItem(
+                          enabled: false,
+                          value: '0',
+                          child: Text(
+                            'Seleccione una opción',
+                            style: TextStyle(
+                              color: const Color.fromARGB(255, 0, 0, 0),
+                            ),
+                          ),
                         ),
-                      ),
+                        ...catalogoProductos.map(
+                          (c) => DropdownMenuItem(
+                            value: c.id,
+                            child: Text(
+                              c.nombre,
+                              style: TextStyle(
+                                color: const Color.fromARGB(255, 0, 0, 0),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                      onChanged: (id) {
+                        if (id != null) {
+                          item.productoId = id;
+                        }
+                      },
+                      validator: (v) {
+                        if (v == '0' || v == null || v.trim().isEmpty) {
+                          return messageValidatorEmpty;
+                        }
+                        return null;
+                      },
                     ),
-                  ],
-                  onChanged: (id) {
-                    if (id != null) {
-                      item.productoId = id;
-                    }
-                  },
-                  validator: (v) {
-                    if (v == '0' || v == null || v.trim().isEmpty) {
-                      return messageValidatorEmpty;
-                    }
-                    return null;
-                  },
-                ),
-
-
               ),
               const SizedBox(width: 8),
-              // SizedBox(
-              //   width: 64,
-              //   child: _CantidadInput(
-              //     valor: item.cantidad,
-              //     onChanged: onCantidadChanged,
-              //   ),
-              // ),
+              SizedBox(
+                width: 64,
+                child: _CantidadInput(
+                  valor: item.cantidad,
+                  onChanged: onCantidadChanged,
+                ),
+              ),
             ],
           ),
         ],
@@ -194,6 +323,57 @@ class _ProductoRow extends StatelessWidget {
   }
 }
 
+class _CantidadInput extends StatefulWidget {
+  final int valor;
+  final void Function(String) onChanged;
+
+  const _CantidadInput({required this.valor, required this.onChanged});
+
+  @override
+  State<_CantidadInput> createState() => _CantidadInputState();
+}
+
+class _CantidadInputState extends State<_CantidadInput> {
+  late TextEditingController _ctrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = TextEditingController(text: widget.valor.toString());
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: kGrayBg,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: kGrayBorder, width: 0.5),
+      ),
+      child: TextField(
+        controller: _ctrl,
+        keyboardType: TextInputType.number,
+        textAlign: TextAlign.center,
+        style: const TextStyle(
+          color: kTextPrimary,
+          fontSize: 15,
+          fontWeight: FontWeight.w600,
+        ),
+        decoration: const InputDecoration(
+          border: InputBorder.none,
+          contentPadding: EdgeInsets.symmetric(vertical: 12),
+        ),
+        onChanged: widget.onChanged,
+      ),
+    );
+  }
+}
 
 class _AgregarProductoBtn extends StatelessWidget {
   final VoidCallback onTap;
@@ -207,7 +387,11 @@ class _AgregarProductoBtn extends StatelessWidget {
         width: double.infinity,
         padding: const EdgeInsets.symmetric(vertical: 14),
         decoration: BoxDecoration(
-          border: Border.all(color: kGrayBorder, width: 1.2, style: BorderStyle.solid),
+          border: Border.all(
+            color: kGrayBorder,
+            width: 1.2,
+            style: BorderStyle.solid,
+          ),
           borderRadius: BorderRadius.circular(10),
         ),
         child: const Row(
@@ -217,6 +401,46 @@ class _AgregarProductoBtn extends StatelessWidget {
             SizedBox(width: 6),
             Text(
               'AÑADIR PRODUCTO',
+              style: TextStyle(
+                color: kTextSecondary,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.8,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _AddSkuBtn extends StatelessWidget {
+  final VoidCallback onTap;
+  const _AddSkuBtn({required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: kGrayBorder,
+            width: 1.2,
+            style: BorderStyle.solid,
+          ),
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.add_rounded, color: kTextSecondary, size: 18),
+            SizedBox(width: 6),
+            Text(
+              'AÑADIR SKU',
               style: TextStyle(
                 color: kTextSecondary,
                 fontSize: 12,

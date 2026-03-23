@@ -37,3 +37,4 @@ export 'package:zentinel/presentation/widgets/onboarding/step_complete.dart';
 export 'package:zentinel/presentation/widgets/sections/services_biomar.dart';
 export 'package:zentinel/presentation/widgets/forms/dispatch.dart';
 export 'package:zentinel/presentation/widgets/cards/products_new_sku.dart';
+export 'package:zentinel/presentation/widgets/inputs/custom_dropdown_field.dart';

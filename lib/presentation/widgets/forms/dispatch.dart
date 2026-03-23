@@ -9,6 +9,11 @@ class ProductoItem {
   ProductoItem({this.productoId, this.cantidad = 1});
 }
 
+class SkuItem {
+  String? skuId;
+  SkuItem({this.skuId});
+}
+
 class ProductoCatalogo {
   final String id;
   final String nombre;
@@ -32,10 +37,18 @@ final List<ProductoCatalogo> catalogoProductos = [
   ProductoCatalogo(id: 'p5', nombre: 'Estructura Aluminio'),
 ];
 
+final List<Map<String, dynamic>> skuAvailable = [
+  {'id': 1, 'nombre': 'SKU 001'},
+  {'id': 2, 'nombre': 'SKU 002'},
+  {'id': 3, 'nombre': 'SKU 003'},
+  {'id': 4, 'nombre': 'SKU 004'},
+  {'id': 5, 'nombre': 'SKU 005'},
+];
+
 final List<Conductor> conductores = [
-  Conductor(id: 'c1', nombre: 'Carlos Mendoza', patente: 'FR-992'),
-  Conductor(id: 'c2', nombre: 'Roberto Castillo', patente: 'BCDF-21'),
-  Conductor(id: 'c3', nombre: 'Ana Fuentes', patente: 'GH-441'),
+  Conductor(id: 'c1', nombre: 'Centro', patente: 'FR-992'),
+  Conductor(id: 'c2', nombre: 'Norte', patente: 'BCDF-21'),
+  Conductor(id: 'c3', nombre: 'Sur', patente: 'GH-441'),
 ];
 
 // ─── Colores ───────────────────────────────────────────────────────────────
@@ -50,20 +63,7 @@ const Color kTextHint = Color(0xFF9CA3AF);
 const Color kGreen = Color(0xFF4CAF50);
 const Color kGreenLight = Color(0xFFE8F5E9);
 const messageValidatorEmpty = 'Este campo es obligatorio';
-
-// InputDecoration styleDecoration() => InputDecoration(
-//   filled: true,
-//   fillColor: const Color.fromARGB(255, 20, 21, 23),
-//   contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
-//   // border: OutlineInputBorder(
-//   //   borderRadius: borderRadius,
-//   //   borderSide: BorderSide(color: Colors.white12),
-//   // ),
-//   // focusedBorder: OutlineInputBorder(
-//   //   borderRadius: borderRadius,
-//   //   borderSide: BorderSide(color: Color.fromARGB(190, 58, 199, 199)),
-//   // ),
-// );
+final _truckLicenseCtrl = TextEditingController();
 
 // ─── Screen principal ──────────────────────────────────────────────────────
 
@@ -75,17 +75,22 @@ class DispatchForm extends StatefulWidget {
 }
 
 class _CrearDespachoScreenState extends State<DispatchForm> {
+  bool _modoNuevo = true;
+
   final List<ProductoItem> _productos = [
-    ProductoItem(productoId: 'p1', cantidad: 12),
-    ProductoItem(productoId: 'p2', cantidad: 4),
+    ProductoItem(),
+  ];
+
+  final List<SkuItem> _skus = [
+    SkuItem(),
   ];
 
   Conductor? _conductorSeleccionado = conductores[0];
   final String _destino = 'Centro de Distribución Norte - Bodega';
 
   String get _tipoSku {
-    final conProducto = _productos.where((p) => p.productoId != null).length;
-    return conProducto > 1 ? 'SKU Múltiple' : 'SKU Independiente';
+    final conProducto = _productos.length;
+    return conProducto > 1 ? 'SKU Mixto' : 'SKU Independiente';
   }
 
   bool get _esMultiple {
@@ -98,10 +103,23 @@ class _CrearDespachoScreenState extends State<DispatchForm> {
     });
   }
 
-  void _eliminarProducto(int index) {
+  void _addSku() {
+    setState(() {
+      _skus.add(SkuItem());
+    });
+  }
+
+  void _deleteProduct(int index) {
     if (_productos.length <= 1) return;
     setState(() {
       _productos.removeAt(index);
+    });
+  }
+
+  void _deleteSku(int index) {
+    if (_skus.length <= 1) return;
+    setState(() {
+      _skus.removeAt(index);
     });
   }
 
@@ -171,22 +189,31 @@ class _CrearDespachoScreenState extends State<DispatchForm> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _SKUModeSelector(),
+                  _SKUModeSelector(
+                    modoNuevo: _modoNuevo,
+                    onChanged: (val) => setState(() => _modoNuevo = val)
+                  ),
                   const SizedBox(height: 16),
                   ProductsNewSku(
+                    flagNewSku: _modoNuevo,
                     productos: _productos,
+                    skus: _skus,
                     tipoSku: _tipoSku,
                     esMultiple: _esMultiple,
                     onCantidadChanged: _onCantidadChanged,
-                    onEliminar: _eliminarProducto,
+                    onDeleteProduct: _deleteProduct,
+                    onDeleteSku: _deleteSku,
                     onAgregarProducto: _agregarProducto,
+                    onAddSku: _addSku,
                   ),
                   const SizedBox(height: 16),
                   _InformacionLogisticaCard(
                     destino: _destino,
                     conductorSeleccionado: _conductorSeleccionado,
                     conductores: conductores,
-                    onConductorChanged: (c) => setState(() => _conductorSeleccionado = c),
+                    onConductorChanged: (c) => setState(() => 
+                      _conductorSeleccionado = c
+                    ),
                   ),
                   const SizedBox(height: 24),
                 ],
@@ -202,13 +229,14 @@ class _CrearDespachoScreenState extends State<DispatchForm> {
 
 // ─── Selector de modo SKU ──────────────────────────────────────────────────
 
-class _SKUModeSelector extends StatefulWidget {
-  @override
-  State<_SKUModeSelector> createState() => _SKUModeSelectorState();
-}
+class _SKUModeSelector extends StatelessWidget {
+  final bool modoNuevo;
+  final Function(bool) onChanged;
 
-class _SKUModeSelectorState extends State<_SKUModeSelector> {
-  bool _modoNuevo = true;
+  const _SKUModeSelector({
+    required this.modoNuevo, 
+    required this.onChanged
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -217,15 +245,15 @@ class _SKUModeSelectorState extends State<_SKUModeSelector> {
         Expanded(child: _ModeCard(
           icon: Icons.add,
           label: 'Agregar\nSKU',
-          selected: _modoNuevo,
-          onTap: () => setState(() => _modoNuevo = true),
+          selected: modoNuevo,
+          onTap: () => onChanged(true),
         )),
         const SizedBox(width: 12),
         Expanded(child: _ModeCard(
           icon: Icons.playlist_add_check_rounded,
           label: 'Seleccionar\nExistente',
-          selected: !_modoNuevo,
-          onTap: () => setState(() => _modoNuevo = false),
+          selected: !modoNuevo,
+          onTap: () => onChanged(false),
         )),
       ],
     );
@@ -281,59 +309,6 @@ class _ModeCard extends StatelessWidget {
   }
 }
 
-class _CantidadInput extends StatefulWidget {
-  final int valor;
-  final void Function(String) onChanged;
-
-  const _CantidadInput({required this.valor, required this.onChanged});
-
-  @override
-  State<_CantidadInput> createState() => _CantidadInputState();
-}
-
-class _CantidadInputState extends State<_CantidadInput> {
-  late TextEditingController _ctrl;
-
-  @override
-  void initState() {
-    super.initState();
-    _ctrl = TextEditingController(text: widget.valor.toString());
-  }
-
-  @override
-  void dispose() {
-    _ctrl.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: kGrayBg,
-        borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: kGrayBorder, width: 0.5),
-      ),
-      child: TextField(
-        controller: _ctrl,
-        keyboardType: TextInputType.number,
-        textAlign: TextAlign.center,
-        style: const TextStyle(
-          color: kTextPrimary,
-          fontSize: 15,
-          fontWeight: FontWeight.w600,
-        ),
-        decoration: const InputDecoration(
-          border: InputBorder.none,
-          contentPadding: EdgeInsets.symmetric(vertical: 12),
-        ),
-        onChanged: widget.onChanged,
-      ),
-    );
-  }
-}
-
-
 
 // ─── Información logística ─────────────────────────────────────────────────
 
@@ -375,15 +350,29 @@ class _InformacionLogisticaCard extends StatelessWidget {
           ),
           const Divider(height: 0.5, thickness: 0.5, color: kGrayBorder),
           _LogisticaFila(
-            icono: Icons.location_on_rounded,
-            label: 'DESTINO',
+            icono: Icons.person_rounded,
+            label: 'CONDUCTOR',
             valor: destino,
           ),
+          
           const Divider(height: 0.5, thickness: 0.5, indent: 56, color: kGrayBorder),
-          _ConductorFila(
-            conductorSeleccionado: conductorSeleccionado,
-            conductores: conductores,
-            onChanged: onConductorChanged,
+          CustomDropdownField<Conductor>(
+            label: 'Destino',
+            icon: Icons.location_on_rounded,
+            value: conductorSeleccionado,
+            items: conductores,
+            itemLabel: (c) => '${c.nombre} (Camión ${c.patente})',
+            onChanged: (c) => onConductorChanged,
+          ),
+
+          const Divider(height: 0.5, thickness: 0.5, indent: 56, color: kGrayBorder),
+          CustomDropdownField<Conductor>(
+            label: 'Tipo transporte',
+            icon: Icons.local_shipping,
+            value: conductorSeleccionado,
+            items: conductores,
+            itemLabel: (c) => c.nombre,
+            onChanged: (c) => onConductorChanged,
           ),
           const SizedBox(height: 4),
         ],
@@ -424,68 +413,17 @@ class _LogisticaFila extends StatelessWidget {
                     style: const TextStyle(
                         color: kTextSecondary, fontSize: 11, fontWeight: FontWeight.w600, letterSpacing: 0.5)),
                 const SizedBox(height: 3),
-                Text(valor,
-                    style: const TextStyle(color: kTextPrimary, fontSize: 14, fontWeight: FontWeight.w500)),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
+                // Text(valor,
+                //     style: const TextStyle(color: kTextPrimary, fontSize: 14, fontWeight: FontWeight.w500)),
 
-class _ConductorFila extends StatelessWidget {
-  final Conductor? conductorSeleccionado;
-  final List<Conductor> conductores;
-  final void Function(Conductor?) onChanged;
-
-  const _ConductorFila({
-    required this.conductorSeleccionado,
-    required this.conductores,
-    required this.onChanged,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      child: Row(
-        children: [
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: kGrayBg,
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: const Icon(Icons.person_rounded, color: kNavy, size: 18),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text('CONDUCTOR',
-                    style: TextStyle(
-                        color: kTextSecondary, fontSize: 11, fontWeight: FontWeight.w600, letterSpacing: 0.5)),
-                const SizedBox(height: 3),
-                DropdownButtonHideUnderline(
-                  child: DropdownButton<Conductor>(
-                    value: conductorSeleccionado,
-                    isDense: true,
-                    icon: const Icon(Icons.keyboard_arrow_down_rounded, color: kTextSecondary, size: 18),
-                    style: const TextStyle(
-                        color: kTextPrimary, fontSize: 14, fontWeight: FontWeight.w500, fontFamily: 'sans-serif'),
-                    dropdownColor: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
-                    items: conductores.map((c) => DropdownMenuItem(
-                      value: c,
-                      child: Text('${c.nombre} (Camión ${c.patente})'),
-                    )).toList(),
-                    onChanged: onChanged,
-                  ),
-                ),
+                TextFormField(
+                  controller: _truckLicenseCtrl,
+                  validator: (v) {
+                    if (v == null || v.isEmpty) return messageValidatorEmpty;
+                    return null;
+                  },
+                )
+                
               ],
             ),
           ),

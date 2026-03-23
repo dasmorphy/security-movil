@@ -81,19 +81,6 @@ class _ServicesBiomarState extends ConsumerState<ServicesBiomar> {
                     },
                   ),
                 ),
-
-              if (userData.hasPermission(Permissions.nuevaBitacoraSalida))
-                BasicServiceCard(
-                  iconImage: 'iconsalida',
-                  label: 'Recepción materia prima',
-                  childWidget: ExitReportForm(
-                    onSubmit: (data) async {
-                      return await ref
-                          .read(saveOutLogbookProvider.notifier)
-                          .saveLogbookOut(data);
-                    },
-                  ),
-                ),
             ],
           ),
 
@@ -132,44 +119,7 @@ class _ServicesBiomarState extends ConsumerState<ServicesBiomar> {
                     },
                   ),
               ],
-            ),
-
-
-            // if (userData.hasPermission(Permissions.listaReportes) || userData.hasPermission(Permissions.generarReportes))
-            const SizedBox(height: 25),
-            const Text(
-              'Control de Herramientas y Equipos',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-
-            GridView.count(
-              crossAxisCount: 3,
-              shrinkWrap: true,
-              physics: const BouncingScrollPhysics(),
-              mainAxisSpacing: 10,
-              crossAxisSpacing: 11,
-              childAspectRatio: 0.9,
-              children: [
-                // if (userData.hasPermission(Permissions.listaReportes))
-                  BasicServiceCard(
-                    iconImage: 'iconregistro',
-                    label: 'Ingresos',
-                    childWidget: TotalReport(),
-                  ),
-                // if (userData.hasPermission(Permissions.generarReportes))
-                  BasicServiceCard(
-                    iconImage: 'iconregistro',
-                    label: 'Salidas',
-                    onTap: () async {
-                      await ref.read(downloadReport.notifier).downloadReport();
-                    },
-                  ),
-              ],
-            ),
+            ),            
         ],
       ),
     );
