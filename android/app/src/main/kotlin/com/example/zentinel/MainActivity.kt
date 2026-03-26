@@ -1,4 +1,4 @@
-package com.example.zentinel
+package com.telearseg.zentinel
 
 import io.flutter.embedding.android.FlutterActivity
 
