@@ -13,7 +13,7 @@ class PublicityCard extends StatelessWidget {
       ),
       child: 
       
-          Image.asset( 'lib/assets/images/banner.png', width: double.infinity, height: 170, fit: BoxFit.fill,),
+          Image.asset( 'assets/images/banner.png', width: double.infinity, height: 170, fit: BoxFit.fill,),
       
       
       // Row(

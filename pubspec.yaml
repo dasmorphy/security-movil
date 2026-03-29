@@ -85,11 +85,11 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - .env
-    - lib/assets/images/
-    - lib/assets/images/icons/
-    - lib/assets/videos/
-    - lib/assets/lottie/
-    - lib/assets/gif/
+    - assets/images/
+    - assets/images/icons/
+    - assets/videos/
+    - assets/lottie/
+    - assets/gif/
     # - images/a_dot_ham.jpeg
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

@@ -18,7 +18,7 @@ class _VideoHeaderState extends ConsumerState<VideoHeader> {
   @override
   void initState() {
     super.initState();
-    _controller = VideoPlayerController.asset('lib/assets/videos/obg.mp4')
+    _controller = VideoPlayerController.asset('assets/videos/obg.mp4')
       ..initialize().then((_) {
         setState(() {});
         _controller

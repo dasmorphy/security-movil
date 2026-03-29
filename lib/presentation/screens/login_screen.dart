@@ -43,7 +43,7 @@ class LoginScreen extends StatelessWidget {
                   right: 0,
                   child: Center(
                     child: Image.asset(
-                      'lib/assets/images/zentinel-logo.png',
+                      'assets/images/zentinel-logo.png',
                       width: 200,
                       height: 40,
                       fit: BoxFit.contain,
@@ -120,7 +120,7 @@ class LoginScreen extends StatelessWidget {
                   right: 0,
                   child: Center(
                     child: Image.asset(
-                      'lib/assets/images/powered.png',
+                      'assets/images/powered.png',
                       width: 150,
                       height: 20,
                       fit: BoxFit.contain,

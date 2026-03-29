@@ -70,7 +70,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       body: Center(
         child: Container(
           child: Lottie.asset(
-            'lib/assets/lottie/zentinel.json',
+            'assets/lottie/zentinel.json',
           ),
         ),
       ),

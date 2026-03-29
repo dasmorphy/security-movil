@@ -20,7 +20,7 @@ class _StepCompleteState extends ConsumerState<StepComplete> {
     super.initState();
 
     _controllerVideo =
-        VideoPlayerController.asset('lib/assets/videos/escudofinish.mp4')
+        VideoPlayerController.asset('assets/videos/escudofinish.mp4')
           ..initialize().then((_) {
             setState(() {});
             _controllerVideo

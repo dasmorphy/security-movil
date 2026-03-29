@@ -43,7 +43,7 @@ class _CheckSuccessScreenState extends ConsumerState<CheckSuccessScreen> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Lottie.asset(
-              'lib/assets/lottie/success_check.json',
+              'assets/lottie/success_check.json',
               width: 240,
               height: 240,
               fit: BoxFit.fill,

@@ -30,7 +30,7 @@ class _StepPhotoState extends ConsumerState<StepPhoto> {
   void initState() {
     super.initState();
     _controllerVideo =
-        VideoPlayerController.asset('lib/assets/videos/escudofoto.mp4')
+        VideoPlayerController.asset('assets/videos/escudofoto.mp4')
           ..initialize().then((_) {
             setState(() {});
             _controllerVideo

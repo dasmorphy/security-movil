@@ -61,7 +61,7 @@ class BasicServiceCard extends StatelessWidget {
             children: [
               // Icon(icon, size: 25, color: const Color.fromARGB(255, 50, 182, 182)),
               Image.asset(
-                'lib/assets/images/icons/$iconImage.png',
+                'assets/images/icons/$iconImage.png',
                 width: 30,
                 height: 30,
                 // fit: BoxFit.contain,

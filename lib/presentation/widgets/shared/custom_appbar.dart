@@ -32,7 +32,7 @@ class CustomAppbar extends ConsumerWidget {
                 child: Row(
                   children: [
                     Image.asset(
-                      'lib/assets/images/zentinel-logo.png',
+                      'assets/images/zentinel-logo.png',
                       width: 120,
                       height: 36,
                       fit: BoxFit.contain,

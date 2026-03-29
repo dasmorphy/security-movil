@@ -36,7 +36,7 @@ class _StepNameState extends ConsumerState<StepName> {
   void initState() {
     super.initState();
     _controllerVideo =
-        VideoPlayerController.asset('lib/assets/videos/escribiendologo.mp4')
+        VideoPlayerController.asset('assets/videos/escribiendologo.mp4')
           ..initialize().then((_) {
             setState(() {});
             _controllerVideo
