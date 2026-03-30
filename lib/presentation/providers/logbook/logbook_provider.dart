@@ -3,10 +3,13 @@ import 'package:zentinel/domain/entities/all_logbook.dart';
 import 'package:zentinel/domain/entities/authorized.dart';
 import 'package:zentinel/domain/entities/category.dart';
 import 'package:zentinel/domain/entities/destiny_intern.dart';
+import 'package:zentinel/domain/entities/dispatch_products.dart';
 import 'package:zentinel/domain/entities/group_business.dart';
 import 'package:zentinel/domain/entities/unity_weight.dart';
+import 'package:zentinel/domain/entities/vehicle_type.dart';
 import 'package:zentinel/domain/repositories/logbook_entry_repository.dart';
 import 'package:zentinel/presentation/providers/auth/auth_provider.dart';
+import 'package:zentinel/presentation/providers/dispatch/dispatch_repository_provider.dart';
 import 'package:zentinel/presentation/providers/logbook/logbook_repository_provider.dart';
 
 final homeTabProvider = StateProvider<int>((ref) => 0);
@@ -27,6 +30,24 @@ final getAllUnitiesWeight =
 
   return CatalogNotifier<UnityWeight>(
     (_) => repo.getAllUnitsWeight(),
+  );
+});
+
+final getAllDispatchProducts =
+    StateNotifierProvider<CatalogNotifier<DispatchProducts>, List<DispatchProducts>>((ref) {
+  final repo = ref.watch(dispatchRepositoryProvider);
+
+  return CatalogNotifier<DispatchProducts>(
+    (_) => repo.getAllDispatchProducts(),
+  );
+});
+
+final getAllVehicleTypes =
+    StateNotifierProvider<CatalogNotifier<VehicleType>, List<VehicleType>>((ref) {
+  final repo = ref.watch(dispatchRepositoryProvider);
+
+  return CatalogNotifier<VehicleType>(
+    (_) => repo.getAllVehicleTypes(),
   );
 });
 

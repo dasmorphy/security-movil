@@ -46,7 +46,7 @@ class ProductsNewSku extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  'DETALLE DE CARGA',
+                  'PRODUCTOS DE SKU',
                   style: TextStyle(
                     color: kTextSecondary,
                     fontSize: 11,

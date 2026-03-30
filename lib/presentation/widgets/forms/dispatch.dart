@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
 // ─── Modelos ───────────────────────────────────────────────────────────────
@@ -37,6 +39,8 @@ final List<ProductoCatalogo> catalogoProductos = [
   ProductoCatalogo(id: 'p5', nombre: 'Estructura Aluminio'),
 ];
 
+
+
 final List<Map<String, dynamic>> skuAvailable = [
   {'id': 1, 'nombre': 'SKU 001'},
   {'id': 2, 'nombre': 'SKU 002'},
@@ -67,14 +71,14 @@ final _truckLicenseCtrl = TextEditingController();
 
 // ─── Screen principal ──────────────────────────────────────────────────────
 
-class DispatchForm extends StatefulWidget {
+class DispatchForm extends ConsumerStatefulWidget {
   const DispatchForm({super.key});
 
   @override
-  State<DispatchForm> createState() => _CrearDespachoScreenState();
+  ConsumerState<DispatchForm> createState() => _CrearDespachoScreenState();
 }
 
-class _CrearDespachoScreenState extends State<DispatchForm> {
+class _CrearDespachoScreenState extends ConsumerState<DispatchForm> {
   bool _modoNuevo = true;
 
   final List<ProductoItem> _productos = [
@@ -158,6 +162,9 @@ class _CrearDespachoScreenState extends State<DispatchForm> {
 
   @override
   Widget build(BuildContext context) {
+    final dispatch_products = ref.watch(getAllDispatchProducts);
+    final vehicles_types = ref.watch(getAllVehicleTypes);
+
     return Scaffold(
       backgroundColor: kGrayBg,
       appBar: AppBar(
@@ -189,10 +196,10 @@ class _CrearDespachoScreenState extends State<DispatchForm> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _SKUModeSelector(
-                    modoNuevo: _modoNuevo,
-                    onChanged: (val) => setState(() => _modoNuevo = val)
-                  ),
+                  // _SKUModeSelector(
+                  //   modoNuevo: _modoNuevo,
+                  //   onChanged: (val) => setState(() => _modoNuevo = val)
+                  // ),
                   const SizedBox(height: 16),
                   ProductsNewSku(
                     flagNewSku: _modoNuevo,
@@ -229,85 +236,85 @@ class _CrearDespachoScreenState extends State<DispatchForm> {
 
 // ─── Selector de modo SKU ──────────────────────────────────────────────────
 
-class _SKUModeSelector extends StatelessWidget {
-  final bool modoNuevo;
-  final Function(bool) onChanged;
+// class _SKUModeSelector extends StatelessWidget {
+//   final bool modoNuevo;
+//   final Function(bool) onChanged;
 
-  const _SKUModeSelector({
-    required this.modoNuevo, 
-    required this.onChanged
-  });
+//   const _SKUModeSelector({
+//     required this.modoNuevo, 
+//     required this.onChanged
+//   });
 
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(child: _ModeCard(
-          icon: Icons.add,
-          label: 'Agregar\nSKU',
-          selected: modoNuevo,
-          onTap: () => onChanged(true),
-        )),
-        const SizedBox(width: 12),
-        Expanded(child: _ModeCard(
-          icon: Icons.playlist_add_check_rounded,
-          label: 'Seleccionar\nExistente',
-          selected: !modoNuevo,
-          onTap: () => onChanged(false),
-        )),
-      ],
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return Row(
+//       children: [
+//         Expanded(child: _ModeCard(
+//           icon: Icons.add,
+//           label: 'Agregar\nSKU',
+//           selected: modoNuevo,
+//           onTap: () => onChanged(true),
+//         )),
+//         const SizedBox(width: 12),
+//         Expanded(child: _ModeCard(
+//           icon: Icons.playlist_add_check_rounded,
+//           label: 'Seleccionar\nExistente',
+//           selected: !modoNuevo,
+//           onTap: () => onChanged(false),
+//         )),
+//       ],
+//     );
+//   }
+// }
 
-class _ModeCard extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
+// class _ModeCard extends StatelessWidget {
+//   final IconData icon;
+//   final String label;
+//   final bool selected;
+//   final VoidCallback onTap;
 
-  const _ModeCard({
-    required this.icon,
-    required this.label,
-    required this.selected,
-    required this.onTap,
-  });
+//   const _ModeCard({
+//     required this.icon,
+//     required this.label,
+//     required this.selected,
+//     required this.onTap,
+//   });
 
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-        decoration: BoxDecoration(
-          color: selected ? kNavy : Colors.white,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: selected ? kNavy : kGrayBorder,
-            width: 0.5,
-          ),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Icon(icon, color: selected ? Colors.white : kNavy, size: 26),
-            const SizedBox(height: 12),
-            Text(
-              label,
-              style: TextStyle(
-                color: selected ? Colors.white : kNavy,
-                fontSize: 15,
-                fontWeight: FontWeight.w600,
-                height: 1.3,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return GestureDetector(
+//       onTap: onTap,
+//       child: AnimatedContainer(
+//         duration: const Duration(milliseconds: 180),
+//         padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
+//         decoration: BoxDecoration(
+//           color: selected ? kNavy : Colors.white,
+//           borderRadius: BorderRadius.circular(14),
+//           border: Border.all(
+//             color: selected ? kNavy : kGrayBorder,
+//             width: 0.5,
+//           ),
+//         ),
+//         child: Column(
+//           crossAxisAlignment: CrossAxisAlignment.start,
+//           children: [
+//             Icon(icon, color: selected ? Colors.white : kNavy, size: 26),
+//             const SizedBox(height: 12),
+//             Text(
+//               label,
+//               style: TextStyle(
+//                 color: selected ? Colors.white : kNavy,
+//                 fontSize: 15,
+//                 fontWeight: FontWeight.w600,
+//                 height: 1.3,
+//               ),
+//             ),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
 
 
 // ─── Información logística ─────────────────────────────────────────────────
