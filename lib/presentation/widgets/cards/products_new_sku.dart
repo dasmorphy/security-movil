@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:zentinel/domain/entities/dispatch_products.dart';
 import 'package:zentinel/presentation/widgets/forms/dispatch.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
@@ -9,6 +10,7 @@ class ProductsNewSku extends StatelessWidget {
   final String tipoSku;
   final bool flagNewSku;
   final bool esMultiple;
+  final List<DispatchProducts> catalogProducts;
   final void Function(int, String) onCantidadChanged;
   final void Function(int) onDeleteProduct;
   final void Function(int) onDeleteSku;
@@ -20,6 +22,7 @@ class ProductsNewSku extends StatelessWidget {
     required this.productos,
     required this.tipoSku,
     required this.esMultiple,
+    required this.catalogProducts,
     required this.onCantidadChanged,
     required this.onDeleteProduct,
     required this.onAgregarProducto, 
@@ -86,6 +89,7 @@ class ProductsNewSku extends StatelessWidget {
                   ...List.generate(
                     productos.length,
                     (i) => _ProductoRow(
+                      catalogProducts: catalogProducts,
                       index: i,
                       item: productos[i],
                       onCantidadChanged: (val) => onCantidadChanged(i, val),
@@ -180,17 +184,17 @@ class _SkuExist extends StatelessWidget {
                         ),
                       ),
                     ),
-                    ...skuAvailable.map(
-                      (c) => DropdownMenuItem(
-                        value: c['id']?.toString(),
-                        child: Text(
-                          c['nombre'],
-                          style: TextStyle(
-                            color: const Color.fromARGB(255, 0, 0, 0),
-                          ),
-                        ),
-                      ),
-                    ),
+                    // ...skuAvailable.map(
+                    //   (c) => DropdownMenuItem(
+                    //     value: c['id']?.toString(),
+                    //     child: Text(
+                    //       c['nombre'],
+                    //       style: TextStyle(
+                    //         color: const Color.fromARGB(255, 0, 0, 0),
+                    //       ),
+                    //     ),
+                    //   ),
+                    // ),
                   ],
                   onChanged: (id) {
                     if (id != null && id != '0') {
@@ -216,12 +220,14 @@ class _SkuExist extends StatelessWidget {
 class _ProductoRow extends StatelessWidget {
   final int index;
   final ProductoItem item;
+  final List<DispatchProducts> catalogProducts;
   final void Function(String) onCantidadChanged;
   final VoidCallback? onDeleteProduct;
 
   const _ProductoRow({
     required this.index,
     required this.item,
+    required this.catalogProducts,
     required this.onCantidadChanged,
     this.onDeleteProduct, 
   });
@@ -262,50 +268,50 @@ class _ProductoRow extends StatelessWidget {
               Expanded(
                 flex: 3,
                 child:
-                    // _DropdownProducto(
-                    //   valorActual: item.productoId,
-                    //   onChanged: (id) {
-                    //     item.productoId = id;
-                    //   },
-                    // ),
-                    GlowDropdownFormField2<String>(
-                      value: item.productoId ?? '0',
-                      textColor: Colors.black,
-                      items: [
-                        DropdownMenuItem(
-                          enabled: false,
-                          value: '0',
+                  // _DropdownProducto(
+                  //   valorActual: item.productoId,
+                  //   onChanged: (id) {
+                  //     item.productoId = id;
+                  //   },
+                  // ),
+                  GlowDropdownFormField2<String>(
+                    value: item.productoId ?? '0',
+                    textColor: Colors.black,
+                    items: [
+                      DropdownMenuItem(
+                        enabled: false,
+                        value: '0',
+                        child: Text(
+                          'Seleccione una opción',
+                          style: TextStyle(
+                            color: const Color.fromARGB(255, 0, 0, 0),
+                          ),
+                        ),
+                      ),
+                      ...catalogProducts.map(
+                        (c) => DropdownMenuItem(
+                          value: c.idProduct.toString(),
                           child: Text(
-                            'Seleccione una opción',
+                            c.name,
                             style: TextStyle(
                               color: const Color.fromARGB(255, 0, 0, 0),
                             ),
                           ),
                         ),
-                        ...catalogoProductos.map(
-                          (c) => DropdownMenuItem(
-                            value: c.id,
-                            child: Text(
-                              c.nombre,
-                              style: TextStyle(
-                                color: const Color.fromARGB(255, 0, 0, 0),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                      onChanged: (id) {
-                        if (id != null) {
-                          item.productoId = id;
-                        }
-                      },
-                      validator: (v) {
-                        if (v == '0' || v == null || v.trim().isEmpty) {
-                          return messageValidatorEmpty;
-                        }
-                        return null;
-                      },
-                    ),
+                      ),
+                    ],
+                    onChanged: (id) {
+                      if (id != null) {
+                        item.productoId = id;
+                      }
+                    },
+                    validator: (v) {
+                      if (v == '0' || v == null || v.trim().isEmpty) {
+                        return messageValidatorEmpty;
+                      }
+                      return null;
+                    },
+                  ),
               ),
               const SizedBox(width: 8),
               SizedBox(

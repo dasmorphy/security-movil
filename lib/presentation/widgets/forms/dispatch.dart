@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:uuid/uuid.dart';
+import 'package:zentinel/domain/entities/destiny_intern.dart';
+import 'package:zentinel/domain/entities/vehicle_type.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
@@ -29,32 +32,6 @@ class Conductor {
   Conductor({required this.id, required this.nombre, required this.patente});
 }
 
-// ─── Datos de ejemplo ──────────────────────────────────────────────────────
-
-final List<ProductoCatalogo> catalogoProductos = [
-  ProductoCatalogo(id: 'p1', nombre: 'Panel Solar XL-400'),
-  ProductoCatalogo(id: 'p2', nombre: 'Inversor Trifásico'),
-  ProductoCatalogo(id: 'p3', nombre: 'Batería 48V 200Ah'),
-  ProductoCatalogo(id: 'p4', nombre: 'Cable Solar 6mm²'),
-  ProductoCatalogo(id: 'p5', nombre: 'Estructura Aluminio'),
-];
-
-
-
-final List<Map<String, dynamic>> skuAvailable = [
-  {'id': 1, 'nombre': 'SKU 001'},
-  {'id': 2, 'nombre': 'SKU 002'},
-  {'id': 3, 'nombre': 'SKU 003'},
-  {'id': 4, 'nombre': 'SKU 004'},
-  {'id': 5, 'nombre': 'SKU 005'},
-];
-
-final List<Conductor> conductores = [
-  Conductor(id: 'c1', nombre: 'Centro', patente: 'FR-992'),
-  Conductor(id: 'c2', nombre: 'Norte', patente: 'BCDF-21'),
-  Conductor(id: 'c3', nombre: 'Sur', patente: 'GH-441'),
-];
-
 // ─── Colores ───────────────────────────────────────────────────────────────
 
 const Color kNavy = Color(0xFF1A237E);
@@ -68,11 +45,13 @@ const Color kGreen = Color(0xFF4CAF50);
 const Color kGreenLight = Color(0xFFE8F5E9);
 const messageValidatorEmpty = 'Este campo es obligatorio';
 final _truckLicenseCtrl = TextEditingController();
+bool isLoading = false;
 
 // ─── Screen principal ──────────────────────────────────────────────────────
 
 class DispatchForm extends ConsumerStatefulWidget {
-  const DispatchForm({super.key});
+  final Future<bool> Function(Map<String, dynamic>)? onSubmit;
+  const DispatchForm({super.key, this.onSubmit});
 
   @override
   ConsumerState<DispatchForm> createState() => _CrearDespachoScreenState();
@@ -80,6 +59,7 @@ class DispatchForm extends ConsumerStatefulWidget {
 
 class _CrearDespachoScreenState extends ConsumerState<DispatchForm> {
   bool _modoNuevo = true;
+  final _formKey = GlobalKey<FormState>();
 
   final List<ProductoItem> _productos = [
     ProductoItem(),
@@ -89,8 +69,9 @@ class _CrearDespachoScreenState extends ConsumerState<DispatchForm> {
     SkuItem(),
   ];
 
-  Conductor? _conductorSeleccionado = conductores[0];
-  final String _destino = 'Centro de Distribución Norte - Bodega';
+  int? _vehicleSelected = 0;
+  int? _destinySelected = 0;
+  final String _driver = '';
 
   String get _tipoSku {
     final conProducto = _productos.length;
@@ -136,7 +117,15 @@ class _CrearDespachoScreenState extends ConsumerState<DispatchForm> {
     }
   }
 
-  void _crearDespacho() {
+  void _crearDespacho() async {
+    if (isLoading) return;
+    setState(() => isLoading = true);
+
+    FocusScope.of(context).unfocus();
+    if (!(_formKey.currentState?.validate() ?? false)) {
+      setState(() => isLoading = false);
+      return;
+    }
     final productosValidos = _productos.where((p) => p.productoId != null).toList();
     if (productosValidos.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -144,16 +133,52 @@ class _CrearDespachoScreenState extends ConsumerState<DispatchForm> {
       );
       return;
     }
-    if (_conductorSeleccionado == null) {
+
+    final authState = ref.read(userSessionProvider);
+
+    //Usuario no cargado o sesión inválida
+    if (!authState.hasValue || authState.value == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Selecciona un conductor')),
+        const SnackBar(
+          content: Text('Sesión no válida. Vuelva a iniciar sesión'),
+        ),
       );
+      setState(() => isLoading = false);
       return;
     }
+
+    final userData = authState.value!;
+
+    final data = {
+      "external_transaction_id": Uuid().v4(),
+      "destiny": _destinySelected,
+      "driver": _truckLicenseCtrl.text.trim(),
+      "products_sku": productosValidos.map((p) => {
+        "id_product": int.parse(p.productoId!),
+        "quantity": p.cantidad,
+      }).toList(),
+      "sku_type": _tipoSku,
+      "vehicle_type": _vehicleSelected,
+      // "weight": int.tryParse(_weightCtrl.text),
+      "user": userData.user,
+      // "images": _selectedImages
+      //   .whereType<Uint8List>()
+      //   .toList(), // Lista de Uint8List directo, sin base64
+    };
+
+    final success = await widget.onSubmit?.call(data) ?? false;
+    setState(() => isLoading = false);
+
+    // if (!success) {
+    //   await savePendingRequest(data, 'logbook_entry');
+    // }
+
+    if (!mounted) return;
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          'Despacho creado · ${productosValidos.length} producto(s) · ${_conductorSeleccionado!.nombre}',
+          'Despacho creado · ${productosValidos.length} producto(s)',
         ),
         backgroundColor: kNavy,
       ),
@@ -162,10 +187,12 @@ class _CrearDespachoScreenState extends ConsumerState<DispatchForm> {
 
   @override
   Widget build(BuildContext context) {
-    final dispatch_products = ref.watch(getAllDispatchProducts);
-    final vehicles_types = ref.watch(getAllVehicleTypes);
+    final dispatchProducts = ref.watch(getAllDispatchProducts);
+    final vehiclesTypes = ref.watch(getAllVehicleTypes);
+    final destiny = ref.watch(getAllDestinyIntern);
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: kGrayBg,
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -191,39 +218,48 @@ class _CrearDespachoScreenState extends ConsumerState<DispatchForm> {
       body: Column(
         children: [
           Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // _SKUModeSelector(
-                  //   modoNuevo: _modoNuevo,
-                  //   onChanged: (val) => setState(() => _modoNuevo = val)
-                  // ),
-                  const SizedBox(height: 16),
-                  ProductsNewSku(
-                    flagNewSku: _modoNuevo,
-                    productos: _productos,
-                    skus: _skus,
-                    tipoSku: _tipoSku,
-                    esMultiple: _esMultiple,
-                    onCantidadChanged: _onCantidadChanged,
-                    onDeleteProduct: _deleteProduct,
-                    onDeleteSku: _deleteSku,
-                    onAgregarProducto: _agregarProducto,
-                    onAddSku: _addSku,
-                  ),
-                  const SizedBox(height: 16),
-                  _InformacionLogisticaCard(
-                    destino: _destino,
-                    conductorSeleccionado: _conductorSeleccionado,
-                    conductores: conductores,
-                    onConductorChanged: (c) => setState(() => 
-                      _conductorSeleccionado = c
+            child: Form(
+              key: _formKey,
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // _SKUModeSelector(
+                    //   modoNuevo: _modoNuevo,
+                    //   onChanged: (val) => setState(() => _modoNuevo = val)
+                    // ),
+                    const SizedBox(height: 16),
+                    ProductsNewSku(
+                      catalogProducts: dispatchProducts,
+                      flagNewSku: _modoNuevo,
+                      productos: _productos,
+                      skus: _skus,
+                      tipoSku: _tipoSku,
+                      esMultiple: _esMultiple,
+                      onCantidadChanged: _onCantidadChanged,
+                      onDeleteProduct: _deleteProduct,
+                      onDeleteSku: _deleteSku,
+                      onAgregarProducto: _agregarProducto,
+                      onAddSku: _addSku,
                     ),
-                  ),
-                  const SizedBox(height: 24),
-                ],
+                    const SizedBox(height: 16),
+                    _InformacionLogisticaCard(
+                      driver: _driver,
+                      vehicleSelected: _vehicleSelected,
+                      catalogVehicles: vehiclesTypes,
+                      onVehicleChanged: (c) => setState(() => 
+                        _vehicleSelected = c
+                      ),
+                      onDestinyChanged: (c) => setState(() => 
+                        _destinySelected = c
+                      ),
+                      catalogDestiny: destiny, 
+                      destinySelected: _destinySelected,
+                    ),
+                    const SizedBox(height: 24),
+                  ],
+                ),
               ),
             ),
           ),
@@ -320,16 +356,22 @@ class _CrearDespachoScreenState extends ConsumerState<DispatchForm> {
 // ─── Información logística ─────────────────────────────────────────────────
 
 class _InformacionLogisticaCard extends StatelessWidget {
-  final String destino;
-  final Conductor? conductorSeleccionado;
-  final List<Conductor> conductores;
-  final void Function(Conductor?) onConductorChanged;
+  final String driver;
+  final int? vehicleSelected;
+  final int? destinySelected;
+  final List<VehicleType> catalogVehicles;
+  final List<DestinyIntern> catalogDestiny;
+  final void Function(int) onDestinyChanged;
+  final void Function(int) onVehicleChanged;
 
   const _InformacionLogisticaCard({
-    required this.destino,
-    required this.conductorSeleccionado,
-    required this.conductores,
-    required this.onConductorChanged,
+    required this.driver,
+    required this.vehicleSelected,
+    required this.onDestinyChanged, 
+    required this.catalogVehicles, 
+    required this.onVehicleChanged, 
+    required this.catalogDestiny, 
+    required this.destinySelected
   });
 
   @override
@@ -359,27 +401,155 @@ class _InformacionLogisticaCard extends StatelessWidget {
           _LogisticaFila(
             icono: Icons.person_rounded,
             label: 'CONDUCTOR',
-            valor: destino,
+            valor: driver,
           ),
           
           const Divider(height: 0.5, thickness: 0.5, indent: 56, color: kGrayBorder),
-          CustomDropdownField<Conductor>(
-            label: 'Destino',
-            icon: Icons.location_on_rounded,
-            value: conductorSeleccionado,
-            items: conductores,
-            itemLabel: (c) => '${c.nombre} (Camión ${c.patente})',
-            onChanged: (c) => onConductorChanged,
+
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            child: Row(
+              children: [
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: kGrayBg,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(Icons.location_on_rounded, color: kNavy, size: 18),
+                ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Destino'.toUpperCase(),
+                        style: const TextStyle(
+                          color: kTextSecondary,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      const SizedBox(height: 3),
+                      GlowDropdownFormField2<String>(
+                        value: destinySelected.toString(),
+                        textColor: Colors.black,
+                        items: [
+                          DropdownMenuItem(
+                            enabled: false,
+                            value: '0',
+                            child: Text(
+                              'Seleccione una opción',
+                              style: TextStyle(
+                                color: const Color.fromARGB(255, 0, 0, 0),
+                              ),
+                            ),
+                          ),
+                          ...catalogDestiny.map(
+                            (c) => DropdownMenuItem(
+                              value: c.idDestiny.toString(),
+                              child: Text(
+                                c.name,
+                                style: TextStyle(
+                                  color: const Color.fromARGB(255, 0, 0, 0),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                        onChanged: (id) {
+                          if (id != null) {
+                            onDestinyChanged(int.parse(id));
+                          }
+                        },
+                        validator: (v) {
+                          if (v == '0' || v == null || v.trim().isEmpty) {
+                            return messageValidatorEmpty;
+                          }
+                          return null;
+                        },
+                      ),
+                    ]
+                  ),
+                ),
+              ],
+            ),
           ),
 
           const Divider(height: 0.5, thickness: 0.5, indent: 56, color: kGrayBorder),
-          CustomDropdownField<Conductor>(
-            label: 'Tipo transporte',
-            icon: Icons.local_shipping,
-            value: conductorSeleccionado,
-            items: conductores,
-            itemLabel: (c) => c.nombre,
-            onChanged: (c) => onConductorChanged,
+
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            child: Row(
+              children: [
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: kGrayBg,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(Icons.local_shipping, color: kNavy, size: 18),
+                ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Tipo transporte'.toUpperCase(),
+                        style: const TextStyle(
+                          color: kTextSecondary,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                      const SizedBox(height: 3),
+                      GlowDropdownFormField2<String>(
+                        value: vehicleSelected.toString(),
+                        textColor: Colors.black,
+                        items: [
+                          DropdownMenuItem(
+                            enabled: false,
+                            value: '0',
+                            child: Text(
+                              'Seleccione una opción',
+                              style: TextStyle(
+                                color: const Color.fromARGB(255, 0, 0, 0),
+                              ),
+                            ),
+                          ),
+                          ...catalogVehicles.map(
+                            (c) => DropdownMenuItem(
+                              value: c.idVehicleType.toString(),
+                              child: Text(
+                                c.name,
+                                style: TextStyle(
+                                  color: const Color.fromARGB(255, 0, 0, 0),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                        onChanged: (id) {
+                          if (id != null) {
+                            onVehicleChanged(int.parse(id));
+                          }
+                        },
+                        validator: (v) {
+                          if (v == '0' || v == null || v.trim().isEmpty) {
+                            return messageValidatorEmpty;
+                          }
+                          return null;
+                        },
+                      ),
+                    ]
+                  ),
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 4),
         ],
@@ -455,16 +625,32 @@ class _BottomBar extends StatelessWidget {
         width: double.infinity,
         height: 52,
         child: ElevatedButton(
-          onPressed: onCrear,
+          onPressed: isLoading ? null : onCrear,
           style: ElevatedButton.styleFrom(
             backgroundColor: kNavy,
             foregroundColor: Colors.white,
             elevation: 0,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
-          child: const Text(
-            'Crear Despacho',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              if (isLoading) ...[
+                const SizedBox(
+                  width: 14,
+                  height: 14,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(width: 12),
+              ],
+              const Text(
+                'Crear Despacho',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              ),
+            ],
           ),
         ),
       ),

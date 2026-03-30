@@ -21,11 +21,18 @@ class HomeViewState extends ConsumerState<HomeView> {
     super.initState();
     ref.read(getHistoryLogbooks.notifier).load();
 
+    final authState = ref.read(userSessionProvider);
+    final userData = authState.value;
+    print('Usuario autenticado: $userData');
+
+    ref.read(getAllVehicleTypes.notifier).load();
+    ref.read(getAllDispatchProducts.notifier).load();
+
     //Se llama los catalogos desde el home para escenarios offline
-    ref.read(getAllCategories.notifier).load();
-    ref.read(getGroupBusinessByIdBusiness.notifier).load();
-    ref.read(getAllUnitiesWeight.notifier).load();
-    ref.read(getAllAuthorized.notifier).load();
+    // ref.read(getAllCategories.notifier).load();
+    // ref.read(getGroupBusinessByIdBusiness.notifier).load();
+    // ref.read(getAllUnitiesWeight.notifier).load();
+    // ref.read(getAllAuthorized.notifier).load();
     ref.read(getAllDestinyIntern.notifier).load();
   }
 

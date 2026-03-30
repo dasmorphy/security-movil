@@ -1,5 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zentinel/domain/repositories/dispatch_repository.dart';
+import 'package:zentinel/presentation/providers/dispatch/dispatch_repository_provider.dart';
+
+
+final saveDispatchProvider =
+    StateNotifierProvider<DispatchProvider, AsyncValue<bool>>((ref) {
+  final repo = ref.watch(dispatchRepositoryProvider);
+  return DispatchProvider(repo);
+});
 
 class DispatchProvider extends StateNotifier<AsyncValue<bool>> {
   final DispatchRepository repository;

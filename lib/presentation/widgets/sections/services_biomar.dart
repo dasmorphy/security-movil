@@ -61,11 +61,11 @@ class _ServicesBiomarState extends ConsumerState<ServicesBiomar> {
                   iconImage: 'iconentrada',
                   label: 'Despacho',
                   childWidget: DispatchForm(
-                    // onSubmit: (data) async {
-                    //   return await ref
-                    //       .read(saveDepatureReportProvider.notifier)
-                    //       .saveLogbookEntry(data);
-                    // },
+                    onSubmit: (data) async {
+                      return await ref
+                        .read(saveDispatchProvider.notifier)
+                        .saveDispatch(data);
+                    },
                   ),
                 ),
 

@@ -33,18 +33,21 @@ class DispatchImpl extends DispatchDatasource {
       final logbookData = Map<String, dynamic>.from(data);
       logbookData.remove('images');
 
-      logbookData['channel'] = 'ZENTINEL';
+      final dispatchData = {
+        "dispatch_data": logbookData,
+        "external_transaction_id": uuid,
+        "channel": 'ZENTINEL', 
+      };
+
+      // logbookData['channel'] = 'ZENTINEL';
       // logbookData['external_transaction_id'] = "1947d6c4-af59-4c26-ae20-e6e935eb7544";
 
-      final logbookJson = jsonEncode(logbookData);
+      final logbookJson = jsonEncode(dispatchData);
 
       // Aquí puedes agregar la lógica para enviar el JSON al backend usando Dio
       final response = await dio.post(
-        '/rest/zent-logbook-api/v1.0/saveDispatch',
+        '/rest/zent-dispatch-api/v1.0/dispatch',
         data: logbookJson,
-        options: Options(
-          headers: {'externalTransactionId': uuid, 'channel': 'ZENTINEL'},
-        ),
       );
 
       return response.statusCode == 200; // Retorna true si la respuesta es exitosa
