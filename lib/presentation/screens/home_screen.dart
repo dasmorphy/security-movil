@@ -88,6 +88,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           
           if (i == 0) {
             ref.read(getHistoryLogbooks.notifier).load();
+            ref.read(getHistoryDispatch.notifier).load();
           }
         },
       ),

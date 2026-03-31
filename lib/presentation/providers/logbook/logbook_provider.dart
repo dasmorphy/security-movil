@@ -33,15 +33,6 @@ final getAllUnitiesWeight =
   );
 });
 
-final getAllDispatchProducts =
-    StateNotifierProvider<CatalogNotifier<DispatchProducts>, List<DispatchProducts>>((ref) {
-  final repo = ref.watch(dispatchRepositoryProvider);
-
-  return CatalogNotifier<DispatchProducts>(
-    (_) => repo.getAllDispatchProducts(),
-  );
-});
-
 final getAllVehicleTypes =
     StateNotifierProvider<CatalogNotifier<VehicleType>, List<VehicleType>>((ref) {
   final repo = ref.watch(dispatchRepositoryProvider);

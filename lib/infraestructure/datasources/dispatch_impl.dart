@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:uuid/uuid.dart';
 import 'package:zentinel/domain/datasources/dispatch_datasource.dart';
+import 'package:zentinel/domain/entities/all_dispatch.dart';
 import 'package:zentinel/domain/entities/dispatch_products.dart';
 import 'package:zentinel/domain/entities/vehicle_type.dart';
 
@@ -67,6 +68,31 @@ class DispatchImpl extends DispatchDatasource {
     );
     final List vehiclesJson = response.data['data'];
     return vehiclesJson.map((json) => VehicleType.fromJson(json)).toList();
+  }
+
+  @override
+  Future<List<AllDispatch>> getHistoryDispatch(Map<String, dynamic> filters) async {
+    List allDispatchJson = [];
+    try {
+      final response = await dio.get(
+        '/rest/zent-dispatch-api/v1.0/dispatch',
+        options: Options(
+          headers: {
+            'externalTransactionId': uuid,
+            'channel': 'ZENTINEL',
+            'user': filters['user'],
+          },
+        ),
+      );
+
+      allDispatchJson = response.data['data']; 
+      print('History Dispatch: $allDispatchJson');
+      return allDispatchJson.map((json) => AllDispatch.fromJson(json)).toList();
+      
+    } catch (e) {
+      print(e);
+      return [];
+    }
   }
 
 }
