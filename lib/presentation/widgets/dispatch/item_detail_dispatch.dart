@@ -13,17 +13,6 @@ class ItemDetailDispatch extends StatelessWidget {
     return Column(
       children: [
         const SizedBox(height: 20),
-
-        Text(
-          'Ingreso',
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-
-        const SizedBox(height: 10),
-
         detailRow('Código Sku', item.codeSku),
         detailRow('Tipo Sku', item.typeSku),
         detailRow('Placa', item.truckLicense),

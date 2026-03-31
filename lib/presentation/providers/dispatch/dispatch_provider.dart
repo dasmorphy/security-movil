@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zentinel/domain/entities/all_dispatch.dart';
+import 'package:zentinel/domain/entities/api_response.dart';
 import 'package:zentinel/domain/entities/dispatch_products.dart';
 import 'package:zentinel/domain/repositories/dispatch_repository.dart';
 import 'package:zentinel/presentation/providers/dispatch/dispatch_repository_provider.dart';
@@ -15,7 +16,13 @@ final getAllDispatchProducts =
 });
 
 final saveDispatchProvider =
-    StateNotifierProvider<DispatchProvider, AsyncValue<bool>>((ref) {
+    StateNotifierProvider<DispatchProvider, AsyncValue<ApiResponse<dynamic>>>((ref) {
+  final repo = ref.watch(dispatchRepositoryProvider);
+  return DispatchProvider(repo);
+});
+
+final updateDispatchProvider =
+    StateNotifierProvider<DispatchProvider, AsyncValue<ApiResponse<dynamic>>>((ref) {
   final repo = ref.watch(dispatchRepositoryProvider);
   return DispatchProvider(repo);
 });
@@ -50,23 +57,46 @@ final getHistoryDispatch =
   },
 );
 
-class DispatchProvider extends StateNotifier<AsyncValue<bool>> {
+class DispatchProvider extends StateNotifier<AsyncValue<ApiResponse>> {
   final DispatchRepository repository;
 
   DispatchProvider(this.repository)
-      : super(const AsyncData(false));
+      : super(AsyncData(ApiResponse(success: false)));
 
-  Future<bool> saveDispatch(Map<String, dynamic> data) async {
+  Future<ApiResponse> saveDispatch(Map<String, dynamic> data) async {
     state = const AsyncLoading();
     try {
-      final success = await repository.saveDispatch(data);
-      state = AsyncData(success);
-      return success;
+      final response = await repository.saveDispatch(data);
+      state = AsyncData(response);
+      return response;
     } catch (e, st) {
       print('Error out E, $e');
       print('Error out ST, $st');
       state = AsyncError(e, st);
-      return false;
+      return ApiResponse(
+        success: false,
+        message: e.toString(),
+      );
     }
   }
+
+  Future<ApiResponse> updateDispatch(Map<String, dynamic> data) async {
+    state = const AsyncLoading();
+
+    try {
+      final response = await repository.updateDispatch(data);
+
+      state = AsyncData(response);
+
+      return response;
+    } catch (e, st) {
+      state = AsyncError(e, st);
+
+      return ApiResponse(
+        success: false,
+        message: e.toString(),
+      );
+    }
+  }
+
 }

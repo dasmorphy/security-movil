@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
+import 'package:zentinel/domain/entities/api_response.dart';
 import 'package:zentinel/domain/entities/destiny_intern.dart';
 import 'package:zentinel/domain/entities/vehicle_type.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
@@ -50,7 +51,7 @@ bool isLoading = false;
 // ─── Screen principal ──────────────────────────────────────────────────────
 
 class DispatchForm extends ConsumerStatefulWidget {
-  final Future<bool> Function(Map<String, dynamic>)? onSubmit;
+  final Future<ApiResponse> Function(Map<String, dynamic>)? onSubmit;
   const DispatchForm({super.key, this.onSubmit});
 
   @override
@@ -166,7 +167,7 @@ class _CrearDespachoScreenState extends ConsumerState<DispatchForm> {
       //   .toList(), // Lista de Uint8List directo, sin base64
     };
 
-    final success = await widget.onSubmit?.call(data) ?? false;
+    final success = await widget.onSubmit?.call(data);
     setState(() => isLoading = false);
 
     // if (!success) {

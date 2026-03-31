@@ -1,5 +1,6 @@
 import 'package:zentinel/domain/datasources/dispatch_datasource.dart';
 import 'package:zentinel/domain/entities/all_dispatch.dart';
+import 'package:zentinel/domain/entities/api_response.dart';
 import 'package:zentinel/domain/entities/dispatch_products.dart';
 import 'package:zentinel/domain/entities/vehicle_type.dart';
 import 'package:zentinel/domain/repositories/dispatch_repository.dart';
@@ -15,9 +16,8 @@ class DispatchRepositoryImpl extends DispatchRepository {
   }
 
   @override
-  Future<bool> saveDispatch(Map<String, dynamic> data) {
-      return datasource.saveDispatch(data);
-
+  Future<ApiResponse> saveDispatch(Map<String, dynamic> data) {
+    return datasource.saveDispatch(data);
   }
 
   @override
@@ -28,5 +28,10 @@ class DispatchRepositoryImpl extends DispatchRepository {
   @override
   Future<List<AllDispatch>> getHistoryDispatch(Map<String, dynamic> filters) {
     return datasource.getHistoryDispatch(filters);
+  }
+
+  @override
+  Future<ApiResponse<dynamic>> updateDispatch(Map<String, dynamic> data) {
+    return datasource.updateDispatch(data);
   }
 }

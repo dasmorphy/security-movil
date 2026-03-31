@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:zentinel/config/constants/permissions.dart';
+import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/domain/entities/all_dispatch.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
@@ -14,6 +16,20 @@ class DispatchDetailModal extends ConsumerWidget {
     // final entryImages = item.imagesEntry ?? [];
     // final outImages = item.out?.imagesOut ?? item.imagesOut ?? [];
 
+    final authState = ref.watch(userSessionProvider);
+
+    if (!authState.hasValue || authState.value == null) {
+      return const SizedBox.shrink();
+    }
+
+    final userData = authState.value!;
+
+    void _changeStatus() async {
+      final dispatchProvider = ref.read(updateDispatchProvider.notifier);
+      await dispatchProvider.updateDispatch({});
+      Navigator.of(context).pop();
+    }
+
     return SafeArea(
       child: Container(
         margin: const EdgeInsets.only(top: 30),
@@ -23,7 +39,7 @@ class DispatchDetailModal extends ConsumerWidget {
           children: [
             /// HEADER
             Text(
-              'Detalle Bitácora',
+              'Detalle',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
@@ -62,37 +78,76 @@ class DispatchDetailModal extends ConsumerWidget {
             const SizedBox(height: 20),
 
             /// BOTÓN CONTINUAR
-            // if (item.status == 'Pendiente Salida')
-            //   SizedBox(
-            //     width: double.infinity,
-            //     child: ElevatedButton(
-            //       style: ElevatedButton.styleFrom(
-            //         backgroundColor: const Color.fromARGB(188, 25, 156, 156),
-            //         padding: const EdgeInsets.symmetric(vertical: 14),
-            //         shape: RoundedRectangleBorder(
-            //           borderRadius: BorderRadius.circular(12),
-            //         ),
-            //       ),
-            //       onPressed: () async {
-            //         await Navigator.of(context).push(
-            //           MaterialPageRoute(
-            //             builder: (context) => ExitReportForm(
-            //               preloadedData: item,
-            //               onSubmit: (data) async {
-            //                 return await ref
-            //                     .read(saveOutLogbookProvider.notifier)
-            //                     .saveLogbookOut(data);
-            //               },
-            //             ),
-            //           ),
-            //         );
-            //       },
-            //       child: const Text(
-            //         'Continuar',
-            //         style: TextStyle(color: Colors.white),
-            //       ),
-            //     ),
-            //   ),
+            if (item.status == 'Despachado' && userData.hasPermission(Permissions.nuevaBitacoraIngreso))
+              // SizedBox(
+              //   width: double.infinity,
+              //   child: ElevatedButton(
+              //     style: ElevatedButton.styleFrom(
+              //       backgroundColor: const Color.fromARGB(188, 25, 156, 156),
+              //       padding: const EdgeInsets.symmetric(vertical: 14),
+              //       shape: RoundedRectangleBorder(
+              //         borderRadius: BorderRadius.circular(12),
+              //       ),
+              //     ),
+              //     onPressed: () async {
+              //       await Navigator.of(context).push(
+              //         MaterialPageRoute(
+              //           builder: (context) => ExitReportForm(
+              //             preloadedData: item,
+              //             onSubmit: (data) async {
+              //               return await ref
+              //                   .read(saveOutLogbookProvider.notifier)
+              //                   .saveLogbookOut(data);
+              //             },
+              //           ),
+              //         ),
+              //       );
+              //     },
+              //     child: const Text(
+              //       'Continuar',
+              //       style: TextStyle(color: Colors.white),
+              //     ),
+              //   ),
+              // ),
+
+
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: isLoading ? null : _changeStatus,
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    backgroundColor: const Color.fromARGB(189, 7, 213, 213),
+                    disabledBackgroundColor: const Color.fromARGB(120, 7, 213, 213),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (isLoading) ...[
+                        const SizedBox(
+                          width: 14,
+                          height: 14,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                      ],
+                      const Text(
+                        'Actualizar estado',
+                        style: TextStyle(
+                          fontSize: 15, 
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
 
             const SizedBox(height: 8),
 

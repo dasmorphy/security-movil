@@ -4,4 +4,6 @@ class Permissions {
   static const nuevaBitacoraSalida = 'NUEVA_BITACORA_SALIDA';
   static const listaReportes = 'LISTA_REPORTES';
   static const generarReportes = 'GENERAR_REPORTES';
+  static const verDespachos = 'VER_DESPACHOS';
+  static const nuevoDespacho = 'NUEVO_DESPACHO';
 }

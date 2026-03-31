@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 import 'package:uuid/uuid.dart';
 import 'package:zentinel/domain/datasources/dispatch_datasource.dart';
 import 'package:zentinel/domain/entities/all_dispatch.dart';
+import 'package:zentinel/domain/entities/api_response.dart';
 import 'package:zentinel/domain/entities/dispatch_products.dart';
 import 'package:zentinel/domain/entities/vehicle_type.dart';
 
@@ -27,7 +28,7 @@ class DispatchImpl extends DispatchDatasource {
   }
 
   @override
-  Future<bool> saveDispatch(Map<String, dynamic> data) async {
+  Future<ApiResponse> saveDispatch(Map<String, dynamic> data) async {
      try {
       
       final images = data['images'] as List<Uint8List>?;
@@ -51,10 +52,20 @@ class DispatchImpl extends DispatchDatasource {
         data: logbookJson,
       );
 
-      return response.statusCode == 200; // Retorna true si la respuesta es exitosa
+      final body = response.data;
+
+      return ApiResponse(
+        success: response.statusCode == 200,
+        errorCode: body['error_code'],
+        message: body['message'],
+      );
     } catch (e) {
       print('Error al guardar el dispatch: $e');
-      return false; // Retorna false en caso de error
+      return ApiResponse(
+        success: false,
+        errorCode: 'update_error',
+        message: 'Error al actualizar despacho',
+      );
     }
   }
   
@@ -92,6 +103,39 @@ class DispatchImpl extends DispatchDatasource {
     } catch (e) {
       print(e);
       return [];
+    }
+  }
+
+  @override
+  Future<ApiResponse<dynamic>> updateDispatch(Map<String, dynamic> data) async {
+    try {      
+      final dispatchData = Map<String, dynamic>.from(data);
+
+      final dispatchJson = {
+        "dispatch_data": dispatchData,
+        "external_transaction_id": uuid,
+        "channel": 'ZENTINEL', 
+      };
+
+      final response = await dio.put(
+        '/rest/zent-dispatch-api/v1.0/dispatch',
+        data: jsonEncode(dispatchJson),
+      );
+
+      final body = response.data;
+
+      return ApiResponse(
+        success: response.statusCode == 200,
+        errorCode: body['error_code'],
+        message: body['message'],
+      );
+    } catch (e) {
+      print('Error al guardar el dispatch: $e');
+      return ApiResponse(
+        success: false,
+        errorCode: 'update_error',
+        message: 'Error al actualizar despacho',
+      );
     }
   }
 
