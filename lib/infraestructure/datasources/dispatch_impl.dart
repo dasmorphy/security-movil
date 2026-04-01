@@ -118,8 +118,8 @@ class DispatchImpl extends DispatchDatasource {
         "channel": 'ZENTINEL', 
       };
 
-      final response = await dio.put(
-        '/rest/zent-dispatch-api/v1.0/dispatch',
+      final response = await dio.patch(
+        '/rest/zent-dispatch-api/v1.0/dispatch/${data['dispatch_id']}',
         data: jsonEncode(dispatchJson),
       );
 
@@ -127,7 +127,7 @@ class DispatchImpl extends DispatchDatasource {
 
       return ApiResponse(
         success: response.statusCode == 200,
-        errorCode: body['error_code'],
+        errorCode: body['error_code']?.toString(),
         message: body['message'],
       );
     } catch (e) {

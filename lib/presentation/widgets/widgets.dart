@@ -46,3 +46,8 @@ export 'package:zentinel/presentation/widgets/modals/dispatch_detail_modal.dart'
 export 'package:zentinel/presentation/widgets/dispatch/item_detail_dispatch.dart';
 export 'package:zentinel/presentation/widgets/dispatch/dispatch_list.dart';
 export 'package:zentinel/presentation/widgets/shared/confirm_bottom_sheet.dart';
+export 'package:zentinel/presentation/widgets/shared/global_loading_bottom_sheet.dart';
+export 'package:zentinel/presentation/widgets/dispatch/dispatch_info_card.dart';
+export 'package:zentinel/presentation/widgets/dispatch/received_product_item.dart';
+export 'package:zentinel/presentation/widgets/headers/confirmation_header.dart';
+export 'package:zentinel/presentation/widgets/forms/reception_confirmation_form.dart';

@@ -1,7 +1,10 @@
+import 'package:zentinel/domain/entities/all_dispatch.dart';
 import 'package:zentinel/presentation/screens/screens.dart';
 import 'package:go_router/go_router.dart';
+import 'package:zentinel/service/navigation_service.dart';
 
 final appRouter = GoRouter(
+  navigatorKey: NavigationService.navigatorKey,
   initialLocation: '/splash',
   routes: [
     GoRoute(
@@ -53,6 +56,16 @@ final appRouter = GoRouter(
           path: 'list-dispatches',
           name: DispatchListScreen.name,
           builder: (context, state) => const DispatchListScreen()
+        ),
+        GoRoute(
+          path: 'confirm-dispatch',
+          name: ReceptionConfirmationScreen.name,
+          builder: (context, state) {
+            final dispatchData = state.extra as AllDispatch;
+            return ReceptionConfirmationScreen(
+              dispatchData: dispatchData,
+            );
+          },
         )
       ]
     ),
