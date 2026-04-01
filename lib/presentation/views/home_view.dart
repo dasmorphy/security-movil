@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:zentinel/config/utils/helper.dart';
+import 'package:zentinel/config/constants/permissions.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
@@ -23,6 +25,7 @@ class HomeViewState extends ConsumerState<HomeView> {
     print('Usuario autenticado: $userData');
 
     ref.read(getAllVehicleTypes.notifier).load();
+    ref.read(getDispatchStatus.notifier).load();
     ref.read(getAllDispatchProducts.notifier).load();
     ref.read(getHistoryLogbooks.notifier).load();
     ref.read(getHistoryDispatch.notifier).load();
@@ -37,6 +40,14 @@ class HomeViewState extends ConsumerState<HomeView> {
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.read(userSessionProvider);
+
+    if (!authState.hasValue || authState.value == null) {
+      return const SizedBox.shrink();
+    }
+
+    final userData = authState.value!;
+    
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -48,18 +59,20 @@ class HomeViewState extends ConsumerState<HomeView> {
               children: [
                 const SizedBox(height: 10),
 
-                // Bitácoras Recientes
-                RecentListHome(
-                  title: 'Bitácoras recientes',
-                  routeLink: '/list-logbooks',
-                  childListBuild: const ItemRecentLogbook(),
-                ),
+                if (userData.hasPermission(Permissions.verBitacoras))
+                  // Bitácoras Recientes
+                  RecentListHome(
+                    title: 'Bitácoras recientes',
+                    routeLink: '/list-logbooks',
+                    childListBuild: const ItemRecentLogbook(),
+                  ),
 
-                RecentListHome(
-                  title: 'Despachos recientes',
-                  routeLink: '/list-logbooks',
-                  childListBuild: const ItemRecentDispatch(),
-                ),
+                if (userData.hasPermission(Permissions.verDespachos))
+                  RecentListHome(
+                    title: 'Despachos recientes',
+                    routeLink: '/list-dispatches',
+                    childListBuild: const ItemRecentDispatch(),
+                  ),
 
                 const SizedBox(height: 15),
                 // Publicidad

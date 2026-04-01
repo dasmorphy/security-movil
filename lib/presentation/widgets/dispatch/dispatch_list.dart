@@ -1,20 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zentinel/config/utils/helper.dart';
+import 'package:zentinel/domain/entities/all_dispatch.dart';
+import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
-class LogbooksList extends ConsumerStatefulWidget {
-  final List<dynamic> items;
+class DispatchList extends ConsumerStatefulWidget {
+  final List<AllDispatch> items;
   final int? limit;
 
-  const LogbooksList({super.key, required this.items, this.limit = 15});
+  const DispatchList({super.key, required this.items, this.limit = 15});
 
   @override
-  ConsumerState<LogbooksList> createState() => LogbooksListState();
+  ConsumerState<DispatchList> createState() => DispatchListState();
 }
 
-class LogbooksListState extends ConsumerState<LogbooksList> {
+class DispatchListState extends ConsumerState<DispatchList> {
   late List<dynamic> _filteredItems;
   bool _isLoading = false;
   DateTimeRange? _currentRange;
@@ -26,7 +28,7 @@ class LogbooksListState extends ConsumerState<LogbooksList> {
   }
 
   @override
-  void didUpdateWidget(LogbooksList oldWidget) {
+  void didUpdateWidget(DispatchList oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.items != widget.items) {
       _filteredItems = List.from(widget.items);
@@ -50,6 +52,7 @@ class LogbooksListState extends ConsumerState<LogbooksList> {
 
   @override
   Widget build(BuildContext context) {
+    final dispatchStatus = ref.watch(getDispatchStatus);
     final items = _isLoading
     ? List.generate(5, (_) => null) // Placeholder para skeletons
     : (_currentRange != null
@@ -91,13 +94,9 @@ class LogbooksListState extends ConsumerState<LogbooksList> {
 
                   final item = displayItems[index];
 
-                  final isEntry = item.idLogbookEntry != null;
-                  final typeText = isEntry ? 'ingreso' : 'salida';
-
-                  final createdBy = item.nameUser ?? 'Sin usuario';
-                  final groupName = item.groupName ?? 'Sin grupo';
-
-                  final description = 'Bitácora de $typeText en $groupName';
+                  final typeText = item.codeSku;
+                  final createdBy = item.createdBy;
+                  final description = 'Despacho de $typeText en ${item.truckLicense}';
 
                   final formattedDate = formatDate(item.createdAt);
 
@@ -109,7 +108,7 @@ class LogbooksListState extends ConsumerState<LogbooksList> {
                     child: InkWell(
                       borderRadius: BorderRadius.circular(8),
                       onTap: () =>
-                          ModalHelper.open(context, child: BitacoraDetailModal(item: item)),
+                        ModalHelper.open(context, child: DispatchDetailModal(item: item)),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [

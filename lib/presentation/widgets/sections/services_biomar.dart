@@ -56,7 +56,7 @@ class _ServicesBiomarState extends ConsumerState<ServicesBiomar> {
             crossAxisSpacing: 11,
             childAspectRatio: 0.9,
             children: [
-              if (userData.hasPermission(Permissions.nuevaBitacoraIngreso))
+              if (userData.hasPermission(Permissions.nuevoDespacho))
                 BasicServiceCard(
                   iconImage: 'iconentrada',
                   label: 'Despacho',
@@ -69,7 +69,7 @@ class _ServicesBiomarState extends ConsumerState<ServicesBiomar> {
                   ),
                 ),
 
-              if (userData.hasPermission(Permissions.nuevaBitacoraSalida))
+              // if (userData.hasPermission(Permissions.nuevaBitacoraSalida))
                 BasicServiceCard(
                   iconImage: 'iconsalida',
                   label: 'Salida materia prima',

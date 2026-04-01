@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zentinel/config/utils/helper.dart';
+import 'package:zentinel/domain/entities/dispatch_status.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
@@ -9,6 +10,7 @@ class ItemRecentDispatch extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final dispatchStatus = ref.watch(getDispatchStatus);
     final historyDispatch = ref.watch(getHistoryDispatch);
     print(historyDispatch);
     final limitedList = historyDispatch.take(5).toList();

@@ -15,6 +15,7 @@ class DispatchDetailModal extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // final entryImages = item.imagesEntry ?? [];
     // final outImages = item.out?.imagesOut ?? item.imagesOut ?? [];
+    final dispatchStatus = ref.watch(getDispatchStatus);
 
     final authState = ref.watch(userSessionProvider);
 
@@ -25,9 +26,23 @@ class DispatchDetailModal extends ConsumerWidget {
     final userData = authState.value!;
 
     void _changeStatus() async {
-      final dispatchProvider = ref.read(updateDispatchProvider.notifier);
-      await dispatchProvider.updateDispatch({});
-      Navigator.of(context).pop();
+      // final dispatchProvider = ref.read(updateDispatchProvider.notifier);
+      // await dispatchProvider.updateDispatch({
+      //   'idDispatch': item.idDispatch,
+      //   'status': 'En tránsito',
+      // });
+      // Navigator.of(context).pop();
+
+      final confirmed = await ConfirmBottomSheet.show(
+        context,
+        title: "Actualizar estado",
+        message: "Se actualizará el estado del despacho a 'En tránsito'. ¿Desea continuar?",
+      );
+
+      if (confirmed == true) {
+        print(dispatchStatus);
+        print('Elemento actualizado');
+      }
     }
 
     return SafeArea(
@@ -52,24 +67,7 @@ class DispatchDetailModal extends ConsumerWidget {
               child: SingleChildScrollView(
                 child: Column(
                   children: [
-                    /// ENTRADA
                     ItemDetailDispatch(item: item),
-
-                    /// IMÁGENES ENTRADA
-                    // if (entryImages.isNotEmpty)
-                    //   ImagesGrid(
-                    //     title: 'Imágenes Ingreso',
-                    //     images: entryImages,
-                    //   ),
-
-                    // /// SALIDA
-                    // if (item.out != null || item.idLogbookOut != null)
-                    //   OutDetails(out: item.out ?? item),
-
-                    // /// IMÁGENES SALIDA
-                    // if (outImages.isNotEmpty ||
-                    //     (item.imagesOut != null && item.imagesOut!.isNotEmpty))
-                    //   ImagesGrid(title: 'Imágenes Salida', images: outImages),
                   ],
                 ),
               ),
@@ -78,7 +76,7 @@ class DispatchDetailModal extends ConsumerWidget {
             const SizedBox(height: 20),
 
             /// BOTÓN CONTINUAR
-            if (item.status == 'Despachado' && userData.hasPermission(Permissions.nuevaBitacoraIngreso))
+            // if (item.status == 'Despachado' && userData.hasPermission(Permissions.nuevaBitacoraIngreso))
               // SizedBox(
               //   width: double.infinity,
               //   child: ElevatedButton(
@@ -111,7 +109,8 @@ class DispatchDetailModal extends ConsumerWidget {
               // ),
 
 
-              Expanded(
+              SizedBox(
+                width: double.infinity,
                 child: ElevatedButton(
                   onPressed: isLoading ? null : _changeStatus,
                   style: ElevatedButton.styleFrom(

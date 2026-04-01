@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zentinel/domain/entities/all_dispatch.dart';
 import 'package:zentinel/domain/entities/api_response.dart';
 import 'package:zentinel/domain/entities/dispatch_products.dart';
+import 'package:zentinel/domain/entities/dispatch_status.dart';
 import 'package:zentinel/domain/repositories/dispatch_repository.dart';
 import 'package:zentinel/presentation/providers/dispatch/dispatch_repository_provider.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
@@ -12,6 +13,15 @@ final getAllDispatchProducts =
 
   return CatalogNotifier<DispatchProducts>(
     (_) => repo.getAllDispatchProducts(),
+  );
+});
+
+final getDispatchStatus =
+    StateNotifierProvider<CatalogNotifier<DispatchStatus>, List<DispatchStatus>>((ref) {
+  final repo = ref.watch(dispatchRepositoryProvider);
+
+  return CatalogNotifier<DispatchStatus>(
+    (_) => repo.getDispatchStatus(),
   );
 });
 

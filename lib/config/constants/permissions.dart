@@ -5,5 +5,6 @@ class Permissions {
   static const listaReportes = 'LISTA_REPORTES';
   static const generarReportes = 'GENERAR_REPORTES';
   static const verDespachos = 'VER_DESPACHOS';
+  static const verBitacoras = 'VER_BITACORAS';
   static const nuevoDespacho = 'NUEVO_DESPACHO';
 }

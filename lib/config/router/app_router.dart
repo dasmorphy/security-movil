@@ -48,6 +48,11 @@ final appRouter = GoRouter(
           path: 'list-logbooks',
           name: LogbookListScreen.name,
           builder: (context, state) => const LogbookListScreen()
+        ),
+        GoRoute(
+          path: 'list-dispatches',
+          name: DispatchListScreen.name,
+          builder: (context, state) => const DispatchListScreen()
         )
       ]
     ),

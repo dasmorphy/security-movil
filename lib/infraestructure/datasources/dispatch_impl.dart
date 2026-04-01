@@ -7,6 +7,7 @@ import 'package:zentinel/domain/datasources/dispatch_datasource.dart';
 import 'package:zentinel/domain/entities/all_dispatch.dart';
 import 'package:zentinel/domain/entities/api_response.dart';
 import 'package:zentinel/domain/entities/dispatch_products.dart';
+import 'package:zentinel/domain/entities/dispatch_status.dart';
 import 'package:zentinel/domain/entities/vehicle_type.dart';
 
 class DispatchImpl extends DispatchDatasource {
@@ -137,6 +138,18 @@ class DispatchImpl extends DispatchDatasource {
         message: 'Error al actualizar despacho',
       );
     }
+  }
+
+  @override
+  Future<List<DispatchStatus>> getDispatchStatus() async {
+    final response = await dio.get(
+      '/rest/zent-dispatch-api/v1.0/status-dispatch',
+      options: Options(
+        headers: {'externalTransactionId': uuid, 'channel': 'ZENTINEL'},
+      ),
+    );
+    final List statusJson = response.data['data'];
+    return statusJson.map((json) => DispatchStatus.fromJson(json)).toList();
   }
 
 }
