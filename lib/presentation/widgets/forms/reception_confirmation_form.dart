@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:zentinel/domain/entities/api_response.dart';
+import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/dispatch/dispatch_info_card.dart';
 import 'package:zentinel/presentation/widgets/dispatch/received_product_item.dart';
 import 'package:zentinel/presentation/widgets/headers/confirmation_header.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
 class ReceivedProduct {
-  final String id;
+  final int id;
   final String productName;
   final String status;
   final int expectedQty;
@@ -28,15 +31,17 @@ class ReceivedProduct {
 }
 
 class DispatchData {
-  final String dispatchId;
-  final String origin;
+  final int dispatchId;
+  final String orderNumber;
+  final String destiny;
   final String driver;
   final String status;
   final Color statusColor;
 
   const DispatchData({
     required this.dispatchId,
-    required this.origin,
+    required this.orderNumber,
+    required this.destiny,
     required this.driver,
     required this.status,
     this.statusColor = const Color.fromARGB(255, 34, 197, 94),
@@ -46,24 +51,22 @@ class DispatchData {
 class ReceptionConfirmationForm extends ConsumerStatefulWidget {
   final DispatchData dispatchData;
   final List<ReceivedProduct> products;
-  final Future<bool> Function(Map<String, dynamic>)? onSubmit;
+  final Future<ApiResponse> Function(Map<String, dynamic>) onSubmit;
   final VoidCallback? onBackPressed;
 
   const ReceptionConfirmationForm({
     super.key,
     required this.dispatchData,
     required this.products,
-    this.onSubmit,
+    required this.onSubmit,
     this.onBackPressed,
   });
 
   @override
-  ConsumerState<ReceptionConfirmationForm> createState() =>
-      _ReceptionConfirmationFormState();
+  ConsumerState<ReceptionConfirmationForm> createState() => _ReceptionConfirmationFormState();
 }
 
-class _ReceptionConfirmationFormState
-    extends ConsumerState<ReceptionConfirmationForm> {
+class _ReceptionConfirmationFormState extends ConsumerState<ReceptionConfirmationForm> {
   late List<ReceivedProduct> _products;
   bool _isLoading = false;
 
@@ -111,13 +114,10 @@ class _ReceptionConfirmationFormState
     for (var product in _products) {
       if (product.hasDiscrepancy) {
         if (product.commentary.isEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                '${product.productName} requiere un comentario',
-              ),
-              backgroundColor: const Color.fromARGB(255, 220, 53, 69),
-            ),
+          GlobalLoadingBottomSheet.show(
+            status: OverlayStatus.error,
+            message: '${product.productName} requiere un comentario',
+            autoDismiss: const Duration(seconds: 3),
           );
           isValid = false;
           break;
@@ -128,55 +128,56 @@ class _ReceptionConfirmationFormState
     if (!isValid) return;
 
     setState(() => _isLoading = true);
-
+    bool hasDiscrepancies = _products.any((p) => p.hasDiscrepancy);
     try {
       final data = {
         'dispatch_id': widget.dispatchData.dispatchId,
-        'products': _products
+        'is_correct': hasDiscrepancies,
+        'reception_details': hasDiscrepancies
+          ? _products
             .map((p) => {
-                  'id': p.id,
-                  'product_name': p.productName,
-                  'status': p.status,
-                  'expected_qty': p.expectedQty,
-                  'received_qty': p.receivedQty,
-                  'commentary': p.commentary,
-                  'has_discrepancy': p.hasDiscrepancy,
-                  'photo_urls': p.photoUrls ?? [],
-                })
-            .toList(),
+              'product_id': p.id,
+              'expected_quantity': p.expectedQty,
+              'received_quantity': p.receivedQty,
+              'observations': p.commentary,
+              // 'photo_urls': p.photoUrls ?? [],
+            })
+            .toList()
+          : null,
       };
 
-      final success = await widget.onSubmit?.call(data) ?? true;
+      GlobalLoadingBottomSheet.show(
+        status: OverlayStatus.loading, 
+        message: "Guardando recepción..."
+      );
 
-      if (mounted) {
-        if (success) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Recepción confirmada exitosamente'),
-              backgroundColor: Color.fromARGB(255, 34, 197, 94),
-            ),
-          );
-          // Future.delayed(const Duration(milliseconds: 500), () {
-          //   if (mounted) Navigator.pop(context);
-          // });
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Error al confirmar la recepción'),
-              backgroundColor: Color.fromARGB(255, 220, 53, 69),
-            ),
-          );
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: ${e.toString()}'),
-            backgroundColor: const Color.fromARGB(255, 220, 53, 69),
-          ),
+      final response = await widget.onSubmit.call(data);
+
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+
+      if (response.success) {
+        GlobalLoadingBottomSheet.show(
+          status: OverlayStatus.success, 
+          message: "Recepción confirmada exitosamente", 
+          autoDismiss: const Duration(seconds: 2)
+        );
+        ref.read(getHistoryDispatch.notifier).load();
+        context.pop();
+      } else {
+        GlobalLoadingBottomSheet.show(
+          status: OverlayStatus.error,
+          message: 'Error: ${response.message ?? 'Error al confirmar la recepción'}',
+          autoDismiss: const Duration(seconds: 3),
         );
       }
+
+    } catch (e) {
+      GlobalLoadingBottomSheet.show(
+        status: OverlayStatus.error,
+        message: 'Error al guardar la recepción: $e',
+        autoDismiss: const Duration(seconds: 3),
+      );
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
@@ -201,7 +202,8 @@ class _ReceptionConfirmationFormState
               // Información del despacho
               DispatchInfoCard(
                 dispatchId: widget.dispatchData.dispatchId,
-                origin: widget.dispatchData.origin,
+                orderNumber: widget.dispatchData.orderNumber,
+                destiny: widget.dispatchData.destiny,
                 driver: widget.dispatchData.driver,
                 status: widget.dispatchData.status,
                 statusColor: widget.dispatchData.statusColor,
@@ -215,7 +217,7 @@ class _ReceptionConfirmationFormState
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text(
-                      'Artículos a Recibir',
+                      'Productos a Recibir',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 18,
@@ -244,7 +246,7 @@ class _ReceptionConfirmationFormState
                   final product = _products[index];
                   return ReceivedProductItem(
                     productName: product.productName,
-                    status: product.hasDiscrepancy ? 'CORRECTO' : 'DISCREPANCIA',
+                    status: product.hasDiscrepancy ? 'DISCREPANCIA' : 'CORRECTO',
                     expectedQty: product.expectedQty,
                     receivedQty: product.receivedQty,
                     commentary: product.commentary,
@@ -279,8 +281,8 @@ class _ReceptionConfirmationFormState
                     onToggleChanged: (hasDiscrepancy) {
                       final updatedProduct = ReceivedProduct(
                         id: product.id,
-                        productName: hasDiscrepancy ? 'CORRECTO' : 'DISCREPANCIA',
-                        status: product.status,
+                        productName: product.productName,
+                        status: hasDiscrepancy ? 'DISCREPANCIA' : 'CORRECTO',
                         expectedQty: product.expectedQty,
                         receivedQty: product.receivedQty,
                         commentary: product.commentary,
@@ -293,61 +295,47 @@ class _ReceptionConfirmationFormState
                 },
               ),
               const SizedBox(height: 32),
-
-              // Botón de confirmación
-              GestureDetector(
-                onTap: _isLoading ? null : _handleSubmit,
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [
-                        Color.fromARGB(255, 100, 200, 255),
-                        Color.fromARGB(255, 76, 195, 233),
-                      ],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: _isLoading ? null : _handleSubmit,
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color.fromARGB(255, 76, 195, 233)
-                            .withOpacity(0.3),
-                        blurRadius: 12,
-                        spreadRadius: 2,
+                    backgroundColor: const Color.fromARGB(189, 7, 213, 213),
+                    disabledBackgroundColor: const Color.fromARGB(
+                      120,
+                      7,
+                      213,
+                      213,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (_isLoading) ...[
+                        const SizedBox(
+                          width: 14,
+                          height: 14,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                      ],
+                      const Text(
+                        'Confirmar Recepción',
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ],
                   ),
-                  child: _isLoading
-                      ? const SizedBox(
-                          height: 24,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              Colors.white,
-                            ),
-                          ),
-                        )
-                      : const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              'Confirmar Recepción',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            SizedBox(width: 8),
-                            Icon(
-                              Icons.check,
-                              color: Colors.white,
-                              size: 20,
-                            ),
-                          ],
-                        ),
                 ),
               ),
               const SizedBox(height: 16),

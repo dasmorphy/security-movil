@@ -13,13 +13,14 @@ class ItemDetailDispatch extends StatelessWidget {
     return Column(
       children: [
         const SizedBox(height: 20),
-        detailRow('Código Sku', item.codeSku),
+        detailRow('N. Orden', item.orderNumber),
         detailRow('Tipo Sku', item.typeSku),
         detailRow('Placa', item.truckLicense),
         detailRow('Usuario', item.createdBy),
         detailRow('Tipo vehículo', item.nameVehicleType),
         detailRow('Conductor', item.driver),
         detailRow('Peso', item.weight),
+        detailRow('Estado', item.status),
         detailRow(
           'Fecha Ingreso',
           formatDateDetails(item.createdAt.toString()),

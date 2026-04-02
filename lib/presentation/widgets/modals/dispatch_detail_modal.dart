@@ -41,14 +41,14 @@ class DispatchDetailModalState extends ConsumerState<DispatchDetailModal> {
       return const SizedBox.shrink();
     }
 
-    // final userData = authState.value!;
+    final userData = authState.value!;
 
     Future<ApiResponse> updateDispatchStatus(int statusId) async {
-      final dispatchProvider = ref.read(updateDispatchProvider.notifier);
-      return await dispatchProvider.updateDispatch({
+      final updateDispatchProvider = ref.read(dispatchProvider.notifier);
+      return await updateDispatchProvider.updateDispatch({
         'dispatch_id': widget.item.idDispatch,
         'status_id': statusId,
-        'user': authState.value!.user,
+        'user': userData.user,
       });
     }
 
@@ -99,15 +99,16 @@ class DispatchDetailModalState extends ConsumerState<DispatchDetailModal> {
               message: "Estado actualizado exitosamente", 
               autoDismiss: const Duration(seconds: 2)
             );
+            ref.read(getHistoryDispatch.notifier).load();
+            Navigator.of(context).pop();
           } else {
             GlobalLoadingBottomSheet.show(
               status: OverlayStatus.error,
-              message: 'Error: ${response.message ?? 'Desconocido'}',
+              message: 'Error: ${response.message ?? 'Error al actualizar el estado'}',
               autoDismiss: const Duration(seconds: 3),
             );
           }
 
-          Navigator.of(context).pop();
 
         }
 
@@ -148,115 +149,86 @@ class DispatchDetailModalState extends ConsumerState<DispatchDetailModal> {
 
             const SizedBox(height: 20),
 
-            /// BOTÓN CONTINUAR
-            // if (item.status == 'Despachado' && userData.hasPermission(Permissions.nuevaBitacoraIngreso))
-            // SizedBox(
-            //   width: double.infinity,
-            //   child: ElevatedButton(
-            //     style: ElevatedButton.styleFrom(
-            //       backgroundColor: const Color.fromARGB(188, 25, 156, 156),
-            //       padding: const EdgeInsets.symmetric(vertical: 14),
-            //       shape: RoundedRectangleBorder(
-            //         borderRadius: BorderRadius.circular(12),
-            //       ),
-            //     ),
-            //     onPressed: () async {
-            //       await Navigator.of(context).push(
-            //         MaterialPageRoute(
-            //           builder: (context) => ExitReportForm(
-            //             preloadedData: item,
-            //             onSubmit: (data) async {
-            //               return await ref
-            //                   .read(saveOutLogbookProvider.notifier)
-            //                   .saveLogbookOut(data);
-            //             },
-            //           ),
-            //         ),
-            //       );
-            //     },
-            //     child: const Text(
-            //       'Continuar',
-            //       style: TextStyle(color: Colors.white),
-            //     ),
-            //   ),
-            // ),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: isLoading ? null : changeStatus,
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
+            // BOTON CAMBIO DE ESTADO EN TRANSITO
+            if (widget.item.status == 'Listo para despacho' && userData.hasPermission(Permissions.despachoCambioEstadoTransito))
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: isLoading ? null : changeStatus,
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    backgroundColor: const Color.fromARGB(189, 7, 213, 213),
+                    disabledBackgroundColor: const Color.fromARGB(
+                      120,
+                      7,
+                      213,
+                      213,
+                    ),
                   ),
-                  backgroundColor: const Color.fromARGB(189, 7, 213, 213),
-                  disabledBackgroundColor: const Color.fromARGB(
-                    120,
-                    7,
-                    213,
-                    213,
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    if (isLoading) ...[
-                      const SizedBox(
-                        width: 14,
-                        height: 14,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (isLoading) ...[
+                        const SizedBox(
+                          width: 14,
+                          height: 14,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                      ],
+                      const Text(
+                        'Actualizar estado',
+                        style: TextStyle(
+                          fontSize: 15,
                           color: Colors.white,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                      const SizedBox(width: 12),
                     ],
-                    const Text(
-                      'Actualizar estado',
-                      style: TextStyle(
-                        fontSize: 15,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () => context.go('/confirm-dispatch', extra: widget.item),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  backgroundColor: const Color.fromARGB(189, 7, 213, 213),
-                  disabledBackgroundColor: const Color.fromARGB(
-                    120,
-                    7,
-                    213,
-                    213,
                   ),
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      'Confirmar recepción',
-                      style: TextStyle(
-                        fontSize: 15,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                      ),
+              ),
+
+            // BOTON CONFIRMAR RECEPCION
+            if (widget.item.status == 'En tránsito' && userData.hasPermission(Permissions.despachoCambioEstadoRecepcion))
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => context.go('/confirm-dispatch', extra: widget.item),
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                  ],
+                    backgroundColor: const Color.fromARGB(189, 7, 213, 213),
+                    disabledBackgroundColor: const Color.fromARGB(
+                      120,
+                      7,
+                      213,
+                      213,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        'Confirmar recepción',
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
 
             const SizedBox(height: 8),
 

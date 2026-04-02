@@ -94,7 +94,7 @@ class DispatchListState extends ConsumerState<DispatchList> {
 
                   final item = displayItems[index];
 
-                  final typeText = item.codeSku;
+                  final typeText = 'Test';
                   final createdBy = item.createdBy;
                   final description = 'Despacho de $typeText en ${item.truckLicense}';
 

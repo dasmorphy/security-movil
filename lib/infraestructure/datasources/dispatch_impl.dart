@@ -151,5 +151,38 @@ class DispatchImpl extends DispatchDatasource {
     final List statusJson = response.data['data'];
     return statusJson.map((json) => DispatchStatus.fromJson(json)).toList();
   }
+  
+  @override
+  Future<ApiResponse<dynamic>> saveReception(Map<String, dynamic> data) async {
+    try {      
+      final receptionData = Map<String, dynamic>.from(data);
+
+      final dispatchJson = {
+        "reception_data": receptionData,
+        "external_transaction_id": uuid,
+        "channel": 'ZENTINEL', 
+      };
+
+      final response = await dio.post(
+        '/rest/zent-dispatch-api/v1.0/reception',
+        data: jsonEncode(dispatchJson),
+      );
+
+      final body = response.data;
+
+      return ApiResponse(
+        success: response.statusCode == 200,
+        errorCode: body['error_code']?.toString(),
+        message: body['message'],
+      );
+    } catch (e) {
+      print('Error al guardar el dispatch: $e');
+      return ApiResponse(
+        success: false,
+        errorCode: 'update_error',
+        message: 'Error al actualizar despacho',
+      );
+    }
+  }
 
 }

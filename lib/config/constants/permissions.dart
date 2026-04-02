@@ -7,4 +7,6 @@ class Permissions {
   static const verDespachos = 'VER_DESPACHOS';
   static const verBitacoras = 'VER_BITACORAS';
   static const nuevoDespacho = 'NUEVO_DESPACHO';
+  static const despachoCambioEstadoTransito = 'DESPACHO_CAMBIO_ESTADO_TRANSITO';
+  static const despachoCambioEstadoRecepcion = 'DESPACHO_CAMBIO_ESTADO_RECEPCION';
 }

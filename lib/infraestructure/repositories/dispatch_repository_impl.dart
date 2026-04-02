@@ -40,4 +40,9 @@ class DispatchRepositoryImpl extends DispatchRepository {
   Future<List<DispatchStatus>> getDispatchStatus() {
     return datasource.getDispatchStatus();
   }
+  
+  @override
+  Future<ApiResponse<dynamic>> saveReception(Map<String, dynamic> data) {
+    return datasource.saveReception(data);
+  }
 }

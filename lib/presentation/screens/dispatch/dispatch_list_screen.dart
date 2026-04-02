@@ -29,7 +29,7 @@ class _DispatchListScreenState extends ConsumerState<DispatchListScreen> {
     final filtered = historyDispatch.where((item) {
       final text = searchText.toLowerCase();
 
-      final codeSku = (item.codeSku).toLowerCase();
+      final codeSku = (item.orderNumber).toLowerCase();
       final truckLicense = (item.truckLicense).toLowerCase();
       final nameDriver = (item.driver).toLowerCase();
 

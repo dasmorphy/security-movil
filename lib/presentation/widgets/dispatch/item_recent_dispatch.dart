@@ -26,9 +26,9 @@ class ItemRecentDispatch extends ConsumerWidget {
       children: List.generate(limitedList.length, (index) {
         final item = limitedList[index];
 
-        final typeText = item.codeSku;
+        final typeText = item.orderNumber;
         final createdBy = item.createdBy;
-        final description = 'Despacho de $typeText en ${item.truckLicense}';
+        final description = 'N. orden $typeText - Placa ${item.truckLicense}';
 
         final formattedDate = formatDate(item.createdAt);
 
@@ -89,9 +89,7 @@ class ItemRecentDispatch extends ConsumerWidget {
 
                       Chip(
                         label: Text(item.status),
-                        backgroundColor: item.status == 'Finalizado'
-                            ? const Color.fromARGB(255, 34, 197, 94)
-                            : const Color.fromARGB(255, 224, 157, 49),
+                        backgroundColor: getStatusColorDispatch(item.status),
                         padding: EdgeInsets.zero,
                         labelStyle: const TextStyle(
                           color: Colors.white,

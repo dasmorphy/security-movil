@@ -63,7 +63,7 @@ class _ServicesBiomarState extends ConsumerState<ServicesBiomar> {
                   childWidget: DispatchForm(
                     onSubmit: (data) async {
                       return await ref
-                        .read(saveDispatchProvider.notifier)
+                        .read(dispatchProvider.notifier)
                         .saveDispatch(data);
                     },
                   ),

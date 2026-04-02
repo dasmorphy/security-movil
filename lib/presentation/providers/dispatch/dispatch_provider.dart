@@ -25,13 +25,7 @@ final getDispatchStatus =
   );
 });
 
-final saveDispatchProvider =
-    StateNotifierProvider<DispatchProvider, AsyncValue<ApiResponse<dynamic>>>((ref) {
-  final repo = ref.watch(dispatchRepositoryProvider);
-  return DispatchProvider(repo);
-});
-
-final updateDispatchProvider =
+final dispatchProvider =
     StateNotifierProvider<DispatchProvider, AsyncValue<ApiResponse<dynamic>>>((ref) {
   final repo = ref.watch(dispatchRepositoryProvider);
   return DispatchProvider(repo);
@@ -102,6 +96,23 @@ class DispatchProvider extends StateNotifier<AsyncValue<ApiResponse>> {
     } catch (e, st) {
       state = AsyncError(e, st);
 
+      return ApiResponse(
+        success: false,
+        message: e.toString(),
+      );
+    }
+  }
+
+  Future<ApiResponse> saveReception(Map<String, dynamic> data) async {
+    state = const AsyncLoading();
+    try {
+      final response = await repository.saveReception(data);
+      state = AsyncData(response);
+      return response;
+    } catch (e, st) {
+      print('Error out E, $e');
+      print('Error out ST, $st');
+      state = AsyncError(e, st);
       return ApiResponse(
         success: false,
         message: e.toString(),

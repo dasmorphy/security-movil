@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:zentinel/config/constants/permissions.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/domain/entities/user_session.dart';
 import 'package:zentinel/presentation/providers/logbook/logbook_provider.dart';
@@ -64,6 +65,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       }
     });
 
+    final authState = ref.watch(userSessionProvider);
+
+    if (!authState.hasValue || authState.value == null) {
+      return const SizedBox.shrink();
+    }
+
+    final userData = authState.value!;
+
     final index = ref.watch(homeTabProvider);
     return Scaffold(
       // appBar: PreferredSize(
@@ -87,8 +96,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ref.read(homeTabProvider.notifier).state = i;
           
           if (i == 0) {
-            ref.read(getHistoryLogbooks.notifier).load();
-            ref.read(getHistoryDispatch.notifier).load();
+            if (userData.hasPermission(Permissions.verBitacoras)) {
+              ref.read(getHistoryLogbooks.notifier).load();
+            }
+
+            if (userData.hasPermission(Permissions.verDespachos)) {
+              ref.read(getHistoryDispatch.notifier).load();
+            }
           }
         },
       ),

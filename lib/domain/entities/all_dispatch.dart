@@ -1,5 +1,5 @@
 class AllDispatch {
-  String codeSku;
+  String orderNumber;
   DateTime createdAt;
   String createdBy;
   String driver;
@@ -17,7 +17,7 @@ class AllDispatch {
   dynamic weight;
 
   AllDispatch({
-    required this.codeSku,
+    required this.orderNumber,
     required this.createdAt,
     required this.createdBy,
     required this.driver,
@@ -36,7 +36,7 @@ class AllDispatch {
   });
 
   factory AllDispatch.fromJson(Map<String, dynamic> json) => AllDispatch(
-    codeSku: json["code_sku"],
+    orderNumber: json["order_number"],
     createdAt: DateTime.parse(json["created_at"]),
     createdBy: json["created_by"],
     driver: json["driver"],
@@ -57,7 +57,7 @@ class AllDispatch {
   );
 
   Map<String, dynamic> toJson() => {
-    "code_sku": codeSku,
+    "order_number": orderNumber,
     "created_at": createdAt.toIso8601String(),
     "created_by": createdBy,
     "driver": driver,

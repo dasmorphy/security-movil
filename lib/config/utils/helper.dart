@@ -261,3 +261,16 @@ Future<Position?> getLocation() async {
     desiredAccuracy: LocationAccuracy.high,
   );
 }
+
+Color getStatusColorDispatch(String status) {
+  switch (status.toLowerCase()) {
+    case 'en tránsito':
+      return const Color.fromARGB(255, 245, 158, 11);
+    case 'listo para despacho':
+      return const Color.fromARGB(255, 35, 105, 151);
+    case 'ingresado en bodega':
+      return const Color.fromARGB(255, 34, 197, 94);
+    default:
+      return Colors.grey;
+  }
+}

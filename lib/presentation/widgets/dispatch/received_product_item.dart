@@ -224,15 +224,15 @@ class _ReceivedProductItemState extends State<ReceivedProductItem> {
         height: 28,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(14),
-          color: widget.hasDiscrepancy
-              ? const Color.fromARGB(255, 34, 197, 94)
-              : const Color.fromARGB(255, 75, 83, 83),
+          color: !widget.hasDiscrepancy
+            ? const Color.fromARGB(255, 34, 197, 94)
+            : const Color.fromARGB(255, 75, 83, 83),
         ),
         child: Stack(
           children: [
             AnimatedPositioned(
               duration: const Duration(milliseconds: 200),
-              left: widget.hasDiscrepancy ? 24 : 2,
+              left: !widget.hasDiscrepancy ? 24 : 2,
               top: 2,
               child: Container(
                 width: 24,

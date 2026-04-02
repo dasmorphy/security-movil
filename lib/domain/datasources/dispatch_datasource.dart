@@ -11,4 +11,5 @@ abstract class DispatchDatasource {
   Future<List<DispatchStatus>> getDispatchStatus();
   Future <List<AllDispatch>> getHistoryDispatch(Map<String, dynamic> filters);
   Future<ApiResponse<dynamic>> updateDispatch(Map<String, dynamic> data);
+  Future<ApiResponse<dynamic>> saveReception(Map<String, dynamic> data);
 }

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
 class DispatchInfoCard extends StatelessWidget {
-  final String dispatchId;
-  final String origin;
+  final int dispatchId;
+  final String orderNumber;
+  final String destiny;
   final String driver;
   final String status;
   final Color statusColor;
@@ -10,7 +11,8 @@ class DispatchInfoCard extends StatelessWidget {
   const DispatchInfoCard({
     super.key,
     required this.dispatchId,
-    required this.origin,
+    required this.orderNumber,
+    required this.destiny,
     required this.driver,
     required this.status,
     this.statusColor = const Color.fromARGB(255, 34, 197, 94),
@@ -38,7 +40,7 @@ class DispatchInfoCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text(
-                    'DISPATCH ID',
+                    'N. ORDEN',
                     style: TextStyle(
                       color: Color.fromARGB(255, 150, 150, 150),
                       fontSize: 11,
@@ -48,7 +50,7 @@ class DispatchInfoCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    dispatchId,
+                    orderNumber,
                     style: const TextStyle(
                       color: Color.fromARGB(255, 76, 195, 233),
                       fontSize: 20,
@@ -83,15 +85,15 @@ class DispatchInfoCard extends StatelessWidget {
             children: [
               Expanded(
                 child: _InfoColumn(
-                  label: 'ORIGIN',
-                  value: origin,
+                  label: 'DESTINO',
+                  value: destiny,
                   icon: Icons.location_on,
                 ),
               ),
               const SizedBox(width: 16),
               Expanded(
                 child: _InfoColumn(
-                  label: 'DRIVER',
+                  label: 'CONDUCTOR',
                   value: driver,
                   icon: Icons.person,
                 ),
