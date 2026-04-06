@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -69,6 +71,9 @@ class ReceptionConfirmationForm extends ConsumerStatefulWidget {
 class _ReceptionConfirmationFormState extends ConsumerState<ReceptionConfirmationForm> {
   late List<ReceivedProduct> _products;
   bool _isLoading = false;
+  List<Uint8List?> _selectedImages = [];
+  final TextEditingController _observationsCtrl = TextEditingController();
+  final FocusNode _observationsFocus = FocusNode();
 
   @override
   void initState() {
@@ -91,19 +96,6 @@ class _ReceptionConfirmationFormState extends ConsumerState<ReceptionConfirmatio
     setState(() {
       _products[index] = product;
     });
-  }
-
-  Future<void> _handlePhotoPress(int productIndex) async {
-    // Aquí se puede implementar la lógica para subir fotos
-    // Por ahora solo mostramos un snackbar
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Foto para: ${_products[productIndex].productName}',
-        ),
-        duration: const Duration(seconds: 2),
-      ),
-    );
   }
 
   Future<void> _handleSubmit() async {
@@ -133,6 +125,7 @@ class _ReceptionConfirmationFormState extends ConsumerState<ReceptionConfirmatio
       final data = {
         'dispatch_id': widget.dispatchData.dispatchId,
         'is_correct': hasDiscrepancies,
+        'images': _selectedImages.whereType<Uint8List>().toList(),
         'reception_details': hasDiscrepancies
           ? _products
             .map((p) => {
@@ -163,7 +156,8 @@ class _ReceptionConfirmationFormState extends ConsumerState<ReceptionConfirmatio
           autoDismiss: const Duration(seconds: 2)
         );
         ref.read(getHistoryDispatch.notifier).load();
-        context.pop();
+        Navigator.of(context).popUntil((route) => route.isFirst);
+        context.go('/');
       } else {
         GlobalLoadingBottomSheet.show(
           status: OverlayStatus.error,
@@ -294,7 +288,35 @@ class _ReceptionConfirmationFormState extends ConsumerState<ReceptionConfirmatio
                   );
                 },
               ),
-              const SizedBox(height: 32),
+
+
+              CommentaryReception(
+                controller: _observationsCtrl,
+                focusNode: _observationsFocus,
+                hint: 'Observaciones generales sobre la recepción (opcional)',
+                onChanged: (value) {
+                  setState(() {
+                    _observationsCtrl.text = value;
+                  });
+                },
+              ),
+
+              const SizedBox(height: 30),
+
+              CameraImagePicker(
+                minImages: 5,
+                maxImages: 10,
+                onImagesChanged: (images) {
+              
+                  print("imagenes seleccionadas ${images.length}");
+              
+                  _selectedImages = images;
+              
+                },
+              ),
+
+              const SizedBox(height: 12),
+
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(

@@ -2,7 +2,9 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
+import 'package:http_parser/http_parser.dart';
 import 'package:uuid/uuid.dart';
+import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/domain/datasources/dispatch_datasource.dart';
 import 'package:zentinel/domain/entities/all_dispatch.dart';
 import 'package:zentinel/domain/entities/api_response.dart';
@@ -31,26 +33,48 @@ class DispatchImpl extends DispatchDatasource {
   @override
   Future<ApiResponse> saveDispatch(Map<String, dynamic> data) async {
      try {
-      
       final images = data['images'] as List<Uint8List>?;
       final logbookData = Map<String, dynamic>.from(data);
       logbookData.remove('images');
+      logbookData['channel'] = 'ZENTINEL';
+      final logbookJson = jsonEncode(logbookData);
+      final logbookBytes = utf8.encode(logbookJson);
 
-      final dispatchData = {
-        "dispatch_data": logbookData,
-        "external_transaction_id": uuid,
-        "channel": 'ZENTINEL', 
-      };
+      final formData = FormData();
 
-      // logbookData['channel'] = 'ZENTINEL';
-      // logbookData['external_transaction_id'] = "1947d6c4-af59-4c26-ae20-e6e935eb7544";
+      // Agregar logbook_out
+      formData.files.add(
+        MapEntry(
+          'dispatch_data',
+          MultipartFile.fromBytes(
+            logbookBytes,
+            filename: 'dispatch_data.json',
+            contentType: MediaType('application', 'json'),
+          ),
+        ),
+      );
 
-      final logbookJson = jsonEncode(dispatchData);
+      // NUEVO: usar Uint8List directamente
+      if (images != null && images.isNotEmpty) {
+        for (var i = 0; i < images.length; i++) {
+          formData.files.add(
+            MapEntry(
+              'images',
+              MultipartFile.fromBytes(
+                images[i],
+                filename: 'image_$i.webp',         // nombre con índice
+                contentType: MediaType('image', 'webp'),
+              ),
+            ),
+          );
+        }
+      }
 
       // Aquí puedes agregar la lógica para enviar el JSON al backend usando Dio
       final response = await dio.post(
         '/rest/zent-dispatch-api/v1.0/dispatch',
-        data: logbookJson,
+        data: formData,
+        options: onlyError(),
       );
 
       final body = response.data;
@@ -65,7 +89,7 @@ class DispatchImpl extends DispatchDatasource {
       return ApiResponse(
         success: false,
         errorCode: 'update_error',
-        message: 'Error al actualizar despacho',
+        message: 'Error al guardar el despacho',
       );
     }
   }
@@ -98,7 +122,6 @@ class DispatchImpl extends DispatchDatasource {
       );
 
       allDispatchJson = response.data['data']; 
-      print('History Dispatch: $allDispatchJson');
       return allDispatchJson.map((json) => AllDispatch.fromJson(json)).toList();
       
     } catch (e) {
@@ -180,7 +203,7 @@ class DispatchImpl extends DispatchDatasource {
       return ApiResponse(
         success: false,
         errorCode: 'update_error',
-        message: 'Error al actualizar despacho',
+        message: 'Error al guardar la recepción',
       );
     }
   }

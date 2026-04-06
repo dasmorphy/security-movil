@@ -51,3 +51,5 @@ export 'package:zentinel/presentation/widgets/dispatch/dispatch_info_card.dart';
 export 'package:zentinel/presentation/widgets/dispatch/received_product_item.dart';
 export 'package:zentinel/presentation/widgets/headers/confirmation_header.dart';
 export 'package:zentinel/presentation/widgets/forms/reception_confirmation_form.dart';
+export 'package:zentinel/presentation/widgets/shared/camera_image_picker.dart';
+export 'package:zentinel/presentation/widgets/dispatch/commentary_reception.dart';

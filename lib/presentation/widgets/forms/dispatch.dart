@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
@@ -45,14 +47,15 @@ const Color kTextHint = Color(0xFF9CA3AF);
 const Color kGreen = Color(0xFF4CAF50);
 const Color kGreenLight = Color(0xFFE8F5E9);
 const messageValidatorEmpty = 'Este campo es obligatorio';
-final _truckLicenseCtrl = TextEditingController();
+
 bool isLoading = false;
+List<Uint8List?> _selectedImages = [];
 
 // ─── Screen principal ──────────────────────────────────────────────────────
 
 class DispatchForm extends ConsumerStatefulWidget {
-  final Future<ApiResponse> Function(Map<String, dynamic>)? onSubmit;
-  const DispatchForm({super.key, this.onSubmit});
+  final Future<ApiResponse> Function(Map<String, dynamic>) onSubmit;
+  const DispatchForm({super.key, required this.onSubmit});
 
   @override
   ConsumerState<DispatchForm> createState() => _CrearDespachoScreenState();
@@ -73,6 +76,26 @@ class _CrearDespachoScreenState extends ConsumerState<DispatchForm> {
   int? _vehicleSelected = 0;
   int? _destinySelected = 0;
   final String _driver = '';
+  final String _truckLicense = '';
+  final String _orderNumber = '';
+  final _truckLicenseCtrl = TextEditingController();
+  final _driverCtrl = TextEditingController();
+  final _orderNumberCtrl = TextEditingController();
+  final _observationsCtrl = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _truckLicenseCtrl.dispose();
+    _driverCtrl.dispose();
+    _orderNumberCtrl.dispose();
+    _observationsCtrl.dispose();
+    super.dispose();
+  }
 
   String get _tipoSku {
     final conProducto = _productos.length;
@@ -151,9 +174,12 @@ class _CrearDespachoScreenState extends ConsumerState<DispatchForm> {
     final userData = authState.value!;
 
     final data = {
+      "order_number": _orderNumberCtrl.text.trim(),
       "external_transaction_id": Uuid().v4(),
       "destiny": _destinySelected,
-      "driver": _truckLicenseCtrl.text.trim(),
+      "driver": _driverCtrl.text.trim(),
+      "observations": _observationsCtrl.text.trim(),
+      "truck_license": _truckLicenseCtrl.text.trim(),
       "products_sku": productosValidos.map((p) => {
         "id_product": int.parse(p.productoId!),
         "quantity": p.cantidad,
@@ -162,28 +188,40 @@ class _CrearDespachoScreenState extends ConsumerState<DispatchForm> {
       "vehicle_type": _vehicleSelected,
       // "weight": int.tryParse(_weightCtrl.text),
       "user": userData.user,
-      // "images": _selectedImages
-      //   .whereType<Uint8List>()
-      //   .toList(), // Lista de Uint8List directo, sin base64
+      "images": _selectedImages
+        .whereType<Uint8List>()
+        .toList(), // Lista de Uint8List directo, sin base64
     };
 
-    final success = await widget.onSubmit?.call(data);
+    GlobalLoadingBottomSheet.show(
+      status: OverlayStatus.loading, 
+      message: "Guardando despacho..."
+    );
+    print(data);
+    final response = await widget.onSubmit.call(data);
+    if (!mounted) return;
     setState(() => isLoading = false);
 
     // if (!success) {
     //   await savePendingRequest(data, 'logbook_entry');
     // }
 
-    if (!mounted) return;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          'Despacho creado · ${productosValidos.length} producto(s)',
-        ),
-        backgroundColor: kNavy,
-      ),
-    );
+    if (response.success) {
+      GlobalLoadingBottomSheet.show(
+        status: OverlayStatus.success, 
+        message: "Despacho guardado exitosamente", 
+        autoDismiss: const Duration(seconds: 2)
+      );
+      ref.read(getHistoryDispatch.notifier).load();
+      Navigator.of(context).pop();
+    } else {
+      GlobalLoadingBottomSheet.show(
+        status: OverlayStatus.error,
+        message: 'Error: ${response.message ?? 'Error al guardar el despacho'}',
+        autoDismiss: const Duration(seconds: 3),
+      );
+    }
   }
 
   @override
@@ -247,6 +285,12 @@ class _CrearDespachoScreenState extends ConsumerState<DispatchForm> {
                     const SizedBox(height: 16),
                     _InformacionLogisticaCard(
                       driver: _driver,
+                      truckLicense: _truckLicense,
+                      orderNumber: _orderNumber,
+                      orderNumberCtrl: _orderNumberCtrl,
+                      truckLicenseCtrl: _truckLicenseCtrl,
+                      driverCtrl: _driverCtrl,
+                      observationsCtrl: _observationsCtrl,
                       vehicleSelected: _vehicleSelected,
                       catalogVehicles: vehiclesTypes,
                       onVehicleChanged: (c) => setState(() => 
@@ -358,6 +402,15 @@ class _CrearDespachoScreenState extends ConsumerState<DispatchForm> {
 
 class _InformacionLogisticaCard extends StatelessWidget {
   final String driver;
+  final String orderNumber;
+  final String truckLicense;
+
+  final TextEditingController driverCtrl;
+  final TextEditingController orderNumberCtrl;
+  final TextEditingController truckLicenseCtrl;
+  final TextEditingController observationsCtrl;
+
+
   final int? vehicleSelected;
   final int? destinySelected;
   final List<VehicleType> catalogVehicles;
@@ -366,13 +419,19 @@ class _InformacionLogisticaCard extends StatelessWidget {
   final void Function(int) onVehicleChanged;
 
   const _InformacionLogisticaCard({
+    required this.truckLicense,
     required this.driver,
+    required this.orderNumber,
     required this.vehicleSelected,
     required this.onDestinyChanged, 
     required this.catalogVehicles, 
     required this.onVehicleChanged, 
     required this.catalogDestiny, 
-    required this.destinySelected
+    required this.destinySelected,
+    required this.orderNumberCtrl,
+    required this.driverCtrl,
+    required this.truckLicenseCtrl,
+    required this.observationsCtrl,
   });
 
   @override
@@ -398,13 +457,32 @@ class _InformacionLogisticaCard extends StatelessWidget {
               ),
             ),
           ),
+
+          const Divider(height: 0.5, thickness: 0.5, color: kGrayBorder),
+          _LogisticaFila(
+            icono: Icons.numbers_rounded,
+            label: 'N. ORDEN',
+            valor: orderNumber,
+            controllerTxt: orderNumberCtrl,
+          ),
+
+
           const Divider(height: 0.5, thickness: 0.5, color: kGrayBorder),
           _LogisticaFila(
             icono: Icons.person_rounded,
             label: 'CONDUCTOR',
             valor: driver,
+            controllerTxt: driverCtrl,
           ),
-          
+
+          const Divider(height: 0.5, thickness: 0.5, color: kGrayBorder),
+          _LogisticaFila(
+            icono: Icons.directions_car_rounded,
+            label: 'PLACA',
+            valor: truckLicense,
+            controllerTxt: truckLicenseCtrl,
+          ),
+
           const Divider(height: 0.5, thickness: 0.5, indent: 56, color: kGrayBorder),
 
           Padding(
@@ -552,7 +630,89 @@ class _InformacionLogisticaCard extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 4),
+          
+          const Divider(height: 0.5, thickness: 0.5, indent: 56, color: kGrayBorder),
+
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            child: Row(
+              children: [
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: kGrayBg,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(Icons.message, color: kNavy, size: 18),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Observaciones'.toUpperCase(),
+                        style: const TextStyle(
+                          color: kTextSecondary,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.5,
+                          
+                        ),
+                      ),
+                      TextFormField(
+                        controller: observationsCtrl,
+                        decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.white,
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 14,
+                            horizontal: 12,
+                          ),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: Color.fromARGB(189, 233, 233, 233)),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: const BorderSide(
+                              color: Color.fromARGB(189, 233, 233, 233),
+                              width: 1.5,
+                            ),
+                          ),
+                        ),
+                        validator: (v) {
+                          return null;
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+
+          const Divider(height: 0.5, thickness: 0.5, indent: 56, color: kGrayBorder),
+
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            child: CameraImagePicker(
+              minImages: 5,
+              maxImages: 10,
+              onImagesChanged: (images) {
+            
+                print("imagenes seleccionadas ${images.length}");
+            
+                _selectedImages = images;
+            
+              },
+            ),
+          ),
+
+          const SizedBox(height: 26),
         ],
       ),
     );
@@ -563,8 +723,9 @@ class _LogisticaFila extends StatelessWidget {
   final IconData icono;
   final String label;
   final String valor;
+  final TextEditingController controllerTxt;
 
-  const _LogisticaFila({required this.icono, required this.label, required this.valor});
+  const _LogisticaFila({required this.icono, required this.label, required this.valor, required this.controllerTxt});
 
   @override
   Widget build(BuildContext context) {
@@ -595,7 +756,7 @@ class _LogisticaFila extends StatelessWidget {
                 //     style: const TextStyle(color: kTextPrimary, fontSize: 14, fontWeight: FontWeight.w500)),
 
                 TextFormField(
-                  controller: _truckLicenseCtrl,
+                  controller: controllerTxt,
                   validator: (v) {
                     if (v == null || v.isEmpty) return messageValidatorEmpty;
                     return null;

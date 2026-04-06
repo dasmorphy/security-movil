@@ -94,9 +94,9 @@ class DispatchListState extends ConsumerState<DispatchList> {
 
                   final item = displayItems[index];
 
-                  final typeText = 'Test';
+                  final typeText = item.orderNumber;
                   final createdBy = item.createdBy;
-                  final description = 'Despacho de $typeText en ${item.truckLicense}';
+                  final description = 'N. orden $typeText - Placa ${item.truckLicense}';
 
                   final formattedDate = formatDate(item.createdAt);
 
@@ -171,9 +171,7 @@ class DispatchListState extends ConsumerState<DispatchList> {
                                 const SizedBox(height: 2),
                                 Chip(
                                   label: Text(item.status),
-                                  backgroundColor: item.status == 'Finalizado'
-                                      ? const Color.fromARGB(255, 34, 197, 94)
-                                      : const Color.fromARGB(255, 224, 157, 49),
+                                  backgroundColor: getStatusColorDispatch(item.status),
                                   padding: EdgeInsets.zero,
                                   labelStyle: const TextStyle(
                                     color: Colors.white,

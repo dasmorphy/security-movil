@@ -1,7 +1,7 @@
 class ApiResponse<T> {
   final bool success;
   final String? message;
-  final String? errorCode;
+  final dynamic errorCode;
   final T? data;
   final String? externalTransactionId;
   final String? internalTransactionId;
