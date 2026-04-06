@@ -108,7 +108,7 @@ class _ServicesBiomarState extends ConsumerState<ServicesBiomar> {
                   BasicServiceCard(
                     iconImage: 'iconregistro',
                     label: 'Ingresos',
-                    childWidget: TotalReport(),
+                    childWidget: BiomarEntryReportForm(),
                   ),
                 // if (userData.hasPermission(Permissions.generarReportes))
                   BasicServiceCard(

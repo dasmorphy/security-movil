@@ -34,20 +34,19 @@ class DispatchImpl extends DispatchDatasource {
   Future<ApiResponse> saveDispatch(Map<String, dynamic> data) async {
      try {
       final images = data['images'] as List<Uint8List>?;
-      final logbookData = Map<String, dynamic>.from(data);
-      logbookData.remove('images');
-      logbookData['channel'] = 'ZENTINEL';
-      final logbookJson = jsonEncode(logbookData);
-      final logbookBytes = utf8.encode(logbookJson);
+      final dispatchData = Map<String, dynamic>.from(data);
+      dispatchData.remove('images');
+      dispatchData['channel'] = 'ZENTINEL';
+      final dispatchJson = jsonEncode(dispatchData);
+      final dispatchBytes = utf8.encode(dispatchJson);
 
       final formData = FormData();
 
-      // Agregar logbook_out
       formData.files.add(
         MapEntry(
           'dispatch_data',
           MultipartFile.fromBytes(
-            logbookBytes,
+            dispatchBytes,
             filename: 'dispatch_data.json',
             contentType: MediaType('application', 'json'),
           ),
@@ -177,18 +176,47 @@ class DispatchImpl extends DispatchDatasource {
   
   @override
   Future<ApiResponse<dynamic>> saveReception(Map<String, dynamic> data) async {
-    try {      
+    try {
+      final images = data['images'] as List<Uint8List>?;
       final receptionData = Map<String, dynamic>.from(data);
+      receptionData.remove('images');
+      receptionData['channel'] = 'ZENTINEL';
+      final receptionJson = jsonEncode(receptionData);
+      final receptionBytes = utf8.encode(receptionJson);
 
-      final dispatchJson = {
-        "reception_data": receptionData,
-        "external_transaction_id": uuid,
-        "channel": 'ZENTINEL', 
-      };
+      final formData = FormData();
+
+      formData.files.add(
+        MapEntry(
+          'reception_data',
+          MultipartFile.fromBytes(
+            receptionBytes,
+            filename: 'reception_data.json',
+            contentType: MediaType('application', 'json'),
+          ),
+        ),
+      );
+
+      // NUEVO: usar Uint8List directamente
+      if (images != null && images.isNotEmpty) {
+        for (var i = 0; i < images.length; i++) {
+          formData.files.add(
+            MapEntry(
+              'images',
+              MultipartFile.fromBytes(
+                images[i],
+                filename: 'image_$i.webp',         // nombre con índice
+                contentType: MediaType('image', 'webp'),
+              ),
+            ),
+          );
+        }
+      }
 
       final response = await dio.post(
         '/rest/zent-dispatch-api/v1.0/reception',
-        data: jsonEncode(dispatchJson),
+        data: formData,
+        options: onlyError(),
       );
 
       final body = response.data;

@@ -3,11 +3,9 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:uuid/uuid.dart';
 import 'package:zentinel/domain/entities/api_response.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
-import 'package:zentinel/presentation/widgets/dispatch/dispatch_info_card.dart';
-import 'package:zentinel/presentation/widgets/dispatch/received_product_item.dart';
-import 'package:zentinel/presentation/widgets/headers/confirmation_header.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
 class ReceivedProduct {
@@ -124,8 +122,10 @@ class _ReceptionConfirmationFormState extends ConsumerState<ReceptionConfirmatio
     try {
       final data = {
         'dispatch_id': widget.dispatchData.dispatchId,
-        'is_correct': hasDiscrepancies,
+        'is_correct': !hasDiscrepancies,
         'images': _selectedImages.whereType<Uint8List>().toList(),
+        'observations': _observationsCtrl.text.trim(),
+        'external_transaction_id': Uuid().v4(),
         'reception_details': hasDiscrepancies
           ? _products
             .map((p) => {
@@ -289,6 +289,7 @@ class _ReceptionConfirmationFormState extends ConsumerState<ReceptionConfirmatio
                 },
               ),
 
+              const SizedBox(height: 16),
 
               CommentaryReception(
                 controller: _observationsCtrl,
@@ -315,7 +316,7 @@ class _ReceptionConfirmationFormState extends ConsumerState<ReceptionConfirmatio
                 },
               ),
 
-              const SizedBox(height: 12),
+              const SizedBox(height: 16),
 
               SizedBox(
                 width: double.infinity,
