@@ -81,24 +81,6 @@ class _ReceivedProductItemState extends State<ReceivedProductItem> {
       decoration: BoxDecoration(
         color: const Color.fromARGB(255, 30, 30, 35),
         borderRadius: BorderRadius.circular(16),
-        // border: Border(
-        //   left: BorderSide(
-        //     color: _getStatusColor(),
-        //     width: 4,
-        //   ),
-        //   top: BorderSide(
-        //     color: const Color.fromARGB(255, 75, 83, 83),
-        //     width: 1,
-        //   ),
-        //   right: BorderSide(
-        //     color: const Color.fromARGB(255, 75, 83, 83),
-        //     width: 1,
-        //   ),
-        //   bottom: BorderSide(
-        //     color: const Color.fromARGB(255, 75, 83, 83),
-        //     width: 1,
-        //   ),
-        // ),
         border: Border.all(
           color: Colors.grey,
           width: 1,

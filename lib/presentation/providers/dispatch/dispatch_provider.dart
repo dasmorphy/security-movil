@@ -16,6 +16,33 @@ final getAllDispatchProducts =
   );
 });
 
+final getAreasVisit =
+    StateNotifierProvider<CatalogNotifier<Map<dynamic, dynamic>>, List<Map<dynamic, dynamic>>>((ref) {
+  final repo = ref.watch(dispatchRepositoryProvider);
+
+  return CatalogNotifier<Map<dynamic, dynamic>>(
+    (_) => repo.getAreasVisit(),
+  );
+});
+
+final getMaterials =
+    StateNotifierProvider<CatalogNotifier<Map<dynamic, dynamic>>, List<Map<dynamic, dynamic>>>((ref) {
+  final repo = ref.watch(dispatchRepositoryProvider);
+
+  return CatalogNotifier<Map<dynamic, dynamic>>(
+    (_) => repo.getMaterials(),
+  );
+});
+
+final getStaffCharge =
+    StateNotifierProvider<CatalogNotifier<Map<dynamic, dynamic>>, List<Map<dynamic, dynamic>>>((ref) {
+  final repo = ref.watch(dispatchRepositoryProvider);
+
+  return CatalogNotifier<Map<dynamic, dynamic>>(
+    (_) => repo.getStaffCharge(),
+  );
+});
+
 final getDispatchStatus =
     StateNotifierProvider<CatalogNotifier<DispatchStatus>, List<DispatchStatus>>((ref) {
   final repo = ref.watch(dispatchRepositoryProvider);
@@ -107,6 +134,23 @@ class DispatchProvider extends StateNotifier<AsyncValue<ApiResponse>> {
     state = const AsyncLoading();
     try {
       final response = await repository.saveReception(data);
+      state = AsyncData(response);
+      return response;
+    } catch (e, st) {
+      print('Error out E, $e');
+      print('Error out ST, $st');
+      state = AsyncError(e, st);
+      return ApiResponse(
+        success: false,
+        message: e.toString(),
+      );
+    }
+  }
+
+  Future<ApiResponse> saveEntry(Map<String, dynamic> data) async {
+    state = const AsyncLoading();
+    try {
+      final response = await repository.saveEntry(data);
       state = AsyncData(response);
       return response;
     } catch (e, st) {

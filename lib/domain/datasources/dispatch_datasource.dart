@@ -9,7 +9,11 @@ abstract class DispatchDatasource {
   Future<ApiResponse> saveDispatch(Map<String, dynamic> data);
   Future<List<VehicleType>> getAllVehicleTypes();
   Future<List<DispatchStatus>> getDispatchStatus();
+  Future<List<Map<dynamic, dynamic>>> getAreasVisit();
+  Future<List<Map<dynamic, dynamic>>> getMaterials();
+  Future<List<Map<dynamic, dynamic>>> getStaffCharge();
   Future <List<AllDispatch>> getHistoryDispatch(Map<String, dynamic> filters);
   Future<ApiResponse<dynamic>> updateDispatch(Map<String, dynamic> data);
   Future<ApiResponse<dynamic>> saveReception(Map<String, dynamic> data);
+  Future<ApiResponse> saveEntry(Map<String, dynamic> data);
 }

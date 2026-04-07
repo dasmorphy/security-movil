@@ -36,6 +36,9 @@ class HomeViewState extends ConsumerState<HomeView> {
     // ref.read(getAllUnitiesWeight.notifier).load();
     // ref.read(getAllAuthorized.notifier).load();
     ref.read(getAllDestinyIntern.notifier).load();
+    ref.read(getAreasVisit.notifier).load();
+    ref.read(getMaterials.notifier).load();
+    ref.read(getStaffCharge.notifier).load();
   }
 
   @override

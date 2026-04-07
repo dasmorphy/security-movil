@@ -45,4 +45,24 @@ class DispatchRepositoryImpl extends DispatchRepository {
   Future<ApiResponse<dynamic>> saveReception(Map<String, dynamic> data) {
     return datasource.saveReception(data);
   }
+  
+  @override
+  Future<List<Map<dynamic, dynamic>>> getAreasVisit() {
+    return datasource.getAreasVisit();
+  }
+  
+  @override
+  Future<List<Map<dynamic, dynamic>>> getMaterials() {
+    return datasource.getMaterials();
+  }
+  
+  @override
+  Future<List<Map<dynamic, dynamic>>> getStaffCharge() {
+    return datasource.getStaffCharge();
+  }
+  
+  @override
+  Future<ApiResponse<dynamic>> saveEntry(Map<String, dynamic> data) {
+    return datasource.saveEntry(data);
+  }
 }

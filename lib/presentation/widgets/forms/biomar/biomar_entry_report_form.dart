@@ -3,14 +3,14 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
-import 'package:zentinel/presentation/providers/onboarding/onboarding_provider.dart';
+import 'package:zentinel/domain/entities/api_response.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/service/pending_request_service.dart';
 
 class BiomarEntryReportForm extends ConsumerStatefulWidget {
-  final Future<bool> Function(Map<String, dynamic>)? onSubmit;
-  const BiomarEntryReportForm({super.key, this.onSubmit});
+  final Future<ApiResponse> Function(Map<String, dynamic>) onSubmit;
+  const BiomarEntryReportForm({super.key, required this.onSubmit});
 
   @override
   ConsumerState<BiomarEntryReportForm> createState() => _BiomarEntryReportFormState();
@@ -22,16 +22,14 @@ class _BiomarEntryReportFormState extends ConsumerState<BiomarEntryReportForm> {
   bool imagesMinError = false;
   bool imagesMaxError = false;
 
-  String _unityId = '0';
   String _areaVisit = '0';
   String _personCharge = '0';
-  String _materialEntryCtrl = '0';
 
   final _dniCtrl = TextEditingController();
   final _quantityCtrl = TextEditingController();
   final _providerCtrl = TextEditingController();
   final _observationsCtrl = TextEditingController();
-  final _truckLicenseCtrl = TextEditingController();
+  final _nameVisitCtrl = TextEditingController();
   final _reasonVisitCtrl = TextEditingController();
 
   List<Uint8List?> _selectedImages = [];
@@ -56,7 +54,7 @@ class _BiomarEntryReportFormState extends ConsumerState<BiomarEntryReportForm> {
     _quantityCtrl.dispose();
     _providerCtrl.dispose();
     _reasonVisitCtrl.dispose();
-    _truckLicenseCtrl.dispose();
+    _nameVisitCtrl.dispose();
     _observationsCtrl.dispose();
     _quantityFocus.dispose();
     _personChargeFocus.dispose();
@@ -106,101 +104,131 @@ class _BiomarEntryReportFormState extends ConsumerState<BiomarEntryReportForm> {
     }
 
     final userData = authState.value!;
-    final userHive = ref.watch(userProfileProvider(userData.email));
 
     // Construir los datos del formulario
     final data = {
       "external_transaction_id": Uuid().v4(),
-      "id_unity": int.parse(_unityId),
+      "area_visit": int.parse(_areaVisit),
       "dni": _dniCtrl.text.trim(),
       "quantity": int.tryParse(_quantityCtrl.text) ?? 0,
-      "provider": _providerCtrl.text.trim(),
+      "names_visit": _nameVisitCtrl.text.trim(),
       "observations": _observationsCtrl.text.trim(),
-      "name_driver": _reasonVisitCtrl.text.trim(),
-      "truck_license": _truckLicenseCtrl.text.trim(),
-      "created_by": userData.user,
-      "name_user": userHive.value?.name ?? userData.attributes['fullname'],
+      "person_charge": int.parse(_personCharge),
+      "reason_visit": _reasonVisitCtrl.text.trim(),
+      "user": userData.user,
+      "material_entry": materialsAdded.map((p) => {
+        "id_material": int.parse(p['id_material']),
+        "quantity": p['quantity'],
+      }).toList(),
       "images": _selectedImages
         .whereType<Uint8List>()
         .toList(), // Lista de Uint8List directo, sin base64
     };
 
     // Verificar conexión a internet
-    final internetAvailable = await hasInternet();
+    // final internetAvailable = await hasInternet();
 
-    if (!internetAvailable) {
-      // 🔴 SIN INTERNET: Guardar localmente
-      print('❌ Sin conexión, guardando localmente...');
-      data['created_at'] = DateTime.now().toString();
-      await savePendingRequest(data, 'logbook_entry');
+    // if (!internetAvailable) {
+    //   // 🔴 SIN INTERNET: Guardar localmente
+    //   print('❌ Sin conexión, guardando localmente...');
+    //   data['created_at'] = DateTime.now().toString();
+    //   await savePendingRequest(data, 'logbook_entry');
 
-      if (mounted) {
-        // Navigator.pop(context); // Cerrar dialog de procesamiento
-        _clearCntrl();
-        if (Navigator.canPop(context)) {
-          context.pop(); // Cerrar el formulario
-        }
+    //   if (mounted) {
+    //     // Navigator.pop(context); // Cerrar dialog de procesamiento
+    //     _clearCntrl();
+    //     if (Navigator.canPop(context)) {
+    //       context.pop(); // Cerrar el formulario
+    //     }
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            duration: Duration(seconds: 6),
-            content: Text(
-              '📱 Sin conexión. Tu información se guardará localmente y se enviará automáticamente cuando recuperes conexión.',
-              style: TextStyle(color: Colors.white),
-            ),
-            backgroundColor: Color.fromARGB(255, 255, 152, 0),
-          ),
-        );
-      }
-      setState(() => isLoading = false);
-      return;
-    }
+    //     ScaffoldMessenger.of(context).showSnackBar(
+    //       const SnackBar(
+    //         duration: Duration(seconds: 6),
+    //         content: Text(
+    //           '📱 Sin conexión. Tu información se guardará localmente y se enviará automáticamente cuando recuperes conexión.',
+    //           style: TextStyle(color: Colors.white),
+    //         ),
+    //         backgroundColor: Color.fromARGB(255, 255, 152, 0),
+    //       ),
+    //     );
+    //   }
+    //   setState(() => isLoading = false);
+    //   return;
+    // }
 
-    // 🟢 CON INTERNET: Enviar al servidor
-    print('✅ Conexión disponible, enviando al servidor...');
-    final success = await widget.onSubmit?.call(data) ?? false;
-    setState(() => isLoading = false);
+    // // 🟢 CON INTERNET: Enviar al servidor
+    // print('✅ Conexión disponible, enviando al servidor...');
 
-    if (!success) {
-      await savePendingRequest(data, 'logbook_entry');
-    }
+    GlobalLoadingBottomSheet.show(
+      status: OverlayStatus.loading, 
+      message: "Guardando ingreso..."
+    );
+    final response = await widget.onSubmit.call(data);
 
     if (!mounted) return;
 
-    _clearCntrl();
-    if (Navigator.canPop(context)) {
-      context.pop();
-    }
+    setState(() => isLoading = false);
 
-    if (success) {
-      context.push('/check-success');
+    if (response.success) {
+      GlobalLoadingBottomSheet.show(
+        status: OverlayStatus.success, 
+        message: "Ingreso guardado exitosamente", 
+        autoDismiss: const Duration(seconds: 2)
+      );
+      ref.read(getHistoryDispatch.notifier).load();
+      Navigator.of(context).pop();
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          duration: Duration(seconds: 6),
-          content: Text(
-            '📱 Error al enviar el formulario. La información se guardará localmente y se enviará automáticamente.',
-            style: TextStyle(color: Colors.white),
-          ),
-          backgroundColor: Color.fromARGB(255, 255, 152, 0),
-        ),
+      GlobalLoadingBottomSheet.show(
+        status: OverlayStatus.error,
+        message: 'Error: ${response.message ?? 'Error al guardar el ingreso'}',
+        autoDismiss: const Duration(seconds: 3),
       );
     }
+
+    // if (!success) {
+    //   await savePendingRequest(data, 'logbook_entry');
+    // }
+
+    // if (!mounted) return;
+
+    // _clearCntrl();
+    // if (Navigator.canPop(context)) {
+    //   context.pop();
+    // }
+
+    // if (success) {
+    //   context.push('/check-success');
+    // } else {
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     const SnackBar(
+    //       duration: Duration(seconds: 6),
+    //       content: Text(
+    //         '📱 Error al enviar el formulario. La información se guardará localmente y se enviará automáticamente.',
+    //         style: TextStyle(color: Colors.white),
+    //       ),
+    //       backgroundColor: Color.fromARGB(255, 255, 152, 0),
+    //     ),
+    //   );
+    // }
   }
 
   void _clearCntrl() {
     _selectedImages = [];
     _formKey.currentState?.reset();
-    _unityId = '0';
     _dniCtrl.clear();
     _quantityCtrl.clear();
     _providerCtrl.clear();
     _reasonVisitCtrl.clear();
-    _truckLicenseCtrl.clear();
+    _nameVisitCtrl.clear();
     _observationsCtrl.clear();
     imagesMinError = false;
     imagesMaxError = false;
   }
+
+  List<Map<String, dynamic>> materialsAdded = [{
+    'id_material': '0',
+    'quantity': 1,
+  }];
 
   @override
   Widget build(BuildContext context) {
@@ -215,17 +243,14 @@ class _BiomarEntryReportFormState extends ConsumerState<BiomarEntryReportForm> {
       );
     }
 
-    final userData = authState.value!;
-    final categories = ref.watch(getAllCategories);
-    final authorized = ref.watch(getAllAuthorized);
-    final destinyIntern = ref.watch(getAllDestinyIntern);
-    final groupBusiness = ref.watch(getGroupBusinessByIdBusiness);
-    final unitiesWeight = ref.watch(getAllUnitiesWeight);
+    final areasVisit = ref.watch(getAreasVisit);
+    final materials = ref.watch(getMaterials);
+    final staffCharge = ref.watch(getStaffCharge);
     final theme = Theme.of(context);
     final messageValidatorEmpty = 'Este campo es obligatorio';
     final fieldFill = const Color.fromARGB(255, 20, 21, 23);
     final borderRadius = BorderRadius.circular(8.0);
-    
+
     InputDecoration styleDecoration() => InputDecoration(
       filled: true,
       fillColor: fieldFill,
@@ -301,7 +326,7 @@ class _BiomarEntryReportFormState extends ConsumerState<BiomarEntryReportForm> {
 
                 CustomFieldLabelRequired(txtLabel: 'Nombres visitante'),
                 GlowTextFormField(
-                  controller: _truckLicenseCtrl,
+                  controller: _nameVisitCtrl,
                   focusNode: _truckLicenseFocus,
                   validator: (v) {
                     if (v == null || v.trim().isEmpty) {
@@ -340,11 +365,11 @@ class _BiomarEntryReportFormState extends ConsumerState<BiomarEntryReportForm> {
                         style: TextStyle(color: Colors.white),
                       ),
                     ),
-                    ...categories.map(
+                    ...areasVisit.map(
                       (c) => DropdownMenuItem(
-                        value: c.idCategory.toString(),
+                        value: c['id_area'].toString(),
                         child: Text(
-                          c.nameCategory,
+                          c['name'],
                           style: TextStyle(color: Colors.white),
                         ),
                       ),
@@ -378,11 +403,11 @@ class _BiomarEntryReportFormState extends ConsumerState<BiomarEntryReportForm> {
                         style: TextStyle(color: Colors.white),
                       ),
                     ),
-                    ...categories.map(
+                    ...staffCharge.map(
                       (c) => DropdownMenuItem(
-                        value: c.idCategory.toString(),
+                        value: c['id_staff'].toString(),
                         child: Text(
-                          c.nameCategory,
+                          c['name'],
                           style: TextStyle(color: Colors.white),
                         ),
                       ),
@@ -401,47 +426,104 @@ class _BiomarEntryReportFormState extends ConsumerState<BiomarEntryReportForm> {
                   },
                 ),
 
-
                 const SizedBox(height: 12),
-                CustomFieldLabelRequired(txtLabel: 'Material que ingresa'),
-                GlowDropdownFormField2<String>(
-                  value: _materialEntryCtrl,
-                  focusNode: _materialEntryFocus,
-                  decoration: styleDecoration(),
-                  items: [
-                    DropdownMenuItem(
-                      enabled: false,
-                      value: '0',
-                      child: Text(
-                        'Seleccione una opción',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                    ...categories.map(
-                      (c) => DropdownMenuItem(
-                        value: c.idCategory.toString(),
-                        child: Text(
-                          c.nameCategory,
-                          style: TextStyle(color: Colors.white),
+
+                CustomFieldLabelRequired(txtLabel: 'Materiales'),
+
+                ...materialsAdded.asMap().entries.map((entry) {
+                  final index = entry.key;
+                  final item = entry.value;
+
+                  final selectedIds = materialsAdded
+                      .asMap()
+                      .entries
+                      .where((e) => e.key != index) // excluir este item
+                      .map((e) => e.value['id_material'])
+                      .where((id) => id != '0')
+                      .toList();
+
+                  final availableMaterials = materials
+                      .where((m) => !selectedIds.contains(m['id_material'].toString()))
+                      .toList();
+
+                  return MaterialEntryItem(
+                    selectedMaterial: item['id_material'],
+                    quantity: item['quantity'],
+                    materials: availableMaterials,
+
+                    onDeleteMaterial: materialsAdded.length > 1
+                          ? () {
+                              setState(() {
+                                materialsAdded.removeAt(index);
+                              });
+                            }
+                          : null,
+
+                    onMaterialChanged: (v) {
+                      setState(() {
+                        materialsAdded[index]['id_material'] = v;
+                      });
+                    },
+
+                    onQuantityChanged: (v) {
+                      setState(() {
+                        materialsAdded[index]['quantity'] = v;
+                      });
+                    },
+
+                    onRemove: () {
+                      setState(() {
+                        materialsAdded.removeAt(index);
+                      });
+                    },
+
+                  );
+                }),
+
+                if (materialsAdded.length < materials.length) ...[
+                  const SizedBox(height: 14),
+                  GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        materialsAdded.add({
+                          'id_material': '0',
+                          'quantity': 1,
+                        });
+                      });
+                    },
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: kGrayBorder,
+                          width: 1.2,
+                          style: BorderStyle.solid,
                         ),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.add_rounded, color: kTextSecondary, size: 18),
+                          SizedBox(width: 6),
+                          Text(
+                            'Agregar material',
+                            style: TextStyle(
+                              color: Color.fromARGB(255, 128, 134, 145),
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.8,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                  onChanged: (v) {
-                    if (v != null) {
-                      setState(() => _materialEntryCtrl = v);
-                    }
-                  },
-                  validator: (v) {
-                    if (v == '0' || v == null || v.trim().isEmpty) {
-                      return messageValidatorEmpty;
-                    }
-                    return null;
-                  },
-                ),
-
+                  )
+                ],
 
                 const SizedBox(height: 12),
+                
                 CustomFieldLabelRequired(
                   txtLabel: 'Observaciones',
                   isRequired: false,
@@ -471,6 +553,19 @@ class _BiomarEntryReportFormState extends ConsumerState<BiomarEntryReportForm> {
                 ),
 
                 const SizedBox(height: 26),
+
+                if (imagesMinError || imagesMaxError)
+                  SizedBox(
+                    width: double.infinity,
+                    child: Text(
+                      imagesMinError
+                          ? 'Debe subir mínimo 5 imagenes'
+                          : 'Debe subir máximo 10 imagenes',
+                      style: TextStyle(color: Color.fromARGB(255, 185, 28, 16)),
+                    ),
+                  ),
+                  const SizedBox(height: 12,),
+
                 Row(
                   children: [
                     Expanded(

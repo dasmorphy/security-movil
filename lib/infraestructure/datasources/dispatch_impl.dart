@@ -235,5 +235,101 @@ class DispatchImpl extends DispatchDatasource {
       );
     }
   }
+  
+  @override
+  Future<List<Map<dynamic, dynamic>>> getAreasVisit() async {
+     final response = await dio.get(
+      '/rest/zent-dispatch-api/v1.0/area-visit',
+      options: Options(
+        headers: {'externalTransactionId': uuid, 'channel': 'ZENTINEL'},
+      ),
+    );
+    return List<Map<String, dynamic>>.from(response.data['data']);
+  }
+  
+  @override
+  Future<List<Map<dynamic, dynamic>>> getMaterials() async {
+     final response = await dio.get(
+      '/rest/zent-dispatch-api/v1.0/materials',
+      options: Options(
+        headers: {'externalTransactionId': uuid, 'channel': 'ZENTINEL'},
+      ),
+    );
+    return List<Map<String, dynamic>>.from(response.data['data']);
+  }
+  
+  @override
+  Future<List<Map<dynamic, dynamic>>> getStaffCharge() async {
+     final response = await dio.get(
+      '/rest/zent-dispatch-api/v1.0/staff-charge',
+      options: Options(
+        headers: {'externalTransactionId': uuid, 'channel': 'ZENTINEL'},
+      ),
+    );
+    return List<Map<String, dynamic>>.from(response.data['data']);
+  }
+  
+  @override
+  Future<ApiResponse<dynamic>> saveEntry(Map<String, dynamic> data) async {
+    try {
+      final images = data['images'] as List<Uint8List>?;
+      final entryControlData = Map<String, dynamic>.from(data);
+      entryControlData.remove('images');
+      entryControlData['channel'] = 'ZENTINEL';
+      final entryControlJson = jsonEncode(entryControlData);
+      final entryControlBytes = utf8.encode(entryControlJson);
+
+      final formData = FormData();
+
+      formData.files.add(
+        MapEntry(
+          'entry_data',
+          MultipartFile.fromBytes(
+            entryControlBytes,
+            filename: 'entry_data.json',
+            contentType: MediaType('application', 'json'),
+          ),
+        ),
+      );
+
+      // NUEVO: usar Uint8List directamente
+      if (images != null && images.isNotEmpty) {
+        for (var i = 0; i < images.length; i++) {
+          formData.files.add(
+            MapEntry(
+              'images',
+              MultipartFile.fromBytes(
+                images[i],
+                filename: 'image_$i.webp',         // nombre con índice
+                contentType: MediaType('image', 'webp'),
+              ),
+            ),
+          );
+        }
+      }
+
+      // Aquí puedes agregar la lógica para enviar el JSON al backend usando Dio
+      final response = await dio.post(
+        '/rest/zent-dispatch-api/v1.0/entry-access',
+        data: formData,
+        options: onlyError(),
+      );
+
+      final body = response.data;
+
+      return ApiResponse(
+        success: response.statusCode == 200,
+        errorCode: body['error_code'],
+        message: body['message'],
+      );
+    } catch (e) {
+      print('Error al guardar el ingreso: $e');
+      return ApiResponse(
+        success: false,
+        errorCode: 'update_error',
+        message: 'Error al guardar el ingreso',
+      );
+    }
+  }
 
 }

@@ -197,7 +197,6 @@ class _CrearDespachoScreenState extends ConsumerState<DispatchForm> {
       status: OverlayStatus.loading, 
       message: "Guardando despacho..."
     );
-    print(data);
     final response = await widget.onSubmit.call(data);
     if (!mounted) return;
     setState(() => isLoading = false);
