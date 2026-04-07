@@ -3,6 +3,7 @@ import 'package:zentinel/domain/entities/all_dispatch.dart';
 import 'package:zentinel/domain/entities/api_response.dart';
 import 'package:zentinel/domain/entities/dispatch_products.dart';
 import 'package:zentinel/domain/entities/dispatch_status.dart';
+import 'package:zentinel/domain/entities/entry_access_control.dart';
 import 'package:zentinel/domain/entities/vehicle_type.dart';
 import 'package:zentinel/domain/repositories/dispatch_repository.dart';
 
@@ -64,5 +65,10 @@ class DispatchRepositoryImpl extends DispatchRepository {
   @override
   Future<ApiResponse<dynamic>> saveEntry(Map<String, dynamic> data) {
     return datasource.saveEntry(data);
+  }
+
+  @override
+  Future<List<EntryAccessControl>> getHistoryEntryAccess(Map<String, dynamic> filters) {
+    return datasource.getHistoryEntryAccess(filters);
   }
 }

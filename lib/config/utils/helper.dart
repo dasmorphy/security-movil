@@ -274,3 +274,14 @@ Color getStatusColorDispatch(String status) {
       return Colors.grey;
   }
 }
+
+Color getStatusColorEntryAccess(String status) {
+  switch (status.toLowerCase()) {
+    case 'pendiente salida':
+      return const Color.fromARGB(255, 245, 158, 11);
+    case 'finalizado':
+      return const Color.fromARGB(255, 34, 197, 94);
+    default:
+      return Colors.grey;
+  }
+}

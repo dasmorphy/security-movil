@@ -100,6 +100,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ref.read(getHistoryLogbooks.notifier).load();
             }
 
+            if (userData.hasPermission(Permissions.verIngresosBiomar)) {
+              ref.read(getHistoryEntryAccess.notifier).load();
+            }
+
             if (userData.hasPermission(Permissions.verDespachos)) {
               ref.read(getHistoryDispatch.notifier).load();
             }

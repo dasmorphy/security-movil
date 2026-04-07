@@ -4,15 +4,15 @@ import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
-class ItemRecentDispatch extends ConsumerWidget {
-  const ItemRecentDispatch({super.key});
+class ItemRecentEntry extends ConsumerWidget {
+  const ItemRecentEntry({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final historyDispatch = ref.watch(getHistoryDispatch);
-    final limitedList = historyDispatch.take(5).toList();
+    final historyEntryAccess = ref.watch(getHistoryEntryAccess);
+    final limitedList = historyEntryAccess.take(5).toList();
 
-    if (historyDispatch.isEmpty) {
+    if (historyEntryAccess.isEmpty) {
       return const Text(
         'No hay registros',
         style: TextStyle(color: Colors.white54),
@@ -23,9 +23,8 @@ class ItemRecentDispatch extends ConsumerWidget {
       children: List.generate(limitedList.length, (index) {
         final item = limitedList[index];
 
-        final typeText = item.orderNumber;
         final createdBy = item.createdBy;
-        final description = 'N. orden $typeText - Placa ${item.truckLicense}';
+        final description = '${item.namesVisit} - ${item.dni}';
 
         final formattedDate = formatDate(item.createdAt);
 
@@ -35,7 +34,7 @@ class ItemRecentDispatch extends ConsumerWidget {
             borderRadius: BorderRadius.circular(8),
             onTap: () => ModalHelper.open(
               context,
-              child: DispatchDetailModal(item: item),
+              child: EntryAccessDetailModal(item: item),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -86,7 +85,7 @@ class ItemRecentDispatch extends ConsumerWidget {
 
                       Chip(
                         label: Text(item.status),
-                        backgroundColor: getStatusColorDispatch(item.status),
+                        backgroundColor: getStatusColorEntryAccess(item.status),
                         padding: EdgeInsets.zero,
                         labelStyle: const TextStyle(
                           color: Colors.white,

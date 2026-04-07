@@ -10,6 +10,7 @@ import 'package:zentinel/domain/entities/all_dispatch.dart';
 import 'package:zentinel/domain/entities/api_response.dart';
 import 'package:zentinel/domain/entities/dispatch_products.dart';
 import 'package:zentinel/domain/entities/dispatch_status.dart';
+import 'package:zentinel/domain/entities/entry_access_control.dart';
 import 'package:zentinel/domain/entities/vehicle_type.dart';
 
 class DispatchImpl extends DispatchDatasource {
@@ -329,6 +330,30 @@ class DispatchImpl extends DispatchDatasource {
         errorCode: 'update_error',
         message: 'Error al guardar el ingreso',
       );
+    }
+  }
+
+  @override
+  Future<List<EntryAccessControl>> getHistoryEntryAccess(Map<String, dynamic> filters) async {
+    List entryAcessJson = [];
+    try {
+      final response = await dio.get(
+        '/rest/zent-dispatch-api/v1.0/entry-access',
+        options: Options(
+          headers: {
+            'externalTransactionId': uuid,
+            'channel': 'ZENTINEL',
+            'user': filters['user'],
+          },
+        ),
+      );
+
+      entryAcessJson = response.data['data']; 
+      return entryAcessJson.map((json) => EntryAccessControl.fromJson(json)).toList();
+      
+    } catch (e) {
+      print(e);
+      return [];
     }
   }
 

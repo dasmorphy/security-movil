@@ -29,6 +29,7 @@ class HomeViewState extends ConsumerState<HomeView> {
     ref.read(getAllDispatchProducts.notifier).load();
     ref.read(getHistoryLogbooks.notifier).load();
     ref.read(getHistoryDispatch.notifier).load();
+    ref.read(getHistoryEntryAccess.notifier).load();
 
     //Se llama los catalogos desde el home para escenarios offline
     // ref.read(getAllCategories.notifier).load();
@@ -60,22 +61,34 @@ class HomeViewState extends ConsumerState<HomeView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 10),
-
-                if (userData.hasPermission(Permissions.verBitacoras))
+                if (userData.hasPermission(Permissions.verBitacoras))...[
                   // Bitácoras Recientes
+                  const SizedBox(height: 10),
                   RecentListHome(
                     title: 'Bitácoras recientes',
                     routeLink: '/list-logbooks',
                     childListBuild: const ItemRecentLogbook(),
                   ),
+                ],
 
-                if (userData.hasPermission(Permissions.verDespachos))
+                if (userData.hasPermission(Permissions.verDespachos))...[
+                  const SizedBox(height: 10),
                   RecentListHome(
                     title: 'Despachos recientes',
                     routeLink: '/list-dispatches',
                     childListBuild: const ItemRecentDispatch(),
                   ),
+                ],
+
+                if (userData.hasPermission(Permissions.verIngresosBiomar))...[
+                  const SizedBox(height: 10),
+                  RecentListHome(
+                    title: 'Ingresos recientes',
+                    routeLink: '/list-entry-access',
+                    childListBuild: const ItemRecentEntry(),
+                  ),
+                ],
+                
 
                 const SizedBox(height: 15),
                 // Publicidad

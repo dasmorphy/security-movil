@@ -3,6 +3,7 @@ import 'package:zentinel/domain/entities/all_dispatch.dart';
 import 'package:zentinel/domain/entities/api_response.dart';
 import 'package:zentinel/domain/entities/dispatch_products.dart';
 import 'package:zentinel/domain/entities/dispatch_status.dart';
+import 'package:zentinel/domain/entities/entry_access_control.dart';
 import 'package:zentinel/domain/repositories/dispatch_repository.dart';
 import 'package:zentinel/presentation/providers/dispatch/dispatch_repository_provider.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
@@ -83,6 +84,35 @@ final getHistoryDispatch =
           ...?filters,
         };
         return repo.getHistoryDispatch(mergedFilters);
+      },
+    );
+  },
+);
+
+final getHistoryEntryAccess =
+    StateNotifierProvider.autoDispose<
+        CatalogNotifier<EntryAccessControl>,
+        List<EntryAccessControl>>(
+  (ref) {
+    final repo = ref.watch(dispatchRepositoryProvider);
+    final authState = ref.watch(userSessionProvider);
+
+    if (!authState.hasValue || authState.value == null) {
+      return CatalogNotifier<EntryAccessControl>((_) async => []);
+    }
+
+    final userData = authState.value!;
+
+    return CatalogNotifier<EntryAccessControl>(
+      (filters) {
+        final mergedFilters = {
+          if (userData.role == 'admin')
+            'id_business': userData.attributes['id_business']
+          else
+            'user': userData.user,
+          ...?filters,
+        };
+        return repo.getHistoryEntryAccess(mergedFilters);
       },
     );
   },
