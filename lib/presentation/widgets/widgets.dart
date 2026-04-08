@@ -60,3 +60,6 @@ export 'package:zentinel/presentation/widgets/modals/entry_access_detail_modal.d
 export 'package:zentinel/presentation/widgets/entry_access/entry_access_list.dart';
 export 'package:zentinel/presentation/widgets/dispatch/item_recent_entry.dart';
 export 'package:zentinel/presentation/widgets/dispatch/item_detail_entry.dart';
+export 'package:zentinel/presentation/widgets/forms/finish_entry_form.dart';
+export 'package:zentinel/presentation/widgets/dispatch/entry_access_header_card.dart';
+export 'package:zentinel/presentation/widgets/dispatch/finish_material_item_card.dart';

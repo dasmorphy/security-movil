@@ -194,4 +194,23 @@ class DispatchProvider extends StateNotifier<AsyncValue<ApiResponse>> {
     }
   }
 
+  Future<ApiResponse> updateEntry(Map<String, dynamic> data) async {
+    state = const AsyncLoading();
+
+    try {
+      final response = await repository.updateEntry(data);
+
+      state = AsyncData(response);
+
+      return response;
+    } catch (e, st) {
+      state = AsyncError(e, st);
+
+      return ApiResponse(
+        success: false,
+        message: e.toString(),
+      );
+    }
+  }
+
 }

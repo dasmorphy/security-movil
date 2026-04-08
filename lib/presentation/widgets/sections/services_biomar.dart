@@ -69,24 +69,12 @@ class _ServicesBiomarState extends ConsumerState<ServicesBiomar> {
                   ),
                 ),
 
-              // if (userData.hasPermission(Permissions.nuevaBitacoraSalida))
-                BasicServiceCard(
-                  iconImage: 'iconsalida',
-                  label: 'Salida materia prima',
-                  childWidget: ExitReportForm(
-                    onSubmit: (data) async {
-                      return await ref
-                          .read(saveOutLogbookProvider.notifier)
-                          .saveLogbookOut(data);
-                    },
-                  ),
-                ),
             ],
           ),
 
           const SizedBox(height: 25),
 
-          // if (userData.hasPermission(Permissions.listaReportes) || userData.hasPermission(Permissions.generarReportes))
+          if (userData.hasPermission(Permissions.verIngresosBiomar))
             const Text(
               'Control de accesos',
               style: TextStyle(
@@ -115,14 +103,6 @@ class _ServicesBiomarState extends ConsumerState<ServicesBiomar> {
                         .saveEntry(data);
                     },
                     ),
-                  ),
-                // if (userData.hasPermission(Permissions.generarReportes))
-                  BasicServiceCard(
-                    iconImage: 'iconregistro',
-                    label: 'Salidas',
-                    onTap: () async {
-                      await ref.read(downloadReport.notifier).downloadReport();
-                    },
                   ),
               ],
             ),            

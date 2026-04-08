@@ -4,7 +4,7 @@ import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/domain/entities/entry_access_cards.dart';
 import 'package:zentinel/domain/entities/entry_access_control.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
-import 'package:zentinel/presentation/widgets/forms/reception_confirmation_form.dart';
+import 'package:zentinel/presentation/widgets/widgets.dart';
 
 class FinishEntryAccessScreen extends ConsumerWidget {
   static const name = 'finish-entry-access-screen';
@@ -24,28 +24,24 @@ class FinishEntryAccessScreen extends ConsumerWidget {
       statusColor: getStatusColorEntryAccess(entryAccessData.status),
     );
 
-    final products = entryAccessData..map((product) {
+    final materials = entryAccessData.materials.map((material) {
       return MaterialEntry(
-        id: product.idProduct,
-        productName: product.name,
-        status: 'CORRECTO',
-        expectedQty: product.quantity,
-        receivedQty: product.quantity,
-        commentary: '',
-        hasDiscrepancy: false,
+        id: material.idMaterial,
+        name: material.name,
+        quantity: material.quantity
       );
     }).toList();
 
-    return ReceptionConfirmationForm(
-      dispatchData: dispatchHeader,
-      products: products,
+    return FinishEntryForm(
+      entryAccessHeader: dispatchHeader,
+      materials: materials,
       onSubmit: (data) async {
         print('Datos de recepción: $data');
         final authState = ref.watch(userSessionProvider);
         final userData = authState.value!;
         data['user'] = userData.user;
-        final saveReceptionProvider = ref.read(dispatchProvider.notifier);
-        return await saveReceptionProvider.saveReception(data);
+        final updateEntryProvider = ref.read(dispatchProvider.notifier);
+        return await updateEntryProvider.updateEntry(data);
       },
       onBackPressed: () {
         Navigator.pop(context);

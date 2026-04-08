@@ -63,6 +63,8 @@ class DispatchForm extends ConsumerStatefulWidget {
 
 class _CrearDespachoScreenState extends ConsumerState<DispatchForm> {
   bool _modoNuevo = true;
+  bool imagesMinError = false;
+  bool imagesMaxError = false;
   final _formKey = GlobalKey<FormState>();
 
   final List<ProductoItem> _productos = [
@@ -144,6 +146,22 @@ class _CrearDespachoScreenState extends ConsumerState<DispatchForm> {
   void _crearDespacho() async {
     if (isLoading) return;
     setState(() => isLoading = true);
+
+    if (_selectedImages.length < 5) {
+      setState(() {
+        imagesMinError = true;
+        isLoading = false;
+      });
+      return;
+    }
+
+    if (_selectedImages.length > 10) {
+      setState(() {
+        imagesMaxError = true;
+        isLoading = false;
+      });
+      return;
+    }
 
     FocusScope.of(context).unfocus();
     if (!(_formKey.currentState?.validate() ?? false)) {
@@ -283,6 +301,8 @@ class _CrearDespachoScreenState extends ConsumerState<DispatchForm> {
                     ),
                     const SizedBox(height: 16),
                     _InformacionLogisticaCard(
+                      imagesMaxError: imagesMaxError,
+                      imagesMinError: imagesMinError,
                       driver: _driver,
                       truckLicense: _truckLicense,
                       orderNumber: _orderNumber,
@@ -403,7 +423,8 @@ class _InformacionLogisticaCard extends StatelessWidget {
   final String driver;
   final String orderNumber;
   final String truckLicense;
-
+  final bool imagesMinError;
+  final bool imagesMaxError;
   final TextEditingController driverCtrl;
   final TextEditingController orderNumberCtrl;
   final TextEditingController truckLicenseCtrl;
@@ -430,7 +451,9 @@ class _InformacionLogisticaCard extends StatelessWidget {
     required this.orderNumberCtrl,
     required this.driverCtrl,
     required this.truckLicenseCtrl,
-    required this.observationsCtrl,
+    required this.observationsCtrl, 
+    required this.imagesMinError, 
+    required this.imagesMaxError,
   });
 
   @override
@@ -712,6 +735,18 @@ class _InformacionLogisticaCard extends StatelessWidget {
           ),
 
           const SizedBox(height: 26),
+
+          if (imagesMinError || imagesMaxError)
+            SizedBox(
+              width: double.infinity,
+              child: Text(
+                imagesMinError
+                    ? 'Debe subir mínimo 5 imagenes'
+                    : 'Debe subir máximo 10 imagenes',
+                style: TextStyle(color: Color.fromARGB(255, 239, 28, 13)),
+              ),
+            ),
+            const SizedBox(height: 12,),
         ],
       ),
     );

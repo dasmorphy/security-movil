@@ -32,6 +32,8 @@ class EntryAccessDetailModalState extends ConsumerState<EntryAccessDetailModal> 
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(userSessionProvider);
+    final imgEntry = widget.item.images.where((img) => img.typeProcess == 'entry').toList();
+    final imgOut = widget.item.images.where((img) => img.typeProcess == 'out').toList();
 
     if (!authState.hasValue || authState.value == null) {
       return const SizedBox.shrink();
@@ -60,7 +62,22 @@ class EntryAccessDetailModalState extends ConsumerState<EntryAccessDetailModal> 
             Flexible(
               child: SingleChildScrollView(
                 child: Column(
-                  children: [ItemDetailEntry(item: widget.item)],
+                  children: [
+                    ItemDetailEntry(item: widget.item),
+
+                    if (imgEntry.isNotEmpty)
+                      ImagesGrid(
+                        title: 'Imágenes entrada',
+                        images: imgEntry.map((img) => img.imagePath).toList(),
+                      ),
+
+                    if (imgOut.isNotEmpty)
+                      ImagesGrid(
+                        title: 'Imágenes salida',
+                        images: imgOut.map((img) => img.imagePath).toList(),
+                      ),
+
+                  ],
                 ),
               ),
             ),
@@ -72,7 +89,7 @@ class EntryAccessDetailModalState extends ConsumerState<EntryAccessDetailModal> 
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () => context.push('/confirm-dispatch', extra: widget.item),
+                  onPressed: () => context.push('/finish-entry-access', extra: widget.item),
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(

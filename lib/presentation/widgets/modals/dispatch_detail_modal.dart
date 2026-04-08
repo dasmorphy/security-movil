@@ -34,6 +34,9 @@ class DispatchDetailModalState extends ConsumerState<DispatchDetailModal> {
   Widget build(BuildContext context) {
     bool isLoading = false;
     final dispatchStatus = ref.watch(getDispatchStatus);
+    final imgSaveDispatch = widget.item.images.where((img) => img.process == 'save_dispatch').toList();
+    final imgSaveReception = widget.item.images.where((img) => img.process == 'save_reception').toList();
+
 
     final authState = ref.watch(userSessionProvider);
 
@@ -77,12 +80,6 @@ class DispatchDetailModalState extends ConsumerState<DispatchDetailModal> {
         );
 
         if (confirmed == true) {
-          print(dispatchStatus);
-          print('Elemento actualizado');
-
-          // GlobalLoadingBottomSheet.show(
-          //   message: "Actualizando estado...",
-          // );
           GlobalLoadingBottomSheet.show(
             status: OverlayStatus.loading, 
             message: "Actualizando estado..."
@@ -142,7 +139,21 @@ class DispatchDetailModalState extends ConsumerState<DispatchDetailModal> {
             Flexible(
               child: SingleChildScrollView(
                 child: Column(
-                  children: [ItemDetailDispatch(item: widget.item)],
+                  children: [
+                    ItemDetailDispatch(item: widget.item),
+
+                    if (imgSaveDispatch.isNotEmpty)
+                      ImagesGrid(
+                        title: 'Imágenes despacho',
+                        images: imgSaveDispatch.map((img) => img.imagePath).toList(),
+                      ),
+
+                    if (imgSaveReception.isNotEmpty)
+                      ImagesGrid(
+                        title: 'Imágenes recepción',
+                        images: imgSaveReception.map((img) => img.imagePath).toList(),
+                      ),
+                  ],
                 ),
               ),
             ),

@@ -71,4 +71,9 @@ class DispatchRepositoryImpl extends DispatchRepository {
   Future<List<EntryAccessControl>> getHistoryEntryAccess(Map<String, dynamic> filters) {
     return datasource.getHistoryEntryAccess(filters);
   }
+  
+  @override
+  Future<ApiResponse<dynamic>> updateEntry(Map<String, dynamic> data) {
+    return datasource.updateEntry(data);
+  }
 }

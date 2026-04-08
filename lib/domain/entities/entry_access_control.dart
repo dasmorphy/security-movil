@@ -6,6 +6,7 @@ class EntryAccessControl {
   String dni;
   int idAccessControl;
   List<Image> images;
+  List<Material> materials;
   String namesVisit;
   String observationsEntry;
   String observationsOut;
@@ -24,6 +25,7 @@ class EntryAccessControl {
     required this.dni,
     required this.idAccessControl,
     required this.images,
+    required this.materials,
     required this.namesVisit,
     required this.observationsEntry,
     required this.observationsOut,
@@ -44,6 +46,9 @@ class EntryAccessControl {
         dni: json["dni"],
         idAccessControl: json["id_access_control"],
         images: List<Image>.from(json["images"].map((x) => Image.fromJson(x))),
+        materials: List<Material>.from(
+          json["materials"].map((x) => Material.fromJson(x)),
+        ),
         namesVisit: json["names_visit"],
         observationsEntry: json["observations_entry"],
         observationsOut: json["observations_out"],
@@ -63,6 +68,7 @@ class EntryAccessControl {
     "dni": dni,
     "id_access_control": idAccessControl,
     "images": List<dynamic>.from(images.map((x) => x.toJson())),
+    "materials": List<dynamic>.from(materials.map((x) => x.toJson())),
     "names_visit": namesVisit,
     "observations_entry": observationsEntry,
     "observations_out": observationsOut,
@@ -87,5 +93,29 @@ class Image {
   Map<String, dynamic> toJson() => {
     "image_path": imagePath,
     "type_process": typeProcess,
+  };
+}
+
+class Material {
+  int idMaterial;
+  String name;
+  int quantity;
+
+  Material({
+    required this.idMaterial,
+    required this.name,
+    required this.quantity,
+  });
+
+  factory Material.fromJson(Map<String, dynamic> json) => Material(
+    idMaterial: json["id_material"],
+    name: json["name"],
+    quantity: json["quantity"],
+  );
+
+  Map<String, dynamic> toJson() => {
+    "id_material": idMaterial,
+    "name": name,
+    "quantity": quantity,
   };
 }

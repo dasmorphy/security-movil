@@ -14,6 +14,7 @@ class AllDispatch {
   String typeSku;
   DateTime updatedAt;
   String updatedBy;
+  List<Image> images;
   dynamic weight;
 
   AllDispatch({
@@ -33,6 +34,7 @@ class AllDispatch {
     required this.updatedAt,
     required this.updatedBy,
     required this.weight,
+    required this.images
   });
 
   factory AllDispatch.fromJson(Map<String, dynamic> json) => AllDispatch(
@@ -47,6 +49,7 @@ class AllDispatch {
     productsSku: List<ProductsSku>.from(
       json["products_sku"].map((x) => ProductsSku.fromJson(x)),
     ),
+    images: List<Image>.from(json["images"].map((x) => Image.fromJson(x))),
     skuId: json["sku_id"],
     status: json["status"],
     truckLicense: json["truck_license"],
@@ -61,6 +64,7 @@ class AllDispatch {
     "created_at": createdAt.toIso8601String(),
     "created_by": createdBy,
     "driver": driver,
+    "images": List<dynamic>.from(images.map((x) => x.toJson())),
     "id_dispatch": idDispatch,
     "name_destiny": nameDestiny,
     "name_vehicle_type": nameVehicleType,
@@ -97,5 +101,20 @@ class ProductsSku {
     "id_product": idProduct,
     "name": name,
     "quantity": quantity,
+  };
+}
+
+class Image {
+  String imagePath;
+  String process;
+
+  Image({required this.imagePath, required this.process});
+
+  factory Image.fromJson(Map<String, dynamic> json) =>
+      Image(imagePath: json["image_path"], process: json["process"]);
+
+  Map<String, dynamic> toJson() => {
+    "image_path": imagePath,
+    "process": process,
   };
 }

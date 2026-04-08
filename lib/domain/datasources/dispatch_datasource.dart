@@ -18,4 +18,5 @@ abstract class DispatchDatasource {
   Future<ApiResponse<dynamic>> updateDispatch(Map<String, dynamic> data);
   Future<ApiResponse<dynamic>> saveReception(Map<String, dynamic> data);
   Future<ApiResponse> saveEntry(Map<String, dynamic> data);
+  Future<ApiResponse> updateEntry(Map<String, dynamic> data);
 }

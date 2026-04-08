@@ -2,23 +2,13 @@ import 'package:flutter/material.dart';
 
 class MaterialEntry {
   final int id;
-  final String productName;
-  final String status;
-  final int expectedQty;
-  int receivedQty;
-  String commentary;
-  bool hasDiscrepancy;
-  List<String>? photoUrls;
+  final String name;
+  final int quantity;
 
   MaterialEntry({
     required this.id,
-    required this.productName,
-    required this.status,
-    required this.expectedQty,
-    this.receivedQty = 0,
-    this.commentary = '',
-    this.hasDiscrepancy = false,
-    this.photoUrls,
+    required this.name,
+    required this.quantity,
   });
 }
 

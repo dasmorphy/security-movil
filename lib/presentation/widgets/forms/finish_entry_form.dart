@@ -5,119 +5,45 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 import 'package:zentinel/domain/entities/api_response.dart';
+import 'package:zentinel/domain/entities/entry_access_cards.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
-class ReceivedProduct {
-  final int id;
-  final String productName;
-  final String status;
-  final int expectedQty;
-  int receivedQty;
-  String commentary;
-  bool hasDiscrepancy;
-  List<String>? photoUrls;
-
-  ReceivedProduct({
-    required this.id,
-    required this.productName,
-    required this.status,
-    required this.expectedQty,
-    this.receivedQty = 0,
-    this.commentary = '',
-    this.hasDiscrepancy = false,
-    this.photoUrls,
-  });
-}
-
-class DispatchData {
-  final int dispatchId;
-  final String orderNumber;
-  final String destiny;
-  final String driver;
-  final String status;
-  final Color statusColor;
-
-  const DispatchData({
-    required this.dispatchId,
-    required this.orderNumber,
-    required this.destiny,
-    required this.driver,
-    required this.status,
-    this.statusColor = const Color.fromARGB(255, 34, 197, 94),
-  });
-}
-
-class ReceptionConfirmationForm extends ConsumerStatefulWidget {
-  final DispatchData dispatchData;
-  final List<ReceivedProduct> products;
+class FinishEntryForm extends ConsumerStatefulWidget {
+  final EntryHeader entryAccessHeader;
+  final List<MaterialEntry> materials;
   final Future<ApiResponse> Function(Map<String, dynamic>) onSubmit;
   final VoidCallback? onBackPressed;
 
-  const ReceptionConfirmationForm({
+  const FinishEntryForm({
     super.key,
-    required this.dispatchData,
-    required this.products,
+    required this.entryAccessHeader,
+    required this.materials,
     required this.onSubmit,
     this.onBackPressed,
   });
 
   @override
-  ConsumerState<ReceptionConfirmationForm> createState() => _ReceptionConfirmationFormState();
+  ConsumerState<FinishEntryForm> createState() => _FinishEntryFormState();
 }
 
-class _ReceptionConfirmationFormState extends ConsumerState<ReceptionConfirmationForm> {
-  late List<ReceivedProduct> _products;
+class _FinishEntryFormState extends ConsumerState<FinishEntryForm> {
+  bool imagesMinError = false;
+  bool imagesMaxError = false;
+  late List<MaterialEntry> _materials;
   bool _isLoading = false;
   List<Uint8List?> _selectedImages = [];
   final TextEditingController _observationsCtrl = TextEditingController();
   final FocusNode _observationsFocus = FocusNode();
-  bool imagesMinError = false;
-  bool imagesMaxError = false;
 
   @override
   void initState() {
     super.initState();
-    _products = widget.products.map((p) {
-      return ReceivedProduct(
-        id: p.id,
-        productName: p.productName,
-        status: p.status,
-        expectedQty: p.expectedQty,
-        receivedQty: p.receivedQty,
-        commentary: p.commentary,
-        hasDiscrepancy: p.hasDiscrepancy,
-        photoUrls: p.photoUrls,
-      );
-    }).toList();
-  }
-
-  void _updateProduct(int index, ReceivedProduct product) {
-    setState(() {
-      _products[index] = product;
-    });
+    _materials = widget.materials;
   }
 
   Future<void> _handleSubmit() async {
     if (_isLoading) return;
-
-    // Validar que todos los productos con discrepancia tengan comentario y foto
-    bool isValid = true;
-    for (var product in _products) {
-      if (product.hasDiscrepancy) {
-        if (product.commentary.isEmpty) {
-          GlobalLoadingBottomSheet.show(
-            status: OverlayStatus.error,
-            message: '${product.productName} requiere un comentario',
-            autoDismiss: const Duration(seconds: 3),
-          );
-          isValid = false;
-          break;
-        }
-      }
-    }
-
-    if (!isValid) return;
 
     setState(() => _isLoading = true);
 
@@ -137,30 +63,17 @@ class _ReceptionConfirmationFormState extends ConsumerState<ReceptionConfirmatio
       return;
     }
 
-    bool hasDiscrepancies = _products.any((p) => p.hasDiscrepancy);
     try {
       final data = {
-        'dispatch_id': widget.dispatchData.dispatchId,
-        'is_correct': !hasDiscrepancies,
+        'entry_access_id': widget.entryAccessHeader.entryAccessId,
         'images': _selectedImages.whereType<Uint8List>().toList(),
         'observations': _observationsCtrl.text.trim(),
         'external_transaction_id': Uuid().v4(),
-        'reception_details': hasDiscrepancies
-          ? _products
-            .map((p) => {
-              'product_id': p.id,
-              'expected_quantity': p.expectedQty,
-              'received_quantity': p.receivedQty,
-              'observations': p.commentary,
-              // 'photo_urls': p.photoUrls ?? [],
-            })
-            .toList()
-          : null,
       };
 
       GlobalLoadingBottomSheet.show(
         status: OverlayStatus.loading, 
-        message: "Guardando recepción..."
+        message: "Guardando salida..."
       );
 
       final response = await widget.onSubmit.call(data);
@@ -171,16 +84,16 @@ class _ReceptionConfirmationFormState extends ConsumerState<ReceptionConfirmatio
       if (response.success) {
         GlobalLoadingBottomSheet.show(
           status: OverlayStatus.success, 
-          message: "Recepción confirmada exitosamente", 
+          message: "Salida guardada exitosamente", 
           autoDismiss: const Duration(seconds: 2)
         );
-        ref.read(getHistoryDispatch.notifier).load();
+        ref.read(getHistoryEntryAccess.notifier).load();
         Navigator.of(context).popUntil((route) => route.isFirst);
         context.go('/');
       } else {
         GlobalLoadingBottomSheet.show(
           status: OverlayStatus.error,
-          message: 'Error: ${response.message ?? 'Error al confirmar la recepción'}',
+          message: 'Error: ${response.message ?? 'Error al guardar la salida'}',
           autoDismiss: const Duration(seconds: 3),
         );
       }
@@ -188,7 +101,7 @@ class _ReceptionConfirmationFormState extends ConsumerState<ReceptionConfirmatio
     } catch (e) {
       GlobalLoadingBottomSheet.show(
         status: OverlayStatus.error,
-        message: 'Error al guardar la recepción: $e',
+        message: 'Error al guardar la salida: $e',
         autoDismiss: const Duration(seconds: 3),
       );
     } finally {
@@ -204,7 +117,7 @@ class _ReceptionConfirmationFormState extends ConsumerState<ReceptionConfirmatio
       backgroundColor: const Color.fromARGB(255, 20, 21, 23),
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(60),
-        child: const HeaderOptionsProfile(headerTxt: 'Confirmar Recepción',)
+        child: const HeaderOptionsProfile(headerTxt: 'Registrar Salida',)
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -212,15 +125,8 @@ class _ReceptionConfirmationFormState extends ConsumerState<ReceptionConfirmatio
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Información del despacho
-              DispatchInfoCard(
-                dispatchId: widget.dispatchData.dispatchId,
-                orderNumber: widget.dispatchData.orderNumber,
-                destiny: widget.dispatchData.destiny,
-                driver: widget.dispatchData.driver,
-                status: widget.dispatchData.status,
-                statusColor: widget.dispatchData.statusColor,
-              ),
+              // Header data del ingreso
+              EntryAccessHeaderCard(entryAccessData: widget.entryAccessHeader,),
               const SizedBox(height: 24),
 
               // Título de artículos
@@ -230,7 +136,7 @@ class _ReceptionConfirmationFormState extends ConsumerState<ReceptionConfirmatio
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text(
-                      'Productos a Recibir',
+                      'Materiales Ingresados',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 18,
@@ -238,7 +144,7 @@ class _ReceptionConfirmationFormState extends ConsumerState<ReceptionConfirmatio
                       ),
                     ),
                     Text(
-                      '${_products.length} Productos',
+                      '${_materials.length} Material(es)',
                       style: const TextStyle(
                         color: Color.fromARGB(255, 150, 150, 150),
                         fontSize: 14,
@@ -253,67 +159,22 @@ class _ReceptionConfirmationFormState extends ConsumerState<ReceptionConfirmatio
               ListView.separated(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                itemCount: _products.length,
+                itemCount: _materials.length,
                 separatorBuilder: (_, __) => const SizedBox(height: 12),
                 itemBuilder: (context, index) {
-                  final product = _products[index];
-                  return ReceivedProductItem(
-                    productName: product.productName,
-                    status: product.hasDiscrepancy ? 'DISCREPANCIA' : 'CORRECTO',
-                    expectedQty: product.expectedQty,
-                    receivedQty: product.receivedQty,
-                    commentary: product.commentary,
-                    hasDiscrepancy: product.hasDiscrepancy,
-                    onReceivedQtyChanged: (qty) {
-                      final updatedProduct = ReceivedProduct(
-                        id: product.id,
-                        productName: product.productName,
-                        status: product.status,
-                        expectedQty: product.expectedQty,
-                        receivedQty: qty,
-                        commentary: product.commentary,
-                        hasDiscrepancy: product.hasDiscrepancy,
-                        photoUrls: product.photoUrls,
-                      );
-                      _updateProduct(index, updatedProduct);
-                    },
-                    onCommentaryChanged: (commentary) {
-                      final updatedProduct = ReceivedProduct(
-                        id: product.id,
-                        productName: product.productName,
-                        status: product.status,
-                        expectedQty: product.expectedQty,
-                        receivedQty: product.receivedQty,
-                        commentary: commentary,
-                        hasDiscrepancy: product.hasDiscrepancy,
-                        photoUrls: product.photoUrls,
-                      );
-                      _updateProduct(index, updatedProduct);
-                    },
-                    // onPhotoPressed: () => _handlePhotoPress(index),
-                    onToggleChanged: (hasDiscrepancy) {
-                      final updatedProduct = ReceivedProduct(
-                        id: product.id,
-                        productName: product.productName,
-                        status: hasDiscrepancy ? 'DISCREPANCIA' : 'CORRECTO',
-                        expectedQty: product.expectedQty,
-                        receivedQty: product.receivedQty,
-                        commentary: product.commentary,
-                        hasDiscrepancy: hasDiscrepancy,
-                        photoUrls: product.photoUrls,
-                      );
-                      _updateProduct(index, updatedProduct);
-                    },
+                  final material = _materials[index];
+                  return FinishMaterialItemCard(
+                    materialName: material.name,
+                    quantity: material.quantity,
                   );
                 },
               ),
 
-              const SizedBox(height: 16),
-
               CommentaryReception(
                 controller: _observationsCtrl,
                 focusNode: _observationsFocus,
-                hint: 'Observaciones generales sobre la recepción (opcional)',
+                label: 'Observaciones',
+                hint: 'Observaciones generales (opcional)',
                 onChanged: (value) {
                   setState(() {
                     _observationsCtrl.text = value;
@@ -381,7 +242,7 @@ class _ReceptionConfirmationFormState extends ConsumerState<ReceptionConfirmatio
                         const SizedBox(width: 12),
                       ],
                       const Text(
-                        'Confirmar Recepción',
+                        'Guardar salida',
                         style: TextStyle(
                           fontSize: 15,
                           color: Colors.white,

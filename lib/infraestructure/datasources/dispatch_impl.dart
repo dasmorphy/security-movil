@@ -356,5 +356,66 @@ class DispatchImpl extends DispatchDatasource {
       return [];
     }
   }
+  
+  @override
+  Future<ApiResponse<dynamic>> updateEntry(Map<String, dynamic> data) async {
+    try {
+      final images = data['images'] as List<Uint8List>?;
+      final entryControlData = Map<String, dynamic>.from(data);
+      entryControlData.remove('images');
+      entryControlData['channel'] = 'ZENTINEL';
+      final entryControlJson = jsonEncode(entryControlData);
+      final entryControlBytes = utf8.encode(entryControlJson);
+
+      final formData = FormData();
+
+      formData.files.add(
+        MapEntry(
+          'entry_data',
+          MultipartFile.fromBytes(
+            entryControlBytes,
+            filename: 'entry_data.json',
+            contentType: MediaType('application', 'json'),
+          ),
+        ),
+      );
+
+      // NUEVO: usar Uint8List directamente
+      if (images != null && images.isNotEmpty) {
+        for (var i = 0; i < images.length; i++) {
+          formData.files.add(
+            MapEntry(
+              'images',
+              MultipartFile.fromBytes(
+                images[i],
+                filename: 'image_$i.webp',         // nombre con índice
+                contentType: MediaType('image', 'webp'),
+              ),
+            ),
+          );
+        }
+      }
+
+      final response = await dio.patch(
+        '/rest/zent-dispatch-api/v1.0/entry-access/${data['entry_access_id']}',
+        data: formData,
+      );
+
+      final body = response.data;
+
+      return ApiResponse(
+        success: response.statusCode == 200,
+        errorCode: body['error_code']?.toString(),
+        message: body['message'],
+      );
+    } catch (e) {
+      print('Error al actualizar el registro: $e');
+      return ApiResponse(
+        success: false,
+        errorCode: 'update_error',
+        message: 'Error al actualizar el registro',
+      );
+    }
+  }
 
 }

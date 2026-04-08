@@ -18,4 +18,5 @@ abstract class DispatchRepository {
   Future <List<EntryAccessControl>> getHistoryEntryAccess(Map<String, dynamic> filters);
   Future<ApiResponse<dynamic>> saveReception(Map<String, dynamic> data);
   Future<ApiResponse> saveEntry(Map<String, dynamic> data);
+  Future<ApiResponse> updateEntry(Map<String, dynamic> data);
 }
