@@ -90,9 +90,9 @@ class HomeViewState extends ConsumerState<HomeView> {
                 ],
                 
 
-                const SizedBox(height: 15),
+                // const SizedBox(height: 15),
                 // Publicidad
-                PublicityCard(),
+                // PublicityCard(),
               ],
             ),
           ),

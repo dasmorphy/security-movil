@@ -165,7 +165,7 @@ class DispatchDetailModalState extends ConsumerState<DispatchDetailModal> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: isLoading ? null : changeStatus,
+                  onPressed: () => context.push('/update-status-dispatch', extra: widget.item),
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(

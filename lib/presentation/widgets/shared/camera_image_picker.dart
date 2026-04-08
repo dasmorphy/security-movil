@@ -150,7 +150,7 @@ class _CameraImagePickerState extends State<CameraImagePicker> {
           ),
         ),
 
-        const SizedBox(height: 12),
+        const SizedBox(height: 20),
 
         _selectedImages.isNotEmpty
             ? GridView.builder(

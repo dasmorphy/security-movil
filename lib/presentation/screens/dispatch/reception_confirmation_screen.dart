@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/domain/entities/all_dispatch.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
-import 'package:zentinel/presentation/widgets/forms/reception_confirmation_form.dart';
+import 'package:zentinel/presentation/widgets/widgets.dart';
 
 class ReceptionConfirmationScreen extends ConsumerWidget {
   static const name = 'reception-confirmation-screen';

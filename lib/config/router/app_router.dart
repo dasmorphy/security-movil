@@ -74,6 +74,16 @@ final appRouter = GoRouter(
           },
         ),
         GoRoute(
+          path: 'update-status-dispatch',
+          name: UpdateStatusDispatchScreen.name,
+          builder: (context, state) {
+            final dispatchData = state.extra as AllDispatch;
+            return UpdateStatusDispatchScreen(
+              dispatchData: dispatchData,
+            );
+          },
+        ),
+        GoRoute(
           path: 'finish-entry-access',
           name: FinishEntryAccessScreen.name,
           builder: (context, state) {
