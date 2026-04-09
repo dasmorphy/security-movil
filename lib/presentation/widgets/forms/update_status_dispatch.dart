@@ -2,9 +2,13 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:uuid/uuid.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/domain/entities/all_dispatch.dart';
 import 'package:zentinel/domain/entities/api_response.dart';
+import 'package:zentinel/domain/entities/dispatch_status.dart';
+import 'package:zentinel/domain/entities/user_session.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
@@ -21,6 +25,10 @@ class UpdateStatusDispatch extends ConsumerStatefulWidget {
 }
 
 class _UpdateStatusDispatchState extends ConsumerState<UpdateStatusDispatch> {
+  User? dataUser;
+  List<DispatchStatus> dispatchStatus = [];
+  
+
   bool imagesMinError = false;
   bool imagesMaxError = false;
   bool _isLoading = false;
@@ -31,29 +39,36 @@ class _UpdateStatusDispatchState extends ConsumerState<UpdateStatusDispatch> {
     super.initState();
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final dispatchStatus = ref.watch(getDispatchStatus);
-    final authState = ref.watch(userSessionProvider);
-
-    if (!authState.hasValue || authState.value == null) {
-      return const SizedBox.shrink();
-    }
-
-    final userData = authState.value!;
-
-    Future<ApiResponse> updateDispatchStatus(int statusId) async {
+  Future<ApiResponse> updateDispatchStatus(int statusId) async {
       final updateDispatchProvider = ref.read(dispatchProvider.notifier);
       return await updateDispatchProvider.updateDispatch({
+        'external_transaction_id': Uuid().v4(),
         'dispatch_id': widget.item.idDispatch,
         'status_id': statusId,
-        'user': userData.user,
+        'user': dataUser!.user,
         'images': _selectedImages.whereType<Uint8List>().toList(),
       });
     }
 
-    void changeStatus() async {
+    Future<void> _changeStatus() async {
+      if (_isLoading) return;
       setState(() => _isLoading = true);
+
+      if (_selectedImages.length < 5) {
+        setState(() {
+          imagesMinError = true;
+          _isLoading = false;
+        });
+        return;
+      }
+
+      if (_selectedImages.length > 10) {
+        setState(() {
+          imagesMaxError = true;
+          _isLoading = false;
+        });
+        return;
+      }
 
       try {
         final statusChange = dispatchStatus.where(
@@ -85,7 +100,7 @@ class _UpdateStatusDispatchState extends ConsumerState<UpdateStatusDispatch> {
           final response = await updateDispatchStatus(statusChange.first.idStatus);
 
           if (!mounted) return;
-          setState(() => isLoading = false);
+          setState(() => _isLoading = false);
 
           if (response.success) {
             GlobalLoadingBottomSheet.show(
@@ -94,7 +109,8 @@ class _UpdateStatusDispatchState extends ConsumerState<UpdateStatusDispatch> {
               autoDismiss: const Duration(seconds: 2)
             );
             ref.read(getHistoryDispatch.notifier).load();
-            Navigator.of(context).pop();
+            Navigator.of(context).popUntil((route) => route.isFirst);
+            context.go('/');
           } else {
             GlobalLoadingBottomSheet.show(
               status: OverlayStatus.error,
@@ -104,9 +120,12 @@ class _UpdateStatusDispatchState extends ConsumerState<UpdateStatusDispatch> {
           }
 
 
+        }else {
+          setState(() => _isLoading = false);
         }
 
       } catch (e) {
+        setState(() => _isLoading = false);
         GlobalLoadingBottomSheet.show(
           status: OverlayStatus.error,
           message: 'Error al actualizar estado: $e',
@@ -114,6 +133,24 @@ class _UpdateStatusDispatchState extends ConsumerState<UpdateStatusDispatch> {
         );
       }
     }
+
+  @override
+  Widget build(BuildContext context) {
+    final products = widget.item.skus
+    .expand((sku) => sku.products)
+    .toList();
+
+    final authState = ref.watch(userSessionProvider);
+
+    if (!authState.hasValue || authState.value == null) {
+      return const SizedBox.shrink();
+    }
+
+    setState(() {
+      dataUser = authState.value!;
+      dispatchStatus = ref.watch(getDispatchStatus);
+    });
+
 
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 0, 0, 0),
@@ -154,7 +191,7 @@ class _UpdateStatusDispatchState extends ConsumerState<UpdateStatusDispatch> {
                       ),
                     ),
                     Text(
-                      '${widget.item.productsSku.length} Material(es)',
+                      '${products.length} Material(es)',
                       style: const TextStyle(
                         color: Color.fromARGB(255, 150, 150, 150),
                         fontSize: 14,
@@ -169,10 +206,10 @@ class _UpdateStatusDispatchState extends ConsumerState<UpdateStatusDispatch> {
               ListView.separated(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                itemCount: widget.item.productsSku.length,
+                itemCount: products.length,
                 separatorBuilder: (_, __) => const SizedBox(height: 12),
                 itemBuilder: (context, index) {
-                  final material = widget.item.productsSku[index];
+                  final material = products[index];
                   return FinishMaterialItemCard(
                     materialName: material.name,
                     quantity: material.quantity,
@@ -211,7 +248,7 @@ class _UpdateStatusDispatchState extends ConsumerState<UpdateStatusDispatch> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _isLoading ? null : changeStatus,
+                  onPressed: _isLoading ? null : _changeStatus,
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(

@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:zentinel/config/constants/permissions.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/domain/entities/all_dispatch.dart';
-import 'package:zentinel/domain/entities/api_response.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
@@ -32,9 +31,8 @@ class DispatchDetailModalState extends ConsumerState<DispatchDetailModal> {
 
   @override
   Widget build(BuildContext context) {
-    bool isLoading = false;
-    final dispatchStatus = ref.watch(getDispatchStatus);
     final imgSaveDispatch = widget.item.images.where((img) => img.process == 'save_dispatch').toList();
+    final imgUpdateDispatch = widget.item.images.where((img) => img.process == 'update_dispatch').toList();
     final imgSaveReception = widget.item.images.where((img) => img.process == 'save_reception').toList();
 
 
@@ -45,78 +43,6 @@ class DispatchDetailModalState extends ConsumerState<DispatchDetailModal> {
     }
 
     final userData = authState.value!;
-
-    Future<ApiResponse> updateDispatchStatus(int statusId) async {
-      final updateDispatchProvider = ref.read(dispatchProvider.notifier);
-      return await updateDispatchProvider.updateDispatch({
-        'dispatch_id': widget.item.idDispatch,
-        'status_id': statusId,
-        'user': userData.user,
-      });
-    }
-
-    void changeStatus() async {
-      setState(() => isLoading = true);
-
-      try {
-        final statusChange = dispatchStatus.where(
-          (statusList) =>
-          statusList.name.toLowerCase() == 'En tránsito'.toLowerCase(),
-        );
-
-        if (statusChange.isEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('No se encontró el estado "En tránsito".'),
-            ),
-          );
-          return;
-        }
-
-        final confirmed = await ConfirmBottomSheet.show(
-          context,
-          title: "Actualizar estado",
-          message: "Se actualizará el estado del despacho a 'En tránsito'. ¿Desea continuar?",
-        );
-
-        if (confirmed == true) {
-          GlobalLoadingBottomSheet.show(
-            status: OverlayStatus.loading, 
-            message: "Actualizando estado..."
-          );
-
-          final response = await updateDispatchStatus(statusChange.first.idStatus);
-
-          if (!mounted) return;
-          setState(() => isLoading = false);
-
-          if (response.success) {
-            GlobalLoadingBottomSheet.show(
-              status: OverlayStatus.success, 
-              message: "Estado actualizado exitosamente", 
-              autoDismiss: const Duration(seconds: 2)
-            );
-            ref.read(getHistoryDispatch.notifier).load();
-            Navigator.of(context).pop();
-          } else {
-            GlobalLoadingBottomSheet.show(
-              status: OverlayStatus.error,
-              message: 'Error: ${response.message ?? 'Error al actualizar el estado'}',
-              autoDismiss: const Duration(seconds: 3),
-            );
-          }
-
-
-        }
-
-      } catch (e) {
-        GlobalLoadingBottomSheet.show(
-          status: OverlayStatus.error,
-          message: 'Error al actualizar estado: $e',
-          autoDismiss: const Duration(seconds: 3),
-        );
-      }
-    }
 
     return SafeArea(
       child: Container(
@@ -146,6 +72,12 @@ class DispatchDetailModalState extends ConsumerState<DispatchDetailModal> {
                       ImagesGrid(
                         title: 'Imágenes despacho',
                         images: imgSaveDispatch.map((img) => img.imagePath).toList(),
+                      ),
+
+                    if (imgUpdateDispatch.isNotEmpty)
+                      ImagesGrid(
+                        title: 'Salida despacho',
+                        images: imgUpdateDispatch.map((img) => img.imagePath).toList(),
                       ),
 
                     if (imgSaveReception.isNotEmpty)
@@ -182,17 +114,6 @@ class DispatchDetailModalState extends ConsumerState<DispatchDetailModal> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      if (isLoading) ...[
-                        const SizedBox(
-                          width: 14,
-                          height: 14,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                      ],
                       const Text(
                         'Actualizar estado',
                         style: TextStyle(

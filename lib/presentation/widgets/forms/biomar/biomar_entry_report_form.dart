@@ -537,11 +537,6 @@ class _BiomarEntryReportFormState extends ConsumerState<BiomarEntryReportForm> {
                 ),
 
                 const SizedBox(height: 26),
-                CustomFieldLabelRequired(
-                  txtLabel:
-                      'Imágenes desde Cámara (${_selectedImages.length}/10)',
-                ),
-                const SizedBox(height: 8),
                 
                 CameraImagePicker(
                   minImages: 5,

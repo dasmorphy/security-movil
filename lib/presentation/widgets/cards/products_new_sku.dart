@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:zentinel/domain/entities/dispatch_products.dart';
-import 'package:zentinel/presentation/widgets/forms/dispatch.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
 class ProductsNewSku extends StatelessWidget {
@@ -13,9 +11,7 @@ class ProductsNewSku extends StatelessWidget {
   final List<DispatchProducts> catalogProducts;
   final void Function(int, String) onCantidadChanged;
   final void Function(int) onDeleteProduct;
-  final void Function(int) onDeleteSku;
   final VoidCallback onAgregarProducto;
-  final VoidCallback onAddSku;
 
   const ProductsNewSku({
     super.key,
@@ -27,9 +23,7 @@ class ProductsNewSku extends StatelessWidget {
     required this.onDeleteProduct,
     required this.onAgregarProducto, 
     required this.flagNewSku, 
-    required this.onAddSku, 
     required this.skus, 
-    required this.onDeleteSku
   });
 
   @override
@@ -101,115 +95,8 @@ class ProductsNewSku extends StatelessWidget {
                   const SizedBox(height: 8),
                   _AgregarProductoBtn(onTap: onAgregarProducto),
                 ]
-                else ...[
-                  ...List.generate(
-                    skus.length,
-                    (i) => _SkuExist(
-                      index: i,
-                      item: skus[i],
-                      onDeleteSku: skus.length > 1
-                          ? () => onDeleteSku(i)
-                          : null,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  _AddSkuBtn(onTap: onAddSku)
-                ], 
               ],
             ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _SkuExist extends StatelessWidget {
-  final int index;
-  final SkuItem item;
-  final VoidCallback? onDeleteSku;
-
-  const _SkuExist({
-    required this.index, 
-    required this.item, 
-    this.onDeleteSku,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Text(
-                'SKU ${(index + 1).toString().padLeft(2, '0')}',
-                style: TextStyle(
-                  color: kNavy,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.5,
-                ),
-              ),
-              const Spacer(),
-              if (onDeleteSku != null)
-                GestureDetector(
-                  onTap: onDeleteSku,
-                  child: const Icon(
-                    Icons.close_rounded,
-                    size: 16,
-                    color: kTextHint,
-                  ),
-                ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Row(
-            children: [
-              Expanded(
-                flex: 3,
-                child: GlowDropdownFormField2<String>(
-                  value: item.skuId ?? '0',
-                  textColor: Colors.black,
-                  items: [
-                    DropdownMenuItem(
-                      enabled: false,
-                      value: '0',
-                      child: Text(
-                        'Seleccione una opción',
-                        style: TextStyle(
-                          color: const Color.fromARGB(255, 0, 0, 0),
-                        ),
-                      ),
-                    ),
-                    // ...skuAvailable.map(
-                    //   (c) => DropdownMenuItem(
-                    //     value: c['id']?.toString(),
-                    //     child: Text(
-                    //       c['nombre'],
-                    //       style: TextStyle(
-                    //         color: const Color.fromARGB(255, 0, 0, 0),
-                    //       ),
-                    //     ),
-                    //   ),
-                    // ),
-                  ],
-                  onChanged: (id) {
-                    if (id != null && id != '0') {
-                      item.skuId = id;
-                    }
-                  },
-                  validator: (v) {
-                    if (v == '0' || v == null || v.trim().isEmpty) {
-                      return messageValidatorEmpty;
-                    }
-                    return null;
-                  },
-                ),
-              ),
-            ],
           ),
         ],
       ),
@@ -407,46 +294,6 @@ class _AgregarProductoBtn extends StatelessWidget {
             SizedBox(width: 6),
             Text(
               'AÑADIR PRODUCTO',
-              style: TextStyle(
-                color: kTextSecondary,
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 0.8,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _AddSkuBtn extends StatelessWidget {
-  final VoidCallback onTap;
-  const _AddSkuBtn({required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 14),
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: kGrayBorder,
-            width: 1.2,
-            style: BorderStyle.solid,
-          ),
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: const Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.add_rounded, color: kTextSecondary, size: 18),
-            SizedBox(width: 6),
-            Text(
-              'AÑADIR SKU',
               style: TextStyle(
                 color: kTextSecondary,
                 fontSize: 12,

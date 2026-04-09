@@ -14,7 +14,6 @@ class ItemDetailDispatch extends StatelessWidget {
       children: [
         const SizedBox(height: 20),
         detailRow('N. Orden', item.orderNumber),
-        detailRow('Tipo Sku', item.typeSku),
         detailRow('Placa', item.truckLicense),
         detailRow('Usuario', item.createdBy),
         detailRow('Tipo vehículo', item.nameVehicleType),

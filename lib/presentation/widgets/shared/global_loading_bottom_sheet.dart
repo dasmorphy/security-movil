@@ -61,6 +61,7 @@ class _LoadingOverlay extends StatelessWidget {
         child: Container(
           margin: const EdgeInsets.all(16),
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          constraints: const BoxConstraints(maxWidth: 320),
           decoration: BoxDecoration(
             color: const Color(0xFF2A2A2A),
             borderRadius: BorderRadius.circular(14),
@@ -70,9 +71,11 @@ class _LoadingOverlay extends StatelessWidget {
             children: [
               _buildIcon(),
               const SizedBox(width: 12),
-              Text(
-                message,
-                style: const TextStyle(color: Colors.white, fontSize: 14),
+              Flexible(
+                child: Text(
+                  message,
+                  style: const TextStyle(color: Colors.white, fontSize: 14),
+                ),
               ),
             ],
           ),

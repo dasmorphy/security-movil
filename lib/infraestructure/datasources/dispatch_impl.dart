@@ -132,18 +132,47 @@ class DispatchImpl extends DispatchDatasource {
 
   @override
   Future<ApiResponse<dynamic>> updateDispatch(Map<String, dynamic> data) async {
-    try {      
+    try {
+      final images = data['images'] as List<Uint8List>?;
       final dispatchData = Map<String, dynamic>.from(data);
+      dispatchData.remove('images');
+      dispatchData['channel'] = 'ZENTINEL';
+      final dispatchJson = jsonEncode(dispatchData);
+      final dispatchBytes = utf8.encode(dispatchJson);
 
-      final dispatchJson = {
-        "dispatch_data": dispatchData,
-        "external_transaction_id": uuid,
-        "channel": 'ZENTINEL', 
-      };
+      final formData = FormData();
+
+      formData.files.add(
+        MapEntry(
+          'dispatch_data',
+          MultipartFile.fromBytes(
+            dispatchBytes,
+            filename: 'dispatch_data.json',
+            contentType: MediaType('application', 'json'),
+          ),
+        ),
+      );
+
+      // NUEVO: usar Uint8List directamente
+      if (images != null && images.isNotEmpty) {
+        for (var i = 0; i < images.length; i++) {
+          formData.files.add(
+            MapEntry(
+              'images',
+              MultipartFile.fromBytes(
+                images[i],
+                filename: 'image_$i.webp',         // nombre con índice
+                contentType: MediaType('image', 'webp'),
+              ),
+            ),
+          );
+        }
+      }
 
       final response = await dio.patch(
         '/rest/zent-dispatch-api/v1.0/dispatch/${data['dispatch_id']}',
-        data: jsonEncode(dispatchJson),
+        data: formData,
+        options: onlyError(),
       );
 
       final body = response.data;

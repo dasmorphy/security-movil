@@ -9,7 +9,7 @@ class EntryAccessControl {
   List<Material> materials;
   String namesVisit;
   String observationsEntry;
-  String observationsOut;
+  dynamic observationsOut;
   String reasonVisit;
   int staffChargeId;
   String staffChargeName;

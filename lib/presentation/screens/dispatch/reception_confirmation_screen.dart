@@ -23,7 +23,9 @@ class ReceptionConfirmationScreen extends ConsumerWidget {
       statusColor: getStatusColorDispatch(dispatchData.status),
     );
 
-    final products = dispatchData.productsSku.map((product) {
+    final products = dispatchData.skus
+    .expand((sku) => sku.products)
+    .map((product) {
       return ReceivedProduct(
         id: product.idProduct,
         productName: product.name,
@@ -33,7 +35,8 @@ class ReceptionConfirmationScreen extends ConsumerWidget {
         commentary: '',
         hasDiscrepancy: false,
       );
-    }).toList();
+    })
+    .toList();
 
     return ReceptionConfirmationForm(
       dispatchData: dispatchHeader,
