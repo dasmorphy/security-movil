@@ -494,26 +494,17 @@ class _BiomarEntryReportFormState extends ConsumerState<BiomarEntryReportForm> {
                     child: Container(
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(vertical: 14),
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: kGrayBorder,
-                          width: 1.2,
-                          style: BorderStyle.solid,
-                        ),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Icon(Icons.add_rounded, color: kTextSecondary, size: 18),
-                          SizedBox(width: 6),
+                          SizedBox(width: 2),
                           Text(
-                            'Agregar material',
-                            style: TextStyle(
-                              color: Color.fromARGB(255, 128, 134, 145),
-                              fontSize: 15,
+                            "Añadir Material",
+                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              color: const Color.fromARGB(255, 137, 172, 255),
+                              fontSize: 12,
                               fontWeight: FontWeight.w600,
-                              letterSpacing: 0.8,
                             ),
                           ),
                         ],

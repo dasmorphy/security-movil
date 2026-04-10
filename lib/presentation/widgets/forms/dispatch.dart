@@ -81,13 +81,6 @@ class _CrearDespachoScreenState extends ConsumerState<DispatchForm> {
     super.dispose();
   }
 
-  String get _tipoSku {
-    // Obtener el primer SKU para calcular el tipo
-    if (_skus.isEmpty) return 'SKU Independiente';
-    final conProducto = _skus[0].productos.length;
-    return conProducto > 1 ? 'SKU Mixto' : 'SKU Independiente';
-  }
-
   void _agregarProducto(int skuIndex) {
     if (skuIndex < 0 || skuIndex >= _skus.length) return;
     setState(() {
@@ -248,41 +241,16 @@ class _CrearDespachoScreenState extends ConsumerState<DispatchForm> {
     final vehiclesTypes = ref.watch(getAllVehicleTypes);
     final destiny = ref.watch(getAllDestinyIntern);
 
-    return Scaffold(
-      resizeToAvoidBottomInset: false,
-      backgroundColor: kGrayBg,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 18, color: kTextPrimary),
-          onPressed: () => Navigator.maybePop(context),
-        ),
-        title: const Text(
-          'Nuevo despacho',
-          style: TextStyle(
-            color: kTextPrimary,
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        centerTitle: false,
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(0.5),
-          child: Container(height: 0.5, color: kGrayBorder),
-        ),
-      ),
-      body: Column(
+    return  Column(
         children: [
           Expanded(
             child: Form(
               key: _formKey,
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 16),
                     NewSkuListCard(
                       skus: _skus,
                       catalogProducts: dispatchProducts,
@@ -292,7 +260,7 @@ class _CrearDespachoScreenState extends ConsumerState<DispatchForm> {
                       onAddSku: _addSku,
                       onAgregarProducto: _agregarProducto,
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 6),
                     InformacionLogisticaCard(
                       imagesMaxError: imagesMaxError,
                       imagesMinError: imagesMinError,
@@ -318,7 +286,6 @@ class _CrearDespachoScreenState extends ConsumerState<DispatchForm> {
                         _selectedImages = images;
                       },
                     ),
-                    const SizedBox(height: 24),
                   ],
                 ),
               ),
@@ -326,8 +293,7 @@ class _CrearDespachoScreenState extends ConsumerState<DispatchForm> {
           ),
           _BottomBar(onCrear: _crearDespacho),
         ],
-      ),
-    );
+      );
   }
 }
 
@@ -340,7 +306,7 @@ class _BottomBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.white,
+      // color: Colors.white,
       padding: EdgeInsets.fromLTRB(16, 12, 16, 12 + MediaQuery.of(context).padding.bottom),
       child: SizedBox(
         width: double.infinity,
@@ -348,10 +314,17 @@ class _BottomBar extends StatelessWidget {
         child: ElevatedButton(
           onPressed: isLoading ? null : onCrear,
           style: ElevatedButton.styleFrom(
-            backgroundColor: kNavy,
-            foregroundColor: Colors.white,
-            elevation: 0,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            backgroundColor: const Color.fromARGB(189, 7, 213, 213),
+            disabledBackgroundColor: const Color.fromARGB(
+              120,
+              7,
+              213,
+              213,
+            ),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -369,7 +342,11 @@ class _BottomBar extends StatelessWidget {
               ],
               const Text(
                 'Crear Despacho',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                style: TextStyle(
+                  fontSize: 15,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ],
           ),

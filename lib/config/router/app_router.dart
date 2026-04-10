@@ -92,6 +92,11 @@ final appRouter = GoRouter(
               entryAccessData: entryAccessData,
             );
           },
+        ),
+        GoRoute(
+          path: 'new-dispatch',
+          name: NewDispatchScreen.name,
+          builder: (context, state) => const NewDispatchScreen(),
         )
       ]
     ),

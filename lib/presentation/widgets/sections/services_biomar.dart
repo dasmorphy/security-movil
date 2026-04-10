@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:zentinel/config/constants/permissions.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
@@ -60,13 +61,7 @@ class _ServicesBiomarState extends ConsumerState<ServicesBiomar> {
                 BasicServiceCard(
                   iconImage: 'iconentrada',
                   label: 'Despacho',
-                  childWidget: DispatchForm(
-                    onSubmit: (data) async {
-                      return await ref
-                        .read(dispatchProvider.notifier)
-                        .saveDispatch(data);
-                    },
-                  ),
+                  onTap: () => context.push('/new-dispatch')
                 ),
 
             ],
