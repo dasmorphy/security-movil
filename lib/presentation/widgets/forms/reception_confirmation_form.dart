@@ -148,7 +148,7 @@ class _ReceptionConfirmationFormState extends ConsumerState<ReceptionConfirmatio
         'reception_details': hasDiscrepancies
           ? _products
             .map((p) => {
-              'product_id': p.id,
+              'product_sku_id': p.id,
               'expected_quantity': p.expectedQty,
               'received_quantity': p.receivedQty,
               'observations': p.commentary,

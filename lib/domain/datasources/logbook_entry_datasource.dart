@@ -15,5 +15,5 @@ abstract class LogbookEntryDatasource {
   Future<void> downloadExcel();
   Future <List<GroupBusiness>> getGroupBusinessByIdBusiness(int idBusinness);
   Future <List<Authorized>> getAllAuthorized();
-  Future <List<DestinyIntern>> getAllDestinyIntern();
+  Future <List<DestinyIntern>> getAllDestinyIntern(Map<String, dynamic> filters);
 }

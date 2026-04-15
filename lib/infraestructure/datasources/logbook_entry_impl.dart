@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:path_provider/path_provider.dart';
@@ -248,11 +247,11 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
   }
 
   @override
-  Future<List<DestinyIntern>> getAllDestinyIntern() async {
+  Future<List<DestinyIntern>> getAllDestinyIntern(Map<String, dynamic> filters) async {
     final response = await dio.get(
       '/rest/zent-logbook-api/v1.0/get/allDestinyIntern',
       options: Options(
-        headers: {'externalTransactionId': uuid, 'channel': 'ZENTINEL'},
+        headers: {'externalTransactionId': uuid, 'channel': 'ZENTINEL', 'business': filters['business']},
       ),
     );
     final List destinyJson = response.data['data'];

@@ -27,7 +27,7 @@ class ReceptionConfirmationScreen extends ConsumerWidget {
     .expand((sku) => sku.products)
     .map((product) {
       return ReceivedProduct(
-        id: product.idProduct,
+        id: product.idProductSku,
         productName: product.name,
         status: 'CORRECTO',
         expectedQty: product.quantity,

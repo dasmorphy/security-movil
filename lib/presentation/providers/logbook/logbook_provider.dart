@@ -51,13 +51,28 @@ final getAllAuthorized =
   );
 });
 
-final getAllDestinyIntern =
-    StateNotifierProvider<CatalogNotifier<DestinyIntern>, List<DestinyIntern>>((ref) {
+final getAllDestinyIntern = StateNotifierProvider<CatalogNotifier<DestinyIntern>, List<DestinyIntern>>((ref) {
   final repo = ref.watch(logbookEntryRepositoryProvider);
+  final authState = ref.watch(userSessionProvider);
+
+  if (!authState.hasValue || authState.value == null) {
+    return CatalogNotifier<DestinyIntern>((_) async => []);
+  }
+
+  final userData = authState.value!;
+
+  // return CatalogNotifier<DestinyIntern>(
+  //   (_) => repo.getAllDestinyIntern(),
+  // );
 
   return CatalogNotifier<DestinyIntern>(
-    (_) => repo.getAllDestinyIntern(),
-  );
+      (filters) {
+        final mergedFilters = {
+          'business': userData.attributes['id_business']
+        };
+        return repo.getAllDestinyIntern(mergedFilters);
+      },
+    );
 });
 
 

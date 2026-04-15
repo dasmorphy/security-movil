@@ -8,6 +8,7 @@ class AllDispatch {
   String nameVehicleType;
   String observations;
   String orderNumber;
+  dynamic reception;
   List<Skus> skus;
   String status;
   String truckLicense;
@@ -25,6 +26,7 @@ class AllDispatch {
     required this.nameVehicleType,
     required this.observations,
     required this.orderNumber,
+    required this.reception,
     required this.skus,
     required this.status,
     required this.truckLicense,
@@ -43,6 +45,7 @@ class AllDispatch {
     nameVehicleType: json["name_vehicle_type"],
     observations: json["observations"],
     orderNumber: json["order_number"],
+    reception: json["reception"],
     skus: List<Skus>.from(json["skus"].map((x) => Skus.fromJson(x))),
     status: json["status"],
     truckLicense: json["truck_license"],
@@ -61,6 +64,7 @@ class AllDispatch {
     "name_vehicle_type": nameVehicleType,
     "observations": observations,
     "order_number": orderNumber,
+    "reception": reception,
     "skus": List<dynamic>.from(skus.map((x) => x.toJson())),
     "status": status,
     "truck_license": truckLicense,
@@ -76,12 +80,46 @@ class Image {
 
   Image({required this.imagePath, required this.process});
 
-  factory Image.fromJson(Map<String, dynamic> json) =>
-      Image(imagePath: json["image_path"], process: json["process"]);
+  factory Image.fromJson(Map<String, dynamic> json) => Image(
+    imagePath: json["image_path"],
+    process: json["process"],
+  );
 
   Map<String, dynamic> toJson() => {
     "image_path": imagePath,
     "process": process,
+  };
+}
+
+class Reception {
+  DateTime createdAt;
+  int idReception;
+  bool isCorrect;
+  String observations;
+  List<dynamic> receptionDetail;
+
+  Reception({
+    required this.createdAt,
+    required this.idReception,
+    required this.isCorrect,
+    required this.observations,
+    required this.receptionDetail,
+  });
+
+  factory Reception.fromJson(Map<String, dynamic> json) => Reception(
+    createdAt: DateTime.parse(json["created_at"]),
+    idReception: json["id_reception"],
+    isCorrect: json["is_correct"],
+    observations: json["observations"],
+    receptionDetail: List<dynamic>.from(json["reception_detail"].map((x) => x)),
+  );
+
+  Map<String, dynamic> toJson() => {
+    "created_at": createdAt.toIso8601String(),
+    "id_reception": idReception,
+    "is_correct": isCorrect,
+    "observations": observations,
+    "reception_detail": List<dynamic>.from(receptionDetail.map((x) => x)),
   };
 }
 
@@ -109,36 +147,28 @@ class Skus {
 
 class Product {
   int idProduct;
+  int idProductSku;
   String name;
   int quantity;
 
   Product({
     required this.idProduct,
+    required this.idProductSku,
     required this.name,
     required this.quantity,
   });
 
   factory Product.fromJson(Map<String, dynamic> json) => Product(
     idProduct: json["id_product"],
+    idProductSku: json["id_product_sku"],
     name: json["name"],
     quantity: json["quantity"],
   );
 
   Map<String, dynamic> toJson() => {
     "id_product": idProduct,
+    "id_product_sku": idProductSku,
     "name": name,
     "quantity": quantity,
   };
-}
-
-class EnumValues<T> {
-  Map<String, T> map;
-  late Map<T, String> reverseMap;
-
-  EnumValues(this.map);
-
-  Map<T, String> get reverse {
-    reverseMap = map.map((k, v) => MapEntry(v, k));
-    return reverseMap;
-  }
 }

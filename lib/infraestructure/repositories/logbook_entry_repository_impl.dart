@@ -54,8 +54,8 @@ class LogbookEntryRepositoryImpl extends LogbookEntryRepository {
   }
 
   @override
-  Future<List<DestinyIntern>> getAllDestinyIntern() {
-    return datasource.getAllDestinyIntern();
+  Future<List<DestinyIntern>> getAllDestinyIntern(Map<String, dynamic> filters) {
+    return datasource.getAllDestinyIntern(filters);
   }
   
 }
