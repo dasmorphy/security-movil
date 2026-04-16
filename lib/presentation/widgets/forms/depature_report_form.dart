@@ -58,6 +58,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
   final FocusNode _descFocus = FocusNode();
   final FocusNode _observationsFocus = FocusNode();
   final FocusNode _categoryEntryFocus = FocusNode();
+  bool isPickingImage = false;
 
   @override
   void initState() {
@@ -106,38 +107,25 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
   }
 
   Future<void> _captureImageFromCamera() async {
-    if (_selectedImages.length >= 5) {
-      if (mounted) {
-        setState(() {
-          imagesMinError = false;
-          imagesMaxError = false;
-        });
-      }
-    }
+    // Evita doble llamada
+    if (isPickingImage) return;
 
     if (_selectedImages.length >= 10) {
-      if (mounted) {
-        setState(() {
-          imagesMaxError = true;
-        });
-      }
+      if (mounted) setState(() => imagesMaxError = true);
       return;
     }
 
-    if (_selectedImages.length == 10) {
-      imagesMaxError = false;
-    }
+    setState(() => isPickingImage = true);
 
     try {
       final XFile? image = await _imagePicker.pickImage(
         source: ImageSource.camera,
-        imageQuality: 60,//reduce peso
+        imageQuality: 60,
         maxWidth: 1024,
-        maxHeight: 1024
+        maxHeight: 1024,
       );
 
       if (image != null && mounted) {
-        // Agregar placeholder nulo para mostrar progreso en la UI
         setState(() {
           _selectedImages.add(null);
           imagesMinError = false;
@@ -145,47 +133,47 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
         });
 
         final placeholderIndex = _selectedImages.length - 1;
-
         final originalFile = File(image.path);
-
-        // Convertir a WebP
         final webpFile = await convertToWebP(originalFile);
 
         if (!mounted) return;
 
         if (webpFile == null) {
-          if (mounted) {
-            // Remover placeholder
-            setState(() {
-              if (placeholderIndex < _selectedImages.length &&
-                  _selectedImages[placeholderIndex] == null) {
-                _selectedImages.removeAt(placeholderIndex);
-              }
-            });
-
-            showDialog(
-              context: context,
-              builder: (_) =>
-                  ShowDialogWidget(title: 'Error al convertir imagen'),
-            );
-          }
+          setState(() {
+            if (placeholderIndex < _selectedImages.length &&
+                _selectedImages[placeholderIndex] == null) {
+              _selectedImages.removeAt(placeholderIndex);
+            }
+          });
+          showDialog(
+            context: context,
+            builder: (_) => ShowDialogWidget(title: 'Error al convertir imagen'),
+          );
           return;
         }
-
-        // final bytes = await webpFile.length();
-        // final mb = bytes / 1024 / 1024;
 
         print("Peso WebP: ${(webpFile.length / 1024 / 1024).toStringAsFixed(2)} MB");
 
         if (mounted) {
-          setState(() {
-            _selectedImages[placeholderIndex] = webpFile;
-          });
+          setState(() => _selectedImages[placeholderIndex] = webpFile);
         }
+      }
+    } on PlatformException catch (e) {
+      if (e.code == 'already_active') return; // ignora silenciosamente
+      if (mounted) {
+        if (_selectedImages.isNotEmpty && _selectedImages.last == null) {
+          setState(() => _selectedImages.removeLast());
+        }
+        showDialog(
+          context: context,
+          builder: (_) => ShowDialogWidget(
+            title: 'Error al capturar imagen',
+            content: e.message ?? '$e',
+          ),
+        );
       }
     } catch (e) {
       if (mounted) {
-        // Remover último placeholder si existe
         if (_selectedImages.isNotEmpty && _selectedImages.last == null) {
           setState(() => _selectedImages.removeLast());
         }
@@ -197,6 +185,8 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
           ),
         );
       }
+    } finally {
+      if (mounted) setState(() => isPickingImage = false);
     }
   }
 
@@ -940,7 +930,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: ElevatedButton(
-                        onPressed: isLoading ? null : _submit,
+                        onPressed: (isLoading || isPickingImage) ? null : _submit,
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
