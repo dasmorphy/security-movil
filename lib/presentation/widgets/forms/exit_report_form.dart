@@ -100,8 +100,10 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
       return;
     }
 
-    _latitude = pos.latitude;
-    _longitude = pos.longitude;
+    setState(() {
+      _latitude = pos.latitude;
+      _longitude = pos.longitude;
+    });
   }
 
   Future<void> _captureImageFromCamera() async {
@@ -227,19 +229,19 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
       return;
     }
 
-    if (_latitude ==  -0.1865936 || _longitude == -78.5953478) {
-      if (mounted) {
-        showDialog(
-          context: context,
-          builder: (_) => const AlertDialog(
-            title: Text("Ubicación no disponible"),
-            content: Text("Activa el GPS o concede permisos."),
-          ),
-        );
-      }
-      setState(() => isLoading = false);
-      return;
-    }
+    // if (_latitude ==  -0.1865936 || _longitude == -78.5953478) {
+    //   if (mounted) {
+    //     showDialog(
+    //       context: context,
+    //       builder: (_) => const AlertDialog(
+    //         title: Text("Ubicación no disponible"),
+    //         content: Text("Activa el GPS o concede permisos."),
+    //       ),
+    //     );
+    //   }
+    //   setState(() => isLoading = false);
+    //   return;
+    // }
     
     if (_selectedImages.length < 5) {
       setState(() {
