@@ -14,7 +14,7 @@ class DiscrepancyDonutWidget extends StatelessWidget {
     final pct = data.discrepancyPercentage;
 
     return Card(
-      color: const Color.fromARGB(255, 0, 0, 0),
+      color: const Color.fromARGB(255, 11, 16, 20),
       elevation: 0,
       // shape: RoundedRectangleBorder(
       //   borderRadius: BorderRadius.circular(16),
@@ -36,8 +36,8 @@ class DiscrepancyDonutWidget extends StatelessWidget {
           // Dona centrada
           Center(
             child: SizedBox(
-              width: 200,
-              height: 200,
+              width: 180,
+              height: 180,
               child: Stack(
                 alignment: Alignment.center,
                 children: [
@@ -96,30 +96,17 @@ class DiscrepancyDonutWidget extends StatelessWidget {
           // Estados de despacho
           ...data.dispatchByStatus.map(
             (s) => Padding(
-              // padding: const EdgeInsets.symmetric(vertical: 4),
-              // child: Row(
-              //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              //   children: [
-              //     Text(
-              //       s.statusName,
-              //       style: TextStyle(fontSize: 12, color: Colors.white),
-              //     ),
-              //     Text(
-              //       '${s.count}',
-              //       style: const TextStyle(
-              //         fontSize: 12,
-              //         fontWeight: FontWeight.w500,
-              //         color: Colors.white,
-              //       ),
-              //     ),
-              //   ],
-              // ),
               padding: const EdgeInsets.symmetric(vertical: 6),
-              child: StatusProgressBar(
-                label: s.statusName,
-                count: s.count,
-                total: data.totalRecords,
-                color: const Color(0xFF1D9E75),
+              child: Column(
+                children: [
+                  StatusProgressBar(
+                    label: s.statusName,
+                    count: s.count,
+                    total: data.totalRecords,
+                    color: const Color(0xFF1D9E75),
+                  ),
+                  const SizedBox(height: 10,)
+                ],
               ),
             ),
           ),

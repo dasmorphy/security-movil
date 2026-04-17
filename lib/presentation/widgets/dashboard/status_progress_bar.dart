@@ -50,15 +50,15 @@ class StatusProgressBar extends StatelessWidget {
                 overflow: TextOverflow.ellipsis,
               ),
             ),
-            const SizedBox(width: 8),
-            Text(
-              '$count',
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-                color: resolvedColor,
-              ),
-            ),
+            // const SizedBox(width: 8),
+            // Text(
+            //   '$count',
+            //   style: TextStyle(
+            //     fontSize: 12,
+            //     fontWeight: FontWeight.w500,
+            //     color: resolvedColor,
+            //   ),
+            // ),
             const SizedBox(width: 6),
             SizedBox(
               width: 32,

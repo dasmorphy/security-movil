@@ -68,14 +68,20 @@ class HomeViewState extends ConsumerState<HomeView> {
                   const SizedBox(height: 10),
                   dataGraphs.when(
                     data: (data) {
-                      return DiscrepancyDonutWidget(data: data);
+                      return Column(
+                        children: [
+                          ShipmentDispatch(data: data),
+                          const SizedBox(height: 20),
+                          DiscrepancyDonutWidget(data: data),
+                        ],
+                      );
                     },
                     loading: () => const Center(child: CircularProgressIndicator()),
                     error: (e, _) {
                       return const Text('Error cargando datos');
                     },
                   ),
-                  const SizedBox(height: 30),
+                  const SizedBox(height: 10),
                 ],
 
                 if (userData.hasPermission(Permissions.verBitacoras))...[

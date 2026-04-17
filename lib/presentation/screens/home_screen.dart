@@ -80,7 +80,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       //   child: const CustomAppbar(),
       // ),
       // resizeToAvoidBottomInset: false,
-      backgroundColor: const Color.fromARGB(255, 0, 0, 0),
+      backgroundColor: const Color.fromARGB(255, 11, 16, 20),
       body: SafeArea(
         top: false,
         // bottom: false,

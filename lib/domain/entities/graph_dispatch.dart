@@ -12,6 +12,15 @@ class GraphDispatch {
  
   int get okRecords => totalRecords - discrepancy;
 
+  int getCountByStatus(String statusName) {
+    return dispatchByStatus
+      .firstWhere(
+        (e) => e.statusName == statusName,
+        orElse: () => DispatchByStatus(count: 0, idStatus: 0, statusName: ''),
+      )
+      .count;
+  }
+
   factory GraphDispatch.fromJson(Map<String, dynamic> json) => GraphDispatch(
     discrepancy: json["discrepancy"],
     dispatchByStatus: List<DispatchByStatus>.from(
