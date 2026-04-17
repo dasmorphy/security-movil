@@ -45,6 +45,7 @@ class HomeViewState extends ConsumerState<HomeView> {
   @override
   Widget build(BuildContext context) {
     final authState = ref.read(userSessionProvider);
+    final dataGraphs = ref.watch(graphDispatchProvider);
 
     if (!authState.hasValue || authState.value == null) {
       return const SizedBox.shrink();
@@ -61,6 +62,22 @@ class HomeViewState extends ConsumerState<HomeView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+
+                if (userData.hasPermission(Permissions.verDashboardBiomar))...[
+                  // Dashboard biomar
+                  const SizedBox(height: 10),
+                  dataGraphs.when(
+                    data: (data) {
+                      return DiscrepancyDonutWidget(data: data);
+                    },
+                    loading: () => const Center(child: CircularProgressIndicator()),
+                    error: (e, _) {
+                      return const Text('Error cargando datos');
+                    },
+                  ),
+                  const SizedBox(height: 30),
+                ],
+
                 if (userData.hasPermission(Permissions.verBitacoras))...[
                   // Bitácoras Recientes
                   const SizedBox(height: 10),
@@ -69,6 +86,7 @@ class HomeViewState extends ConsumerState<HomeView> {
                     routeLink: '/list-logbooks',
                     childListBuild: const ItemRecentLogbook(),
                   ),
+                  const SizedBox(height: 30),
                 ],
 
                 if (userData.hasPermission(Permissions.verDespachos))...[
@@ -78,6 +96,7 @@ class HomeViewState extends ConsumerState<HomeView> {
                     routeLink: '/list-dispatches',
                     childListBuild: const ItemRecentDispatch(),
                   ),
+                  const SizedBox(height: 30),
                 ],
 
                 if (userData.hasPermission(Permissions.verIngresosBiomar))...[

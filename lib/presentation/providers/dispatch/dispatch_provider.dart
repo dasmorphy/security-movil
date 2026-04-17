@@ -4,6 +4,7 @@ import 'package:zentinel/domain/entities/api_response.dart';
 import 'package:zentinel/domain/entities/dispatch_products.dart';
 import 'package:zentinel/domain/entities/dispatch_status.dart';
 import 'package:zentinel/domain/entities/entry_access_control.dart';
+import 'package:zentinel/domain/entities/graph_dispatch.dart';
 import 'package:zentinel/domain/repositories/dispatch_repository.dart';
 import 'package:zentinel/presentation/providers/dispatch/dispatch_repository_provider.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
@@ -57,6 +58,11 @@ final dispatchProvider =
     StateNotifierProvider<DispatchProvider, AsyncValue<ApiResponse<dynamic>>>((ref) {
   final repo = ref.watch(dispatchRepositoryProvider);
   return DispatchProvider(repo);
+});
+
+final graphDispatchProvider = FutureProvider<GraphDispatch>((ref) async {
+  final repo = ref.watch(dispatchRepositoryProvider);
+  return await repo.getGraphDispatch();
 });
 
 

@@ -11,6 +11,7 @@ import 'package:zentinel/domain/entities/api_response.dart';
 import 'package:zentinel/domain/entities/dispatch_products.dart';
 import 'package:zentinel/domain/entities/dispatch_status.dart';
 import 'package:zentinel/domain/entities/entry_access_control.dart';
+import 'package:zentinel/domain/entities/graph_dispatch.dart';
 import 'package:zentinel/domain/entities/vehicle_type.dart';
 
 class DispatchImpl extends DispatchDatasource {
@@ -445,6 +446,18 @@ class DispatchImpl extends DispatchDatasource {
         message: 'Error al actualizar el registro',
       );
     }
+  }
+
+  @override
+  Future<GraphDispatch> getGraphDispatch() async {
+    final response = await dio.get(
+      '/rest/zent-dispatch-api/v1.0/get/resume_graphs',
+      options: Options(
+        headers: {'externalTransactionId': uuid, 'channel': 'ZENTINEL'},
+      ),
+    );
+    final GraphDispatch graphsJson = GraphDispatch.fromJson(response.data['data']);
+    return graphsJson;
   }
 
 }
