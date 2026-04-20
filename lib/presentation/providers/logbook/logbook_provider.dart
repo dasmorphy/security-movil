@@ -3,7 +3,7 @@ import 'package:zentinel/domain/entities/all_logbook.dart';
 import 'package:zentinel/domain/entities/authorized.dart';
 import 'package:zentinel/domain/entities/category.dart';
 import 'package:zentinel/domain/entities/destiny_intern.dart';
-import 'package:zentinel/domain/entities/dispatch_products.dart';
+import 'package:zentinel/domain/entities/graph_logbook.dart';
 import 'package:zentinel/domain/entities/group_business.dart';
 import 'package:zentinel/domain/entities/unity_weight.dart';
 import 'package:zentinel/domain/entities/vehicle_type.dart';
@@ -88,6 +88,18 @@ final saveOutLogbookProvider =
   return OutLogbookNotifier(repo);
 });
 
+final graphLogbookProvider = FutureProvider<GraphLogbook>((ref) async {
+  final repo = ref.watch(logbookEntryRepositoryProvider);
+  final now = DateTime.now();
+  final startDate = DateTime(now.year, now.month, now.day);
+  final endDate = startDate.add(const Duration(days: 1));
+
+  final filters = {
+    'start_date': startDate.toIso8601String(),
+    'end_date': endDate.toIso8601String(),
+  };
+  return await repo.getGraphLogbook(filters);
+});
 
 final getHistoryLogbooks =
     StateNotifierProvider.autoDispose<

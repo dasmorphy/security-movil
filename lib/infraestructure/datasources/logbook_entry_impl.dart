@@ -9,6 +9,7 @@ import 'package:zentinel/domain/entities/all_logbook.dart';
 import 'package:zentinel/domain/entities/authorized.dart';
 import 'package:zentinel/domain/entities/category.dart';
 import 'package:zentinel/domain/entities/destiny_intern.dart';
+import 'package:zentinel/domain/entities/graph_logbook.dart';
 import 'package:zentinel/domain/entities/group_business.dart';
 import 'package:zentinel/domain/entities/unity_weight.dart';
 import 'package:open_filex/open_filex.dart';
@@ -256,5 +257,20 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
     );
     final List destinyJson = response.data['data'];
     return destinyJson.map((json) => DestinyIntern.fromJson(json)).toList();
+  }
+
+  @override
+  Future<GraphLogbook> getGraphLogbook(Map<String, dynamic> filters) async {
+    final response = await dio.get(
+      '/rest/zent-logbook-api/v1.0/get/resume_graphs?start_date=${filters['start_date']}&end_date=${filters['end_date']}',
+      options: Options(
+        headers: {
+          'externalTransactionId': uuid, 
+          'channel': 'ZENTINEL'
+        },
+      ),
+    );
+    final GraphLogbook graphsJson = GraphLogbook.fromJson(response.data['data']);
+    return graphsJson;
   }
 }

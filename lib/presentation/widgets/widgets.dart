@@ -67,5 +67,6 @@ export 'package:zentinel/presentation/widgets/forms/update_status_dispatch.dart'
 export 'package:zentinel/presentation/widgets/forms/logistic_card_form.dart';
 export 'package:zentinel/presentation/widgets/cards/new_sku_list_card.dart';
 export 'package:zentinel/presentation/widgets/dashboard/donut.dart';
+export 'package:zentinel/presentation/widgets/dashboard/donut_expalsa.dart';
 export 'package:zentinel/presentation/widgets/dashboard/status_progress_bar.dart';
 export 'package:zentinel/presentation/widgets/dashboard/shipment_dispatch.dart';

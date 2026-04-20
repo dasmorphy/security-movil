@@ -3,6 +3,7 @@ import 'package:zentinel/domain/entities/all_logbook.dart';
 import 'package:zentinel/domain/entities/authorized.dart';
 import 'package:zentinel/domain/entities/category.dart';
 import 'package:zentinel/domain/entities/destiny_intern.dart';
+import 'package:zentinel/domain/entities/graph_logbook.dart';
 import 'package:zentinel/domain/entities/group_business.dart';
 import 'package:zentinel/domain/entities/unity_weight.dart';
 import 'package:zentinel/domain/repositories/logbook_entry_repository.dart';
@@ -56,6 +57,11 @@ class LogbookEntryRepositoryImpl extends LogbookEntryRepository {
   @override
   Future<List<DestinyIntern>> getAllDestinyIntern(Map<String, dynamic> filters) {
     return datasource.getAllDestinyIntern(filters);
+  }
+
+  @override
+  Future<GraphLogbook> getGraphLogbook(Map<String, dynamic> filters) {
+    return datasource.getGraphLogbook(filters);
   }
   
 }

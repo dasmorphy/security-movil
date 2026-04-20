@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/config/constants/permissions.dart';
+import 'package:zentinel/domain/entities/user_session.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
@@ -23,29 +24,36 @@ class HomeViewState extends ConsumerState<HomeView> {
     final authState = ref.read(userSessionProvider);
     final userData = authState.value;
     print('Usuario autenticado: $userData');
+    initProvidersByBusiness(userData);
+  }
 
-    ref.read(getAllVehicleTypes.notifier).load();
-    ref.read(getDispatchStatus.notifier).load();
-    ref.read(getAllDispatchProducts.notifier).load();
-    ref.read(getHistoryLogbooks.notifier).load();
-    ref.read(getHistoryDispatch.notifier).load();
-    ref.read(getHistoryEntryAccess.notifier).load();
+  void initProvidersByBusiness(User? userData) {
+    if (userData != null) {
+      if (userData.attributes['id_business'] == 1) {
+        ref.read(getAllCategories.notifier).load();
+        ref.read(getGroupBusinessByIdBusiness.notifier).load();
+        ref.read(getAllUnitiesWeight.notifier).load();
+        ref.read(getAllAuthorized.notifier).load();
+        ref.read(getAllDestinyIntern.notifier).load();
+        ref.read(getHistoryLogbooks.notifier).load();
 
-    //Se llama los catalogos desde el home para escenarios offline
-    // ref.read(getAllCategories.notifier).load();
-    // ref.read(getGroupBusinessByIdBusiness.notifier).load();
-    // ref.read(getAllUnitiesWeight.notifier).load();
-    // ref.read(getAllAuthorized.notifier).load();
-    ref.read(getAllDestinyIntern.notifier).load();
-    ref.read(getAreasVisit.notifier).load();
-    ref.read(getMaterials.notifier).load();
-    ref.read(getStaffCharge.notifier).load();
+      }else if (userData.attributes['id_business'] == 2) {
+        ref.read(getAllDestinyIntern.notifier).load();
+        ref.read(getAreasVisit.notifier).load();
+        ref.read(getMaterials.notifier).load();
+        ref.read(getStaffCharge.notifier).load();
+        ref.read(getAllVehicleTypes.notifier).load();
+        ref.read(getDispatchStatus.notifier).load();
+        ref.read(getAllDispatchProducts.notifier).load();
+        ref.read(getHistoryDispatch.notifier).load();
+        ref.read(getHistoryEntryAccess.notifier).load();
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final authState = ref.read(userSessionProvider);
-    final dataGraphs = ref.watch(graphDispatchProvider);
 
     if (!authState.hasValue || authState.value == null) {
       return const SizedBox.shrink();
@@ -66,13 +74,32 @@ class HomeViewState extends ConsumerState<HomeView> {
                 if (userData.hasPermission(Permissions.verDashboardBiomar))...[
                   // Dashboard biomar
                   const SizedBox(height: 10),
-                  dataGraphs.when(
+                  ref.watch(graphDispatchProvider).when(
                     data: (data) {
                       return Column(
                         children: [
                           ShipmentDispatch(data: data),
                           const SizedBox(height: 20),
                           DiscrepancyDonutWidget(data: data),
+                        ],
+                      );
+                    },
+                    loading: () => const Center(child: CircularProgressIndicator()),
+                    error: (e, _) {
+                      return const Text('Error cargando datos');
+                    },
+                  ),
+                  const SizedBox(height: 10),
+                ],
+
+                if (userData.hasPermission(Permissions.verDashboardExpalsa))...[
+                  // Dashboard biomar
+                  const SizedBox(height: 10),
+                  ref.watch(graphLogbookProvider).when(
+                    data: (data) {
+                      return Column(
+                        children: [
+                          DonutExpalsa(data: data),
                         ],
                       );
                     },
