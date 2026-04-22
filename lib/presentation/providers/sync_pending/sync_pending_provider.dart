@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
@@ -50,6 +52,16 @@ class SyncPendingNotifier extends StateNotifier<bool> {
 
   Future<bool> providerOut(Map<String, dynamic> data) async {
     return await ref.read(saveOutLogbookProvider.notifier).saveLogbookOut(data);
+  }
+
+  Future<void> cleanupImages(Map<String, dynamic> storedData) async {
+    final rawImages = storedData['images'];
+    if (rawImages is List) {
+      for (final path in rawImages.whereType<String>()) {
+        final file = File(path);
+        if (await file.exists()) await file.delete();
+      }
+    }
   }
 
   Future<void> sync() async {
@@ -128,6 +140,8 @@ class SyncPendingNotifier extends StateNotifier<bool> {
           Map<String, dynamic>.from(mark['payload']),
         );
 
+        final originalPayload = Map<String, dynamic>.from(mark['payload']); // paths intactos
+
         print('📤 Enviando request $key con payload: $restoredData');
 
         bool response = false;
@@ -144,6 +158,7 @@ class SyncPendingNotifier extends StateNotifier<bool> {
           // Eliminamos en caso de éxito
           await box.delete(key);
           synced++;
+          await cleanupImages(originalPayload);
           print('✅ Request $key eliminado de Hive tras sincronizar.');
         } else {
           // Desmarcar processing para reintentar luego

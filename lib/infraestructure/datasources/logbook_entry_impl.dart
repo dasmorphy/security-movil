@@ -50,7 +50,7 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
   Future<bool> saveLogbookEntry(Map<String, dynamic> data) async {
     try {
       
-      final images = data['images'] as List<Uint8List>?;
+      final images = (data['images'] as List?)?.whereType<Uint8List>().toList() ?? [];
       final logbookData = Map<String, dynamic>.from(data);
       logbookData.remove('images');
 
@@ -76,7 +76,7 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
 
       // Agregar imágenes
       // NUEVO: usar Uint8List directamente
-      if (images != null && images.isNotEmpty) {
+      if (images.isNotEmpty) {
         for (var i = 0; i < images.length; i++) {
           formData.files.add(
             MapEntry(
@@ -115,7 +115,7 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
 
     try {
       
-      final images = data['images'] as List<Uint8List>?;
+      final images = (data['images'] as List?)?.whereType<Uint8List>().toList() ?? [];
       final logbookData = Map<String, dynamic>.from(data);
       logbookData.remove('images');
 
@@ -140,7 +140,7 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
       );
 
       // NUEVO: usar Uint8List directamente
-      if (images != null && images.isNotEmpty) {
+      if (images.isNotEmpty) {
         for (var i = 0; i < images.length; i++) {
           formData.files.add(
             MapEntry(

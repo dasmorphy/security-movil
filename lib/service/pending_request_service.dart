@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
+import 'package:path_provider/path_provider.dart';
 
 
 Future<bool> hasInternet() async {
@@ -16,6 +18,19 @@ Future<bool> hasInternet() async {
   }
 }
 
+Future<List<String>> saveImagesToDisk(List<Uint8List> images) async {
+  final dir = await getApplicationDocumentsDirectory();
+  List<String> paths = [];
+
+  for (int i = 0; i < images.length; i++) {
+    final file = File('${dir.path}/img_${DateTime.now().millisecondsSinceEpoch}_$i.webp');
+    await file.writeAsBytes(images[i]);
+    paths.add(file.path);
+  }
+
+  return paths;
+}
+
 /// Convierte archivos a Base64 para poder ser guardados en Hive
 Future<Map<String, dynamic>> _prepareDataForStorage(
   Map<String, dynamic> data,
@@ -23,10 +38,10 @@ Future<Map<String, dynamic>> _prepareDataForStorage(
   final preparedData = Map<String, dynamic>.from(data);
 
   if (preparedData['images'] != null && preparedData['images'] is List) {
-    preparedData['images'] = (preparedData['images'] as List)
-      .whereType<File>()
-      .map((file) => file.path)
-      .toList();
+    preparedData['images'] = await saveImagesToDisk(
+      (preparedData['images'] as List).whereType<Uint8List>().toList(),
+    );
+    // Ahora 'images' es List<String> de paths
   }
 
   return preparedData;
@@ -38,8 +53,8 @@ Map<String, dynamic> restoreFiles(Map<String, dynamic> data) {
   if (restored['images'] != null && restored['images'] is List) {
     restored['images'] = (restored['images'] as List)
         .whereType<String>()
-        .map((path) => File(path))
-        .where((file) => file.existsSync())
+        .where((path) => File(path).existsSync())
+        .map((path) => File(path).readAsBytesSync()) // path → Uint8List
         .toList();
   }
 
