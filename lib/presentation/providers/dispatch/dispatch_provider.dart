@@ -67,7 +67,7 @@ final graphDispatchProvider = FutureProvider<GraphDispatch>((ref) async {
 
 
 final getHistoryDispatch =
-    StateNotifierProvider.autoDispose<
+    StateNotifierProvider<
         CatalogNotifier<AllDispatch>,
         List<AllDispatch>>(
   (ref) {
@@ -83,10 +83,9 @@ final getHistoryDispatch =
     return CatalogNotifier<AllDispatch>(
       (filters) {
         final mergedFilters = {
-          if (userData.role == 'admin')
-            'id_business': userData.attributes['id_business']
-          else
-            'user': userData.user,
+          'user': userData.user,
+          if (userData.role == 'admin' || userData.role == 'admin_tlsg')
+            'id_business': userData.attributes['id_business'],
           ...?filters,
         };
         return repo.getHistoryDispatch(mergedFilters);
@@ -96,7 +95,7 @@ final getHistoryDispatch =
 );
 
 final getHistoryEntryAccess =
-    StateNotifierProvider.autoDispose<
+    StateNotifierProvider<
         CatalogNotifier<EntryAccessControl>,
         List<EntryAccessControl>>(
   (ref) {
@@ -112,10 +111,9 @@ final getHistoryEntryAccess =
     return CatalogNotifier<EntryAccessControl>(
       (filters) {
         final mergedFilters = {
-          if (userData.role == 'admin')
-            'id_business': userData.attributes['id_business']
-          else
-            'user': userData.user,
+          'user': userData.user,
+          if (userData.role == 'admin' || userData.role == 'admin_tlsg')
+            'id_business': userData.attributes['id_business'],
           ...?filters,
         };
         return repo.getHistoryEntryAccess(mergedFilters);

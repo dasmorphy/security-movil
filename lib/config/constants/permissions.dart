@@ -13,4 +13,5 @@ class Permissions {
   static const despachoCambioEstadoRecepcion = 'DESPACHO_CAMBIO_ESTADO_RECEPCION';
   static const verIngresosBiomar = 'VER_INGRESOS_BIOMAR';
   static const finalizarIngresoBiomar = 'FINALIZAR_INGRESO_BIOMAR';
+  static const dataGroupBusiness = 'DATA_BY_GROUP_BUSINESS';
 }

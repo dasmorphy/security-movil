@@ -1,4 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:zentinel/config/constants/permissions.dart';
+import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/domain/entities/all_logbook.dart';
 import 'package:zentinel/domain/entities/authorized.dart';
 import 'package:zentinel/domain/entities/category.dart';
@@ -102,7 +104,7 @@ final graphLogbookProvider = FutureProvider<GraphLogbook>((ref) async {
 });
 
 final getHistoryLogbooks =
-    StateNotifierProvider.autoDispose<
+    StateNotifierProvider<
         CatalogNotifier<AllLogbook>,
         List<AllLogbook>>(
   (ref) {
@@ -118,10 +120,14 @@ final getHistoryLogbooks =
     return CatalogNotifier<AllLogbook>(
       (filters) {
         final mergedFilters = {
-          if (userData.role == 'admin')
-            'id_business': userData.attributes['id_business']
-          else
+          if (userData.hasPermission(Permissions.dataGroupBusiness))
+            'groups_business_id': userData.attributes['group_business'],
+
+          if (userData.role == 'admin' || userData.role == 'admin_tlsg')
+            'id_business': userData.attributes['id_business'],
+          if (userData.role == 'guardia')
             'user': userData.user,
+            
           ...?filters,
         };
         return repo.getHistoryLogbooks(mergedFilters);

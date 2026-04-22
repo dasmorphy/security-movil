@@ -15,6 +15,11 @@ class HomeView extends ConsumerStatefulWidget {
 
 class HomeViewState extends ConsumerState<HomeView> {
   //SINO SE ESPECIFICA NOTIFIER DEVUELVE EL ESTADO POR DEFECTO, ES DECIR EL VALOR DE ESE PROVIDER
+  String selectedBusiness = '1';
+  final List<Map<String, String>> optionsDashboard = [
+    {"id": "1", "value": "Expalsa"},
+    {"id": "2", "value": "Biomar"},
+  ];
 
   @override
   void initState() {
@@ -23,21 +28,21 @@ class HomeViewState extends ConsumerState<HomeView> {
 
     final authState = ref.read(userSessionProvider);
     final userData = authState.value;
-    print('Usuario autenticado: $userData');
     initProvidersByBusiness(userData);
+    print('Usuario autenticado: $userData');
   }
 
   void initProvidersByBusiness(User? userData) {
     if (userData != null) {
-      if (userData.attributes['id_business'] == 1) {
+      if (userData.attributes['id_business'] == 1 || selectedBusiness == "1") {
         ref.read(getAllCategories.notifier).load();
         ref.read(getGroupBusinessByIdBusiness.notifier).load();
         ref.read(getAllUnitiesWeight.notifier).load();
         ref.read(getAllAuthorized.notifier).load();
         ref.read(getAllDestinyIntern.notifier).load();
         ref.read(getHistoryLogbooks.notifier).load();
-
-      }else if (userData.attributes['id_business'] == 2) {
+      } else if (userData.attributes['id_business'] == 2 ||
+          selectedBusiness == "2") {
         ref.read(getAllDestinyIntern.notifier).load();
         ref.read(getAreasVisit.notifier).load();
         ref.read(getMaterials.notifier).load();
@@ -60,7 +65,14 @@ class HomeViewState extends ConsumerState<HomeView> {
     }
 
     final userData = authState.value!;
-    
+    final idBusiness = userData.attributes['id_business'];
+
+    // Si es grupo 3 (admin_tlsg), usa el dropdown para decidir
+    // Si es 1 o 2, fuerza directamente
+    final effectiveBusiness = idBusiness == 3
+        ? selectedBusiness
+        : idBusiness.toString();
+
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -70,49 +82,84 @@ class HomeViewState extends ConsumerState<HomeView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-
-                if (userData.hasPermission(Permissions.verDashboardBiomar))...[
-                  // Dashboard biomar
-                  const SizedBox(height: 10),
-                  ref.watch(graphDispatchProvider).when(
-                    data: (data) {
-                      return Column(
-                        children: [
-                          ShipmentDispatch(data: data),
-                          const SizedBox(height: 20),
-                          DiscrepancyDonutWidget(data: data),
-                        ],
-                      );
-                    },
-                    loading: () => const Center(child: CircularProgressIndicator()),
-                    error: (e, _) {
-                      return const Text('Error cargando datos');
+                // Dropdown solo visible para grupo 3
+                if (idBusiness == 3)
+                  GlowDropdownFormField2<String>(
+                    value: selectedBusiness,
+                    items: [
+                      ...optionsDashboard.map(
+                        (c) => DropdownMenuItem(
+                          value: c["id"].toString(),
+                          child: Text(
+                            c["value"]!,
+                            style: TextStyle(
+                              color: const Color.fromARGB(255, 31, 30, 30),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                    onChanged: (v) {
+                      if (v != null) {
+                        setState(() => selectedBusiness = v);
+                        initProvidersByBusiness(userData);
+                      }
                     },
                   ),
+
+                /// =======================
+                /// DASHBOARD BIOMAR
+                /// =======================
+                if (effectiveBusiness == "2" &&
+                    (userData.role == "admin_tlsg" ||
+                        userData.hasPermission(
+                          Permissions.verDashboardBiomar,
+                        ))) ...[
+                  const SizedBox(height: 10),
+                  ref
+                      .watch(graphDispatchProvider)
+                      .when(
+                        data: (data) => Column(
+                          children: [
+                            ShipmentDispatch(data: data),
+                            const SizedBox(height: 20),
+                            DiscrepancyDonutWidget(data: data),
+                          ],
+                        ),
+                        loading: () =>
+                            const Center(child: CircularProgressIndicator()),
+                        error: (e, _) => const Text('Error cargando datos'),
+                      ),
                   const SizedBox(height: 10),
                 ],
 
-                if (userData.hasPermission(Permissions.verDashboardExpalsa))...[
-                  // Dashboard biomar
+                /// =======================
+                /// DASHBOARD EXPALSA
+                /// =======================
+                if (effectiveBusiness == "1" &&
+                    (userData.role == "admin_tlsg" ||
+                        userData.hasPermission(
+                          Permissions.verDashboardExpalsa,
+                        ))) ...[
                   const SizedBox(height: 10),
-                  ref.watch(graphLogbookProvider).when(
-                    data: (data) {
-                      return Column(
-                        children: [
-                          DonutExpalsa(data: data),
-                        ],
-                      );
-                    },
-                    loading: () => const Center(child: CircularProgressIndicator()),
-                    error: (e, _) {
-                      return const Text('Error cargando datos');
-                    },
-                  ),
+                  ref
+                      .watch(graphLogbookProvider)
+                      .when(
+                        data: (data) =>
+                            Column(children: [DonutExpalsa(data: data)]),
+                        loading: () =>
+                            const Center(child: CircularProgressIndicator()),
+                        error: (e, _) => const Text('Error cargando datos'),
+                      ),
                   const SizedBox(height: 10),
                 ],
 
-                if (userData.hasPermission(Permissions.verBitacoras))...[
-                  // Bitácoras Recientes
+                /// =======================
+                /// BITÁCORAS
+                /// =======================
+                if (effectiveBusiness == "1" &&
+                    (userData.role == "admin_tlsg" ||
+                        userData.hasPermission(Permissions.verBitacoras))) ...[
                   const SizedBox(height: 10),
                   RecentListHome(
                     title: 'Bitácoras recientes',
@@ -122,7 +169,12 @@ class HomeViewState extends ConsumerState<HomeView> {
                   const SizedBox(height: 30),
                 ],
 
-                if (userData.hasPermission(Permissions.verDespachos))...[
+                /// =======================
+                /// DESPACHOS
+                /// =======================
+                if (effectiveBusiness == "2" &&
+                    (userData.role == "admin_tlsg" ||
+                        userData.hasPermission(Permissions.verDespachos))) ...[
                   const SizedBox(height: 10),
                   RecentListHome(
                     title: 'Despachos recientes',
@@ -132,7 +184,14 @@ class HomeViewState extends ConsumerState<HomeView> {
                   const SizedBox(height: 30),
                 ],
 
-                if (userData.hasPermission(Permissions.verIngresosBiomar))...[
+                /// =======================
+                /// INGRESOS
+                /// =======================
+                if (effectiveBusiness == "2" &&
+                    (userData.role == "admin_tlsg" ||
+                        userData.hasPermission(
+                          Permissions.verIngresosBiomar,
+                        ))) ...[
                   const SizedBox(height: 10),
                   RecentListHome(
                     title: 'Ingresos recientes',
@@ -140,11 +199,6 @@ class HomeViewState extends ConsumerState<HomeView> {
                     childListBuild: const ItemRecentEntry(),
                   ),
                 ],
-                
-
-                // const SizedBox(height: 15),
-                // Publicidad
-                // PublicityCard(),
               ],
             ),
           ),

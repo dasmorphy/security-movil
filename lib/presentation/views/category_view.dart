@@ -51,27 +51,25 @@ class CategoryViewState extends ConsumerState<CategoryView> {
               ),
               children: [
 
-                // EXPALSA
-                if (userData.attributes['id_business'] == 1)...[
-                  SingleChildScrollView(
-                    padding: const EdgeInsets.all(16),
-                    physics: const BouncingScrollPhysics(
-                      parent: AlwaysScrollableScrollPhysics(),
-                    ),
-                    child: BasicServicesSection(),
+                SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  physics: const BouncingScrollPhysics(
+                    parent: AlwaysScrollableScrollPhysics(),
                   ),
-                ],
+                  child: Column(
+                    children: [
+                      if (userData.attributes['id_business'] == 1 || 
+                          userData.attributes['id_business'] == 3)
+                        BasicServicesSection(),
 
-                // BIOMAR
-                if (userData.attributes['id_business'] == 2)...[
-                  SingleChildScrollView(
-                    padding: const EdgeInsets.all(16),
-                    physics: const BouncingScrollPhysics(
-                      parent: AlwaysScrollableScrollPhysics(),
-                    ),
-                    child: ServicesBiomar(),
+                      if (userData.attributes['id_business'] == 2 || 
+                          userData.attributes['id_business'] == 3)
+                        ServicesBiomar(),
+                    ],
                   ),
-                ],
+                ),
+
+                // EXPALSA
 
       
                 // TAB 2
