@@ -159,23 +159,25 @@ class GlowDropdownFormField<T> extends StatelessWidget {
 class GlowDropdownFormField2<T> extends StatelessWidget {
   final T value;
   final bool enabled;
-  final FocusNode focusNode;
+  final FocusNode? focusNode;
   final List<DropdownMenuItem<T>> items;
   final ValueChanged<T?> onChanged;
   final String? Function(T?)? validator; // ✅ AQUÍ
-  final InputDecoration decoration;
+  final InputDecoration? decoration;
   final Color glowColor;
+  final Color textColor;
 
   const GlowDropdownFormField2({
     super.key,
     required this.value,
-    required this.focusNode,
+    this.focusNode,
     required this.items,
     required this.onChanged,
-    required this.decoration,
+    this.decoration,
     this.enabled = true,
     this.glowColor = const Color.fromARGB(190, 58, 199, 199),
     this.validator,
+    this.textColor = Colors.white
   });
 
   @override
@@ -191,7 +193,7 @@ class GlowDropdownFormField2<T> extends StatelessWidget {
       dropdownStyleData: DropdownStyleData(
         maxHeight: 250,
         decoration: BoxDecoration(
-          color: decoration.fillColor,
+          color: decoration?.fillColor,
           borderRadius: BorderRadius.circular(8),
         ),
       ),
@@ -202,7 +204,7 @@ class GlowDropdownFormField2<T> extends StatelessWidget {
             item.child is Text ? (item.child as Text).data ?? '' : '',
             style: TextStyle(
               color: enabled
-                  ? Colors.white
+                  ? textColor
                   : const Color.fromARGB(255, 84, 81, 81),
             ),
           );

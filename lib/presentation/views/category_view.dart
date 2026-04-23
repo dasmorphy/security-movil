@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:zentinel/config/constants/permissions.dart';
+import 'package:zentinel/config/utils/helper.dart';
+import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
 class CategoryView extends ConsumerStatefulWidget {
@@ -21,8 +24,13 @@ class CategoryViewState extends ConsumerState<CategoryView> {
 
   @override
   Widget build(BuildContext context) {
-    // final allCategories = ref.watch(getAllCategories);
-    // print(allCategories);
+    final authState = ref.read(userSessionProvider);
+
+    if (!authState.hasValue || authState.value == null) {
+      return const SizedBox.shrink();
+    }
+
+    final userData = authState.value!;
 
     return DefaultTabController(
       length: 2,
@@ -42,14 +50,27 @@ class CategoryViewState extends ConsumerState<CategoryView> {
                 parent: AlwaysScrollableScrollPhysics(),
               ),
               children: [
-                // TAB 1
+
                 SingleChildScrollView(
                   padding: const EdgeInsets.all(16),
                   physics: const BouncingScrollPhysics(
                     parent: AlwaysScrollableScrollPhysics(),
                   ),
-                  child: BasicServicesSection(),
+                  child: Column(
+                    children: [
+                      if (userData.attributes['id_business'] == 1 || 
+                          userData.attributes['id_business'] == 3)
+                        BasicServicesSection(),
+
+                      if (userData.attributes['id_business'] == 2 || 
+                          userData.attributes['id_business'] == 3)
+                        ServicesBiomar(),
+                    ],
+                  ),
                 ),
+
+                // EXPALSA
+
       
                 // TAB 2
                 SingleChildScrollView(

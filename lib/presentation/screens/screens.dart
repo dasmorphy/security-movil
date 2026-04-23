@@ -5,4 +5,10 @@ export 'package:zentinel/presentation/screens/profile/personal_data_screen.dart'
 export 'package:zentinel/presentation/screens/profile/change_email_screen.dart';
 export 'package:zentinel/presentation/screens/shared/check_success_screen.dart';
 export 'package:zentinel/presentation/screens/logbook/logbook_list_screen.dart';
+export 'package:zentinel/presentation/screens/dispatch/dispatch_list_screen.dart';
 export 'package:zentinel/presentation/screens/onboarding/onboarding_screen.dart';
+export 'package:zentinel/presentation/screens/dispatch/reception_confirmation_screen.dart';
+export 'package:zentinel/presentation/screens/entry_access/entry_access_list_screen.dart';
+export 'package:zentinel/presentation/screens/entry_access/finish_entry_access_screen.dart';
+export 'package:zentinel/presentation/screens/dispatch/update_status_dispatch_screen.dart';
+export 'package:zentinel/presentation/screens/dispatch/new_dispatch_screen.dart';

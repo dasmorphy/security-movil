@@ -261,3 +261,51 @@ Future<Position?> getLocation() async {
     desiredAccuracy: LocationAccuracy.high,
   );
 }
+
+Color getStatusColorDispatch(String status) {
+  switch (status.toLowerCase()) {
+    case 'en tránsito':
+      return const Color.fromARGB(255, 248, 172, 70);
+    case 'listo para despacho':
+      return const Color.fromARGB(255, 137, 172, 255);
+    case 'ingresado en bodega':
+      return const Color.fromARGB(255, 105, 246, 184);
+    default:
+      return Colors.grey;
+  }
+}
+
+Color getStatusColorBckgDispatch(String status) {
+  switch (status.toLowerCase()) {
+    case 'en tránsito':
+      return const Color.fromARGB(255, 61, 43, 14);
+    case 'listo para despacho':
+      return const Color.fromARGB(255, 34, 44, 63);
+    case 'ingresado en bodega':
+      return const Color.fromARGB(255, 18, 54, 42);
+    default:
+      return Colors.grey;
+  }
+}
+
+Color getStatusColorEntryAccess(String status) {
+  switch (status.toLowerCase()) {
+    case 'pendiente salida':
+      return const Color.fromARGB(255, 248, 172, 70);
+    case 'finalizado':
+      return const Color.fromARGB(255, 105, 246, 184);
+    default:
+      return Colors.grey;
+  }
+}
+
+Color getStatusColorBckgEntry(String status) {
+  switch (status.toLowerCase()) {
+    case 'pendiente salida':
+      return const Color.fromARGB(255, 61, 43, 14);
+    case 'finalizado':
+      return const Color.fromARGB(255, 18, 54, 42);
+    default:
+      return Colors.grey;
+  }
+}

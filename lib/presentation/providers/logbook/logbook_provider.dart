@@ -1,12 +1,17 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:zentinel/config/constants/permissions.dart';
+import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/domain/entities/all_logbook.dart';
 import 'package:zentinel/domain/entities/authorized.dart';
 import 'package:zentinel/domain/entities/category.dart';
 import 'package:zentinel/domain/entities/destiny_intern.dart';
+import 'package:zentinel/domain/entities/graph_logbook.dart';
 import 'package:zentinel/domain/entities/group_business.dart';
 import 'package:zentinel/domain/entities/unity_weight.dart';
+import 'package:zentinel/domain/entities/vehicle_type.dart';
 import 'package:zentinel/domain/repositories/logbook_entry_repository.dart';
 import 'package:zentinel/presentation/providers/auth/auth_provider.dart';
+import 'package:zentinel/presentation/providers/dispatch/dispatch_repository_provider.dart';
 import 'package:zentinel/presentation/providers/logbook/logbook_repository_provider.dart';
 
 final homeTabProvider = StateProvider<int>((ref) => 0);
@@ -30,6 +35,15 @@ final getAllUnitiesWeight =
   );
 });
 
+final getAllVehicleTypes =
+    StateNotifierProvider<CatalogNotifier<VehicleType>, List<VehicleType>>((ref) {
+  final repo = ref.watch(dispatchRepositoryProvider);
+
+  return CatalogNotifier<VehicleType>(
+    (_) => repo.getAllVehicleTypes(),
+  );
+});
+
 final getAllAuthorized =
     StateNotifierProvider<CatalogNotifier<Authorized>, List<Authorized>>((ref) {
   final repo = ref.watch(logbookEntryRepositoryProvider);
@@ -39,13 +53,28 @@ final getAllAuthorized =
   );
 });
 
-final getAllDestinyIntern =
-    StateNotifierProvider<CatalogNotifier<DestinyIntern>, List<DestinyIntern>>((ref) {
+final getAllDestinyIntern = StateNotifierProvider<CatalogNotifier<DestinyIntern>, List<DestinyIntern>>((ref) {
   final repo = ref.watch(logbookEntryRepositoryProvider);
+  final authState = ref.watch(userSessionProvider);
+
+  if (!authState.hasValue || authState.value == null) {
+    return CatalogNotifier<DestinyIntern>((_) async => []);
+  }
+
+  final userData = authState.value!;
+
+  // return CatalogNotifier<DestinyIntern>(
+  //   (_) => repo.getAllDestinyIntern(),
+  // );
 
   return CatalogNotifier<DestinyIntern>(
-    (_) => repo.getAllDestinyIntern(),
-  );
+      (filters) {
+        final mergedFilters = {
+          'business': userData.attributes['id_business']
+        };
+        return repo.getAllDestinyIntern(mergedFilters);
+      },
+    );
 });
 
 
@@ -61,9 +90,21 @@ final saveOutLogbookProvider =
   return OutLogbookNotifier(repo);
 });
 
+final graphLogbookProvider = FutureProvider<GraphLogbook>((ref) async {
+  final repo = ref.watch(logbookEntryRepositoryProvider);
+  final now = DateTime.now();
+  final startDate = DateTime(now.year, now.month, now.day);
+  final endDate = startDate.add(const Duration(days: 1));
+
+  final filters = {
+    'start_date': startDate.toIso8601String(),
+    'end_date': endDate.toIso8601String(),
+  };
+  return await repo.getGraphLogbook(filters);
+});
 
 final getHistoryLogbooks =
-    StateNotifierProvider.autoDispose<
+    StateNotifierProvider<
         CatalogNotifier<AllLogbook>,
         List<AllLogbook>>(
   (ref) {
@@ -79,10 +120,14 @@ final getHistoryLogbooks =
     return CatalogNotifier<AllLogbook>(
       (filters) {
         final mergedFilters = {
-          if (userData.role == 'admin')
-            'id_business': userData.attributes['id_business']
-          else
+          if (userData.hasPermission(Permissions.dataGroupBusiness))
+            'groups_business_id': userData.attributes['group_business'],
+
+          if (userData.role == 'admin' || userData.role == 'admin_tlsg')
+            'id_business': userData.attributes['id_business'],
+          if (userData.role == 'guardia')
             'user': userData.user,
+            
           ...?filters,
         };
         return repo.getHistoryLogbooks(mergedFilters);

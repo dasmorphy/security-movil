@@ -33,21 +33,6 @@ class LogbooksListState extends ConsumerState<LogbooksList> {
     }
   }
 
-  Future<DateTimeRange?> _openModal(
-    BuildContext context,
-    Widget childWidget,
-  ) async {
-    return await showModalBottomSheet<DateTimeRange>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      barrierColor: Colors.black54,
-      builder: (context) {
-        return AnimatedModal(child: childWidget);
-      },
-    );
-  }
-
   List<dynamic> _filterItemsByDateRange(DateTimeRange range) {
     return _filteredItems.where((item) {
       final itemDate = item.createdAt;
@@ -124,7 +109,7 @@ class LogbooksListState extends ConsumerState<LogbooksList> {
                     child: InkWell(
                       borderRadius: BorderRadius.circular(8),
                       onTap: () =>
-                          _openModal(context, BitacoraDetailModal(item: item)),
+                          ModalHelper.open(context, child: BitacoraDetailModal(item: item)),
                       child: Row(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
@@ -225,9 +210,9 @@ class LogbooksListState extends ConsumerState<LogbooksList> {
               children: [
                 GestureDetector(
                   onTap: () async {
-                    final range = await _openModal(
+                    final range = await ModalHelper.open(
                       context,
-                      DateRangePicker(
+                      child: DateRangePicker(
                         onApply: (start, end) {
                           Navigator.of(context).pop();
                         },

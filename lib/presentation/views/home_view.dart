@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:zentinel/config/utils/helper.dart';
+import 'package:zentinel/config/constants/permissions.dart';
+import 'package:zentinel/domain/entities/user_session.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
@@ -14,23 +15,66 @@ class HomeView extends ConsumerStatefulWidget {
 
 class HomeViewState extends ConsumerState<HomeView> {
   //SINO SE ESPECIFICA NOTIFIER DEVUELVE EL ESTADO POR DEFECTO, ES DECIR EL VALOR DE ESE PROVIDER
+  String selectedBusiness = '0';
+  final List<Map<String, String>> optionsDashboard = [
+    {"id": "1", "value": "Expalsa"},
+    {"id": "2", "value": "Biomar"},
+  ];
 
   @override
   void initState() {
     //En los metodos llmar el metodo read en los providers (flutter favorite)
     super.initState();
-    ref.read(getHistoryLogbooks.notifier).load();
 
-    //Se llama los catalogos desde el home para escenarios offline
-    ref.read(getAllCategories.notifier).load();
-    ref.read(getGroupBusinessByIdBusiness.notifier).load();
-    ref.read(getAllUnitiesWeight.notifier).load();
-    ref.read(getAllAuthorized.notifier).load();
-    ref.read(getAllDestinyIntern.notifier).load();
+    final authState = ref.read(userSessionProvider);
+    final userData = authState.value;
+    if (userData!.role == 'admin_tlsg') {
+      selectedBusiness = '1';
+    }
+    initProvidersByBusiness(userData);
+  }
+
+  void initProvidersByBusiness(User? userData) {
+    if (userData != null) {
+      if (userData.attributes['id_business'] == 1 || selectedBusiness == "1") {
+        ref.read(getAllCategories.notifier).load();
+        ref.read(getGroupBusinessByIdBusiness.notifier).load();
+        ref.read(getAllUnitiesWeight.notifier).load();
+        ref.read(getAllAuthorized.notifier).load();
+        ref.read(getAllDestinyIntern.notifier).load();
+        ref.read(getHistoryLogbooks.notifier).load();
+      } else if (userData.attributes['id_business'] == 2 ||
+          selectedBusiness == "2") {
+        ref.read(getAllDestinyIntern.notifier).load();
+        ref.read(getAreasVisit.notifier).load();
+        ref.read(getMaterials.notifier).load();
+        ref.read(getStaffCharge.notifier).load();
+        ref.read(getAllVehicleTypes.notifier).load();
+        ref.read(getDispatchStatus.notifier).load();
+        ref.read(getAllDispatchProducts.notifier).load();
+        ref.read(getHistoryDispatch.notifier).load();
+        ref.read(getHistoryEntryAccess.notifier).load();
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.read(userSessionProvider);
+
+    if (!authState.hasValue || authState.value == null) {
+      return const SizedBox.shrink();
+    }
+
+    final userData = authState.value!;
+    final idBusiness = userData.attributes['id_business'];
+
+    // Si es grupo 3 (admin_tlsg), usa el dropdown para decidir
+    // Si es 1 o 2, fuerza directamente
+    final effectiveBusiness = idBusiness == 3
+        ? selectedBusiness
+        : idBusiness.toString();
+
     return SingleChildScrollView(
       child: Column(
         children: [
@@ -40,176 +84,128 @@ class HomeViewState extends ConsumerState<HomeView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 10),
-
-                // Bitácoras Recientes
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF1E1E1E),
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Text(
-                            'Bitácoras recientes',
-                            style: Theme.of(context).textTheme.titleMedium
-                                ?.copyWith(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                // Dropdown solo visible para grupo 3
+                if (idBusiness == 3)
+                  GlowDropdownFormField2<String>(
+                    value: selectedBusiness,
+                    items: [
+                      ...optionsDashboard.map(
+                        (c) => DropdownMenuItem(
+                          value: c["id"].toString(),
+                          child: Text(
+                            c["value"]!,
+                            style: TextStyle(
+                              color: const Color.fromARGB(255, 31, 30, 30),
+                            ),
                           ),
-                          Column(
-                            children: [
-                              SizedBox(height: 4),
-                              InkWell(
-                                borderRadius: BorderRadius.circular(20),
-                                onTap: () => context.push('/list-logbooks'),
-                                child: const Padding(
-                                  padding: EdgeInsets.all(7),
-                                  child: Icon(
-                                    Icons.chevron_right,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
+                        ),
                       ),
-                      const SizedBox(height: 16),
-                      ..._buildBitacoraItems(context),
                     ],
+                    onChanged: (v) {
+                      if (v != null) {
+                        setState(() => selectedBusiness = v);
+                        initProvidersByBusiness(userData);
+                      }
+                    },
                   ),
-                ),
 
-                const SizedBox(height: 15),
-                // Publicidad
-                PublicityCard(),
+                /// =======================
+                /// DASHBOARD BIOMAR
+                /// =======================
+                if (effectiveBusiness == "2" &&
+                    (userData.role == "admin_tlsg" ||
+                        userData.hasPermission(
+                          Permissions.verDashboardBiomar,
+                        ))) ...[
+                  const SizedBox(height: 10),
+                  ref
+                      .watch(graphDispatchProvider)
+                      .when(
+                        data: (data) => Column(
+                          children: [
+                            ShipmentDispatch(data: data),
+                            const SizedBox(height: 20),
+                            DiscrepancyDonutWidget(data: data),
+                          ],
+                        ),
+                        loading: () =>
+                            const Center(child: CircularProgressIndicator()),
+                        error: (e, _) => const Text('Error cargando datos'),
+                      ),
+                  const SizedBox(height: 10),
+                ],
+
+                /// =======================
+                /// DASHBOARD EXPALSA
+                /// =======================
+                if (effectiveBusiness == "1" &&
+                    (userData.role == "admin_tlsg" ||
+                        userData.hasPermission(
+                          Permissions.verDashboardExpalsa,
+                        ))) ...[
+                  const SizedBox(height: 10),
+                  ref
+                      .watch(graphLogbookProvider)
+                      .when(
+                        data: (data) =>
+                            Column(children: [DonutExpalsa(data: data)]),
+                        loading: () =>
+                            const Center(child: CircularProgressIndicator()),
+                        error: (e, _) => const Text('Error cargando datos'),
+                      ),
+                  const SizedBox(height: 10),
+                ],
+
+                /// =======================
+                /// BITÁCORAS
+                /// =======================
+                if (effectiveBusiness == "1" &&
+                    (userData.role == "admin_tlsg" ||
+                        userData.hasPermission(Permissions.verBitacoras))) ...[
+                  const SizedBox(height: 10),
+                  RecentListHome(
+                    title: 'Bitácoras recientes',
+                    routeLink: '/list-logbooks',
+                    childListBuild: const ItemRecentLogbook(),
+                  ),
+                  const SizedBox(height: 30),
+                ],
+
+                /// =======================
+                /// DESPACHOS
+                /// =======================
+                if (effectiveBusiness == "2" &&
+                    (userData.role == "admin_tlsg" ||
+                        userData.hasPermission(Permissions.verDespachos))) ...[
+                  const SizedBox(height: 10),
+                  RecentListHome(
+                    title: 'Despachos recientes',
+                    routeLink: '/list-dispatches',
+                    childListBuild: const ItemRecentDispatch(),
+                  ),
+                  const SizedBox(height: 30),
+                ],
+
+                /// =======================
+                /// INGRESOS
+                /// =======================
+                if (effectiveBusiness == "2" &&
+                    (userData.role == "admin_tlsg" ||
+                        userData.hasPermission(
+                          Permissions.verIngresosBiomar,
+                        ))) ...[
+                  const SizedBox(height: 10),
+                  RecentListHome(
+                    title: 'Ingresos recientes',
+                    routeLink: '/list-entry-access',
+                    childListBuild: const ItemRecentEntry(),
+                  ),
+                ],
               ],
             ),
           ),
         ],
       ),
-    );
-  }
-
-  List<Widget> _buildBitacoraItems(BuildContext context) {
-    final historyLogbooks = ref.watch(getHistoryLogbooks);
-    final limitedList = historyLogbooks.take(5).toList();
-
-    if (historyLogbooks.isEmpty) {
-      return [
-        const Text(
-          'No hay registros',
-          style: TextStyle(color: Colors.white54),
-        )
-      ];
-    }
-
-    return List.generate(limitedList.length, (index) {
-      final item = limitedList[index];
-
-      final isEntry = item.idLogbookEntry;
-      final typeText = isEntry != null ? 'ingreso' : 'salida';
-
-      final createdBy = item.nameUser;
-      final groupName = item.groupName;
-
-      final description = isEntry != null
-          ? 'Bitácora de $typeText en $groupName'
-          : 'Bitácora de $typeText en $groupName';
-
-      final formattedDate = formatDate(item.createdAt);
-
-      return Padding(
-        padding: const EdgeInsets.only(bottom: 12),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(8),
-          onTap: () => _openModal(context, BitacoraDetailModal(item: item)),
-          child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // Icono check
-            Container(
-              width: 24,
-              height: 24,
-              decoration: BoxDecoration(
-                color: const Color.fromARGB(255, 4, 88, 99),
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: const Icon(
-                Icons.edit_note_sharp,
-                color: Colors.white,
-                size: 16,
-              ),
-            ),
-            const SizedBox(width: 12),
-            // Nombre y descripción
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    createdBy,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    description,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: const Color.fromARGB(255, 180, 180, 180),
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    formattedDate,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: const Color.fromARGB(255, 180, 180, 180),
-                      fontWeight: FontWeight.w400,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Chip(
-                    label: Text(item.status),
-                    backgroundColor: item.status == 'Finalizado'
-                        ? const Color.fromARGB(255, 34, 197, 94)
-                        : const Color.fromARGB(255, 224, 157, 49),
-                    padding: EdgeInsets.zero,
-                    labelStyle: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            // Chevron
-            const Icon(Icons.chevron_right, color: Colors.white, size: 20),
-          ],
-        ),
-        ),
-      );
-    });
-  }
-
-  void _openModal(BuildContext context, Widget childWidget) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      barrierColor: Colors.black54,
-      builder: (_) {
-        return AnimatedModal(child: childWidget);
-      },
     );
   }
 }

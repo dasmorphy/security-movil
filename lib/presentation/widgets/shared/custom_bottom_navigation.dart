@@ -10,73 +10,68 @@ class CustomBottomNavigation extends StatelessWidget {
     required this.onTap,
   });
 
+  static const _items = [
+    (icon: Icons.home_outlined, activeIcon: Icons.home, label: 'Inicio'),
+    (
+      icon: Icons.category_outlined,
+      activeIcon: Icons.category,
+      label: 'Categorías',
+    ),
+    (icon: Icons.person_outline, activeIcon: Icons.person, label: 'Perfil'),
+  ];
+
   @override
   Widget build(BuildContext context) {
+    // final bottomPadding = MediaQuery.of(context).padding.bottom;
+
     return Container(
-      // color: const Color.fromARGB(255, 15, 17, 21),
-      decoration: BoxDecoration(
-        color: const Color.fromARGB(255, 15, 17, 21),
-        border: Border(
-          top: BorderSide(
-            color: Colors.white24, // 👈 color del borde
-            width: 1,
-          ),
-        )
-        // gradient: LinearGradient(
-        //   begin: Alignment.topCenter,
-        //   end: Alignment.bottomCenter,
-        //   colors: [
-        //     const Color.fromARGB(0, 127, 199, 61),
-        //     Color.fromARGB(255, 95, 175, 175),
-        //   ],
-        // ),
-        // boxShadow: [
-        //   BoxShadow(
-        //     color: const Color.fromARGB(255, 187, 58, 58).withOpacity(0.2),
-        //     blurRadius: 10,
-        //     offset: const Offset(0, -5),
-        //   ),
-        // ],
+      decoration: const BoxDecoration(
+        color: Color.fromARGB(255, 34, 33, 33),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
       ),
-      child: Theme(
-        data: Theme.of(context).copyWith(
-          splashColor: Colors.transparent,
-          highlightColor: Colors.transparent,
-        ),
-        child: BottomNavigationBar(
-          iconSize: 20,
-          currentIndex: currentIndex,
-          onTap: onTap,
-          type: BottomNavigationBarType.fixed,
-          backgroundColor: const Color.fromARGB(0, 255, 210, 11),
-          elevation: 0,
-          selectedItemColor: Color.fromARGB(255, 4, 229, 221),
-          selectedFontSize: 10,
-          unselectedFontSize: 10,
-          unselectedItemColor: Colors.white70,
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home_outlined),
-              activeIcon: Icon(Icons.home),
-              label: 'Inicio',
+      padding: EdgeInsets.only(
+        top: 15,
+        bottom: 17,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: List.generate(_items.length, (index) {
+          final item = _items[index];
+          final isActive = currentIndex == index;
+
+          return GestureDetector(
+            onTap: () => onTap(index),
+            behavior: HitTestBehavior.opaque,
+            child: SizedBox(
+              width: 72,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    isActive ? item.activeIcon : item.icon,
+                    size: 23,
+                    color: isActive
+                        ? const Color.fromARGB(255, 4, 229, 221)
+                        : Colors.white70,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    item.label,
+                    style: TextStyle(
+                      fontSize: 10,
+                      color: isActive
+                          ? const Color.fromARGB(255, 4, 229, 221)
+                          : Colors.white70,
+                    ),
+                  ),
+                ],
+              ),
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.category_outlined),
-              activeIcon: Icon(Icons.category),
-              label: 'Categorías',
-            ),
-            // BottomNavigationBarItem(
-            //   icon: Icon(Icons.favorite_outline),
-            //   activeIcon: Icon(Icons.favorite),
-            //   label: 'Favoritos',
-            // ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person_outline),
-              activeIcon: Icon(Icons.person),
-              label: 'Perfil',
-            ),
-          ],
-        ),
+          );
+        }),
       ),
     );
   }
