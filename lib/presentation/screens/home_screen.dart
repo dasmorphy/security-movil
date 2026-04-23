@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:zentinel/config/constants/permissions.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/domain/entities/user_session.dart';
-import 'package:zentinel/presentation/providers/logbook/logbook_provider.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/views/views.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';

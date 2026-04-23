@@ -12,3 +12,4 @@ export 'package:zentinel/presentation/screens/entry_access/entry_access_list_scr
 export 'package:zentinel/presentation/screens/entry_access/finish_entry_access_screen.dart';
 export 'package:zentinel/presentation/screens/dispatch/update_status_dispatch_screen.dart';
 export 'package:zentinel/presentation/screens/dispatch/new_dispatch_screen.dart';
+export 'package:zentinel/presentation/screens/urb/new_round_screen.dart';

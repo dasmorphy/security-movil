@@ -109,6 +109,11 @@ class HomeViewState extends ConsumerState<HomeView> {
                     },
                   ),
 
+                  
+
+                MapApp(),
+
+
                 /// =======================
                 /// DASHBOARD BIOMAR
                 /// =======================

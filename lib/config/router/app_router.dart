@@ -97,6 +97,11 @@ final appRouter = GoRouter(
           path: 'new-dispatch',
           name: NewDispatchScreen.name,
           builder: (context, state) => const NewDispatchScreen(),
+        ),
+        GoRoute(
+          path: 'new-round-register',
+          name: NewRoundScreen.name,
+          builder: (context, state) => const NewRoundScreen(),
         )
       ]
     ),
