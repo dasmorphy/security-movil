@@ -96,16 +96,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ref.read(homeTabProvider.notifier).state = i;
           
           if (i == 0) {
-            if (userData.hasPermission(Permissions.verBitacoras)) {
-              ref.read(getHistoryLogbooks.notifier).load();
-            }
-
             if (userData.hasPermission(Permissions.verIngresosBiomar)) {
               ref.read(getHistoryEntryAccess.notifier).load();
             }
 
             if (userData.hasPermission(Permissions.verDespachos)) {
               ref.read(getHistoryDispatch.notifier).load();
+            }
+            
+            if (userData.hasPermission(Permissions.verBitacoras)) {
+              ref.read(getHistoryLogbooks.notifier).load();
             }
           }
         },

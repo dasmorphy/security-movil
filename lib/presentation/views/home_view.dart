@@ -15,7 +15,7 @@ class HomeView extends ConsumerStatefulWidget {
 
 class HomeViewState extends ConsumerState<HomeView> {
   //SINO SE ESPECIFICA NOTIFIER DEVUELVE EL ESTADO POR DEFECTO, ES DECIR EL VALOR DE ESE PROVIDER
-  String selectedBusiness = '1';
+  String selectedBusiness = '0';
   final List<Map<String, String>> optionsDashboard = [
     {"id": "1", "value": "Expalsa"},
     {"id": "2", "value": "Biomar"},
@@ -28,8 +28,10 @@ class HomeViewState extends ConsumerState<HomeView> {
 
     final authState = ref.read(userSessionProvider);
     final userData = authState.value;
+    if (userData!.role == 'admin_tlsg') {
+      selectedBusiness = '1';
+    }
     initProvidersByBusiness(userData);
-    print('Usuario autenticado: $userData');
   }
 
   void initProvidersByBusiness(User? userData) {

@@ -79,13 +79,14 @@ final getHistoryDispatch =
     }
 
     final userData = authState.value!;
-
+    
     return CatalogNotifier<AllDispatch>(
       (filters) {
         final mergedFilters = {
-          'user': userData.user,
           if (userData.role == 'admin' || userData.role == 'admin_tlsg')
-            'id_business': userData.attributes['id_business'],
+            'id_business': userData.attributes['id_business']
+          else
+            'user': userData.user,
           ...?filters,
         };
         return repo.getHistoryDispatch(mergedFilters);
@@ -111,9 +112,10 @@ final getHistoryEntryAccess =
     return CatalogNotifier<EntryAccessControl>(
       (filters) {
         final mergedFilters = {
-          'user': userData.user,
           if (userData.role == 'admin' || userData.role == 'admin_tlsg')
-            'id_business': userData.attributes['id_business'],
+            'id_business': userData.attributes['id_business']
+          else
+            'user': userData.user,
           ...?filters,
         };
         return repo.getHistoryEntryAccess(mergedFilters);

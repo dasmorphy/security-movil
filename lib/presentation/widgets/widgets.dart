@@ -54,7 +54,6 @@ export 'package:zentinel/presentation/widgets/forms/reception_confirmation_form.
 export 'package:zentinel/presentation/widgets/shared/camera_image_picker.dart';
 export 'package:zentinel/presentation/widgets/dispatch/commentary_reception.dart';
 export 'package:zentinel/presentation/widgets/forms/biomar/biomar_entry_report_form.dart';
-export 'package:zentinel/presentation/widgets/forms/biomar/biomar_exit_report_form.dart';
 export 'package:zentinel/presentation/widgets/dispatch/material_entry_item.dart';
 export 'package:zentinel/presentation/widgets/modals/entry_access_detail_modal.dart';
 export 'package:zentinel/presentation/widgets/entry_access/entry_access_list.dart';
