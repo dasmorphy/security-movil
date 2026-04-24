@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
+import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/domain/entities/api_response.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
@@ -27,6 +28,9 @@ class _NewRoundFormState extends ConsumerState<NewRoundForm> {
   bool imagesMinError = false;
   bool imagesMaxError = false;
   
+  
+  double latitude = -0.1865936;
+  double longitude = -78.5953478;
 
   final observationsCtrl = TextEditingController();
 
@@ -38,6 +42,7 @@ class _NewRoundFormState extends ConsumerState<NewRoundForm> {
   @override
   void initState() {
     super.initState();
+    _getUserLocation();
   }
 
   @override
@@ -49,11 +54,33 @@ class _NewRoundFormState extends ConsumerState<NewRoundForm> {
     super.dispose();
   }
 
+  void _getUserLocation() async {
+    final pos = await getLocation();
+
+    if (pos == null) {
+      if (mounted) {
+        showDialog(
+          context: context,
+          builder: (_) => const AlertDialog(
+            title: Text("Ubicación no disponible"),
+            content: Text("Activa el GPS o concede permisos."),
+          ),
+        );
+      }
+      return;
+    }
+
+    setState(() {
+      latitude = pos.latitude;
+      longitude = pos.longitude;
+    });
+  }
+
   void onSubmitRound() async {
     if (isLoading) return;
     setState(() => isLoading = true);
 
-    if (selectedImages.length < 5) {
+    if (selectedImages.isEmpty) {
       setState(() {
         imagesMinError = true;
         isLoading = false;
@@ -95,7 +122,10 @@ class _NewRoundFormState extends ConsumerState<NewRoundForm> {
       "external_transaction_id": Uuid().v4(),
       // "destiny": _destinySelected,
       // "driver": _driverCtrl.text.trim(),
-      // "observations": _observationsCtrl.text.trim(),
+      "observations": observationsCtrl.text.trim(),
+      "lat": latitude,
+      "long": longitude,
+      "out_round": false,
       // "truck_license": _truckLicenseCtrl.text.trim(),
       // "vehicle_type": _vehicleSelected,
       // "weight": int.tryParse(_weightCtrl.text),
@@ -107,7 +137,7 @@ class _NewRoundFormState extends ConsumerState<NewRoundForm> {
 
     GlobalLoadingBottomSheet.show(
       status: OverlayStatus.loading, 
-      message: "Guardando despacho..."
+      message: "Guardando registro..."
     );
     final response = await widget.onSubmit.call(data);
     if (!mounted) return;
@@ -121,15 +151,15 @@ class _NewRoundFormState extends ConsumerState<NewRoundForm> {
     if (response.success) {
       GlobalLoadingBottomSheet.show(
         status: OverlayStatus.success, 
-        message: "Ronda guardada exitosamente", 
+        message: "Registro guardado exitosamente", 
         autoDismiss: const Duration(seconds: 2)
       );
-      ref.read(getHistoryDispatch.notifier).load();
+      // ref.read(getHistoryDispatch.notifier).load();
       Navigator.of(context).pop();
     } else {
       GlobalLoadingBottomSheet.show(
         status: OverlayStatus.error,
-        message: 'Error: ${response.message ?? 'Error al guardar la ronda'}',
+        message: 'Error: ${response.message ?? 'Error al guardar el registro'}',
         autoDismiss: const Duration(seconds: 3),
       );
     }

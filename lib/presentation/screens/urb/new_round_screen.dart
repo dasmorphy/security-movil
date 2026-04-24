@@ -38,8 +38,8 @@ class _NewRoundScreenState extends ConsumerState<NewRoundScreen> {
           NewRoundForm(
             onSubmit: (data) async {
               return await ref
-                .read(dispatchProvider.notifier)
-                .saveDispatch(data);
+                .read(roundProvider.notifier)
+                .saveRound(data);
             },
           ),
             
