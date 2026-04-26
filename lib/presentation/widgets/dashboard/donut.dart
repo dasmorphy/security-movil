@@ -1,16 +1,24 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:zentinel/domain/entities/graph_dispatch.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
-class DiscrepancyDonutWidget extends StatelessWidget {
-  final GraphDispatch data;
-
-  const DiscrepancyDonutWidget({super.key, required this.data});
+class DiscrepancyDonutWidget extends ConsumerWidget {
+  const DiscrepancyDonutWidget({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final data = ref.watch(graphDispatchProvider);
+
+    if (data == null) {
+      return const Text(
+        'No hay registros',
+        style: TextStyle(color: Colors.white54),
+      );
+    }
+
     final pct = data.discrepancyPercentage;
 
     return Card(

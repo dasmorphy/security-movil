@@ -1,24 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zentinel/domain/entities/graph_dispatch.dart';
+import 'package:zentinel/presentation/providers/providers.dart';
 
-class ShipmentDispatch extends StatelessWidget {
-  final GraphDispatch data;
-
-  const ShipmentDispatch({super.key, required this.data});
+class ShipmentDispatch extends ConsumerWidget {
+  const ShipmentDispatch({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final data = ref.watch(graphDispatchProvider);
+
+    if (data == null) {
+      return const Text(
+        'No hay registros',
+        style: TextStyle(color: Colors.white54),
+      );
+    }
+    
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Column(
         children: [
-          _buildTotalCard(),
+          _buildTotalCard(data),
           const SizedBox(height: 16),
           Row(
             children: [
-              Expanded(child: _buildPendingCard()),
+              Expanded(child: _buildPendingCard(data)),
               const SizedBox(width: 12),
-              Expanded(child: _buildTransitCard()),
+              Expanded(child: _buildTransitCard(data)),
             ],
           ),
         ],
@@ -26,7 +35,7 @@ class ShipmentDispatch extends StatelessWidget {
     );
   }
 
-  Widget _buildTotalCard() {
+  Widget _buildTotalCard(GraphDispatch data) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: _cardDecoration(null),
@@ -66,7 +75,7 @@ class ShipmentDispatch extends StatelessWidget {
     );
   }
 
-  Widget _buildPendingCard() {
+  Widget _buildPendingCard(GraphDispatch data) {
     return Container(
       // height: 115,
       padding: const EdgeInsets.all(16),
@@ -93,7 +102,7 @@ class ShipmentDispatch extends StatelessWidget {
     );
   }
 
-  Widget _buildTransitCard() {
+  Widget _buildTransitCard(GraphDispatch data) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: _cardDecoration(Color.fromARGB(255, 11, 126, 202)),

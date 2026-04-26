@@ -1,16 +1,25 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
-import 'package:zentinel/domain/entities/graph_logbook.dart';
+import 'package:zentinel/presentation/providers/providers.dart';
 
-class DonutExpalsa extends StatelessWidget {
-  final GraphLogbook data;
+class DonutExpalsa extends ConsumerWidget {
 
-  const DonutExpalsa({super.key, required this.data});
+  const DonutExpalsa({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final data = ref.watch(graphLogbookProvider);
+
+    if (data == null) {
+      return const Text(
+        'No hay registros',
+        style: TextStyle(color: Colors.white54),
+      );
+    }
+
     final totalEntrada = data.totalEntrada;
     final totalSalida = data.totalSalida;
     final totalGeneral = totalEntrada + totalSalida;
@@ -50,7 +59,7 @@ class DonutExpalsa extends StatelessWidget {
                     size: const Size(200, 200),
                     painter: _DonutPainter(
                       percentage: pct,
-                      discrepancyColor: const Color(0xFFE24B4A),
+                      discrepancyColor: const Color.fromARGB(255, 17, 109, 200),
                       okColor: const Color(0xFF1D9E75),
                       backgroundColor: Colors.grey.shade200,
                       strokeWidth: 14,
@@ -83,7 +92,7 @@ class DonutExpalsa extends StatelessWidget {
 
           // Leyenda
           _LegendItem(
-            color: const Color(0xFFE24B4A),
+            color: const Color.fromARGB(255, 17, 109, 200),
             label: 'Entrada',
             count: totalEntrada,
             percentage: totalGeneral == 0 ? 0 : (totalEntrada / totalGeneral) * 100,

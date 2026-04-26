@@ -90,17 +90,23 @@ final saveOutLogbookProvider =
   return OutLogbookNotifier(repo);
 });
 
-final graphLogbookProvider = FutureProvider<GraphLogbook>((ref) async {
+final graphLogbookProvider =
+    StateNotifierProvider<ObjectCatalogNotifier<GraphLogbook>, GraphLogbook?>((ref) {
   final repo = ref.watch(logbookEntryRepositoryProvider);
+
   final now = DateTime.now();
   final startDate = DateTime(now.year, now.month, now.day);
   final endDate = startDate.add(const Duration(days: 1));
 
-  final filters = {
-    'start_date': startDate.toIso8601String(),
-    'end_date': endDate.toIso8601String(),
-  };
-  return await repo.getGraphLogbook(filters);
+  return ObjectCatalogNotifier<GraphLogbook>(
+    (filters) {
+      final mergedFilters = {
+        'start_date': startDate.toIso8601String(),
+        'end_date': endDate.toIso8601String(),
+      };
+      return repo.getGraphLogbook(mergedFilters);
+    }
+  );
 });
 
 final getHistoryLogbooks =
@@ -171,6 +177,10 @@ typedef FetchListCallback<T> = Future<List<T>> Function(
   Map<String, dynamic>? filters,
 );
 
+typedef FetchObjectCallback<T> = Future<T> Function(
+  Map<String, dynamic>? filters,
+);
+
 class CatalogNotifier<T> extends StateNotifier<List<T>> {
   final FetchListCallback<T> fetch;
   bool _isLoading = false;
@@ -191,6 +201,33 @@ class CatalogNotifier<T> extends StateNotifier<List<T>> {
     } catch (e) {
       if (mounted) {
         state = [];
+      }
+    } finally {
+      _isLoading = false;
+    }
+  }
+}
+
+class ObjectCatalogNotifier<T> extends StateNotifier<T?> {
+  final FetchObjectCallback<T> fetch;
+  bool _isLoading = false;
+
+  ObjectCatalogNotifier(this.fetch) : super(null);
+
+  Future<void> load({Map<String, dynamic>? filters}) async {
+    if (_isLoading || !mounted) return;
+
+    _isLoading = true;
+
+    try {
+      final data = await fetch(filters);
+
+      if (!mounted) return; // 🔥 CLAVE
+
+      state = data;
+    } catch (e) {
+      if (mounted) {
+        state = null;
       }
     } finally {
       _isLoading = false;

@@ -98,14 +98,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           if (i == 0) {
             if (userData.hasPermission(Permissions.verIngresosBiomar)) {
               ref.read(getHistoryEntryAccess.notifier).load();
+              ref.read(graphDispatchProvider.notifier).load();
             }
 
             if (userData.hasPermission(Permissions.verDespachos)) {
               ref.read(getHistoryDispatch.notifier).load();
+              ref.read(graphDispatchProvider.notifier).load();
             }
             
             if (userData.hasPermission(Permissions.verBitacoras)) {
               ref.read(getHistoryLogbooks.notifier).load();
+              ref.read(graphLogbookProvider.notifier).load();
             }
           }
         },

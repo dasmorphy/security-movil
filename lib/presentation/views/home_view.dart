@@ -43,6 +43,7 @@ class HomeViewState extends ConsumerState<HomeView> {
         ref.read(getAllAuthorized.notifier).load();
         ref.read(getAllDestinyIntern.notifier).load();
         ref.read(getHistoryLogbooks.notifier).load();
+        ref.read(graphLogbookProvider.notifier).load();
       } else if (userData.attributes['id_business'] == 2 ||
           selectedBusiness == "2") {
         ref.read(getAllDestinyIntern.notifier).load();
@@ -54,6 +55,7 @@ class HomeViewState extends ConsumerState<HomeView> {
         ref.read(getAllDispatchProducts.notifier).load();
         ref.read(getHistoryDispatch.notifier).load();
         ref.read(getHistoryEntryAccess.notifier).load();
+        ref.read(graphDispatchProvider.notifier).load();
       }
     }
   }
@@ -118,20 +120,13 @@ class HomeViewState extends ConsumerState<HomeView> {
                           Permissions.verDashboardBiomar,
                         ))) ...[
                   const SizedBox(height: 10),
-                  ref
-                      .watch(graphDispatchProvider)
-                      .when(
-                        data: (data) => Column(
-                          children: [
-                            ShipmentDispatch(data: data),
-                            const SizedBox(height: 20),
-                            DiscrepancyDonutWidget(data: data),
-                          ],
-                        ),
-                        loading: () =>
-                            const Center(child: CircularProgressIndicator()),
-                        error: (e, _) => const Text('Error cargando datos'),
-                      ),
+                  Column(
+                    children: [
+                      ShipmentDispatch(),
+                      const SizedBox(height: 20),
+                      DiscrepancyDonutWidget(),
+                    ],
+                  ),
                   const SizedBox(height: 10),
                 ],
 
@@ -144,15 +139,7 @@ class HomeViewState extends ConsumerState<HomeView> {
                           Permissions.verDashboardExpalsa,
                         ))) ...[
                   const SizedBox(height: 10),
-                  ref
-                      .watch(graphLogbookProvider)
-                      .when(
-                        data: (data) =>
-                            Column(children: [DonutExpalsa(data: data)]),
-                        loading: () =>
-                            const Center(child: CircularProgressIndicator()),
-                        error: (e, _) => const Text('Error cargando datos'),
-                      ),
+                  Column(children: [DonutExpalsa()]),
                   const SizedBox(height: 10),
                 ],
 

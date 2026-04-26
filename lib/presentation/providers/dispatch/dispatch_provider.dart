@@ -60,9 +60,12 @@ final dispatchProvider =
   return DispatchProvider(repo);
 });
 
-final graphDispatchProvider = FutureProvider<GraphDispatch>((ref) async {
+final graphDispatchProvider =
+    StateNotifierProvider<ObjectCatalogNotifier<GraphDispatch>, GraphDispatch?>((ref) {
   final repo = ref.watch(dispatchRepositoryProvider);
-  return await repo.getGraphDispatch();
+  return ObjectCatalogNotifier<GraphDispatch>(
+    (filters) => repo.getGraphDispatch(),
+  );
 });
 
 
