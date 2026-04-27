@@ -13,7 +13,10 @@ final persistedSessionProvider = FutureProvider<User?>((ref) async {
   
   if (sessionModel != null) {
     return User(
-      attributes: sessionModel.attributes,
+      attributes: {
+        ...sessionModel.attributes,
+        'accessToken': sessionModel.token,
+      },
       email: sessionModel.email,
       idUser: sessionModel.userId,
       isActive: sessionModel.isActive,
@@ -51,7 +54,10 @@ class UserSessionNotifier extends StateNotifier<AsyncValue<User?>> {
       
       if (sessionModel != null) {
         final user = User(
-          attributes: sessionModel.attributes,
+          attributes: {
+            ...sessionModel.attributes,
+            'accessToken': sessionModel.token, // Restaurar el token JWT
+          },
           email: sessionModel.email,
           idUser: sessionModel.userId,
           isActive: sessionModel.isActive,
@@ -88,6 +94,17 @@ class UserSessionNotifier extends StateNotifier<AsyncValue<User?>> {
   }
 
   Future<void> logout() async {
+    final userSession = state.value;
+
+    try {
+      if (userSession != null) {
+        final token = userSession.attributes['accessToken'] as String?;
+        await authRepository.logout(token ?? "");
+      }
+    } catch (e) {
+      print('Error al llamar logout API: $e');
+    }
+
     // Eliminar sesión de Hive
     await hiveService.deleteUserSession();
     state = const AsyncValue.data(null);
