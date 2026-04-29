@@ -87,6 +87,8 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
   void _getUserLocation() async {
     final pos = await getLocation();
 
+    if (!mounted) return;
+
     if (pos == null) {
       if (mounted) {
         showDialog(
@@ -220,13 +222,13 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
     //   return;
     // }
 
-    // if (_selectedImages.length < 5) {
-    //   setState(() {
-    //     imagesMinError = true;
-    //     isLoading = false;
-    //   });
-    //   return;
-    // }
+    if (_selectedImages.length < 5) {
+      setState(() {
+        imagesMinError = true;
+        isLoading = false;
+      });
+      return;
+    }
 
     if (_selectedImages.length > 10) {
       setState(() {
@@ -255,11 +257,11 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
     // Construir los datos del formulario
     final data = {
       "external_transaction_id": Uuid().v4(),
-      "id_unity": int.parse(_unityId),
+      "id_unity": int.parse(_unityId) == 0 ? null : int.parse(_unityId),
       "id_category": int.parse(_categoryEntry),
       "shipping_guide": _guideCtrl.text.trim(),
       "description": _descCtrl.text.trim(),
-      "quantity": int.tryParse(_quantityCtrl.text) ?? 0,
+      "quantity": int.tryParse(_quantityCtrl.text) == 0 ? null : int.tryParse(_quantityCtrl.text),
       "weight": int.tryParse(_weightCtrl.text),
       "provider": _providerCtrl.text.trim(),
       "destiny_intern": _destiny,

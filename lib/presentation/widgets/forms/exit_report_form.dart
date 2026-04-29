@@ -87,6 +87,8 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
   void _getUserLocation() async {
     final pos = await getLocation();
 
+    if (!mounted) return;
+
     if (pos == null) {
       if (mounted) {
         showDialog(
@@ -265,11 +267,11 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
     final data = {
       "id_logbook_entry": widget.preloadedData?.idLogbookEntry,
       "external_transaction_id": Uuid().v4(),
-      "id_unity": int.parse(_unityId),
+      "id_unity": int.parse(_unityId) == 0 ? null : int.parse(_unityId),
       "id_category": int.parse(_categoryEntry),
       "shipping_guide": _guideCtrl.text.trim(),
       "name_driver": _nameDriverCtrl.text.trim(),
-      "quantity": int.tryParse(_quantityCtrl.text),
+      "quantity": int.tryParse(_quantityCtrl.text) == 0 ? null : int.tryParse(_quantityCtrl.text),
       "weight": int.tryParse(_weightCtrl.text),
       "truck_license": _truckLicenseCtrl.text.trim(),
       "lat": _latitude.toString(),
