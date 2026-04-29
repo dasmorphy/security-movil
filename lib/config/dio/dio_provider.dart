@@ -11,6 +11,7 @@ final dioProvider = Provider<Dio>((ref) {
     ),
   );
 
+  // Agregar el interceptor que maneja el token JWT
   dio.interceptors.add(DioInterceptor(ref));
 
   return dio;

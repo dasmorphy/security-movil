@@ -54,7 +54,7 @@ class HiveService {
     final sessionModel = UserSessionModel(
       userId: user.idUser,
       email: user.email,
-      token: '', // El token se maneja en auth_provider
+      token: user.attributes['accessToken'] ?? '', // Guardar el token JWT
       role: user.role,
       attributes: user.attributes,
       user: user.user,

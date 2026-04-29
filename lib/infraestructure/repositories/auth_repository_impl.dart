@@ -14,5 +14,10 @@ class AuthRepositoryImpl extends AuthRepository {
   Future<User> signin(Map<String, dynamic> data) {
     return datasource.signin(data);
   }
+  
+  @override
+  Future<void> logout(String token) {
+    return datasource.logout(token);
+  }
 
 }
