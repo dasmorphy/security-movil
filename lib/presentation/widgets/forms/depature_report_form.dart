@@ -220,13 +220,13 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
     //   return;
     // }
 
-    if (_selectedImages.length < 5) {
-      setState(() {
-        imagesMinError = true;
-        isLoading = false;
-      });
-      return;
-    }
+    // if (_selectedImages.length < 5) {
+    //   setState(() {
+    //     imagesMinError = true;
+    //     isLoading = false;
+    //   });
+    //   return;
+    // }
 
     if (_selectedImages.length > 10) {
       setState(() {
@@ -397,8 +397,18 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
       'Cuadrillas para pesca'
     };
 
-    final hideWeight = hiddenWeightCategories.contains(categoryName);
+    const hiddenEjectCategories = {
+      'Ejecutivos de expalsa',
+    };
 
+    const hiddenPersonalCategories = {
+      'Personal interno',
+      'Personal externo',
+    };
+
+    final hideWeight = hiddenWeightCategories.contains(categoryName);
+    final hideEject = hiddenEjectCategories.contains(categoryName);
+    final hidePersonal = hiddenPersonalCategories.contains(categoryName);
 
     InputDecoration styleDecoration() => InputDecoration(
       filled: true,
@@ -549,9 +559,23 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                     if (v != null) {
                       setState(() => _categoryEntry = v);
 
-                      if (hideWeight) {
+                      if (!hideWeight) {
                         _guideCtrl.clear();
                         _weightCtrl.clear();
+                      }
+
+                      if (!hideEject) {
+                        _quantityCtrl.clear();
+                        _descCtrl.clear();
+                        _providerCtrl.clear();
+                        _unityId = '0';
+                        _authorized = '0';
+                      }
+
+                      if (!hidePersonal) {
+                        _providerCtrl.clear();
+                        _unityId = '0';
+                        _quantityCtrl.clear();
                       }
                     }
                   },
@@ -578,67 +602,72 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                   ),
                 ],
 
-                const SizedBox(height: 12),
+                if (!hideEject) ...[
+                  const SizedBox(height: 12),
+                  CustomFieldLabelRequired(txtLabel: 'Descripción'),
+                  GlowTextFormField(
+                    controller: _descCtrl,
+                    focusNode: _descFocus,
+                    validator: (v) {
+                      if (v == null || v.trim().isEmpty) {
+                        return messageValidatorEmpty;
+                      }
+                      return null;
+                    },
+                  ),
+                ],
 
-                CustomFieldLabelRequired(txtLabel: 'Descripción'),
-                GlowTextFormField(
-                  controller: _descCtrl,
-                  focusNode: _descFocus,
-                  validator: (v) {
-                    if (v == null || v.trim().isEmpty) {
-                      return messageValidatorEmpty;
-                    }
-                    return null;
-                  },
-                ),
-
-                const SizedBox(height: 12),
-                CustomFieldLabelRequired(txtLabel: 'Cantidad'),
-                GlowTextFormField(
-                  controller: _quantityCtrl,
-                  focusNode: _quantityFocus,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  validator: (v) {
-                    if (v == null || v.isEmpty) return messageValidatorEmpty;
-                    final n = int.tryParse(v);
-                    if (n == null) return 'Cantidad inválida';
-                    return null;
-                  },
-                ),
-
-                const SizedBox(height: 12),
-                CustomFieldLabelRequired(txtLabel: 'Unidad'),
-                GlowDropdownFormField<String>(
-                  // enabled: false,
-                  value: _unityId,
-                  focusNode: _unitFocus,
-                  decoration: styleDecoration(),
-                  items: [
-                    DropdownMenuItem(
-                      enabled: false,
-                      value: '0',
-                      child: Text('Seleccione una opción'),
-                    ),
-                    ...unitiesWeight.map(
-                      (c) => DropdownMenuItem(
-                        value: c.idUnity.toString(),
-                        child: Text('${c.name} - ${c.code}'),
+                if (!hideEject && !hidePersonal) ...[
+                  const SizedBox(height: 12),
+                  CustomFieldLabelRequired(txtLabel: 'Cantidad'),
+                  GlowTextFormField(
+                    controller: _quantityCtrl,
+                    focusNode: _quantityFocus,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    validator: (v) {
+                      if (v == null || v.isEmpty) return messageValidatorEmpty;
+                      final n = int.tryParse(v);
+                      if (n == null) return 'Cantidad inválida';
+                      return null;
+                    },
+                  ),
+                ],
+                
+                if (!hideEject && !hidePersonal) ...[
+                  const SizedBox(height: 12),
+                  CustomFieldLabelRequired(txtLabel: 'Unidad'),
+                  GlowDropdownFormField<String>(
+                    // enabled: false,
+                    value: _unityId,
+                    focusNode: _unitFocus,
+                    decoration: styleDecoration(),
+                    items: [
+                      DropdownMenuItem(
+                        enabled: false,
+                        value: '0',
+                        child: Text('Seleccione una opción'),
                       ),
-                    ),
-                  ],
-                  onChanged: (v) {
-                    if (v != null) {
-                      setState(() => _unityId = v);
-                    }
-                  },
-                  validator: (v) {
-                    if (v == '0' || v == null || v.trim().isEmpty) {
-                      return messageValidatorEmpty;
-                    }
-                    return null;
-                  },
-                ),
+                      ...unitiesWeight.map(
+                        (c) => DropdownMenuItem(
+                          value: c.idUnity.toString(),
+                          child: Text('${c.name} - ${c.code}'),
+                        ),
+                      ),
+                    ],
+                    onChanged: (v) {
+                      if (v != null) {
+                        setState(() => _unityId = v);
+                      }
+                    },
+                    validator: (v) {
+                      if (v == '0' || v == null || v.trim().isEmpty) {
+                        return messageValidatorEmpty;
+                      }
+                      return null;
+                    },
+                  ),
+                ], 
 
                 if (!hideWeight) ...[
                   const SizedBox(height: 12),
@@ -655,23 +684,25 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                   ),
                 ],
                 
-                const SizedBox(height: 12),
-                CustomFieldLabelRequired(txtLabel: 'Proveedor / Origen'),
-                GlowTextFormField(
-                  controller: _providerCtrl,
-                  focusNode: _providerFocus,
-                  validator: (v) {
-                    if (v == null || v.trim().isEmpty) {
-                      return messageValidatorEmpty;
-                    }
-                    return null;
-                  },
-                ),
+                if (!hideEject && !hidePersonal) ...[
+                  const SizedBox(height: 12),
+                  CustomFieldLabelRequired(txtLabel: 'Proveedor / Origen'),
+                  GlowTextFormField(
+                    controller: _providerCtrl,
+                    focusNode: _providerFocus,
+                    validator: (v) {
+                      if (v == null || v.trim().isEmpty) {
+                        return messageValidatorEmpty;
+                      }
+                      return null;
+                    },
+                  ),
+                ],
 
                 const SizedBox(height: 12),
                 CustomFieldLabelRequired(txtLabel: 'Placa del Camión'),
                 GlowTextFormField(
-                  maxLength: 8,
+                  maxLength: 10,
                   controller: _truckLicenseCtrl,
                   focusNode: _truckLicenseFocus,
                   validator: (v) {
@@ -727,37 +758,39 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                   },
                 ),
 
-                const SizedBox(height: 12),
-                CustomFieldLabelRequired(txtLabel: 'Autorizado por'),
-                GlowDropdownFormField2<String>(
-                  value: _authorized,
-                  focusNode: _authorizedFocus,
-                  decoration: styleDecoration(),
-                  items: [
-                    DropdownMenuItem(
-                      enabled: false,
-                      value: '0',
-                      child: Text('Seleccione una opción', style: TextStyle(color: Colors.white),),
-                    ),
-                    ...authorized.map(
-                      (c) => DropdownMenuItem(
-                        value: c.name,
-                        child: Text(c.name, style: TextStyle(color: Colors.white),),
+                if (!hideEject) ...[
+                  const SizedBox(height: 12),
+                  CustomFieldLabelRequired(txtLabel: 'Autorizado por'),
+                  GlowDropdownFormField2<String>(
+                    value: _authorized,
+                    focusNode: _authorizedFocus,
+                    decoration: styleDecoration(),
+                    items: [
+                      DropdownMenuItem(
+                        enabled: false,
+                        value: '0',
+                        child: Text('Seleccione una opción', style: TextStyle(color: Colors.white),),
                       ),
-                    ),
-                  ],
-                  onChanged: (v) {
-                    if (v != null) {
-                      setState(() => _authorized = v);
-                    }
-                  },
-                  validator: (v) {
-                    if (v == '0' || v == null || v.trim().isEmpty) {
-                      return messageValidatorEmpty;
-                    }
-                    return null;
-                  },
-                ),
+                      ...authorized.map(
+                        (c) => DropdownMenuItem(
+                          value: c.name,
+                          child: Text(c.name, style: TextStyle(color: Colors.white),),
+                        ),
+                      ),
+                    ],
+                    onChanged: (v) {
+                      if (v != null) {
+                        setState(() => _authorized = v);
+                      }
+                    },
+                    validator: (v) {
+                      if (v == '0' || v == null || v.trim().isEmpty) {
+                        return messageValidatorEmpty;
+                      }
+                      return null;
+                    },
+                  ),
+                ],
 
                 const SizedBox(height: 12),
                 CustomFieldLabelRequired(

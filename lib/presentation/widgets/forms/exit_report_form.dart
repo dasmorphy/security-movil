@@ -420,10 +420,23 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
 
     const hiddenQuantityCategories = {
       'Camarón',
+      'Tilapia',
     };
+
+    const hiddenEjectCategories = {
+      'Ejecutivos de expalsa',
+    };
+
+    const hiddenPersonalCategories = {
+      'Personal interno',
+      'Personal externo',
+    };
+
 
     final hideWeight = hiddenWeightCategories.contains(categoryName);
     final hideQuantity = hiddenQuantityCategories.contains(categoryName);
+    final hideEject = hiddenEjectCategories.contains(categoryName);
+    final hidePersonal = hiddenPersonalCategories.contains(categoryName);
     final isDestinyRequired = categoryName == 'Camarón';
 
     InputDecoration styleDecoration() => InputDecoration(
@@ -564,14 +577,25 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                     if (v != null) {
                       setState(() => _categoryEntry = v);
 
-                      if (hideWeight) {
+                      if (!hideWeight) {
                         _guideCtrl.clear();
                         _weightCtrl.clear();
                       }
-                      if (hideQuantity) {
+
+                      if (!hideQuantity) {
                         _quantityCtrl.clear();
                         _personWithdrawsCtrl.clear();
                       }
+
+                      if (!hideEject || !hidePersonal) {
+                        _unityId = '0';
+                        _quantityCtrl.clear();
+                      }
+
+                      if (!hideEject) {
+                        _authorized = '0';
+                      }
+
                     }
                   },
                   validator: (v) {
@@ -597,7 +621,7 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                   ),
                 ],
 
-                if (hideQuantity) ...[
+                if (hideQuantity && !hideEject && !hidePersonal) ...[
                   const SizedBox(height: 12),
                   CustomFieldLabelRequired(txtLabel: 'Cantidad de Bines'),
                   GlowTextFormField(
@@ -627,37 +651,39 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                   ),
                 ],
 
-                const SizedBox(height: 12),
-                CustomFieldLabelRequired(txtLabel: 'Unidad'),
-                GlowDropdownFormField<String>(
-                  value: _unityId,
-                  focusNode: _unitFocus,
-                  decoration: styleDecoration(),
-                  items: [
-                    DropdownMenuItem(
-                      enabled: false,
-                      value: '0',
-                      child: Text('Seleccione una opción'),
-                    ),
-                    ...unitiesWeight.map(
-                      (c) => DropdownMenuItem(
-                        value: c.idUnity.toString(),
-                        child: Text('${c.name} - ${c.code}'),
+                if (!hideEject && !hidePersonal) ...[
+                  const SizedBox(height: 12),
+                  CustomFieldLabelRequired(txtLabel: 'Unidad'),
+                  GlowDropdownFormField<String>(
+                    value: _unityId,
+                    focusNode: _unitFocus,
+                    decoration: styleDecoration(),
+                    items: [
+                      DropdownMenuItem(
+                        enabled: false,
+                        value: '0',
+                        child: Text('Seleccione una opción'),
                       ),
-                    ),
-                  ],
-                  onChanged: (v) {
-                    if (v != null) {
-                      setState(() => _unityId = v);
-                    }
-                  },
-                  validator: (v) {
-                    if (v == '0' || v == null || v.trim().isEmpty) {
-                      return messageValidatorEmpty;
-                    }
-                    return null;
-                  },
-                ),
+                      ...unitiesWeight.map(
+                        (c) => DropdownMenuItem(
+                          value: c.idUnity.toString(),
+                          child: Text('${c.name} - ${c.code}'),
+                        ),
+                      ),
+                    ],
+                    onChanged: (v) {
+                      if (v != null) {
+                        setState(() => _unityId = v);
+                      }
+                    },
+                    validator: (v) {
+                      if (v == '0' || v == null || v.trim().isEmpty) {
+                        return messageValidatorEmpty;
+                      }
+                      return null;
+                    },
+                  ),
+                ],
 
                 if (!hideWeight) ...[
                   const SizedBox(height: 12),
@@ -677,7 +703,7 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                 const SizedBox(height: 12),
                 CustomFieldLabelRequired(txtLabel: 'Placa del Camión'),
                 GlowTextFormField(
-                  maxLength: 8,
+                  maxLength: 10,
                   controller: _truckLicenseCtrl,
                   focusNode: _truckLicenseFocus,
                   validator: (v) {
@@ -717,39 +743,42 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                   },
                 ),
 
-                const SizedBox(height: 12),
-                CustomFieldLabelRequired(
-                  txtLabel: 'Autorizado por',
-                ),
-                GlowDropdownFormField2<String>(
-                  value: _authorized,
-                  focusNode: _authorizedFocus,
-                  decoration: styleDecoration(),
-                  items: [
-                    DropdownMenuItem(
-                      enabled: false,
-                      value: '0',
-                      child: Text('Seleccione una opción', style: TextStyle(color: Colors.white),),
-                    ),
-                    ...authorized.map(
-                      (c) => DropdownMenuItem(
-                        value: c.name,
-                        child: Text(c.name, style: TextStyle(color: Colors.white),),
+                if (!hideEject) ...[
+                
+                  const SizedBox(height: 12),
+                  CustomFieldLabelRequired(
+                    txtLabel: 'Autorizado por',
+                  ),
+                  GlowDropdownFormField2<String>(
+                    value: _authorized,
+                    focusNode: _authorizedFocus,
+                    decoration: styleDecoration(),
+                    items: [
+                      DropdownMenuItem(
+                        enabled: false,
+                        value: '0',
+                        child: Text('Seleccione una opción', style: TextStyle(color: Colors.white),),
                       ),
-                    ),
-                  ],
-                  onChanged: (v) {
-                    if (v != null) {
-                      setState(() => _authorized = v);
-                    }
-                  },
-                  validator: (v) {
-                    if (v == '0' || v == null || v.trim().isEmpty) {
-                      return messageValidatorEmpty;
-                    }
-                    return null;
-                  },
-                ),
+                      ...authorized.map(
+                        (c) => DropdownMenuItem(
+                          value: c.name,
+                          child: Text(c.name, style: TextStyle(color: Colors.white),),
+                        ),
+                      ),
+                    ],
+                    onChanged: (v) {
+                      if (v != null) {
+                        setState(() => _authorized = v);
+                      }
+                    },
+                    validator: (v) {
+                      if (v == '0' || v == null || v.trim().isEmpty) {
+                        return messageValidatorEmpty;
+                      }
+                      return null;
+                    },
+                  ),
+                ],
 
                 const SizedBox(height: 12),
                 CustomFieldLabelRequired(
