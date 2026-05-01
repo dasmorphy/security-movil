@@ -176,7 +176,6 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
   @override
   Future<List<AllLogbook>> getHistoryLogbooks(filter) async {
     List allLogJson = [];
-    print('HOLA');
     try {
       final response = await dio.get(
         '/rest/zent-logbook-api/v1.0/get/all-logbooks',
@@ -190,7 +189,7 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
       );
 
       allLogJson = response.data['data']; 
-      
+
       return allLogJson.map((json) => AllLogbook.fromJson(json)).toList();
       
     } catch (e) {

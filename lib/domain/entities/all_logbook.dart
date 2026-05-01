@@ -19,12 +19,12 @@ class AllLogbook {
   String nameUser;
   String? observations;
   LogbookOut? out;
-  int? quantity;
+  dynamic quantity;
   String? personWithdraws;
   String? shippingGuide;
   String status;
   String truckLicense;
-  int unityId;
+  dynamic unityId;
   DateTime updatedAt;
   String updatedBy;
   int? weight;

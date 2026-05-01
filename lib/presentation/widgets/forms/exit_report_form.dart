@@ -198,7 +198,7 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
     setState(() {
       _categoryEntry = data.categoryId.toString();
       _guideCtrl.text = data.shippingGuide ?? '';
-      _unityId = data.unityId.toString();
+      _unityId = data.unityId?.toString() ?? '0';
       _truckLicenseCtrl.text = data.truckLicense;
       _nameDriverCtrl.text = data.nameDriver ?? '';
     });
