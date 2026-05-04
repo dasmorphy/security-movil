@@ -2,19 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
+// Coordenadas de Quito como fallback
+const _kDefaultLat = -0.1807;
+const _kDefaultLng = -78.4678;
+
 class MapApp extends StatelessWidget {
   final double? latitude;
   final double? longitude;
 
   const MapApp({super.key, this.latitude, this.longitude});
 
+  /// Devuelve true solo si el valor es un double real y finito
+  static bool _isValid(double? v) => v != null && v.isFinite;
+
   @override
   Widget build(BuildContext context) {
-    final lat = (latitude != null && latitude!.isFinite) ? latitude! : -0.1807;
-    final lng = (longitude != null && longitude!.isFinite)
-        ? longitude!
-        : -78.4678;
-    final center = LatLng(lat, lng);
+    // Validación centralizada ANTES de tocar LatLng
+    final bool hasValidCoords = _isValid(latitude) && _isValid(longitude);
+
+    final LatLng center = hasValidCoords
+        ? LatLng(latitude!, longitude!)
+        : const LatLng(_kDefaultLat, _kDefaultLng);
 
     return Container(
       height: 300,
@@ -37,8 +45,8 @@ class MapApp extends StatelessWidget {
             minZoom: 3,
           ),
 
-          // ✅ Guard: solo renderiza si las coordenadas son válidas
-          if (center.latitude.isFinite && center.longitude.isFinite)
+          // El marker solo aparece si hay coordenadas reales
+          if (hasValidCoords)
             MarkerLayer(
               markers: [
                 Marker(

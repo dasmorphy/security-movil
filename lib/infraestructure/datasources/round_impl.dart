@@ -6,6 +6,7 @@ import 'package:http_parser/http_parser.dart';
 import 'package:uuid/uuid.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/domain/datasources/round_datasource.dart';
+import 'package:zentinel/domain/entities/all_round.dart';
 import 'package:zentinel/domain/entities/api_response.dart';
 
 class RoundImpl extends RoundDatasource {
@@ -74,6 +75,41 @@ class RoundImpl extends RoundDatasource {
         errorCode: 'update_error',
         message: 'Error al guardar el registro de ronda',
       );
+    }
+  }
+  
+  @override
+  Future<List<Map<dynamic, dynamic>>> getSectorPool() async {
+    final response = await dio.get(
+      '/rest/zent-round-api/v1.0/sectors-pool',
+      options: Options(
+        headers: {'externalTransactionId': uuid, 'channel': 'ZENTINEL'},
+      ),
+    );
+    return List<Map<String, dynamic>>.from(response.data['data']);
+  }
+
+  @override
+  Future<List<AllRound>> getHistoryRounds(Map<String, dynamic> filters) async {
+    List allRoundJson = [];
+    try {
+      final response = await dio.get(
+        '/rest/zent-round-api/v1.0/round-register',
+        options: Options(
+          headers: {
+            'externalTransactionId': uuid,
+            'channel': 'ZENTINEL',
+            'user': filters['user'],
+          },
+        ),
+      );
+
+      allRoundJson = response.data['data']; 
+      return allRoundJson.map((json) => AllRound.fromJson(json)).toList();
+      
+    } catch (e) {
+      print(e);
+      return [];
     }
   }
 }

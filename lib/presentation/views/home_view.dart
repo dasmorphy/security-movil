@@ -55,6 +55,8 @@ class HomeViewState extends ConsumerState<HomeView> {
         ref.read(getHistoryDispatch.notifier).load();
         ref.read(getHistoryEntryAccess.notifier).load();
       }
+        ref.read(getSectorPool.notifier).load();
+        ref.read(getHistoryRounds.notifier).load();
     }
   }
 
@@ -172,6 +174,13 @@ class HomeViewState extends ConsumerState<HomeView> {
                     title: 'Bitácoras recientes',
                     routeLink: '/list-logbooks',
                     childListBuild: const ItemRecentLogbook(),
+                  ),
+                  const SizedBox(height: 30),
+
+                  RecentListHome(
+                    title: 'Rondas recientes',
+                    routeLink: '/list-round',
+                    childListBuild: const ItemRecentRound(),
                   ),
                   const SizedBox(height: 30),
                 ],

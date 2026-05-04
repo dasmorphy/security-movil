@@ -19,7 +19,6 @@ class _NewRoundScreenState extends ConsumerState<NewRoundScreen> {
   @override
   void initState() {
     super.initState();
-    ref.read(getHistoryEntryAccess.notifier).load();
   }
   
 

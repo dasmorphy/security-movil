@@ -31,7 +31,7 @@ class GlowTextFormField extends StatelessWidget {
 
     return AnimatedBuilder(
       animation: focusNode,
-      builder: (_, __) {
+      builder: (_, _) {
         return AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           decoration: BoxDecoration(

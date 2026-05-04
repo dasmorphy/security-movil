@@ -102,7 +102,12 @@ final appRouter = GoRouter(
           path: 'new-round-register',
           name: NewRoundScreen.name,
           builder: (context, state) => const NewRoundScreen(),
-        )
+        ),
+        GoRoute(
+          path: 'list-round',
+          name: RoundListScreen.name,
+          builder: (context, state) => const RoundListScreen()
+        ),
       ]
     ),
   ]
