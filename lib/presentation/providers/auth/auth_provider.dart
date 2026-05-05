@@ -82,6 +82,7 @@ class UserSessionNotifier extends StateNotifier<AsyncValue<User?>> {
       
       state = AsyncValue.data(user);
     } on DioException catch (e) {
+      if (!mounted) return;
       state = AsyncValue.error(
         e.response?.data?['message'] ?? 'Error de autenticación',
         StackTrace.current,

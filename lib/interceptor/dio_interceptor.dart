@@ -48,7 +48,33 @@ class DioInterceptor extends Interceptor {
   void onError(DioException err, ErrorInterceptorHandler handler) async {
     final showError = err.requestOptions.extra['showErrorMessage'] ?? true;
     final statusCode = err.response?.statusCode;
+    
+    if (err.requestOptions.path.contains('/rest/zent-logbook-api/v1.0/post/login')) {
+      String message;
+      
+      switch (err.type) {
+        case DioExceptionType.connectionTimeout:
+        case DioExceptionType.receiveTimeout:
+          message = 'Tiempo de espera agotado';
+          break;
 
+        case DioExceptionType.connectionError:
+          message = 'Revise su conexión a internet';
+          break;
+
+        case DioExceptionType.badResponse:
+          message = err.response?.data?['message'] ?? 'Error del servidor';
+          break;
+
+        default:
+          message = 'Error inesperado';
+      }
+
+      ref.read(globalMessageProvider.notifier).showError(message);
+
+      handler.next(err);
+      return;
+    }
     // Manejar error 401 (Unauthorized) - Token expirado o inválido
     if (err.response?.statusCode == 401 && !isLoggingOut) {
       isLoggingOut = true;
