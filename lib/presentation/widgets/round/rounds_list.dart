@@ -91,9 +91,7 @@ class RoundsListState extends ConsumerState<RoundsList> {
 
                   final item = displayItems[index];
 
-                  final createdBy = item.createdBy ?? 'Sin usuario';
-
-                  final description = 'Ronda';
+                  final description = 'Ronda en ${item.pool} - Sector: ${item.nameSector}';
 
                   final formattedDate = formatDate(item.createdAt);
 
@@ -132,7 +130,7 @@ class RoundsListState extends ConsumerState<RoundsList> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  createdBy,
+                                  item.createdBy,
                                   style: Theme.of(context).textTheme.bodyMedium
                                       ?.copyWith(
                                         color: Colors.white,

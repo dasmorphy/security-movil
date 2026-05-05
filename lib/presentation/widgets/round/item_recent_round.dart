@@ -9,7 +9,7 @@ class ItemRecentRound extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final historyRounds = [];
+    final historyRounds = ref.watch(getHistoryRounds);
     final limitedList = historyRounds.take(5).toList();
 
     if (historyRounds.isEmpty) {
@@ -22,14 +22,7 @@ class ItemRecentRound extends ConsumerWidget {
     return Column(
       children: List.generate(limitedList.length, (index) {
         final item = limitedList[index];
-
-        final isEntry = item.idLogbookEntry;
-        final typeText = isEntry != null ? 'ingreso' : 'salida';
-
-        final createdBy = item.nameUser;
-        final groupName = item.groupName;
-
-        final description = 'Bitácora de $typeText en $groupName';
+        final description = 'Ronda en ${item.pool} - Sector: ${item.nameSector}';
 
         final formattedDate = formatDate(item.createdAt);
 
@@ -39,7 +32,7 @@ class ItemRecentRound extends ConsumerWidget {
             borderRadius: BorderRadius.circular(8),
             onTap: () => ModalHelper.open(
               context,
-              child: BitacoraDetailModal(item: item),
+              child: RoundDetailModal(item: item),
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -64,7 +57,7 @@ class ItemRecentRound extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        createdBy,
+                        item.createdBy,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                           color: Colors.white,
                           fontWeight: FontWeight.w600,
@@ -88,18 +81,18 @@ class ItemRecentRound extends ConsumerWidget {
                       ),
                       const SizedBox(height: 2),
 
-                      Chip(
-                        label: Text(item.status),
-                        backgroundColor: item.status == 'Finalizado'
-                            ? const Color.fromARGB(255, 34, 197, 94)
-                            : const Color.fromARGB(255, 224, 157, 49),
-                        padding: EdgeInsets.zero,
-                        labelStyle: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      // Chip(
+                      //   label: Text(item.status),
+                      //   backgroundColor: item.status == 'Finalizado'
+                      //       ? const Color.fromARGB(255, 34, 197, 94)
+                      //       : const Color.fromARGB(255, 224, 157, 49),
+                      //   padding: EdgeInsets.zero,
+                      //   labelStyle: const TextStyle(
+                      //     color: Colors.white,
+                      //     fontSize: 12,
+                      //     fontWeight: FontWeight.bold,
+                      //   ),
+                      // ),
                     ],
                   ),
                 ),

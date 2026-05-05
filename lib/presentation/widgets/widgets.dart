@@ -74,3 +74,5 @@ export 'package:zentinel/presentation/widgets/forms/new_round_form.dart';
 export 'package:zentinel/presentation/widgets/sections/services_urb.dart';
 export 'package:zentinel/presentation/widgets/round/rounds_list.dart';
 export 'package:zentinel/presentation/widgets/round/item_recent_round.dart';
+export 'package:zentinel/presentation/widgets/modals/round_detail_modal.dart';
+export 'package:zentinel/presentation/widgets/round/round_detail.dart';
