@@ -50,6 +50,13 @@ class _BiomarEntryReportFormState extends ConsumerState<BiomarEntryReportForm> {
 
   @override
   void dispose() {
+    _clearCntrl();
+    super.dispose();
+  }
+
+  void _clearCntrl() {
+    _selectedImages = [];
+    _formKey.currentState?.reset();
     _dniFocus.dispose();
     _quantityCtrl.dispose();
     _providerCtrl.dispose();
@@ -61,7 +68,8 @@ class _BiomarEntryReportFormState extends ConsumerState<BiomarEntryReportForm> {
     _materialEntryFocus.dispose();
     _truckLicenseFocus.dispose();
     _reasonVisitFocus.dispose();
-    super.dispose();
+    imagesMinError = false;
+    imagesMaxError = false;
   }
 
   void _submit() async {
@@ -126,38 +134,31 @@ class _BiomarEntryReportFormState extends ConsumerState<BiomarEntryReportForm> {
     };
 
     // Verificar conexión a internet
-    // final internetAvailable = await hasInternet();
+    final internetAvailable = await hasInternet();
 
-    // if (!internetAvailable) {
-    //   // 🔴 SIN INTERNET: Guardar localmente
-    //   print('❌ Sin conexión, guardando localmente...');
-    //   data['created_at'] = DateTime.now().toString();
-    //   await savePendingRequest(data, 'logbook_entry');
+    if (!internetAvailable) {
+      // 🔴 SIN INTERNET: Guardar localmente
+      print('❌ Sin conexión, guardando localmente...');
+      data['created_at'] = DateTime.now().toString();
+      await savePendingBiomar(data, 'entry');
 
-    //   if (mounted) {
-    //     // Navigator.pop(context); // Cerrar dialog de procesamiento
-    //     _clearCntrl();
-    //     if (Navigator.canPop(context)) {
-    //       context.pop(); // Cerrar el formulario
-    //     }
-
-    //     ScaffoldMessenger.of(context).showSnackBar(
-    //       const SnackBar(
-    //         duration: Duration(seconds: 6),
-    //         content: Text(
-    //           '📱 Sin conexión. Tu información se guardará localmente y se enviará automáticamente cuando recuperes conexión.',
-    //           style: TextStyle(color: Colors.white),
-    //         ),
-    //         backgroundColor: Color.fromARGB(255, 255, 152, 0),
-    //       ),
-    //     );
-    //   }
-    //   setState(() => isLoading = false);
-    //   return;
-    // }
-
-    // // 🟢 CON INTERNET: Enviar al servidor
-    // print('✅ Conexión disponible, enviando al servidor...');
+      if (mounted) {
+        _clearCntrl();
+        context.pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            duration: Duration(seconds: 6),
+            content: Text(
+              '📱 Sin conexión. Tu información se guardará localmente y se enviará automáticamente cuando recuperes conexión.',
+              style: TextStyle(color: Colors.white),
+            ),
+            backgroundColor: Color.fromARGB(255, 255, 152, 0),
+          ),
+        );
+      }
+      setState(() => isLoading = false);
+      return;
+    }
 
     GlobalLoadingBottomSheet.show(
       status: OverlayStatus.loading, 
@@ -169,15 +170,19 @@ class _BiomarEntryReportFormState extends ConsumerState<BiomarEntryReportForm> {
 
     setState(() => isLoading = false);
 
+    if (Navigator.canPop(context)) {
+      context.pop();
+    }
+
     if (response.success) {
       GlobalLoadingBottomSheet.show(
         status: OverlayStatus.success, 
         message: "Ingreso guardado exitosamente", 
         autoDismiss: const Duration(seconds: 2)
       );
-      ref.read(getHistoryDispatch.notifier).load();
-      Navigator.of(context).pop();
+      ref.read(getHistoryEntryAccess.notifier).load();
     } else {
+      await savePendingBiomar(data, 'entry');
       GlobalLoadingBottomSheet.show(
         status: OverlayStatus.error,
         message: 'Error: ${response.message ?? 'Error al guardar el ingreso'}',
@@ -210,19 +215,6 @@ class _BiomarEntryReportFormState extends ConsumerState<BiomarEntryReportForm> {
     //     ),
     //   );
     // }
-  }
-
-  void _clearCntrl() {
-    _selectedImages = [];
-    _formKey.currentState?.reset();
-    _dniCtrl.clear();
-    _quantityCtrl.clear();
-    _providerCtrl.clear();
-    _reasonVisitCtrl.clear();
-    _nameVisitCtrl.clear();
-    _observationsCtrl.clear();
-    imagesMinError = false;
-    imagesMaxError = false;
   }
 
   List<Map<String, dynamic>> materialsAdded = [{

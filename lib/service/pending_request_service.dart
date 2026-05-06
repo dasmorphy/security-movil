@@ -73,6 +73,17 @@ Future<void> savePendingRequest(Map<String, dynamic> data, String nameMethod) as
   });
 }
 
+Future<void> savePendingBiomar(Map<String, dynamic> data, String nameMethod) async {
+  final box = Hive.box('pending_biomar');
+  final preparedData = await _prepareDataForStorage(data);
+
+  await box.add({
+    'endpoint': nameMethod,
+    'payload': preparedData,
+    'createdAt': DateTime.now().toIso8601String(),
+  });
+}
+
 class SyncService {
   StreamSubscription? _sub;
   VoidCallback? _onSyncNeeded;

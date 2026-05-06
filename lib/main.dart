@@ -68,6 +68,7 @@ class _MyAppState extends ConsumerState<MyApp> {
     void onSyncNeeded() {
       print('📡 Internet disponible, iniciando sincronización...');
       ref.read(syncPendingProvider.notifier).sync();
+      ref.read(syncPendingProvider.notifier).syncBiomar();
     }
 
     // 🔄 Inicializar el SyncService con el callback

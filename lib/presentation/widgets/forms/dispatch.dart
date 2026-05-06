@@ -2,10 +2,12 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 import 'package:zentinel/domain/entities/api_response.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
+import 'package:zentinel/service/pending_request_service.dart';
 
 // ─── Modelos ───────────────────────────────────────────────────────────────
 
@@ -205,6 +207,36 @@ class _CrearDespachoScreenState extends ConsumerState<DispatchForm> {
         .toList(), // Lista de Uint8List directo, sin base64
     };
 
+    // Verificar conexión a internet
+    final internetAvailable = await hasInternet();
+
+    if (!internetAvailable) {
+      // 🔴 SIN INTERNET: Guardar localmente
+      print('❌ Sin conexión, guardando localmente...');
+      data['created_at'] = DateTime.now().toString();
+      await savePendingRequest(data, 'dispatch');
+
+      if (mounted) {
+        // _truckLicenseCtrl.dispose();
+        // _driverCtrl.dispose();
+        // _orderNumberCtrl.dispose();
+        // _observationsCtrl.dispose();
+        context.pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            duration: Duration(seconds: 6),
+            content: Text(
+              '📱 Sin conexión. Tu información se guardará localmente y se enviará automáticamente cuando recuperes conexión.',
+              style: TextStyle(color: Colors.white),
+            ),
+            backgroundColor: Color.fromARGB(255, 255, 152, 0),
+          ),
+        );
+      }
+      setState(() => isLoading = false);
+      return;
+    }
+
     GlobalLoadingBottomSheet.show(
       status: OverlayStatus.loading, 
       message: "Guardando despacho..."
@@ -217,6 +249,9 @@ class _CrearDespachoScreenState extends ConsumerState<DispatchForm> {
     //   await savePendingRequest(data, 'logbook_entry');
     // }
 
+    if (Navigator.canPop(context)) {
+      context.pop();
+    }
 
     if (response.success) {
       GlobalLoadingBottomSheet.show(
@@ -225,11 +260,11 @@ class _CrearDespachoScreenState extends ConsumerState<DispatchForm> {
         autoDismiss: const Duration(seconds: 2)
       );
       ref.read(getHistoryDispatch.notifier).load();
-      Navigator.of(context).pop();
     } else {
+      await savePendingBiomar(data, 'dispatch');
       GlobalLoadingBottomSheet.show(
         status: OverlayStatus.error,
-        message: 'Error: ${response.message ?? 'Error al guardar el despacho'}',
+        message: 'Error: ${response.message ?? 'Error al guardar el despacho. La información se guardará localmente y se enviará automáticamente.'}',
         autoDismiss: const Duration(seconds: 3),
       );
     }

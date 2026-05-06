@@ -7,6 +7,7 @@ Future<void> initHive() async {
   Hive.registerAdapter(UserProfileModelAdapter());
   Hive.registerAdapter(UserSessionModelAdapter());
   await Hive.openBox('pending_requests');
+  await Hive.openBox('pending_biomar');
   await Hive.openBox<UserProfileModel>('user_profile');
   await Hive.openBox<UserSessionModel>('user_session');
 }
