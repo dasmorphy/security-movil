@@ -43,8 +43,9 @@ List<Uint8List?> _selectedImages = [];
 // ─── Screen principal ──────────────────────────────────────────────────────
 
 class DispatchForm extends ConsumerStatefulWidget {
+  final bool? isProductTerm;
   final Future<ApiResponse> Function(Map<String, dynamic>) onSubmit;
-  const DispatchForm({super.key, required this.onSubmit});
+  const DispatchForm({super.key, required this.onSubmit, this.isProductTerm = false});
 
   @override
   ConsumerState<DispatchForm> createState() => _CrearDespachoScreenState();
@@ -61,6 +62,7 @@ class _CrearDespachoScreenState extends ConsumerState<DispatchForm> {
 
   int? _vehicleSelected = 0;
   int? _destinySelected = 0;
+  String _destinyProduct = '0';
   final String _driver = '';
   final String _truckLicense = '';
   final String _orderNumber = '';
@@ -68,6 +70,7 @@ class _CrearDespachoScreenState extends ConsumerState<DispatchForm> {
   final _driverCtrl = TextEditingController();
   final _orderNumberCtrl = TextEditingController();
   final _observationsCtrl = TextEditingController();
+  final _clientCtrl = TextEditingController();
 
   @override
   void initState() {
@@ -96,14 +99,6 @@ class _CrearDespachoScreenState extends ConsumerState<DispatchForm> {
     });
   }
 
-  void _deleteProduct(int skuIndex, int productoIndex) {
-    if (skuIndex < 0 || skuIndex >= _skus.length) return;
-    if (_skus[skuIndex].productos.length <= 1) return;
-    setState(() {
-      _skus[skuIndex].productos.removeAt(productoIndex);
-    });
-  }
-
   void _deleteSku(int index) {
     if (_skus.length <= 1) return;
     setState(() {
@@ -111,28 +106,17 @@ class _CrearDespachoScreenState extends ConsumerState<DispatchForm> {
     });
   }
 
-  void _onCantidadChanged(int skuIndex, int productoIndex, String val) {
-    if (skuIndex < 0 || skuIndex >= _skus.length) return;
-    if (productoIndex < 0 || productoIndex >= _skus[skuIndex].productos.length) return;
-    final n = int.tryParse(val);
-    if (n != null && n > 0) {
-      setState(() {
-        _skus[skuIndex].productos[productoIndex].cantidad = n;
-      });
-    }
-  }
-
   void _crearDespacho() async {
-    if (isLoading) return;
-    setState(() => isLoading = true);
+    // if (isLoading) return;
+    // setState(() => isLoading = true);
 
-    if (_selectedImages.length < 5) {
-      setState(() {
-        imagesMinError = true;
-        isLoading = false;
-      });
-      return;
-    }
+    // if (_selectedImages.length < 5) {
+    //   setState(() {
+    //     imagesMinError = true;
+    //     isLoading = false;
+    //   });
+    //   return;
+    // }
 
     if (_selectedImages.length > 10) {
       setState(() {
@@ -190,15 +174,19 @@ class _CrearDespachoScreenState extends ConsumerState<DispatchForm> {
           .toList(),
       };
     }).toList();
+    
+    final dynamic destinyProduct = _destinyProduct != '0' ? _destinyProduct : null;
 
     final data = {
       "order_number": _orderNumberCtrl.text.trim(),
       "external_transaction_id": Uuid().v4(),
-      "destiny": _destinySelected,
+      "destiny": _destinySelected == 0 ? null : _destinySelected,
       "driver": _driverCtrl.text.trim(),
       "observations": _observationsCtrl.text.trim(),
       "truck_license": _truckLicenseCtrl.text.trim(),
       "vehicle_type": _vehicleSelected,
+      "type_process": widget.isProductTerm != true ? 'dispatch' : 'product',
+      "destiny_product": widget.isProductTerm != true && !destinyProduct ? null : _clientCtrl.text.trim(),
       "sku": skusData,
       // "weight": int.tryParse(_weightCtrl.text),
       "user": userData.user,
@@ -207,72 +195,73 @@ class _CrearDespachoScreenState extends ConsumerState<DispatchForm> {
         .toList(), // Lista de Uint8List directo, sin base64
     };
 
+    print('despacho a guardar $data');
+
     // Verificar conexión a internet
-    final internetAvailable = await hasInternet();
+    // final internetAvailable = await hasInternet();
 
-    if (!internetAvailable) {
-      // 🔴 SIN INTERNET: Guardar localmente
-      print('❌ Sin conexión, guardando localmente...');
-      data['created_at'] = DateTime.now().toString();
-      await savePendingRequest(data, 'dispatch');
+    // if (!internetAvailable) {
+    //   // 🔴 SIN INTERNET: Guardar localmente
+    //   print('❌ Sin conexión, guardando localmente...');
+    //   data['created_at'] = DateTime.now().toString();
+    //   await savePendingRequest(data, 'dispatch');
 
-      if (mounted) {
-        // _truckLicenseCtrl.dispose();
-        // _driverCtrl.dispose();
-        // _orderNumberCtrl.dispose();
-        // _observationsCtrl.dispose();
-        context.pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            duration: Duration(seconds: 6),
-            content: Text(
-              '📱 Sin conexión. Tu información se guardará localmente y se enviará automáticamente cuando recuperes conexión.',
-              style: TextStyle(color: Colors.white),
-            ),
-            backgroundColor: Color.fromARGB(255, 255, 152, 0),
-          ),
-        );
-      }
-      setState(() => isLoading = false);
-      return;
-    }
-
-    GlobalLoadingBottomSheet.show(
-      status: OverlayStatus.loading, 
-      message: "Guardando despacho..."
-    );
-    final response = await widget.onSubmit.call(data);
-    if (!mounted) return;
-    setState(() => isLoading = false);
-
-    // if (!success) {
-    //   await savePendingRequest(data, 'logbook_entry');
+    //   if (mounted) {
+    //     // _truckLicenseCtrl.dispose();
+    //     // _driverCtrl.dispose();
+    //     // _orderNumberCtrl.dispose();
+    //     // _observationsCtrl.dispose();
+    //     context.pop();
+    //     ScaffoldMessenger.of(context).showSnackBar(
+    //       const SnackBar(
+    //         duration: Duration(seconds: 6),
+    //         content: Text(
+    //           '📱 Sin conexión. Tu información se guardará localmente y se enviará automáticamente cuando recuperes conexión.',
+    //           style: TextStyle(color: Colors.white),
+    //         ),
+    //         backgroundColor: Color.fromARGB(255, 255, 152, 0),
+    //       ),
+    //     );
+    //   }
+    //   setState(() => isLoading = false);
+    //   return;
     // }
 
-    if (Navigator.canPop(context)) {
-      context.pop();
-    }
+    // GlobalLoadingBottomSheet.show(
+    //   status: OverlayStatus.loading, 
+    //   message: "Guardando despacho..."
+    // );
+    // final response = await widget.onSubmit.call(data);
+    // if (!mounted) return;
+    // setState(() => isLoading = false);
 
-    if (response.success) {
-      GlobalLoadingBottomSheet.show(
-        status: OverlayStatus.success, 
-        message: "Despacho guardado exitosamente", 
-        autoDismiss: const Duration(seconds: 2)
-      );
-      ref.read(getHistoryDispatch.notifier).load();
-    } else {
-      await savePendingBiomar(data, 'dispatch');
-      GlobalLoadingBottomSheet.show(
-        status: OverlayStatus.error,
-        message: 'Error: ${response.message ?? 'Error al guardar el despacho. La información se guardará localmente y se enviará automáticamente.'}',
-        autoDismiss: const Duration(seconds: 3),
-      );
-    }
+    // // if (!success) {
+    // //   await savePendingRequest(data, 'logbook_entry');
+    // // }
+
+    // if (Navigator.canPop(context)) {
+    //   context.pop();
+    // }
+
+    // if (response.success) {
+    //   GlobalLoadingBottomSheet.show(
+    //     status: OverlayStatus.success, 
+    //     message: "Despacho guardado exitosamente", 
+    //     autoDismiss: const Duration(seconds: 2)
+    //   );
+    //   ref.read(getHistoryDispatch.notifier).load();
+    // } else {
+    //   await savePendingBiomar(data, 'dispatch');
+    //   GlobalLoadingBottomSheet.show(
+    //     status: OverlayStatus.error,
+    //     message: 'Error: ${response.message ?? 'Error al guardar el despacho. La información se guardará localmente y se enviará automáticamente.'}',
+    //     autoDismiss: const Duration(seconds: 3),
+    //   );
+    // }
   }
 
   @override
   Widget build(BuildContext context) {
-    final dispatchProducts = ref.watch(getAllDispatchProducts);
     final vehiclesTypes = ref.watch(getAllVehicleTypes);
     final destiny = ref.watch(getAllDestinyIntern);
 
@@ -288,15 +277,14 @@ class _CrearDespachoScreenState extends ConsumerState<DispatchForm> {
                   children: [
                     NewSkuListCard(
                       skus: _skus,
-                      catalogProducts: dispatchProducts,
-                      onCantidadChanged: _onCantidadChanged,
-                      onDeleteProduct: _deleteProduct,
                       onDeleteSku: _deleteSku,
                       onAddSku: _addSku,
                       onAgregarProducto: _agregarProducto,
                     ),
                     const SizedBox(height: 6),
                     InformacionLogisticaCard(
+                      clientCtrl: _clientCtrl,
+                      isProductTerm: widget.isProductTerm,
                       imagesMaxError: imagesMaxError,
                       imagesMinError: imagesMinError,
                       driver: _driver,
@@ -314,8 +302,12 @@ class _CrearDespachoScreenState extends ConsumerState<DispatchForm> {
                       onDestinyChanged: (c) => setState(() => 
                         _destinySelected = c
                       ),
+                      onDestinyProductChange: (c) => setState(() => 
+                        _destinyProduct = c
+                      ),
                       catalogDestiny: destiny, 
                       destinySelected: _destinySelected,
+                      destinyProduct: _destinyProduct,
                       onImagesChanged: (images) {
                         print("imagenes seleccionadas ${images.length}");
                         _selectedImages = images;
