@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:zentinel/config/constants/environment.dart';
 import 'dart:io';
 import 'package:zentinel/presentation/providers/auth/auth_provider.dart';
 import 'package:zentinel/presentation/providers/onboarding/onboarding_provider.dart';
@@ -107,53 +109,53 @@ class ProfileViewState extends ConsumerState<ProfileView> {
                               ),
                               const SizedBox(height: 4),
                               // Última conexión
-                              const Text(
-                                'Última conexión: 22 ene. 2026 | 17:12',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.grey,
-                                ),
-                              ),
+                              // const Text(
+                              //   'Última conexión: 22 ene. 2026 | 17:12',
+                              //   style: TextStyle(
+                              //     fontSize: 12,
+                              //     color: Colors.grey,
+                              //   ),
+                              // ),
                             ],
                           ),
                         ),
                         const SizedBox(height: 32),
 
                         // INFORMACIÓN PERSONAL
-                        const Text(
-                          'Información Personal',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        _buildMenuTile(
-                          icon: Icons.person,
-                          title: 'Datos personales',
-                          onTap: () {
-                            context.push('/personal-data');
-                          },
-                        ),
-                        const SizedBox(height: 24),
+                        // const Text(
+                        //   'Información Personal',
+                        //   style: TextStyle(
+                        //     fontSize: 16,
+                        //     fontWeight: FontWeight.bold,
+                        //     color: Colors.white,
+                        //   ),
+                        // ),
+                        // const SizedBox(height: 12),
+                        // _buildMenuTile(
+                        //   icon: Icons.person,
+                        //   title: 'Datos personales',
+                        //   onTap: () {
+                        //     context.push('/personal-data');
+                        //   },
+                        // ),
+                        // const SizedBox(height: 24),
 
                         // CONFIGURACIÓN
-                        const Text(
-                          'Configuración',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                        const SizedBox(height: 12),
-                        _buildMenuTile(
-                          icon: Icons.security,
-                          title: 'Seguridad',
-                          onTap: () {},
-                        ),
-                        const SizedBox(height: 24),
+                        // const Text(
+                        //   'Configuración',
+                        //   style: TextStyle(
+                        //     fontSize: 16,
+                        //     fontWeight: FontWeight.bold,
+                        //     color: Colors.white,
+                        //   ),
+                        // ),
+                        // const SizedBox(height: 12),
+                        // _buildMenuTile(
+                        //   icon: Icons.security,
+                        //   title: 'Seguridad',
+                        //   onTap: () {},
+                        // ),
+                        // const SizedBox(height: 24),
 
                         // EXPERIENCIA EN EL APP
                         const Text(
@@ -164,24 +166,33 @@ class ProfileViewState extends ConsumerState<ProfileView> {
                             color: Colors.white,
                           ),
                         ),
-                        const SizedBox(height: 12),
-                        _buildMenuTile(
-                          icon: Icons.phonelink,
-                          title: 'Servicios',
-                          onTap: () {},
-                        ),
-                        const SizedBox(height: 12),
-                        _buildMenuTile(
-                          icon: Icons.phone,
-                          title: 'Contáctanos',
-                          onTap: () {},
-                        ),
+                        // const SizedBox(height: 12),
+                        // _buildMenuTile(
+                        //   icon: Icons.phonelink,
+                        //   title: 'Servicios',
+                        //   onTap: () {},
+                        // ),
+                        // const SizedBox(height: 12),
+                        // _buildMenuTile(
+                        //   icon: Icons.phone,
+                        //   title: 'Contáctanos',
+                        //   onTap: () {},
+                        // ),
                         const SizedBox(height: 12),
                         _buildMenuTile(
                           icon: Icons.description,
-                          title: 'Términos y condiciones',
-                          onTap: () {
-                            context.go('/personal-data');
+                          title: 'Política de privacidad',
+                          onTap: () async {
+                            final Uri url = Uri.parse(
+                              '${Environments.baseUrl}/politica-privacidad',
+                            );
+
+                            if (!await launchUrl(
+                              url,
+                              mode: LaunchMode.externalApplication,
+                            )) {
+                              throw Exception('No se pudo abrir la URL');
+                            }
                           },
                         ),
                         const SizedBox(height: 32),

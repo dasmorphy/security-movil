@@ -86,41 +86,41 @@ class _BasicServicesStionState extends ConsumerState<BasicServicesSection> {
 
           const SizedBox(height: 25),
 
-          if (userData.hasPermission(Permissions.listaReportes) || userData.hasPermission(Permissions.generarReportes))
-            const Text(
-              'Reportes',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
+          // if (userData.hasPermission(Permissions.listaReportes) || userData.hasPermission(Permissions.generarReportes))
+          //   const Text(
+          //     'Reportes',
+          //     style: TextStyle(
+          //       color: Colors.white,
+          //       fontSize: 20,
+          //       fontWeight: FontWeight.bold,
+          //     ),
+          //   ),
 
-            if (userData.hasPermission(Permissions.listaReportes) || userData.hasPermission(Permissions.generarReportes))
-              GridView.count(
-                crossAxisCount: 3,
-                shrinkWrap: true,
-                physics: const BouncingScrollPhysics(),
-                mainAxisSpacing: 10,
-                crossAxisSpacing: 11,
-                childAspectRatio: 0.9,
-                children: [
-                  if (userData.hasPermission(Permissions.listaReportes))
-                    BasicServiceCard(
-                      iconImage: 'iconregistro',
-                      label: 'Reporte Totalizado',
-                      childWidget: TotalReport(),
-                    ),
-                  if (userData.hasPermission(Permissions.generarReportes))
-                    BasicServiceCard(
-                      iconImage: 'iconregistro',
-                      label: 'Generar Reporte',
-                      onTap: () async {
-                        await ref.read(downloadReport.notifier).downloadReport();
-                      },
-                    ),
-                ],
-              ),
+          //   if (userData.hasPermission(Permissions.listaReportes) || userData.hasPermission(Permissions.generarReportes))
+          //     GridView.count(
+          //       crossAxisCount: 3,
+          //       shrinkWrap: true,
+          //       physics: const BouncingScrollPhysics(),
+          //       mainAxisSpacing: 10,
+          //       crossAxisSpacing: 11,
+          //       childAspectRatio: 0.9,
+          //       children: [
+          //         if (userData.hasPermission(Permissions.listaReportes))
+          //           BasicServiceCard(
+          //             iconImage: 'iconregistro',
+          //             label: 'Reporte Totalizado',
+          //             childWidget: TotalReport(),
+          //           ),
+          //         if (userData.hasPermission(Permissions.generarReportes))
+          //           BasicServiceCard(
+          //             iconImage: 'iconregistro',
+          //             label: 'Generar Reporte',
+          //             onTap: () async {
+          //               await ref.read(downloadReport.notifier).downloadReport();
+          //             },
+          //           ),
+          //       ],
+          //     ),
         ],
       ),
     );
