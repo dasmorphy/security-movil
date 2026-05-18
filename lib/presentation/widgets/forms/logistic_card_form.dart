@@ -271,7 +271,7 @@ class InformacionLogisticaCard extends StatelessWidget {
         const SizedBox(height: 20),
 
         CameraImagePicker(
-          minImages: 5,
+          minImages: 3,
           maxImages: 10,
           onImagesChanged: onImagesChanged,
         ),
@@ -283,7 +283,7 @@ class InformacionLogisticaCard extends StatelessWidget {
             width: double.infinity,
             child: Text(
               imagesMinError
-                  ? 'Debe subir mínimo 5 imagenes'
+                  ? 'Debe subir mínimo 3 imagenes'
                   : 'Debe subir máximo 10 imagenes',
               style: TextStyle(color: Color.fromARGB(255, 239, 28, 13)),
             ),

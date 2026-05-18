@@ -144,6 +144,22 @@ class _SkuCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Badges y botones
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  if (canDelete)
+                    GestureDetector(
+                      onTap: onDeleteSku,
+                      child: const Icon(
+                        Icons.close_rounded,
+                        size: 18,
+                        color: Color.fromARGB(255, 255, 255, 255),
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 12,),
               // Header del SKU con Toggle
               Padding(
                 padding: const EdgeInsets.fromLTRB(0, 0, 0, 16),
@@ -193,23 +209,6 @@ class _SkuCard extends StatelessWidget {
                     ),
                   ],
                 ),
-              ),
-              Divider(height: 0.5, thickness: 0.5, color: kGrayBorder),
-              const SizedBox(height: 16),
-              // Badges y botones
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  if (canDelete)
-                    GestureDetector(
-                      onTap: onDeleteSku,
-                      child: const Icon(
-                        Icons.close_rounded,
-                        size: 18,
-                        color: Color.fromARGB(255, 255, 255, 255),
-                      ),
-                    ),
-                ],
               ),
             ],
           ),
