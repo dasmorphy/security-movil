@@ -68,6 +68,16 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
     if (widget.preloadedData != null && mounted) {
       _loadPreloadedData(widget.preloadedData!);
     }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await Future.delayed(const Duration(seconds: 2));
+
+      ref.read(getAllCategories.notifier).load();
+      ref.read(getGroupBusinessByIdBusiness.notifier).load();
+      ref.read(getAllUnitiesWeight.notifier).load();
+      ref.read(getAllAuthorized.notifier).load();
+      ref.read(getAllDestinyIntern.notifier).load();
+    });
   }
   
   @override

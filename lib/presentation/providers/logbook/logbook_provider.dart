@@ -1,6 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zentinel/config/constants/permissions.dart';
 import 'package:zentinel/config/utils/helper.dart';
+import 'package:zentinel/data/models/hive/category_model.dart';
+import 'package:zentinel/data/models/hive/authorized_model.dart';
+import 'package:zentinel/data/models/hive/destiny_intern_model.dart';
+import 'package:zentinel/data/models/hive/unity_weight_model.dart';
+import 'package:zentinel/data/models/hive/vehicle_type_model.dart';
+import 'package:zentinel/data/models/hive/group_business_model.dart';
 import 'package:zentinel/domain/entities/all_logbook.dart';
 import 'package:zentinel/domain/entities/authorized.dart';
 import 'package:zentinel/domain/entities/category.dart';
@@ -11,70 +17,261 @@ import 'package:zentinel/domain/entities/unity_weight.dart';
 import 'package:zentinel/domain/entities/vehicle_type.dart';
 import 'package:zentinel/domain/repositories/logbook_entry_repository.dart';
 import 'package:zentinel/presentation/providers/auth/auth_provider.dart';
+import 'package:zentinel/presentation/providers/catalog_notifier.dart';
 import 'package:zentinel/presentation/providers/dispatch/dispatch_repository_provider.dart';
 import 'package:zentinel/presentation/providers/logbook/logbook_repository_provider.dart';
+import 'package:zentinel/presentation/providers/onboarding/onboarding_provider.dart';
 
 final homeTabProvider = StateProvider<int>((ref) => 0);
 
 final getAllCategories =
-    StateNotifierProvider<CatalogNotifier<Category>, List<Category>>((ref) {
+    StateNotifierProvider<CatalogNotifierWithCache<Category>, List<Category>>((ref) {
   final repo = ref.watch(logbookEntryRepositoryProvider);
+  final hiveService = ref.watch(hiveServiceProvider);
 
-  return CatalogNotifier<Category>(
-    (_) => repo.getAllCategory(),
+  return CatalogNotifierWithCache<Category>(
+    fetch: (_) async {
+      final categories = await repo.getAllCategory();
+      // Convertir a modelos Hive y guardar
+      final categoryModels = categories
+          .map((c) => CategoryModel.fromEntity(
+                c.idCategory,
+                c.nameCategory,
+                c.createdAt,
+                c.updatedAt,
+              ))
+          .toList();
+      await hiveService.saveCategories(categoryModels);
+      return categories;
+    },
+    cacheGetter: () {
+      final cachedModels = hiveService.getCategories();
+      return cachedModels
+          .map((model) => Category(
+                idCategory: model.idCategory,
+                nameCategory: model.nameCategory,
+                createdAt: model.createdAt,
+                updatedAt: model.updatedAt,
+              ))
+          .toList();
+    },
+    cacheSaver: (categories) async {
+      final categoryModels = categories
+          .map((c) => CategoryModel.fromEntity(
+                c.idCategory,
+                c.nameCategory,
+                c.createdAt,
+                c.updatedAt,
+              ))
+          .toList();
+      await hiveService.saveCategories(categoryModels);
+    },
+    cacheChecker: () => hiveService.hasCategories(),
   );
 });
 
 
 final getAllUnitiesWeight =
-    StateNotifierProvider<CatalogNotifier<UnityWeight>, List<UnityWeight>>((ref) {
+    StateNotifierProvider<CatalogNotifierWithCache<UnityWeight>, List<UnityWeight>>((ref) {
   final repo = ref.watch(logbookEntryRepositoryProvider);
+  final hiveService = ref.watch(hiveServiceProvider);
 
-  return CatalogNotifier<UnityWeight>(
-    (_) => repo.getAllUnitsWeight(),
+  return CatalogNotifierWithCache<UnityWeight>(
+    fetch: (_) async {
+      final unities = await repo.getAllUnitsWeight();
+      final unityModels = unities
+          .map((u) => UnityWeightModel.fromEntity(
+                u.idUnity,
+                u.name,
+                u.code,
+                u.createdAt,
+                u.updatedAt,
+              ))
+          .toList();
+      await hiveService.saveUnityWeight(unityModels);
+      return unities;
+    },
+    cacheGetter: () {
+      final cachedModels = hiveService.getUnityWeight();
+      return cachedModels
+          .map((model) => UnityWeight(
+                idUnity: model.id,
+                name: model.name,
+                code: model.code,
+                createdAt: model.createdAt,
+                updatedAt: model.updatedAt,
+              ))
+          .toList();
+    },
+    cacheSaver: (unities) async {
+      final unityModels = unities
+          .map((u) => UnityWeightModel.fromEntity(
+                u.idUnity,
+                u.name,
+                u.code,
+                u.createdAt,
+                u.updatedAt,
+              ))
+          .toList();
+      await hiveService.saveUnityWeight(unityModels);
+    },
+    cacheChecker: () => hiveService.hasUnityWeight(),
   );
 });
 
 final getAllVehicleTypes =
-    StateNotifierProvider<CatalogNotifier<VehicleType>, List<VehicleType>>((ref) {
+    StateNotifierProvider<CatalogNotifierWithCache<VehicleType>, List<VehicleType>>((ref) {
   final repo = ref.watch(dispatchRepositoryProvider);
+  final hiveService = ref.watch(hiveServiceProvider);
 
-  return CatalogNotifier<VehicleType>(
-    (_) => repo.getAllVehicleTypes(),
+  return CatalogNotifierWithCache<VehicleType>(
+    fetch: (_) async {
+      final vehicleTypes = await repo.getAllVehicleTypes();
+      final vehicleModels = vehicleTypes
+          .map((v) => VehicleTypeModel.fromEntity(
+                v.idVehicleType,
+                v.name,
+                v.createdAt.toIso8601String(),
+                v.updatedAt.toIso8601String(),
+                v.createdBy,
+                v.updatedBy,
+              ))
+          .toList();
+      await hiveService.saveVehicleType(vehicleModels);
+      return vehicleTypes;
+    },
+    cacheGetter: () {
+      final cachedModels = hiveService.getVehicleType();
+      return cachedModels
+          .map((model) => VehicleType(
+                idVehicleType: model.idVehicleType,
+                name: model.name,
+                createdAt: DateTime.parse(model.createdAt),
+                updatedAt: DateTime.parse(model.updatedAt),
+                createdBy: model.createdBy,
+                updatedBy: model.updatedBy,
+              ))
+          .toList();
+    },
+    cacheSaver: (vehicleTypes) async {
+      final vehicleModels = vehicleTypes
+          .map((v) => VehicleTypeModel.fromEntity(
+                v.idVehicleType,
+                v.name,
+                v.createdAt.toIso8601String(),
+                v.updatedAt.toIso8601String(),
+                v.createdBy,
+                v.updatedBy,
+              ))
+          .toList();
+      await hiveService.saveVehicleType(vehicleModels);
+    },
+    cacheChecker: () => hiveService.hasVehicleType(),
   );
 });
 
 final getAllAuthorized =
-    StateNotifierProvider<CatalogNotifier<Authorized>, List<Authorized>>((ref) {
+    StateNotifierProvider<CatalogNotifierWithCache<Authorized>, List<Authorized>>((ref) {
   final repo = ref.watch(logbookEntryRepositoryProvider);
+  final hiveService = ref.watch(hiveServiceProvider);
 
-  return CatalogNotifier<Authorized>(
-    (_) => repo.getAllAuthorized(),
+  return CatalogNotifierWithCache<Authorized>(
+    fetch: (_) async {
+      final authorized = await repo.getAllAuthorized();
+      final authorizedModels = authorized
+          .map((a) => AuthorizedModel.fromEntity(
+                a.idAuthorized,
+                a.name,
+                a.createdAt.toIso8601String(),
+                a.updatedAt.toIso8601String(),
+              ))
+          .toList();
+      await hiveService.saveAuthorized(authorizedModels);
+      return authorized;
+    },
+    cacheGetter: () {
+      final cachedModels = hiveService.getAuthorized();
+      return cachedModels
+          .map((model) => Authorized(
+                idAuthorized: model.idAuthorized,
+                name: model.name,
+                createdAt: DateTime.parse(model.createdAt),
+                updatedAt: DateTime.parse(model.updatedAt),
+              ))
+          .toList();
+    },
+    cacheSaver: (authorized) async {
+      final authorizedModels = authorized
+          .map((a) => AuthorizedModel.fromEntity(
+                a.idAuthorized,
+                a.name,
+                a.createdAt.toIso8601String(),
+                a.updatedAt.toIso8601String(),
+              ))
+          .toList();
+      await hiveService.saveAuthorized(authorizedModels);
+    },
+    cacheChecker: () => hiveService.hasAuthorized(),
   );
 });
 
-final getAllDestinyIntern = StateNotifierProvider<CatalogNotifier<DestinyIntern>, List<DestinyIntern>>((ref) {
+final getAllDestinyIntern = StateNotifierProvider<CatalogNotifierWithCache<DestinyIntern>, List<DestinyIntern>>((ref) {
   final repo = ref.watch(logbookEntryRepositoryProvider);
   final authState = ref.watch(userSessionProvider);
+  final hiveService = ref.watch(hiveServiceProvider);
 
   if (!authState.hasValue || authState.value == null) {
-    return CatalogNotifier<DestinyIntern>((_) async => []);
+    return CatalogNotifierWithCache<DestinyIntern>(
+      fetch: (_) async => [],
+      cacheGetter: () => [],
+      cacheSaver: (_) async {},
+      cacheChecker: () => false,
+    );
   }
 
   final userData = authState.value!;
 
-  // return CatalogNotifier<DestinyIntern>(
-  //   (_) => repo.getAllDestinyIntern(),
-  // );
-
-  return CatalogNotifier<DestinyIntern>(
-      (filters) {
-        final mergedFilters = {
-          'business': userData.attributes['id_business']
-        };
-        return repo.getAllDestinyIntern(mergedFilters);
-      },
-    );
+  return CatalogNotifierWithCache<DestinyIntern>(
+    fetch: (filters) async {
+      final mergedFilters = {
+        'business': userData.attributes['id_business']
+      };
+      final destinyIntern = await repo.getAllDestinyIntern(mergedFilters);
+      final destinyModels = destinyIntern
+          .map((d) => DestinyInternModel.fromEntity(
+                d.idDestiny,
+                d.name,
+                d.createdAt.toIso8601String(),
+                d.updatedAt.toIso8601String(),
+              ))
+          .toList();
+      await hiveService.saveDestinyIntern(destinyModels);
+      return destinyIntern;
+    },
+    cacheGetter: () {
+      final cachedModels = hiveService.getDestinyIntern();
+      return cachedModels
+          .map((model) => DestinyIntern(
+                idDestiny: model.idDestiny,
+                name: model.name,
+                createdAt: DateTime.parse(model.createdAt),
+                updatedAt: DateTime.parse(model.updatedAt),
+              ))
+          .toList();
+    },
+    cacheSaver: (destinyIntern) async {
+      final destinyModels = destinyIntern
+          .map((d) => DestinyInternModel.fromEntity(
+                d.idDestiny,
+                d.name,
+                d.createdAt.toIso8601String(),
+                d.updatedAt.toIso8601String(),
+              ))
+          .toList();
+      await hiveService.saveDestinyIntern(destinyModels);
+    },
+    cacheChecker: () => hiveService.hasDestinyIntern(),
+  );
 });
 
 
@@ -144,10 +341,11 @@ final getHistoryLogbooks =
 
 
 final getGroupBusinessByIdBusiness =
-    StateNotifierProvider<CatalogNotifier<GroupBusiness>, List<GroupBusiness>>(
+    StateNotifierProvider<CatalogNotifierWithCache<GroupBusiness>, List<GroupBusiness>>(
   (ref) {
     final repo = ref.watch(logbookEntryRepositoryProvider);
     final authState = ref.watch(userSessionProvider);
+    final hiveService = ref.watch(hiveServiceProvider);
 
     //Usuario no cargado o sesión inválida
     if (!authState.hasValue || authState.value == null) {
@@ -156,11 +354,50 @@ final getGroupBusinessByIdBusiness =
 
     final userData = authState.value!;
 
-    return CatalogNotifier<GroupBusiness>(
-      (filters) {
+    return CatalogNotifierWithCache<GroupBusiness>(
+      fetch: (filters) async {
         final idBusiness = userData.attributes['id_business'] ?? 0;
-        return repo.getGroupBusinessByIdBusiness(idBusiness);
+        final groupBusiness = await repo.getGroupBusinessByIdBusiness(idBusiness);
+        final businessModels = groupBusiness
+            .map((g) => GroupBusinessModel.fromEntity(
+                  g.idGroupBusiness,
+                  g.name,
+                  g.businessId,
+                  g.sectorId,
+                  g.createdAt.toIso8601String(),
+                  g.updatedAt.toIso8601String(),
+                ))
+            .toList();
+        await hiveService.saveGroupBusiness(businessModels);
+        return groupBusiness;
       },
+      cacheGetter: () {
+        final cachedModels = hiveService.getGroupBusiness();
+        return cachedModels
+            .map((model) => GroupBusiness(
+                  idGroupBusiness: model.idGroupBusiness,
+                  name: model.name,
+                  businessId: model.businessId,
+                  sectorId: model.sectorId,
+                  createdAt: DateTime.parse(model.createdAt),
+                  updatedAt: DateTime.parse(model.updatedAt),
+                ))
+            .toList();
+      },
+      cacheSaver: (groupBusiness) async {
+        final businessModels = groupBusiness
+            .map((g) => GroupBusinessModel.fromEntity(
+                  g.idGroupBusiness,
+                  g.name,
+                  g.businessId,
+                  g.sectorId,
+                  g.createdAt.toIso8601String(),
+                  g.updatedAt.toIso8601String(),
+                ))
+            .toList();
+        await hiveService.saveGroupBusiness(businessModels);
+      },
+      cacheChecker: () => hiveService.hasGroupBusiness(),
     );
   },
 );
@@ -176,64 +413,6 @@ final downloadReport =
 typedef FetchListCallback<T> = Future<List<T>> Function(
   Map<String, dynamic>? filters,
 );
-
-typedef FetchObjectCallback<T> = Future<T> Function(
-  Map<String, dynamic>? filters,
-);
-
-class CatalogNotifier<T> extends StateNotifier<List<T>> {
-  final FetchListCallback<T> fetch;
-  bool _isLoading = false;
-
-  CatalogNotifier(this.fetch) : super(const []);
-
-  Future<void> load({Map<String, dynamic>? filters}) async {
-    if (_isLoading || !mounted) return;
-
-    _isLoading = true;
-
-    try {
-      final data = await fetch(filters);
-
-      if (!mounted) return; // 🔥 CLAVE
-
-      state = data;
-    } catch (e) {
-      if (mounted) {
-        state = [];
-      }
-    } finally {
-      _isLoading = false;
-    }
-  }
-}
-
-class ObjectCatalogNotifier<T> extends StateNotifier<T?> {
-  final FetchObjectCallback<T> fetch;
-  bool _isLoading = false;
-
-  ObjectCatalogNotifier(this.fetch) : super(null);
-
-  Future<void> load({Map<String, dynamic>? filters}) async {
-    if (_isLoading || !mounted) return;
-
-    _isLoading = true;
-
-    try {
-      final data = await fetch(filters);
-
-      if (!mounted) return; // 🔥 CLAVE
-
-      state = data;
-    } catch (e) {
-      if (mounted) {
-        state = null;
-      }
-    } finally {
-      _isLoading = false;
-    }
-  }
-}
 
 
 class DepatureReportNotifier extends StateNotifier<AsyncValue<bool>> {

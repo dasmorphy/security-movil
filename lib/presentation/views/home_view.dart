@@ -37,11 +37,6 @@ class HomeViewState extends ConsumerState<HomeView> {
   void initProvidersByBusiness(User? userData) {
     if (userData != null) {
       if (userData.attributes['id_business'] == 1 || selectedBusiness == "1") {
-        ref.read(getAllCategories.notifier).load();
-        ref.read(getGroupBusinessByIdBusiness.notifier).load();
-        ref.read(getAllUnitiesWeight.notifier).load();
-        ref.read(getAllAuthorized.notifier).load();
-        ref.read(getAllDestinyIntern.notifier).load();
         ref.read(getHistoryLogbooks.notifier).load();
         ref.read(graphLogbookProvider.notifier).load();
       } else if (userData.attributes['id_business'] == 2 ||

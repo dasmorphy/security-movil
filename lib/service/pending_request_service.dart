@@ -11,11 +11,9 @@ import 'package:path_provider/path_provider.dart';
 
 
 Future<bool> hasInternet() async {
-  try {
-    return await InternetConnection().hasInternetAccess;
-  } catch (_) {
-    return false;
-  }
+  final connectivityResult = await Connectivity().checkConnectivity();
+
+  return connectivityResult != ConnectivityResult.none;
 }
 
 Future<List<String>> saveImagesToDisk(List<Uint8List> images) async {

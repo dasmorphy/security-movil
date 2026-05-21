@@ -64,6 +64,19 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
   void initState() {
     super.initState();
     _getUserLocation();
+
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await Future.delayed(const Duration(seconds: 2));
+
+      ref.read(getAllCategories.notifier).load();
+      ref.read(getGroupBusinessByIdBusiness.notifier).load();
+      ref.read(getAllUnitiesWeight.notifier).load();
+      ref.read(getAllAuthorized.notifier).load();
+      ref.read(getAllDestinyIntern.notifier).load();
+    });
+
+
   }
 
   @override
@@ -222,13 +235,13 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
     //   return;
     // }
 
-    if (_selectedImages.length < 5) {
-      setState(() {
-        imagesMinError = true;
-        isLoading = false;
-      });
-      return;
-    }
+    // if (_selectedImages.length < 5) {
+    //   setState(() {
+    //     imagesMinError = true;
+    //     isLoading = false;
+    //   });
+    //   return;
+    // }
 
     if (_selectedImages.length > 10) {
       setState(() {
