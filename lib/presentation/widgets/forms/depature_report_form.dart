@@ -235,13 +235,13 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
     //   return;
     // }
 
-    // if (_selectedImages.length < 5) {
-    //   setState(() {
-    //     imagesMinError = true;
-    //     isLoading = false;
-    //   });
-    //   return;
-    // }
+    if (_selectedImages.length < 5) {
+      setState(() {
+        imagesMinError = true;
+        isLoading = false;
+      });
+      return;
+    }
 
     if (_selectedImages.length > 10) {
       setState(() {
