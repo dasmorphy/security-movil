@@ -42,9 +42,9 @@ class HomeViewState extends ConsumerState<HomeView> {
       } else if (userData.attributes['id_business'] == 2 ||
           selectedBusiness == "2") {
         ref.read(getAllDestinyIntern.notifier).load();
-        ref.read(getAreasVisit.notifier).load();
-        ref.read(getMaterials.notifier).load();
-        ref.read(getStaffCharge.notifier).load();
+        // ref.read(getAreasVisit.notifier).load();
+        // ref.read(getMaterials.notifier).load();
+        // ref.read(getStaffCharge.notifier).load();
         ref.read(getAllVehicleTypes.notifier).load();
         ref.read(getDispatchStatus.notifier).load();
         ref.read(getAllDispatchProducts.notifier).load();

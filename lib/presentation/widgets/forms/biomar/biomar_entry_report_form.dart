@@ -23,6 +23,7 @@ class _BiomarEntryReportFormState extends ConsumerState<BiomarEntryReportForm> {
   bool imagesMaxError = false;
 
   String _areaVisit = '0';
+  String _typeAccess = '0';
   String _personCharge = '0';
 
   final _dniCtrl = TextEditingController();
@@ -42,10 +43,15 @@ class _BiomarEntryReportFormState extends ConsumerState<BiomarEntryReportForm> {
   final FocusNode _observationsFocus = FocusNode();
   final FocusNode _personChargeFocus = FocusNode();
   final FocusNode _areaVisitFocus = FocusNode();
+  final FocusNode _typeAccessFocus = FocusNode();
 
   @override
   void initState() {
     super.initState();
+    ref.read(getMaterials.notifier).load();
+    ref.read(getAreasVisit.notifier).load();
+    ref.read(getStaffCharge.notifier).load();
+
   }
 
   @override
@@ -123,6 +129,7 @@ class _BiomarEntryReportFormState extends ConsumerState<BiomarEntryReportForm> {
       "observations": _observationsCtrl.text.trim(),
       "person_charge": int.parse(_personCharge),
       "reason_visit": _reasonVisitCtrl.text.trim(),
+      "type_access": _typeAccess,
       "user": userData.user,
       "material_entry": materialsAdded.map((p) => {
         "id_material": int.parse(p['id_material']),
@@ -301,7 +308,50 @@ class _BiomarEntryReportFormState extends ConsumerState<BiomarEntryReportForm> {
                 ),
                 const SizedBox(height: 20),
 
-                CustomFieldLabelRequired(txtLabel: 'Cédula visitante'),
+                CustomFieldLabelRequired(txtLabel: 'Tipo de visita'),
+                GlowDropdownFormField2<String>(
+                  value: _typeAccess,
+                  focusNode: _typeAccessFocus,
+                  decoration: styleDecoration(),
+                  items: [
+                    DropdownMenuItem(
+                      enabled: false,
+                      value: '0',
+                      child: Text(
+                        'Seleccione una opción',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                    DropdownMenuItem(
+                      value: 'Proveedor',
+                      child: Text(
+                        'Proveedor',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                    DropdownMenuItem(
+                      value: 'Visitante',
+                      child: Text(
+                        'Visitante',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ],
+                  onChanged: (v) {
+                    if (v != null) {
+                      setState(() => _typeAccess = v);
+                    }
+                  },
+                  validator: (v) {
+                    if (v == '0' || v == null || v.trim().isEmpty) {
+                      return messageValidatorEmpty;
+                    }
+                    return null;
+                  },
+                ),
+
+                const SizedBox(height: 12),
+                CustomFieldLabelRequired(txtLabel: 'Cédula'),
                 GlowTextFormField(
                   maxLength: 10,
                   keyboardType: TextInputType.number,
@@ -316,7 +366,7 @@ class _BiomarEntryReportFormState extends ConsumerState<BiomarEntryReportForm> {
                 ),
                 const SizedBox(height: 12),
 
-                CustomFieldLabelRequired(txtLabel: 'Nombres visitante'),
+                CustomFieldLabelRequired(txtLabel: 'Nombres Completos'),
                 GlowTextFormField(
                   controller: _nameVisitCtrl,
                   focusNode: _truckLicenseFocus,
@@ -330,7 +380,7 @@ class _BiomarEntryReportFormState extends ConsumerState<BiomarEntryReportForm> {
 
                 const SizedBox(height: 12),
                 
-                CustomFieldLabelRequired(txtLabel: 'Motivo visita'),
+                CustomFieldLabelRequired(txtLabel: 'Motivo ingreso'),
                 GlowTextFormField(
                   controller: _reasonVisitCtrl,
                   focusNode: _reasonVisitFocus,
@@ -343,7 +393,7 @@ class _BiomarEntryReportFormState extends ConsumerState<BiomarEntryReportForm> {
                 ),
 
                 const SizedBox(height: 12),
-                CustomFieldLabelRequired(txtLabel: 'Área de visita'),
+                CustomFieldLabelRequired(txtLabel: 'Área de ingreso'),
                 GlowDropdownFormField2<String>(
                   value: _areaVisit,
                   focusNode: _areaVisitFocus,
