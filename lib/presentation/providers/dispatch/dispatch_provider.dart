@@ -6,6 +6,7 @@ import 'package:zentinel/domain/entities/dispatch_status.dart';
 import 'package:zentinel/domain/entities/entry_access_control.dart';
 import 'package:zentinel/domain/entities/graph_dispatch.dart';
 import 'package:zentinel/domain/repositories/dispatch_repository.dart';
+import 'package:zentinel/presentation/providers/catalog_notifier.dart';
 import 'package:zentinel/presentation/providers/dispatch/dispatch_repository_provider.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 

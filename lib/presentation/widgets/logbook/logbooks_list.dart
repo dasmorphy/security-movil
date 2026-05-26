@@ -110,88 +110,68 @@ class LogbooksListState extends ConsumerState<LogbooksList> {
                       borderRadius: BorderRadius.circular(8),
                       onTap: () =>
                           ModalHelper.open(context, child: BitacoraDetailModal(item: item)),
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          // Icono
-                          Container(
-                            width: 24,
-                            height: 24,
-                            decoration: BoxDecoration(
-                              color: const Color.fromARGB(255, 4, 88, 99),
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                            child: const Icon(
-                              Icons.edit_note_sharp,
-                              color: Colors.white,
-                              size: 16,
-                            ),
-                          ),
-
-                          const SizedBox(width: 12),
-
-                          // Información
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  createdBy,
-                                  style: Theme.of(context).textTheme.bodyMedium
-                                      ?.copyWith(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  description,
-                                  style: Theme.of(context).textTheme.bodySmall
-                                      ?.copyWith(
-                                        color: const Color.fromARGB(
-                                          255,
-                                          180,
-                                          180,
-                                          180,
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            // Información
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    createdBy,
+                                    style: Theme.of(context).textTheme.bodyMedium
+                                        ?.copyWith(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w600,
                                         ),
-                                      ),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  formattedDate,
-                                  style: Theme.of(context).textTheme.bodySmall
-                                      ?.copyWith(
-                                        color: const Color.fromARGB(
-                                          255,
-                                          180,
-                                          180,
-                                          180,
-                                        ),
-                                      ),
-                                ),
-                                const SizedBox(height: 2),
-                                Chip(
-                                  label: Text(item.status),
-                                  backgroundColor: item.status == 'Finalizado'
-                                      ? const Color.fromARGB(255, 34, 197, 94)
-                                      : const Color.fromARGB(255, 224, 157, 49),
-                                  padding: EdgeInsets.zero,
-                                  labelStyle: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
                                   ),
-                                ),
-                              ],
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    description,
+                                    style: Theme.of(context).textTheme.bodySmall
+                                        ?.copyWith(
+                                          color: const Color.fromARGB(
+                                            255,
+                                            180,
+                                            180,
+                                            180,
+                                          ),
+                                        ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    formattedDate,
+                                    style: Theme.of(context).textTheme.bodySmall
+                                        ?.copyWith(
+                                          color: const Color.fromARGB(
+                                            255,
+                                            180,
+                                            180,
+                                            180,
+                                          ),
+                                        ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                ],
+                              ),
                             ),
-                          ),
-
-                          const Icon(
-                            Icons.chevron_right,
-                            color: Colors.white,
-                            size: 20,
-                          ),
-                        ],
+                        
+                            Chip(
+                              side: BorderSide.none,
+                              label: Text(item.status),
+                              backgroundColor: getStatusColorBckgEntry(item.status),
+                              padding: EdgeInsets.zero,
+                              labelStyle: TextStyle(
+                                color: getStatusColorEntryAccess(item.status),
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   );

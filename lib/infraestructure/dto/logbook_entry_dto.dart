@@ -60,11 +60,11 @@ class UnityWeightDto {
 
 class LogbookEntry {
   int idLogbookEntry;
-  int unityId;
+  dynamic unityId;
   int categoryId;
   String shippingGuide;
   String description;
-  int quantity;
+  dynamic quantity;
   int weight;
   String provider;
   String destinyIntern;

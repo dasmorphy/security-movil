@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:video_player/video_player.dart';
+import 'package:zentinel/config/constants/permissions.dart';
+import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/presentation/providers/auth/auth_provider.dart';
 import 'package:zentinel/presentation/providers/onboarding/onboarding_provider.dart';
+import 'package:zentinel/presentation/widgets/modals/dispatch_offline.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
 class VideoHeader extends ConsumerStatefulWidget {
@@ -96,14 +99,26 @@ class _VideoHeaderState extends ConsumerState<VideoHeader> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
-                                InkWell(
-                                  borderRadius: BorderRadius.circular(20),
-                                  onTap: () => _openModal(context, LogbooksOfflineListModal()),
-                                  child: const Padding(
-                                    padding: EdgeInsets.all(7),
-                                    child: Icon(Icons.upload_file_rounded, color: Colors.white),
+                                if (userData.hasPermission(Permissions.dispatchOffline))...[
+                                  InkWell(
+                                    borderRadius: BorderRadius.circular(20),
+                                    onTap: () => _openModal(context, DispatchOffline()),
+                                    child: const Padding(
+                                      padding: EdgeInsets.all(7),
+                                      child: Icon(Icons.upload_file_rounded, color: Colors.white),
+                                    ),
                                   ),
-                                ),
+                                ],
+                                if (userData.hasPermission(Permissions.bitacorasOffline))...[
+                                  InkWell(
+                                    borderRadius: BorderRadius.circular(20),
+                                    onTap: () => _openModal(context, LogbooksOfflineListModal()),
+                                    child: const Padding(
+                                      padding: EdgeInsets.all(7),
+                                      child: Icon(Icons.upload_file_rounded, color: Colors.white),
+                                    ),
+                                  ),
+                                ]
                               ],
                             ),
                             

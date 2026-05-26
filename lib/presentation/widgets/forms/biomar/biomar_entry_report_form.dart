@@ -23,6 +23,7 @@ class _BiomarEntryReportFormState extends ConsumerState<BiomarEntryReportForm> {
   bool imagesMaxError = false;
 
   String _areaVisit = '0';
+  String _typeAccess = '0';
   String _personCharge = '0';
 
   final _dniCtrl = TextEditingController();
@@ -42,14 +43,26 @@ class _BiomarEntryReportFormState extends ConsumerState<BiomarEntryReportForm> {
   final FocusNode _observationsFocus = FocusNode();
   final FocusNode _personChargeFocus = FocusNode();
   final FocusNode _areaVisitFocus = FocusNode();
+  final FocusNode _typeAccessFocus = FocusNode();
 
   @override
   void initState() {
     super.initState();
+    ref.read(getMaterials.notifier).load();
+    ref.read(getAreasVisit.notifier).load();
+    ref.read(getStaffCharge.notifier).load();
+
   }
 
   @override
   void dispose() {
+    _clearCntrl();
+    super.dispose();
+  }
+
+  void _clearCntrl() {
+    _selectedImages = [];
+    _formKey.currentState?.reset();
     _dniFocus.dispose();
     _quantityCtrl.dispose();
     _providerCtrl.dispose();
@@ -61,7 +74,8 @@ class _BiomarEntryReportFormState extends ConsumerState<BiomarEntryReportForm> {
     _materialEntryFocus.dispose();
     _truckLicenseFocus.dispose();
     _reasonVisitFocus.dispose();
-    super.dispose();
+    imagesMinError = false;
+    imagesMaxError = false;
   }
 
   void _submit() async {
@@ -115,6 +129,7 @@ class _BiomarEntryReportFormState extends ConsumerState<BiomarEntryReportForm> {
       "observations": _observationsCtrl.text.trim(),
       "person_charge": int.parse(_personCharge),
       "reason_visit": _reasonVisitCtrl.text.trim(),
+      "type_access": _typeAccess,
       "user": userData.user,
       "material_entry": materialsAdded.map((p) => {
         "id_material": int.parse(p['id_material']),
@@ -126,38 +141,31 @@ class _BiomarEntryReportFormState extends ConsumerState<BiomarEntryReportForm> {
     };
 
     // Verificar conexión a internet
-    // final internetAvailable = await hasInternet();
+    final internetAvailable = await hasInternet();
 
-    // if (!internetAvailable) {
-    //   // 🔴 SIN INTERNET: Guardar localmente
-    //   print('❌ Sin conexión, guardando localmente...');
-    //   data['created_at'] = DateTime.now().toString();
-    //   await savePendingRequest(data, 'logbook_entry');
+    if (!internetAvailable) {
+      // 🔴 SIN INTERNET: Guardar localmente
+      print('❌ Sin conexión, guardando localmente...');
+      data['created_at'] = DateTime.now().toString();
+      await savePendingBiomar(data, 'entry');
 
-    //   if (mounted) {
-    //     // Navigator.pop(context); // Cerrar dialog de procesamiento
-    //     _clearCntrl();
-    //     if (Navigator.canPop(context)) {
-    //       context.pop(); // Cerrar el formulario
-    //     }
-
-    //     ScaffoldMessenger.of(context).showSnackBar(
-    //       const SnackBar(
-    //         duration: Duration(seconds: 6),
-    //         content: Text(
-    //           '📱 Sin conexión. Tu información se guardará localmente y se enviará automáticamente cuando recuperes conexión.',
-    //           style: TextStyle(color: Colors.white),
-    //         ),
-    //         backgroundColor: Color.fromARGB(255, 255, 152, 0),
-    //       ),
-    //     );
-    //   }
-    //   setState(() => isLoading = false);
-    //   return;
-    // }
-
-    // // 🟢 CON INTERNET: Enviar al servidor
-    // print('✅ Conexión disponible, enviando al servidor...');
+      if (mounted) {
+        _clearCntrl();
+        context.pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            duration: Duration(seconds: 6),
+            content: Text(
+              '📱 Sin conexión. Tu información se guardará localmente y se enviará automáticamente cuando recuperes conexión.',
+              style: TextStyle(color: Colors.white),
+            ),
+            backgroundColor: Color.fromARGB(255, 255, 152, 0),
+          ),
+        );
+      }
+      setState(() => isLoading = false);
+      return;
+    }
 
     GlobalLoadingBottomSheet.show(
       status: OverlayStatus.loading, 
@@ -169,15 +177,19 @@ class _BiomarEntryReportFormState extends ConsumerState<BiomarEntryReportForm> {
 
     setState(() => isLoading = false);
 
+    if (Navigator.canPop(context)) {
+      context.pop();
+    }
+
     if (response.success) {
       GlobalLoadingBottomSheet.show(
         status: OverlayStatus.success, 
         message: "Ingreso guardado exitosamente", 
         autoDismiss: const Duration(seconds: 2)
       );
-      ref.read(getHistoryDispatch.notifier).load();
-      Navigator.of(context).pop();
+      ref.read(getHistoryEntryAccess.notifier).load();
     } else {
+      await savePendingBiomar(data, 'entry');
       GlobalLoadingBottomSheet.show(
         status: OverlayStatus.error,
         message: 'Error: ${response.message ?? 'Error al guardar el ingreso'}',
@@ -210,19 +222,6 @@ class _BiomarEntryReportFormState extends ConsumerState<BiomarEntryReportForm> {
     //     ),
     //   );
     // }
-  }
-
-  void _clearCntrl() {
-    _selectedImages = [];
-    _formKey.currentState?.reset();
-    _dniCtrl.clear();
-    _quantityCtrl.clear();
-    _providerCtrl.clear();
-    _reasonVisitCtrl.clear();
-    _nameVisitCtrl.clear();
-    _observationsCtrl.clear();
-    imagesMinError = false;
-    imagesMaxError = false;
   }
 
   List<Map<String, dynamic>> materialsAdded = [{
@@ -309,7 +308,50 @@ class _BiomarEntryReportFormState extends ConsumerState<BiomarEntryReportForm> {
                 ),
                 const SizedBox(height: 20),
 
-                CustomFieldLabelRequired(txtLabel: 'Cédula visitante'),
+                CustomFieldLabelRequired(txtLabel: 'Tipo de visita'),
+                GlowDropdownFormField2<String>(
+                  value: _typeAccess,
+                  focusNode: _typeAccessFocus,
+                  decoration: styleDecoration(),
+                  items: [
+                    DropdownMenuItem(
+                      enabled: false,
+                      value: '0',
+                      child: Text(
+                        'Seleccione una opción',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                    DropdownMenuItem(
+                      value: 'Proveedor',
+                      child: Text(
+                        'Proveedor',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                    DropdownMenuItem(
+                      value: 'Visitante',
+                      child: Text(
+                        'Visitante',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ],
+                  onChanged: (v) {
+                    if (v != null) {
+                      setState(() => _typeAccess = v);
+                    }
+                  },
+                  validator: (v) {
+                    if (v == '0' || v == null || v.trim().isEmpty) {
+                      return messageValidatorEmpty;
+                    }
+                    return null;
+                  },
+                ),
+
+                const SizedBox(height: 12),
+                CustomFieldLabelRequired(txtLabel: 'Cédula'),
                 GlowTextFormField(
                   maxLength: 10,
                   keyboardType: TextInputType.number,
@@ -324,7 +366,7 @@ class _BiomarEntryReportFormState extends ConsumerState<BiomarEntryReportForm> {
                 ),
                 const SizedBox(height: 12),
 
-                CustomFieldLabelRequired(txtLabel: 'Nombres visitante'),
+                CustomFieldLabelRequired(txtLabel: 'Nombres Completos'),
                 GlowTextFormField(
                   controller: _nameVisitCtrl,
                   focusNode: _truckLicenseFocus,
@@ -338,7 +380,7 @@ class _BiomarEntryReportFormState extends ConsumerState<BiomarEntryReportForm> {
 
                 const SizedBox(height: 12),
                 
-                CustomFieldLabelRequired(txtLabel: 'Motivo visita'),
+                CustomFieldLabelRequired(txtLabel: 'Motivo ingreso'),
                 GlowTextFormField(
                   controller: _reasonVisitCtrl,
                   focusNode: _reasonVisitFocus,
@@ -351,7 +393,7 @@ class _BiomarEntryReportFormState extends ConsumerState<BiomarEntryReportForm> {
                 ),
 
                 const SizedBox(height: 12),
-                CustomFieldLabelRequired(txtLabel: 'Área de visita'),
+                CustomFieldLabelRequired(txtLabel: 'Área de ingreso'),
                 GlowDropdownFormField2<String>(
                   value: _areaVisit,
                   focusNode: _areaVisitFocus,

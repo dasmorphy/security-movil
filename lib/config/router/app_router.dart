@@ -96,7 +96,12 @@ final appRouter = GoRouter(
         GoRoute(
           path: 'new-dispatch',
           name: NewDispatchScreen.name,
-          builder: (context, state) => const NewDispatchScreen(),
+          builder: (context, state) {
+            final isProductTerm = state.extra as dynamic;
+            return NewDispatchScreen(
+              isProductTerm: isProductTerm,
+            );
+          },
         )
       ]
     ),

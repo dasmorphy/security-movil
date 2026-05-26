@@ -159,22 +159,22 @@ class _LoginFormState extends ConsumerState<LoginForm> {
         const SizedBox(height: 18),
 
         // Sign up link
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Text(
-              "¿No tienes una cuenta?",
-              style: TextStyle(color: Colors.white54),
-            ),
-            TextButton(
-              onPressed: () {},
-              child: const Text(
-                'Registrarse',
-                style: TextStyle(color: Color.fromARGB(255, 14, 170, 170)),
-              ),
-            ),
-          ],
-        ),
+        // Row(
+        //   mainAxisAlignment: MainAxisAlignment.center,
+        //   children: [
+        //     const Text(
+        //       "¿No tienes una cuenta?",
+        //       style: TextStyle(color: Colors.white54),
+        //     ),
+        //     TextButton(
+        //       onPressed: () {},
+        //       child: const Text(
+        //         'Registrarse',
+        //         style: TextStyle(color: Color.fromARGB(255, 14, 170, 170)),
+        //       ),
+        //     ),
+        //   ],
+        // ),
       ],
     );
   }

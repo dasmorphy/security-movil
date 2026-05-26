@@ -11,11 +11,9 @@ import 'package:path_provider/path_provider.dart';
 
 
 Future<bool> hasInternet() async {
-  try {
-    return await InternetConnection().hasInternetAccess;
-  } catch (_) {
-    return false;
-  }
+  final connectivityResult = await Connectivity().checkConnectivity();
+
+  return connectivityResult != ConnectivityResult.none;
 }
 
 Future<List<String>> saveImagesToDisk(List<Uint8List> images) async {
@@ -64,6 +62,17 @@ Map<String, dynamic> restoreFiles(Map<String, dynamic> data) {
 
 Future<void> savePendingRequest(Map<String, dynamic> data, String nameMethod) async {
   final box = Hive.box('pending_requests');
+  final preparedData = await _prepareDataForStorage(data);
+
+  await box.add({
+    'endpoint': nameMethod,
+    'payload': preparedData,
+    'createdAt': DateTime.now().toIso8601String(),
+  });
+}
+
+Future<void> savePendingBiomar(Map<String, dynamic> data, String nameMethod) async {
+  final box = Hive.box('pending_biomar');
   final preparedData = await _prepareDataForStorage(data);
 
   await box.add({

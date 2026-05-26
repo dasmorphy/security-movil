@@ -30,6 +30,7 @@ class FinishEntryForm extends ConsumerStatefulWidget {
 class _FinishEntryFormState extends ConsumerState<FinishEntryForm> {
   bool imagesMinError = false;
   bool imagesMaxError = false;
+  List<bool> checkedList = [];
   late List<MaterialEntry> _materials;
   bool _isLoading = false;
   List<Uint8List?> _selectedImages = [];
@@ -40,12 +41,25 @@ class _FinishEntryFormState extends ConsumerState<FinishEntryForm> {
   void initState() {
     super.initState();
     _materials = widget.materials;
+    checkedList = List.generate(_materials.length, (_) => false);
   }
 
   Future<void> _handleSubmit() async {
     if (_isLoading) return;
 
     setState(() => _isLoading = true);
+
+    final allChecked = checkedList.every((e) => e);
+
+    if (!allChecked) {
+      GlobalLoadingBottomSheet.show(
+        status: OverlayStatus.error,
+        message: 'Todos los materiales deben ser marcados para finalizar el ingreso',
+        autoDismiss: const Duration(seconds: 4),
+      );
+      setState(() => _isLoading = false);
+      return;
+    }
 
     if (_selectedImages.length < 5) {
       setState(() {
@@ -160,17 +174,21 @@ class _FinishEntryFormState extends ConsumerState<FinishEntryForm> {
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
                 itemCount: _materials.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 12),
+                separatorBuilder: (_, _) => const SizedBox(height: 12),
                 itemBuilder: (context, index) {
                   final material = _materials[index];
                   return FinishMaterialItemCard(
                     materialName: material.name,
                     quantity: material.quantity,
+                    isChecked: checkedList[index],
+                    onChanged: (value) {
+                      setState(() {
+                        checkedList[index] = value;
+                      });
+                    },
                   );
                 },
               ),
-
-              const SizedBox(height: 15,),
 
               CommentaryReception(
                 controller: _observationsCtrl,

@@ -84,12 +84,12 @@ class ShipmentDispatch extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            "En tránsito",
+            "Ingresado bodega",
             style: TextStyle(color: Colors.grey, fontSize: 12),
           ),
           const SizedBox(height: 6),
           Text(
-            data.getCountByStatus('En tránsito').toString(),
+            data.getCountByStatus('Ingresado en bodega').toString(),
             style: const TextStyle(
               color: Colors.white,
               fontSize: 26,
@@ -110,12 +110,12 @@ class ShipmentDispatch extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            "Listo para despacho",
+            "Salida de planta",
             style: TextStyle(color: Colors.grey, fontSize: 12),
           ),
           const SizedBox(height: 6),
           Text(
-            data.getCountByStatus('Listo para despacho').toString(),
+            data.getCountByStatus('Salida de planta').toString(),
             style: const TextStyle(
               color: Colors.white,
               fontSize: 26,

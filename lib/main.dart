@@ -10,6 +10,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:zentinel/config/utils/helper.dart';
+import 'package:zentinel/data/services/hive_service.dart';
 import 'package:zentinel/service/local_storage.dart';
 import 'package:zentinel/service/pending_request_service.dart';
 import 'package:zentinel/presentation/widgets/shared/sync_listener.dart';
@@ -23,7 +24,9 @@ Future<void> main() async {
   await FlutterLocalization.instance.ensureInitialized();
   await initializeDateFormatting('es_ES', null);
   Intl.defaultLocale = 'es_ES';
-  await initHive();
+  final hiveService = HiveService();
+  await hiveService.initHive();
+  // await initHive();
   
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
@@ -68,6 +71,7 @@ class _MyAppState extends ConsumerState<MyApp> {
     void onSyncNeeded() {
       print('📡 Internet disponible, iniciando sincronización...');
       ref.read(syncPendingProvider.notifier).sync();
+      ref.read(syncPendingProvider.notifier).syncBiomar();
     }
 
     // 🔄 Inicializar el SyncService con el callback

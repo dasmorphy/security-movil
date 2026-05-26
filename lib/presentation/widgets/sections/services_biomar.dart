@@ -59,9 +59,15 @@ class _ServicesBiomarState extends ConsumerState<ServicesBiomar> {
             children: [
               if (userData.hasPermission(Permissions.nuevoDespacho))
                 BasicServiceCard(
+                    iconImage: 'iconentrada',
+                    label: 'Despacho',
+                    onTap: () => context.push('/new-dispatch')
+                  ),
+              if (userData.hasPermission(Permissions.nuevoProductoInterno))
+                BasicServiceCard(
                   iconImage: 'iconentrada',
-                  label: 'Despacho',
-                  onTap: () => context.push('/new-dispatch')
+                  label: 'Producto terminado',
+                  onTap: () => context.push('/new-dispatch', extra: true)
                 ),
 
             ],

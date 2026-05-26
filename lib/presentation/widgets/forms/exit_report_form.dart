@@ -25,6 +25,7 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
   final _formKey = GlobalKey<FormState>();
   String _categoryEntry = '0';
   String _groupBusiness = '0';
+  int _minImages = 5;
   String _unityId = '0';
   double _latitude = -0.1865936;
   double _longitude = -78.5953478;
@@ -68,6 +69,16 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
     if (widget.preloadedData != null && mounted) {
       _loadPreloadedData(widget.preloadedData!);
     }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await Future.delayed(const Duration(seconds: 2));
+
+      ref.read(getAllCategories.notifier).load();
+      ref.read(getGroupBusinessByIdBusiness.notifier).load();
+      ref.read(getAllUnitiesWeight.notifier).load();
+      ref.read(getAllAuthorized.notifier).load();
+      ref.read(getAllDestinyIntern.notifier).load();
+    });
   }
   
   @override
@@ -198,7 +209,7 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
     setState(() {
       _categoryEntry = data.categoryId.toString();
       _guideCtrl.text = data.shippingGuide ?? '';
-      _unityId = data.unityId.toString();
+      _unityId = data.unityId?.toString() ?? '0';
       _truckLicenseCtrl.text = data.truckLicense;
       _nameDriverCtrl.text = data.nameDriver ?? '';
     });
@@ -234,7 +245,22 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
     //   return;
     // }
     
-    if (_selectedImages.length < 5) {
+    final categories = ref.read(getAllCategories);
+
+    final categoryMap = {
+      for (var c in categories) c.idCategory.toString(): c
+    };
+
+    final categoryName = categoryMap[_categoryEntry]?.nameCategory;
+
+    final requiredImages =
+        categoryName?.toLowerCase() == 'personal interno'
+          ? 3
+          : 5;
+
+    _minImages = requiredImages;
+
+    if (_selectedImages.length < requiredImages) {
       setState(() {
         imagesMinError = true;
         isLoading = false;
@@ -908,7 +934,7 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                     width: double.infinity,
                     child: Text(
                       imagesMinError
-                          ? 'Debe subir mínimo 5 imagenes'
+                          ? 'Debe subir mínimo $_minImages imagenes'
                           : 'Debe subir máximo 10 imagenes',
                       style: TextStyle(color: Color.fromARGB(255, 185, 28, 16)),
                     ),

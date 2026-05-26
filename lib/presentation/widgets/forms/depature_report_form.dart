@@ -31,6 +31,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
   String _destiny = '0';
 
   String _unityId = '0';
+  int _minImages = 5;
   double _latitude = -0.1865936;
   double _longitude = -78.5953478;
   final _guideCtrl = TextEditingController();
@@ -64,6 +65,19 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
   void initState() {
     super.initState();
     _getUserLocation();
+
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await Future.delayed(const Duration(seconds: 2));
+
+      ref.read(getAllCategories.notifier).load();
+      ref.read(getGroupBusinessByIdBusiness.notifier).load();
+      ref.read(getAllUnitiesWeight.notifier).load();
+      ref.read(getAllAuthorized.notifier).load();
+      ref.read(getAllDestinyIntern.notifier).load();
+    });
+
+
   }
 
   @override
@@ -222,7 +236,22 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
     //   return;
     // }
 
-    if (_selectedImages.length < 5) {
+    final categories = ref.read(getAllCategories);
+
+    final categoryMap = {
+      for (var c in categories) c.idCategory.toString(): c
+    };
+
+    final categoryName = categoryMap[_categoryEntry]?.nameCategory;
+
+    final requiredImages =
+        categoryName?.toLowerCase() == 'personal interno'
+          ? 3
+          : 5;
+
+    _minImages = requiredImages;
+
+    if (_selectedImages.length < requiredImages) {
       setState(() {
         imagesMinError = true;
         isLoading = false;
@@ -931,7 +960,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                     width: double.infinity,
                     child: Text(
                       imagesMinError
-                          ? 'Debe subir mínimo 5 imagenes'
+                          ? 'Debe subir mínimo $_minImages imagenes'
                           : 'Debe subir máximo 10 imagenes',
                       style: TextStyle(color: Color.fromARGB(255, 185, 28, 16)),
                     ),

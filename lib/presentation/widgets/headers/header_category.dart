@@ -19,25 +19,25 @@ class HeaderCategory extends StatelessWidget {
 
             const Spacer(),
 
-            InkWell(
-              borderRadius: BorderRadius.circular(20),
-              onTap: () {},
-              child: const Padding(
-                padding: EdgeInsets.all(7),
-                child: Icon(Icons.search, color: Colors.white),
-              ),
-            ),
+            // InkWell(
+            //   borderRadius: BorderRadius.circular(20),
+            //   onTap: () {},
+            //   child: const Padding(
+            //     padding: EdgeInsets.all(7),
+            //     child: Icon(Icons.search, color: Colors.white),
+            //   ),
+            // ),
 
-            InkWell(
-              borderRadius: BorderRadius.circular(20),
-              onTap: () {
-                print('jjkjj');
-              },
-              child: const Padding(
-                padding: EdgeInsets.all(7),
-                child: Icon(Icons.help_outline, color: Colors.white),
-              ),
-            ),
+            // InkWell(
+            //   borderRadius: BorderRadius.circular(20),
+            //   onTap: () {
+            //     print('jjkjj');
+            //   },
+            //   child: const Padding(
+            //     padding: EdgeInsets.all(7),
+            //     child: Icon(Icons.help_outline, color: Colors.white),
+            //   ),
+            // ),
           ],
         ),
       ),

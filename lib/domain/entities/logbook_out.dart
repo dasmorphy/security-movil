@@ -21,7 +21,7 @@ class LogbookOut {
   String? shippingGuide;
   String status;
   String truckLicense;
-  int unityId;
+  dynamic unityId;
   DateTime updatedAt;
   String updatedBy;
   dynamic weight;

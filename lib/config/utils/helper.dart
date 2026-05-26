@@ -219,6 +219,18 @@ Map<String, dynamic> mapPendingToUI(Map<String, dynamic> raw) {
   };
 }
 
+Map<String, dynamic> mapPendingBiomar(Map<String, dynamic> raw) {
+  final bool processing = raw['processing'] == true;
+
+  return {
+    "name": raw['endpoint'] == 'entry'
+        ? 'Registro entrada'
+        : 'Despacho',
+    "subtitle": raw['payload']['dni'] ?? raw['payload']['order_number'] ?? 'Desconocido',
+    "statusText": processing ? 'Subiendo...' : 'Pendiente',
+  };
+}
+
 Future<Uint8List?> convertToWebP(File file) async {
   final result = await FlutterImageCompress.compressWithFile(
     file.absolute.path,
@@ -229,7 +241,9 @@ Future<Uint8List?> convertToWebP(File file) async {
     // No uses minWidth como si fuera maxWidth
   );
   // Eliminar el archivo temporal de cámara inmediatamente
-  try { await file.delete(); } catch (_) {}
+  // después de todo
+  await Future.delayed(const Duration(seconds: 1));
+  await file.delete();
   return result; // retorna Uint8List directamente
 }
 
@@ -266,7 +280,7 @@ Color getStatusColorDispatch(String status) {
   switch (status.toLowerCase()) {
     case 'en tránsito':
       return const Color.fromARGB(255, 248, 172, 70);
-    case 'listo para despacho':
+    case 'salida de planta':
       return const Color.fromARGB(255, 137, 172, 255);
     case 'ingresado en bodega':
       return const Color.fromARGB(255, 105, 246, 184);
@@ -279,7 +293,7 @@ Color getStatusColorBckgDispatch(String status) {
   switch (status.toLowerCase()) {
     case 'en tránsito':
       return const Color.fromARGB(255, 61, 43, 14);
-    case 'listo para despacho':
+    case 'salida de planta':
       return const Color.fromARGB(255, 34, 44, 63);
     case 'ingresado en bodega':
       return const Color.fromARGB(255, 18, 54, 42);

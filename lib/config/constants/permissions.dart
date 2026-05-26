@@ -14,4 +14,8 @@ class Permissions {
   static const verIngresosBiomar = 'VER_INGRESOS_BIOMAR';
   static const finalizarIngresoBiomar = 'FINALIZAR_INGRESO_BIOMAR';
   static const dataGroupBusiness = 'DATA_BY_GROUP_BUSINESS';
+  static const dispatchOffline = 'DISPATCH_OFFLINE';
+  static const bitacorasOffline = 'BITACORAS_OFFLINE';
+  static const nuevoProductoInterno = 'NUEVO_PRODUCTO_INTERNO';
+
 }
