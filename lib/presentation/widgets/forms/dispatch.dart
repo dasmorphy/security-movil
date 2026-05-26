@@ -202,37 +202,35 @@ class _CrearDespachoScreenState extends ConsumerState<DispatchForm> {
         .toList(), // Lista de Uint8List directo, sin base64
     };
 
-    print('despacho a guardar $data');
-
     // Verificar conexión a internet
-    // final internetAvailable = await hasInternet();
+    final internetAvailable = await hasInternet();
 
-    // if (!internetAvailable) {
-    //   // 🔴 SIN INTERNET: Guardar localmente
-    //   print('❌ Sin conexión, guardando localmente...');
-    //   data['created_at'] = DateTime.now().toString();
-    //   await savePendingRequest(data, 'dispatch');
+    if (!internetAvailable) {
+      // 🔴 SIN INTERNET: Guardar localmente
+      print('❌ Sin conexión, guardando localmente...');
+      data['created_at'] = DateTime.now().toString();
+      await savePendingRequest(data, 'dispatch');
 
-    //   if (mounted) {
-    //     // _truckLicenseCtrl.dispose();
-    //     // _driverCtrl.dispose();
-    //     // _orderNumberCtrl.dispose();
-    //     // _observationsCtrl.dispose();
-    //     context.pop();
-    //     ScaffoldMessenger.of(context).showSnackBar(
-    //       const SnackBar(
-    //         duration: Duration(seconds: 6),
-    //         content: Text(
-    //           '📱 Sin conexión. Tu información se guardará localmente y se enviará automáticamente cuando recuperes conexión.',
-    //           style: TextStyle(color: Colors.white),
-    //         ),
-    //         backgroundColor: Color.fromARGB(255, 255, 152, 0),
-    //       ),
-    //     );
-    //   }
-    //   setState(() => isLoading = false);
-    //   return;
-    // }
+      if (mounted) {
+        // _truckLicenseCtrl.dispose();
+        // _driverCtrl.dispose();
+        // _orderNumberCtrl.dispose();
+        // _observationsCtrl.dispose();
+        context.pop();
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            duration: Duration(seconds: 6),
+            content: Text(
+              '📱 Sin conexión. Tu información se guardará localmente y se enviará automáticamente cuando recuperes conexión.',
+              style: TextStyle(color: Colors.white),
+            ),
+            backgroundColor: Color.fromARGB(255, 255, 152, 0),
+          ),
+        );
+      }
+      setState(() => isLoading = false);
+      return;
+    }
 
     GlobalLoadingBottomSheet.show(
       status: OverlayStatus.loading, 
