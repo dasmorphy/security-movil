@@ -156,16 +156,17 @@ class GlowDropdownFormField<T> extends StatelessWidget {
   }
 }
 
-class GlowDropdownFormField2<T> extends StatelessWidget {
-  final T value;
+class GlowDropdownFormField2<T> extends StatefulWidget {
+  final T? value;
   final bool enabled;
   final FocusNode? focusNode;
   final List<DropdownMenuItem<T>> items;
   final ValueChanged<T?> onChanged;
-  final String? Function(T?)? validator; // ✅ AQUÍ
+  final String? Function(T?)? validator;
   final InputDecoration? decoration;
   final Color glowColor;
   final Color textColor;
+  final String searchHint;
 
   const GlowDropdownFormField2({
     super.key,
@@ -177,35 +178,94 @@ class GlowDropdownFormField2<T> extends StatelessWidget {
     this.enabled = true,
     this.glowColor = const Color.fromARGB(190, 58, 199, 199),
     this.validator,
-    this.textColor = Colors.white
+    this.textColor = Colors.white,
+    this.searchHint = 'Buscar...',
   });
+
+  @override
+  State<GlowDropdownFormField2<T>> createState() =>
+      _GlowDropdownFormField2State<T>();
+}
+
+class _GlowDropdownFormField2State<T> extends State<GlowDropdownFormField2<T>> {
+  final TextEditingController searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return DropdownButtonFormField2<T>(
-      value: value,
-      focusNode: focusNode,
+      value: widget.value,
+      focusNode: widget.focusNode,
       isExpanded: true,
-      decoration: decoration,
-      items: items,
-      validator: validator,
-      onChanged: enabled ? onChanged : null,
+      decoration: widget.decoration,
+      items: widget.items,
+      validator: widget.validator,
+      onChanged: widget.enabled ? widget.onChanged : null,
+
       dropdownStyleData: DropdownStyleData(
-        maxHeight: 250,
+        maxHeight: 300,
         decoration: BoxDecoration(
-          color: decoration?.fillColor,
+          color: widget.decoration?.fillColor,
           borderRadius: BorderRadius.circular(8),
         ),
       ),
+
       menuItemStyleData: const MenuItemStyleData(height: 48),
+
+      // 🔍 SEARCH
+      dropdownSearchData: DropdownSearchData(
+        searchController: searchController,
+        searchInnerWidgetHeight: 8,
+        searchInnerWidget: Padding(
+          padding: const EdgeInsets.all(2),
+          child: TextFormField(
+            controller: searchController,
+            style: TextStyle(color: widget.textColor),
+            decoration: InputDecoration(
+              hintText: widget.searchHint,
+              hintStyle: const TextStyle(color: Color.fromARGB(255, 255, 255, 255)),
+              prefixIcon: const Icon(Icons.search, color: Colors.white,),
+              filled: true,
+              fillColor: const Color.fromARGB(40, 255, 255, 255),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+          ),
+        ),
+
+        searchMatchFn: (item, searchValue) {
+          final text = item.child is Text
+              ? (item.child as Text).data ?? ''
+              : '';
+
+          return text.toLowerCase().contains(searchValue.toLowerCase());
+        },
+      ),
+
+      onMenuStateChange: (isOpen) {
+        if (!isOpen) {
+          searchController.clear();
+        }
+      },
+
       selectedItemBuilder: (context) {
-        return items.map((item) {
-          return Text(
-            item.child is Text ? (item.child as Text).data ?? '' : '',
-            style: TextStyle(
-              color: enabled
-                  ? textColor
-                  : const Color.fromARGB(255, 84, 81, 81),
+        return widget.items.map((item) {
+          return Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              item.child is Text ? (item.child as Text).data ?? '' : '',
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                color: widget.enabled
+                    ? widget.textColor
+                    : const Color.fromARGB(255, 84, 81, 81),
+              ),
             ),
           );
         }).toList();

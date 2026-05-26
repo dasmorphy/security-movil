@@ -7,7 +7,9 @@ class NewDispatchScreen extends ConsumerStatefulWidget  {
 
   static const name = 'new-dispatch-screen';
 
-  const NewDispatchScreen({super.key});
+  final dynamic isProductTerm;
+  
+  const NewDispatchScreen({super.key, this.isProductTerm = false});
 
   @override
   ConsumerState<NewDispatchScreen> createState() => _NewDispatchScreenState();
@@ -25,10 +27,11 @@ class _NewDispatchScreenState extends ConsumerState<NewDispatchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final String title = widget.isProductTerm == true ? 'Producto terminado' : 'Nuevo despacho'; 
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(60),
-        child: const HeaderOptionsProfile(headerTxt: 'Nuevo despacho',),
+        child: HeaderOptionsProfile(headerTxt: title,),
       ),
       resizeToAvoidBottomInset: true,
       backgroundColor: const Color.fromARGB(255, 23, 24, 28),
@@ -37,6 +40,7 @@ class _NewDispatchScreenState extends ConsumerState<NewDispatchScreen> {
         // bottom: false,
         child: 
               DispatchForm(
+                isProductTerm: widget.isProductTerm,
                 onSubmit: (data) async {
                   return await ref
                     .read(dispatchProvider.notifier)

@@ -21,6 +21,7 @@ class SyncListener extends ConsumerWidget {
         if (hasInternet) {
           print('📡 Internet detectado: iniciando sincronización...');
           ref.read(syncPendingProvider.notifier).sync();
+          ref.read(syncPendingProvider.notifier).syncBiomar();
         }
       });
     });

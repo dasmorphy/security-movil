@@ -16,4 +16,6 @@ class Permissions {
   static const dataGroupBusiness = 'DATA_BY_GROUP_BUSINESS';
   static const dispatchOffline = 'DISPATCH_OFFLINE';
   static const bitacorasOffline = 'BITACORAS_OFFLINE';
+  static const nuevoProductoInterno = 'NUEVO_PRODUCTO_INTERNO';
+
 }

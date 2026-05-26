@@ -93,42 +93,42 @@ class DispatchDetailModalState extends ConsumerState<DispatchDetailModal> {
             const SizedBox(height: 20),
 
             // BOTON CAMBIO DE ESTADO EN TRANSITO
-            if (widget.item.status == 'Listo para despacho' && userData.hasPermission(Permissions.despachoCambioEstadoTransito))
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () => context.push('/update-status-dispatch', extra: widget.item),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    backgroundColor: const Color.fromARGB(189, 7, 213, 213),
-                    disabledBackgroundColor: const Color.fromARGB(
-                      120,
-                      7,
-                      213,
-                      213,
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text(
-                        'Actualizar estado',
-                        style: TextStyle(
-                          fontSize: 15,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+            // if (widget.item.status == 'Salida de planta' && userData.hasPermission(Permissions.despachoCambioEstadoTransito))
+            //   SizedBox(
+            //     width: double.infinity,
+            //     child: ElevatedButton(
+            //       onPressed: () => context.push('/update-status-dispatch', extra: widget.item),
+            //       style: ElevatedButton.styleFrom(
+            //         padding: const EdgeInsets.symmetric(vertical: 14),
+            //         shape: RoundedRectangleBorder(
+            //           borderRadius: BorderRadius.circular(8),
+            //         ),
+            //         backgroundColor: const Color.fromARGB(189, 7, 213, 213),
+            //         disabledBackgroundColor: const Color.fromARGB(
+            //           120,
+            //           7,
+            //           213,
+            //           213,
+            //         ),
+            //       ),
+            //       child: Row(
+            //         mainAxisAlignment: MainAxisAlignment.center,
+            //         children: [
+            //           const Text(
+            //             'Actualizar estado',
+            //             style: TextStyle(
+            //               fontSize: 15,
+            //               color: Colors.white,
+            //               fontWeight: FontWeight.bold,
+            //             ),
+            //           ),
+            //         ],
+            //       ),
+            //     ),
+            //   ),
 
             // BOTON CONFIRMAR RECEPCION
-            if (widget.item.status == 'En tránsito' && userData.hasPermission(Permissions.despachoCambioEstadoRecepcion))
+            if (widget.item.status == 'Salida de planta' && userData.hasPermission(Permissions.despachoCambioEstadoRecepcion))
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
