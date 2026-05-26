@@ -20,6 +20,7 @@ class HiveService {
   static const String vehicleTypeBox = 'vehicle_type';
   static const String groupBusinessBox = 'group_business';
   static const String sessionKey = 'current_session';
+  static const String pendingBiomar = 'pending_biomar';
 
   Future<void> initHive() async {
     await Hive.initFlutter();
@@ -39,6 +40,9 @@ class HiveService {
     // Crear cajas si no existen
     if (!Hive.isBoxOpen(pendingRequestBox)) {
       await Hive.openBox(pendingRequestBox);
+    }
+    if (!Hive.isBoxOpen(pendingBiomar)) {
+      await Hive.openBox(pendingBiomar);
     }
     if (!Hive.isBoxOpen(userProfileBox)) {
       await Hive.openBox<UserProfileModel>(userProfileBox);

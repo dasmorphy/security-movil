@@ -99,7 +99,7 @@ class _VideoHeaderState extends ConsumerState<VideoHeader> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
-                                // if (userData.hasPermission(Permissions.bitacorasOffline))...[
+                                if (userData.hasPermission(Permissions.dispatchOffline))...[
                                   InkWell(
                                     borderRadius: BorderRadius.circular(20),
                                     onTap: () => _openModal(context, DispatchOffline()),
@@ -108,9 +108,17 @@ class _VideoHeaderState extends ConsumerState<VideoHeader> {
                                       child: Icon(Icons.upload_file_rounded, color: Colors.white),
                                     ),
                                   ),
-                                // ]
-                                // else
-                                //   const SizedBox(),
+                                ],
+                                if (userData.hasPermission(Permissions.bitacorasOffline))...[
+                                  InkWell(
+                                    borderRadius: BorderRadius.circular(20),
+                                    onTap: () => _openModal(context, LogbooksOfflineListModal()),
+                                    child: const Padding(
+                                      padding: EdgeInsets.all(7),
+                                      child: Icon(Icons.upload_file_rounded, color: Colors.white),
+                                    ),
+                                  ),
+                                ]
                               ],
                             ),
                             
