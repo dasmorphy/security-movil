@@ -116,13 +116,13 @@ class _SkuCard extends StatelessWidget {
   });
 
   String get _status {
-    return isChecked || (sku.productos.where((p) => p.productoId != null).length > 1) 
-        ? 'multiple' 
-        : 'individual';
+    return isChecked 
+        ? 'Multiple' 
+        : 'Individual';
   }
 
   Color _getStatusColor() {
-    return (isChecked || (sku.productos.where((p) => p.productoId != null).length > 1))
+    return (isChecked)
         ? const Color.fromARGB(255, 245, 158, 11)
         : const Color.fromARGB(255, 34, 197, 94);
   }

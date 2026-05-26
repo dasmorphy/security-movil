@@ -19,9 +19,7 @@ class ProductoItem {
 
 class SkuItem {
   String typeSku;
-  List<ProductoItem> productos;
-  SkuItem({this.typeSku = '', List<ProductoItem>? productos})
-      : productos = productos ?? [ProductoItem()];
+  SkuItem({this.typeSku = 'Individual'});
 }
 
 // ─── Colores ───────────────────────────────────────────────────────────────
@@ -89,7 +87,16 @@ class _CrearDespachoScreenState extends ConsumerState<DispatchForm> {
   void _agregarProducto(int skuIndex) {
     if (skuIndex < 0 || skuIndex >= _skus.length) return;
     setState(() {
-      _skus[skuIndex].productos.add(ProductoItem());
+      _skus[skuIndex];
+    });
+  }
+
+  void _skuChangeChecked(int skuIndex, bool check) {
+    if (skuIndex < 0 || skuIndex >= _skus.length) return;
+
+    setState(() {
+      _skus[skuIndex].typeSku =
+        check ? 'Multiple' : 'Individual';
     });
   }
 
@@ -107,16 +114,16 @@ class _CrearDespachoScreenState extends ConsumerState<DispatchForm> {
   }
 
   void _crearDespacho() async {
-    // if (isLoading) return;
-    // setState(() => isLoading = true);
+    if (isLoading) return;
+    setState(() => isLoading = true);
 
-    // if (_selectedImages.length < 5) {
-    //   setState(() {
-    //     imagesMinError = true;
-    //     isLoading = false;
-    //   });
-    //   return;
-    // }
+    if (_selectedImages.length < 5) {
+      setState(() {
+        imagesMinError = true;
+        isLoading = false;
+      });
+      return;
+    }
 
     if (_selectedImages.length > 10) {
       setState(() {
@@ -133,19 +140,19 @@ class _CrearDespachoScreenState extends ConsumerState<DispatchForm> {
     }
 
     // Recolectar todos los productos válidos de todos los SKUs
-    final productosValidos = <ProductoItem>[];
-    for (final sku in _skus) {
-      productosValidos.addAll(
-        sku.productos.where((p) => p.productoId != null)
-      );
-    }
+    // final productosValidos = <ProductoItem>[];
+    // for (final sku in _skus) {
+    //   productosValidos.addAll(
+    //     sku.productos.where((p) => p.productoId != null)
+    //   );
+    // }
 
-    if (productosValidos.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Agrega al menos un producto a los SKUs')),
-      );
-      return;
-    }
+    // if (productosValidos.isEmpty) {
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     const SnackBar(content: Text('Agrega al menos un producto a los SKUs')),
+    //   );
+    //   return;
+    // }
 
     final authState = ref.read(userSessionProvider);
 
@@ -164,14 +171,14 @@ class _CrearDespachoScreenState extends ConsumerState<DispatchForm> {
 
     final skusData = _skus.map((sku) {
       return {
-        "type_sku": sku.productos.length > 1 ? "Multiple" : "Individual",
-        "products": sku.productos
-          .where((p) => p.productoId != null)
-          .map((p) => {
-            "id_product": int.parse(p.productoId!),
-            "quantity": p.cantidad,
-          })
-          .toList(),
+        "type_sku": sku.typeSku,
+        // "products": sku.productos
+        //   .where((p) => p.productoId != null)
+        //   .map((p) => {
+        //     "id_product": int.parse(p.productoId!),
+        //     "quantity": p.cantidad,
+        //   })
+        //   .toList(),
       };
     }).toList();
     
@@ -186,7 +193,7 @@ class _CrearDespachoScreenState extends ConsumerState<DispatchForm> {
       "truck_license": _truckLicenseCtrl.text.trim(),
       "vehicle_type": _vehicleSelected,
       "type_process": widget.isProductTerm != true ? 'dispatch' : 'product',
-      "destiny_product": widget.isProductTerm != true && !destinyProduct ? null : _clientCtrl.text.trim(),
+      "destiny_product": widget.isProductTerm != true && destinyProduct == null ? null : _clientCtrl.text.trim(),
       "sku": skusData,
       // "weight": int.tryParse(_weightCtrl.text),
       "user": userData.user,
@@ -227,37 +234,37 @@ class _CrearDespachoScreenState extends ConsumerState<DispatchForm> {
     //   return;
     // }
 
-    // GlobalLoadingBottomSheet.show(
-    //   status: OverlayStatus.loading, 
-    //   message: "Guardando despacho..."
-    // );
-    // final response = await widget.onSubmit.call(data);
-    // if (!mounted) return;
-    // setState(() => isLoading = false);
+    GlobalLoadingBottomSheet.show(
+      status: OverlayStatus.loading, 
+      message: "Guardando despacho..."
+    );
+    final response = await widget.onSubmit.call(data);
+    if (!mounted) return;
+    setState(() => isLoading = false);
 
-    // // if (!success) {
-    // //   await savePendingRequest(data, 'logbook_entry');
-    // // }
-
-    // if (Navigator.canPop(context)) {
-    //   context.pop();
+    // if (!success) {
+    //   await savePendingRequest(data, 'logbook_entry');
     // }
 
-    // if (response.success) {
-    //   GlobalLoadingBottomSheet.show(
-    //     status: OverlayStatus.success, 
-    //     message: "Despacho guardado exitosamente", 
-    //     autoDismiss: const Duration(seconds: 2)
-    //   );
-    //   ref.read(getHistoryDispatch.notifier).load();
-    // } else {
-    //   await savePendingBiomar(data, 'dispatch');
-    //   GlobalLoadingBottomSheet.show(
-    //     status: OverlayStatus.error,
-    //     message: 'Error: ${response.message ?? 'Error al guardar el despacho. La información se guardará localmente y se enviará automáticamente.'}',
-    //     autoDismiss: const Duration(seconds: 3),
-    //   );
-    // }
+    if (Navigator.canPop(context)) {
+      context.pop();
+    }
+
+    if (response.success) {
+      GlobalLoadingBottomSheet.show(
+        status: OverlayStatus.success, 
+        message: "Despacho guardado exitosamente", 
+        autoDismiss: const Duration(seconds: 2)
+      );
+      ref.read(getHistoryDispatch.notifier).load();
+    } else {
+      await savePendingBiomar(data, 'dispatch');
+      GlobalLoadingBottomSheet.show(
+        status: OverlayStatus.error,
+        message: 'Error: ${response.message ?? 'Error al guardar el despacho. La información se guardará localmente y se enviará automáticamente.'}',
+        autoDismiss: const Duration(seconds: 3),
+      );
+    }
   }
 
   @override
@@ -280,6 +287,7 @@ class _CrearDespachoScreenState extends ConsumerState<DispatchForm> {
                       onDeleteSku: _deleteSku,
                       onAddSku: _addSku,
                       onAgregarProducto: _agregarProducto,
+                      onSkuCheckedChanged: _skuChangeChecked
                     ),
                     const SizedBox(height: 6),
                     InformacionLogisticaCard(

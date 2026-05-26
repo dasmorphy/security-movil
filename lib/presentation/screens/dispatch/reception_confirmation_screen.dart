@@ -23,6 +23,21 @@ class ReceptionConfirmationScreen extends ConsumerWidget {
       statusColor: getStatusColorDispatch(dispatchData.status),
     );
 
+    // final products = dispatchData.skus
+    // .expand((sku) => sku.products)
+    // .map((product) {
+    //   return ReceivedProduct(
+    //     id: product.idProductSku,
+    //     productName: product.name,
+    //     status: 'CORRECTO',
+    //     expectedQty: product.quantity,
+    //     receivedQty: product.quantity,
+    //     commentary: '',
+    //     hasDiscrepancy: false,
+    //   );
+    // })
+    // .toList();
+
     final products = dispatchData.skus
     .expand((sku) => sku.products)
     .map((product) {
@@ -38,9 +53,21 @@ class ReceptionConfirmationScreen extends ConsumerWidget {
     })
     .toList();
 
+    final skus = dispatchData.skus
+    .map((sku) {
+      return ReceivedSku(
+        id: sku.idSku,
+        status: 'CORRECTO',
+        // receivedQty: sku.quantity,
+        commentary: '',
+        hasDiscrepancy: false,
+      );
+    })
+    .toList();
+
     return ReceptionConfirmationForm(
       dispatchData: dispatchHeader,
-      products: products,
+      skus: skus,
       onSubmit: (data) async {
         print('Datos de recepción: $data');
         final authState = ref.watch(userSessionProvider);

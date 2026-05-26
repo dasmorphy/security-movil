@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
+import 'package:zentinel/domain/entities/all_dispatch.dart';
 import 'package:zentinel/domain/entities/api_response.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
@@ -23,6 +24,24 @@ class ReceivedProduct {
     required this.productName,
     required this.status,
     required this.expectedQty,
+    this.receivedQty = 0,
+    this.commentary = '',
+    this.hasDiscrepancy = false,
+    this.photoUrls,
+  });
+}
+
+class ReceivedSku {
+  final int id;
+  final String status;
+  int receivedQty;
+  String commentary;
+  bool hasDiscrepancy;
+  List<String>? photoUrls;
+
+  ReceivedSku({
+    required this.id,
+    required this.status,
     this.receivedQty = 0,
     this.commentary = '',
     this.hasDiscrepancy = false,
@@ -50,14 +69,14 @@ class DispatchData {
 
 class ReceptionConfirmationForm extends ConsumerStatefulWidget {
   final DispatchData dispatchData;
-  final List<ReceivedProduct> products;
+  final List<ReceivedSku> skus;
   final Future<ApiResponse> Function(Map<String, dynamic>) onSubmit;
   final VoidCallback? onBackPressed;
 
   const ReceptionConfirmationForm({
     super.key,
     required this.dispatchData,
-    required this.products,
+    required this.skus,
     required this.onSubmit,
     this.onBackPressed,
   });
@@ -68,6 +87,7 @@ class ReceptionConfirmationForm extends ConsumerStatefulWidget {
 
 class _ReceptionConfirmationFormState extends ConsumerState<ReceptionConfirmationForm> {
   late List<ReceivedProduct> _products;
+  late List<ReceivedSku> _skus;
   bool _isLoading = false;
   List<Uint8List?> _selectedImages = [];
   final TextEditingController _observationsCtrl = TextEditingController();
@@ -78,23 +98,30 @@ class _ReceptionConfirmationFormState extends ConsumerState<ReceptionConfirmatio
   @override
   void initState() {
     super.initState();
-    _products = widget.products.map((p) {
-      return ReceivedProduct(
-        id: p.id,
-        productName: p.productName,
-        status: p.status,
-        expectedQty: p.expectedQty,
-        receivedQty: p.receivedQty,
-        commentary: p.commentary,
-        hasDiscrepancy: p.hasDiscrepancy,
-        photoUrls: p.photoUrls,
-      );
-    }).toList();
+    _skus = widget.skus;
+    // _products = widget.products.map((p) {
+    //   return ReceivedProduct(
+    //     id: p.id,
+    //     productName: p.productName,
+    //     status: p.status,
+    //     expectedQty: p.expectedQty,
+    //     receivedQty: p.receivedQty,
+    //     commentary: p.commentary,
+    //     hasDiscrepancy: p.hasDiscrepancy,
+    //     photoUrls: p.photoUrls,
+    //   );
+    // }).toList();
   }
 
-  void _updateProduct(int index, ReceivedProduct product) {
+  // void _updateProduct(int index, ReceivedProduct product) {
+  //   setState(() {
+  //     _products[index] = product;
+  //   });
+  // }
+
+  void _updateSku(int index, ReceivedSku sku) {
     setState(() {
-      _products[index] = product;
+      _skus[index] = sku;
     });
   }
 
@@ -103,12 +130,27 @@ class _ReceptionConfirmationFormState extends ConsumerState<ReceptionConfirmatio
 
     // Validar que todos los productos con discrepancia tengan comentario y foto
     bool isValid = true;
-    for (var product in _products) {
-      if (product.hasDiscrepancy) {
-        if (product.commentary.isEmpty) {
+    // for (var product in _products) {
+    //   if (product.hasDiscrepancy) {
+    //     if (product.commentary.isEmpty) {
+    //       GlobalLoadingBottomSheet.show(
+    //         status: OverlayStatus.error,
+    //         message: '${product.productName} requiere un comentario',
+    //         autoDismiss: const Duration(seconds: 3),
+    //       );
+    //       isValid = false;
+    //       break;
+    //     }
+    //   }
+    // }
+
+    for (int i = 0; i < _skus.length; i++) {
+      final sku = _skus[i];
+      if (sku.hasDiscrepancy) {
+        if (sku.commentary.isEmpty) {
           GlobalLoadingBottomSheet.show(
             status: OverlayStatus.error,
-            message: '${product.productName} requiere un comentario',
+            message: 'Sku ${i + 1} requiere un comentario',
             autoDismiss: const Duration(seconds: 3),
           );
           isValid = false;
@@ -136,8 +178,7 @@ class _ReceptionConfirmationFormState extends ConsumerState<ReceptionConfirmatio
       });
       return;
     }
-
-    bool hasDiscrepancies = _products.any((p) => p.hasDiscrepancy);
+    bool hasDiscrepancies = _skus.any((p) => p.hasDiscrepancy);
     try {
       final data = {
         'dispatch_id': widget.dispatchData.dispatchId,
@@ -146,14 +187,13 @@ class _ReceptionConfirmationFormState extends ConsumerState<ReceptionConfirmatio
         'observations': _observationsCtrl.text.trim(),
         'external_transaction_id': Uuid().v4(),
         'reception_details': hasDiscrepancies
-          ? _products
+          ? _skus
+            .where((p) => p.hasDiscrepancy)
             .map((p) => {
-              'product_sku_id': p.id,
-              'expected_quantity': p.expectedQty,
-              'received_quantity': p.receivedQty,
-              'observations': p.commentary,
-              // 'photo_urls': p.photoUrls ?? [],
-            })
+                'product_sku_id': p.id,
+                'received_quantity': p.receivedQty,
+                'observations': p.commentary,
+              })
             .toList()
           : null,
       };
@@ -230,7 +270,7 @@ class _ReceptionConfirmationFormState extends ConsumerState<ReceptionConfirmatio
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text(
-                      'Productos a Recibir',
+                      'Skus a Recibir',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 18,
@@ -238,7 +278,7 @@ class _ReceptionConfirmationFormState extends ConsumerState<ReceptionConfirmatio
                       ),
                     ),
                     Text(
-                      '${_products.length} Productos',
+                      '${widget.skus.length} Skus',
                       style: const TextStyle(
                         color: Color.fromARGB(255, 150, 150, 150),
                         fontSize: 14,
@@ -253,58 +293,87 @@ class _ReceptionConfirmationFormState extends ConsumerState<ReceptionConfirmatio
               ListView.separated(
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                itemCount: _products.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 12),
+                itemCount: widget.skus.length,
+                separatorBuilder: (_, _) => const SizedBox(height: 12),
                 itemBuilder: (context, index) {
-                  final product = _products[index];
-                  return ReceivedProductItem(
-                    productName: product.productName,
-                    status: product.hasDiscrepancy ? 'DISCREPANCIA' : 'CORRECTO',
-                    expectedQty: product.expectedQty,
-                    receivedQty: product.receivedQty,
-                    commentary: product.commentary,
-                    hasDiscrepancy: product.hasDiscrepancy,
-                    onReceivedQtyChanged: (qty) {
-                      final updatedProduct = ReceivedProduct(
-                        id: product.id,
-                        productName: product.productName,
-                        status: product.status,
-                        expectedQty: product.expectedQty,
-                        receivedQty: qty,
-                        commentary: product.commentary,
-                        hasDiscrepancy: product.hasDiscrepancy,
-                        photoUrls: product.photoUrls,
-                      );
-                      _updateProduct(index, updatedProduct);
-                    },
+                  final sku = widget.skus[index];
+                  return ReceivedSkuItem(
+                    index: index,
+                    status: sku.hasDiscrepancy ? 'DISCREPANCIA' : 'CORRECTO',
+                    commentary: sku.commentary,
+                    hasDiscrepancy: sku.hasDiscrepancy,
                     onCommentaryChanged: (commentary) {
-                      final updatedProduct = ReceivedProduct(
-                        id: product.id,
-                        productName: product.productName,
-                        status: product.status,
-                        expectedQty: product.expectedQty,
-                        receivedQty: product.receivedQty,
+                      final updatedSku = ReceivedSku(
+                        id: sku.id,
+                        status: sku.status,
+                        receivedQty: sku.receivedQty,
                         commentary: commentary,
-                        hasDiscrepancy: product.hasDiscrepancy,
-                        photoUrls: product.photoUrls,
+                        hasDiscrepancy: sku.hasDiscrepancy,
+                        photoUrls: sku.photoUrls,
                       );
-                      _updateProduct(index, updatedProduct);
+                      _updateSku(index, updatedSku);
                     },
                     // onPhotoPressed: () => _handlePhotoPress(index),
                     onToggleChanged: (hasDiscrepancy) {
-                      final updatedProduct = ReceivedProduct(
-                        id: product.id,
-                        productName: product.productName,
+                      final updatedSku = ReceivedSku(
+                        id: sku.id,
                         status: hasDiscrepancy ? 'DISCREPANCIA' : 'CORRECTO',
-                        expectedQty: product.expectedQty,
-                        receivedQty: product.receivedQty,
-                        commentary: product.commentary,
+                        // receivedQty: product.receivedQty,
+                        commentary: sku.commentary,
                         hasDiscrepancy: hasDiscrepancy,
-                        photoUrls: product.photoUrls,
+                        photoUrls: sku.photoUrls,
                       );
-                      _updateProduct(index, updatedProduct);
+                      _updateSku(index, updatedSku);
                     },
                   );
+                  // return ReceivedProductItem(
+                  //   productName: product.productName,
+                  //   status: product.hasDiscrepancy ? 'DISCREPANCIA' : 'CORRECTO',
+                  //   expectedQty: product.expectedQty,
+                  //   receivedQty: product.receivedQty,
+                  //   commentary: product.commentary,
+                  //   hasDiscrepancy: product.hasDiscrepancy,
+                  //   onReceivedQtyChanged: (qty) {
+                  //     final updatedProduct = ReceivedProduct(
+                  //       id: product.id,
+                  //       productName: product.productName,
+                  //       status: product.status,
+                  //       expectedQty: product.expectedQty,
+                  //       receivedQty: qty,
+                  //       commentary: product.commentary,
+                  //       hasDiscrepancy: product.hasDiscrepancy,
+                  //       photoUrls: product.photoUrls,
+                  //     );
+                  //     _updateProduct(index, updatedProduct);
+                  //   },
+                  //   onCommentaryChanged: (commentary) {
+                  //     final updatedProduct = ReceivedProduct(
+                  //       id: product.id,
+                  //       productName: product.productName,
+                  //       status: product.status,
+                  //       expectedQty: product.expectedQty,
+                  //       receivedQty: product.receivedQty,
+                  //       commentary: commentary,
+                  //       hasDiscrepancy: product.hasDiscrepancy,
+                  //       photoUrls: product.photoUrls,
+                  //     );
+                  //     _updateProduct(index, updatedProduct);
+                  //   },
+                  //   // onPhotoPressed: () => _handlePhotoPress(index),
+                  //   onToggleChanged: (hasDiscrepancy) {
+                  //     final updatedProduct = ReceivedProduct(
+                  //       id: product.id,
+                  //       productName: product.productName,
+                  //       status: hasDiscrepancy ? 'DISCREPANCIA' : 'CORRECTO',
+                  //       expectedQty: product.expectedQty,
+                  //       receivedQty: product.receivedQty,
+                  //       commentary: product.commentary,
+                  //       hasDiscrepancy: hasDiscrepancy,
+                  //       photoUrls: product.photoUrls,
+                  //     );
+                  //     _updateProduct(index, updatedProduct);
+                  //   },
+                  // );
                 },
               ),
 
