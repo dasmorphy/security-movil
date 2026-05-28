@@ -178,7 +178,14 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
     List allLogJson = [];
     try {
       final response = await dio.get(
-        '/rest/zent-logbook-api/v1.0/get/all-logbooks',
+        '/rest/zent-logbook-api/v1.0/get/all-logbooks-paginated',
+        queryParameters: {
+          'first': filter['page'] ?? 1,
+          'rows': filter['rows'] ?? 5,
+          'start_date': filter['start_date'],
+          'end_date': filter['end_date'],
+          'search': filter['search'],
+        },
         options: Options(
           headers: {
             'externalTransactionId': uuid,
@@ -188,7 +195,7 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
         ),
       );
 
-      allLogJson = response.data['data']; 
+      allLogJson = response.data?['data']?['data']; 
 
       return allLogJson.map((json) => AllLogbook.fromJson(json)).toList();
       

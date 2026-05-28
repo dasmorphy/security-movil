@@ -85,7 +85,7 @@ class CatalogNotifier<T> extends StateNotifier<List<T>> {
 
   CatalogNotifier(this.fetch) : super(const []);
 
-  Future<void> load({Map<String, dynamic>? filters}) async {
+  Future<void> load({Map<String, dynamic>? filters, bool append = false}) async {
     if (_isLoading || !mounted) return;
 
     _isLoading = true;
@@ -95,10 +95,10 @@ class CatalogNotifier<T> extends StateNotifier<List<T>> {
 
       if (!mounted) return;
 
-      state = data;
-    } catch (e) {
-      if (mounted) {
-        state = [];
+      if (append) {
+        state = [...state, ...data];
+      } else {
+        state = data;
       }
     } finally {
       _isLoading = false;

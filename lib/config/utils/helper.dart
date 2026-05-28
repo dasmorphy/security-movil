@@ -323,3 +323,7 @@ Color getStatusColorBckgEntry(String status) {
       return Colors.grey;
   }
 }
+
+String formatDateToApi(DateTime date) {
+  return DateFormat('yyyy-MM-dd HH:mm:ss').format(date);
+}

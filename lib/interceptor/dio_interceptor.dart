@@ -115,7 +115,12 @@ class DioInterceptor extends Interceptor {
           break;
 
         case DioExceptionType.badResponse:
-          message = err.response?.data?['message'] ?? 'Error del servidor';
+          final data = err.response?.data;
+
+          message = data is Map<String, dynamic>
+            ? data['message'] ?? 'Error del servidor'
+            : 'Error del servidor';
+
           break;
 
         default:
