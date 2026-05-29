@@ -14,7 +14,7 @@ class AuthImpl extends AuthDatasource {
   @override
   Future<User> signin(Map<String, dynamic> data) async {
     final dataBody = {
-      "channel": data["user"] == "test" ? "ZENTINEL_TEST" : "ZENTINEL_WEB",
+      "channel": data["user"] == "test" ? "ZENTINEL_TEST" : "ZENTINEL",
       "externalTransactionId": uuid,
       "login": data,
     };

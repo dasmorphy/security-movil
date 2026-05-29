@@ -77,7 +77,7 @@ class _LogbookListScreenState extends ConsumerState<LogbookListScreen> {
                         59,
                       );
                     }
-
+                    print(page);
                     await ref.read(getHistoryLogbooks.notifier).load(
                       filters: {
                         "page": page,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -22,6 +23,7 @@ class LogbooksListState extends ConsumerState<LogbooksList> {
   DateTimeRange? _currentRange;
   int _page = 1;
   bool _isFetchingMore = false;
+  bool _loadMoreData = true;
 
   @override
   void initState() {
@@ -42,6 +44,11 @@ class LogbooksListState extends ConsumerState<LogbooksList> {
     if (oldWidget.items != widget.items) {
       setState(() {
         _filteredItems = List.from(widget.items);
+      });
+    }else {
+      print('No se actualizó la lista de items');
+      setState(() {
+        _loadMoreData = false;
       });
     }
   }
@@ -109,7 +116,7 @@ class LogbooksListState extends ConsumerState<LogbooksList> {
 
                 final item = displayItems[index];
 
-                final isEntry = item.idLogbookEntry != null;
+                final isEntry = item.recordType == 'entry';
                 final typeText = isEntry ? 'ingreso' : 'salida';
 
                 final createdBy = item.nameUser ?? 'Sin usuario';
@@ -216,6 +223,8 @@ class LogbooksListState extends ConsumerState<LogbooksList> {
                     final range = await ModalHelper.open(
                       context,
                       child: DateRangePicker(
+                        initialStart: _currentRange?.start,
+                        initialEnd: _currentRange?.end,
                         onApply: (start, end) {
                           if (start != null && end != null) {
                             Navigator.of(
@@ -229,19 +238,43 @@ class LogbooksListState extends ConsumerState<LogbooksList> {
                     );
 
                     if (range != null) {
-                      setState(() {
-                        _isLoading = true;
-                        _currentRange = range;
-                        _page = 1;
-                      });
+                      // Detectar si el usuario presionó "Limpiar" (marcador especial: año 1969)
+                      final isClearAction = range.start.year == 1969;
 
-                      await widget.onFilterDate?.call(range, _page, false);
+                      if (isClearAction) {
+                        // Usuario presionó "Limpiar"
+                        setState(() {
+                          _isLoading = true;
+                          _currentRange = null;
+                          _page = 1;
+                          _loadMoreData = true;
+                          _filteredItems = List.from(widget.items);
+                        });
 
-                      if (!mounted) return;
+                        await widget.onFilterDate?.call(null, _page, false);
 
-                      setState(() {
-                        _isLoading = false;
-                      });
+                        if (!mounted) return;
+
+                        setState(() {
+                          _isLoading = false;
+                        });
+                      } else {
+                        // Usuario presionó "Ver registros"
+                        setState(() {
+                          _isLoading = true;
+                          _currentRange = range;
+                          _page = 1;
+                          _loadMoreData = true;
+                        });
+
+                        await widget.onFilterDate?.call(range, _page, false);
+
+                        if (!mounted) return;
+
+                        setState(() {
+                          _isLoading = false;
+                        });
+                      }
                     }
                   },
                   child: Container(
@@ -267,20 +300,24 @@ class LogbooksListState extends ConsumerState<LogbooksList> {
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
-                      children: const [
-                        Icon(
+                      children: [
+                        const Icon(
                           Icons.calendar_today,
                           color: Colors.white,
                           size: 15,
                         ),
-                        SizedBox(width: 10),
+                        const SizedBox(width: 10),
                         Text(
-                          'Filtrar por fechas',
-                          style: TextStyle(
+                          _currentRange != null
+                              ? _formatDateRangeLabel()
+                              : 'Filtrar por fechas',
+                          style: const TextStyle(
                             fontSize: 12,
                             color: Colors.white,
                             fontWeight: FontWeight.w600,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
@@ -294,8 +331,19 @@ class LogbooksListState extends ConsumerState<LogbooksList> {
     );
   }
 
+  String _formatDateRangeLabel() {
+    if (_currentRange == null) return 'Filtrar por fechas';
+    
+    final f = DateFormat('dd/MM');
+    final start = f.format(_currentRange!.start);
+    final end = f.format(_currentRange!.end);
+    
+    return '$start - $end';
+  }
+
   Future<void> _onScroll() async {
-    if (_isFetchingMore || _isLoading) return;
+    print(_loadMoreData);
+    if (_isFetchingMore || _isLoading ) return;
 
     // Verificar si el scroll ha llegado al final (200px antes)
     if (_scrollController.hasClients &&
@@ -379,18 +427,6 @@ class LogbooksListState extends ConsumerState<LogbooksList> {
           infinite: true,
           child: Container(
             padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: const Color.fromARGB(189, 21, 139, 139),
-              borderRadius: BorderRadius.circular(50),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color.fromARGB(255, 46, 175, 132)
-                      .withOpacity(0.3),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
             child: const Icon(
               Icons.sync,
               color: Colors.white,

@@ -11,8 +11,8 @@ class BitacoraDetailModal extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final entryImages = item.imagesEntry ?? [];
-    final outImages = item.out?.imagesOut ?? item.imagesOut ?? [];
+    final entryImages = item.recordType == 'entry' ? item.images : [];
+    final outImages = item.out?.images ?? (item.recordType == 'out' ? item.images : []);
 
     return SafeArea(
       child: Container(
@@ -37,7 +37,7 @@ class BitacoraDetailModal extends ConsumerWidget {
                 child: Column(
                   children: [
                     /// ENTRADA
-                    if (item.idLogbookEntry != null) EntryDetails(item: item),
+                    if (item.recordType == 'entry') EntryDetails(item: item),
 
                     /// IMÁGENES ENTRADA
                     if (entryImages.isNotEmpty)
@@ -47,12 +47,12 @@ class BitacoraDetailModal extends ConsumerWidget {
                       ),
 
                     /// SALIDA
-                    if (item.out != null || item.idLogbookOut != null)
+                    if (item.out != null || item.recordType == 'out')
                       OutDetails(out: item.out ?? item),
 
                     /// IMÁGENES SALIDA
                     if (outImages.isNotEmpty ||
-                        (item.imagesOut != null && item.imagesOut!.isNotEmpty))
+                        (item.recordType == 'out' && item.images.isNotEmpty))
                       ImagesGrid(title: 'Imágenes Salida', images: outImages),
                   ],
                 ),
