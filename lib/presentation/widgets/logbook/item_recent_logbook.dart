@@ -23,8 +23,8 @@ class ItemRecentLogbook extends ConsumerWidget {
       children: List.generate(limitedList.length, (index) {
         final item = limitedList[index];
 
-        final isEntry = item.idLogbookEntry;
-        final typeText = isEntry != null ? 'ingreso' : 'salida';
+        final isEntry = item.recordType == 'entry';
+        final typeText = isEntry ? 'entrada' : 'salida';
 
         final createdBy = item.nameUser;
         final groupName = item.groupName;
@@ -83,11 +83,11 @@ class ItemRecentLogbook extends ConsumerWidget {
 
                   Chip(
                     side: BorderSide.none,
-                    label: Text(item.status),
-                    backgroundColor: getStatusColorBckgEntry(item.status),
+                    label: Text(item.status ?? ''),
+                    backgroundColor: getStatusColorBckgEntry(item.status ?? ''),
                     padding: EdgeInsets.zero,
                     labelStyle: TextStyle(
-                      color: getStatusColorEntryAccess(item.status),
+                      color: getStatusColorEntryAccess(item.status ?? ''),
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
                     ),

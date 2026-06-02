@@ -1,35 +1,55 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import 'package:animate_do/animate_do.dart';
 
 class LogbooksList extends ConsumerStatefulWidget {
   final List<dynamic> items;
-  final int? limit;
+  final Future<void> Function(DateTimeRange? range, int page, bool append)? onFilterDate;
 
-  const LogbooksList({super.key, required this.items, this.limit = 15});
+  const LogbooksList({super.key, required this.items, this.onFilterDate});
 
   @override
   ConsumerState<LogbooksList> createState() => LogbooksListState();
 }
 
 class LogbooksListState extends ConsumerState<LogbooksList> {
+  final ScrollController _scrollController = ScrollController();
   late List<dynamic> _filteredItems;
   bool _isLoading = false;
   DateTimeRange? _currentRange;
+  int _page = 1;
+  bool _isFetchingMore = false;
+  bool _loadMoreData = true;
 
   @override
   void initState() {
     super.initState();
     _filteredItems = List.from(widget.items);
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
   void didUpdateWidget(LogbooksList oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.items != widget.items) {
-      _filteredItems = List.from(widget.items);
+      setState(() {
+        _filteredItems = List.from(widget.items);
+      });
+    }else {
+      print('No se actualizó la lista de items');
+      setState(() {
+        _loadMoreData = false;
+      });
     }
   }
 
@@ -51,15 +71,14 @@ class LogbooksListState extends ConsumerState<LogbooksList> {
   @override
   Widget build(BuildContext context) {
     final items = _isLoading
-    ? List.generate(5, (_) => null) // Placeholder para skeletons
-    : (_currentRange != null
-        ? _filterItemsByDateRange(_currentRange!)
-        : _filteredItems
-      );
+        ? List.generate(5, (_) => null) // Placeholder para skeletons
+        : (_currentRange != null
+              ? _filterItemsByDateRange(_currentRange!)
+              : _filteredItems);
 
     final displayItems = _currentRange != null
-      ? items
-      : items.take(widget.limit ?? items.length).toList();
+        ? items
+        : items.take(items.length).toList();
 
     if (!_isLoading && _filteredItems.isEmpty) {
       return const Center(
@@ -70,6 +89,9 @@ class LogbooksListState extends ConsumerState<LogbooksList> {
       );
     }
 
+    // Contar items totales incluyendo el loader si está fetching
+    final totalItems = displayItems.length + (_isFetchingMore ? 1 : 0);
+
     return SizedBox(
       width: double.infinity,
       child: Stack(
@@ -78,105 +100,113 @@ class LogbooksListState extends ConsumerState<LogbooksList> {
             enabled: _isLoading,
             enableSwitchAnimation: true,
             ignorePointers: _isLoading,
-            child: SingleChildScrollView(
+            child: ListView.builder(
+              controller: _scrollController,
               padding: const EdgeInsets.only(bottom: 80),
-              child: ListView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: displayItems.length,
-                itemBuilder: (context, index) {
-                  if (_isLoading) {
-                    return _buildSkeletonCard();
-                  }
+              itemCount: totalItems,
+              itemBuilder: (context, index) {
+                // Mostrar loading icon al final si está fetching más
+                if (_isFetchingMore && index == displayItems.length) {
+                  return _buildLoadingIndicator();
+                }
 
-                  final item = displayItems[index];
+                if (_isLoading) {
+                  return _buildSkeletonCard();
+                }
 
-                  final isEntry = item.idLogbookEntry != null;
-                  final typeText = isEntry ? 'ingreso' : 'salida';
+                final item = displayItems[index];
 
-                  final createdBy = item.nameUser ?? 'Sin usuario';
-                  final groupName = item.groupName ?? 'Sin grupo';
+                final isEntry = item.recordType == 'entry';
+                final typeText = isEntry ? 'ingreso' : 'salida';
 
-                  final description = 'Bitácora de $typeText en $groupName';
+                final createdBy = item.nameUser ?? 'Sin usuario';
+                final groupName = item.groupName ?? 'Sin grupo';
 
-                  final formattedDate = formatDate(item.createdAt);
+                final description = 'Bitácora de $typeText en $groupName';
 
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 7,
-                      vertical: 4,
+                final formattedDate = formatDate(item.createdAt);
+
+                return Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 7,
+                    vertical: 4,
+                  ),
+                  child: InkWell(
+                    borderRadius: BorderRadius.circular(8),
+                    onTap: () => ModalHelper.open(
+                      context,
+                      child: BitacoraDetailModal(item: item),
                     ),
-                    child: InkWell(
-                      borderRadius: BorderRadius.circular(8),
-                      onTap: () =>
-                          ModalHelper.open(context, child: BitacoraDetailModal(item: item)),
-                      child: Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            // Información
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    createdBy,
-                                    style: Theme.of(context).textTheme.bodyMedium
-                                        ?.copyWith(
-                                          color: Colors.white,
-                                          fontWeight: FontWeight.w600,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          // Información
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  createdBy,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium
+                                      ?.copyWith(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  description,
+                                  style: Theme.of(context).textTheme.bodySmall
+                                      ?.copyWith(
+                                        color: const Color.fromARGB(
+                                          255,
+                                          180,
+                                          180,
+                                          180,
                                         ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    description,
-                                    style: Theme.of(context).textTheme.bodySmall
-                                        ?.copyWith(
-                                          color: const Color.fromARGB(
-                                            255,
-                                            180,
-                                            180,
-                                            180,
-                                          ),
+                                      ),
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  formattedDate,
+                                  style: Theme.of(context).textTheme.bodySmall
+                                      ?.copyWith(
+                                        color: const Color.fromARGB(
+                                          255,
+                                          180,
+                                          180,
+                                          180,
                                         ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                  Text(
-                                    formattedDate,
-                                    style: Theme.of(context).textTheme.bodySmall
-                                        ?.copyWith(
-                                          color: const Color.fromARGB(
-                                            255,
-                                            180,
-                                            180,
-                                            180,
-                                          ),
-                                        ),
-                                  ),
-                                  const SizedBox(height: 2),
-                                ],
-                              ),
+                                      ),
+                                ),
+                                const SizedBox(height: 2),
+                              ],
                             ),
-                        
-                            Chip(
-                              side: BorderSide.none,
-                              label: Text(item.status),
-                              backgroundColor: getStatusColorBckgEntry(item.status),
-                              padding: EdgeInsets.zero,
-                              labelStyle: TextStyle(
-                                color: getStatusColorEntryAccess(item.status),
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                              ),
+                          ),
+
+                          Chip(
+                            side: BorderSide.none,
+                            label: Text(item.status),
+                            backgroundColor: getStatusColorBckgEntry(
+                              item.status,
                             ),
-                          ],
-                        ),
+                            padding: EdgeInsets.zero,
+                            labelStyle: TextStyle(
+                              color: getStatusColorEntryAccess(item.status),
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                  );
-                },
-              ),
+                  ),
+                );
+              },
             ),
           ),
 
@@ -193,26 +223,58 @@ class LogbooksListState extends ConsumerState<LogbooksList> {
                     final range = await ModalHelper.open(
                       context,
                       child: DateRangePicker(
+                        initialStart: _currentRange?.start,
+                        initialEnd: _currentRange?.end,
                         onApply: (start, end) {
-                          Navigator.of(context).pop();
+                          if (start != null && end != null) {
+                            Navigator.of(
+                              context,
+                            ).pop(DateTimeRange(start: start, end: end));
+                          } else {
+                            Navigator.of(context).pop();
+                          }
                         },
                       ),
                     );
 
                     if (range != null) {
-                      setState(() {
-                        _isLoading = true;
-                        _currentRange = range;
-                      });
+                      // Detectar si el usuario presionó "Limpiar" (marcador especial: año 1969)
+                      final isClearAction = range.start.year == 1969;
 
-                      // Simula llamada a API con filtros start/end
-                      Future.delayed(const Duration(seconds: 2), () {
+                      if (isClearAction) {
+                        // Usuario presionó "Limpiar"
+                        setState(() {
+                          _isLoading = true;
+                          _currentRange = null;
+                          _page = 1;
+                          _loadMoreData = true;
+                          _filteredItems = List.from(widget.items);
+                        });
+
+                        await widget.onFilterDate?.call(null, _page, false);
+
                         if (!mounted) return;
 
                         setState(() {
                           _isLoading = false;
                         });
-                      });
+                      } else {
+                        // Usuario presionó "Ver registros"
+                        setState(() {
+                          _isLoading = true;
+                          _currentRange = range;
+                          _page = 1;
+                          _loadMoreData = true;
+                        });
+
+                        await widget.onFilterDate?.call(range, _page, false);
+
+                        if (!mounted) return;
+
+                        setState(() {
+                          _isLoading = false;
+                        });
+                      }
                     }
                   },
                   child: Container(
@@ -238,20 +300,24 @@ class LogbooksListState extends ConsumerState<LogbooksList> {
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
-                      children: const [
-                        Icon(
+                      children: [
+                        const Icon(
                           Icons.calendar_today,
                           color: Colors.white,
                           size: 15,
                         ),
-                        SizedBox(width: 10),
+                        const SizedBox(width: 10),
                         Text(
-                          'Filtrar por fechas',
-                          style: TextStyle(
+                          _currentRange != null
+                              ? _formatDateRangeLabel()
+                              : 'Filtrar por fechas',
+                          style: const TextStyle(
                             fontSize: 12,
                             color: Colors.white,
                             fontWeight: FontWeight.w600,
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
@@ -263,6 +329,53 @@ class LogbooksListState extends ConsumerState<LogbooksList> {
         ],
       ),
     );
+  }
+
+  String _formatDateRangeLabel() {
+    if (_currentRange == null) return 'Filtrar por fechas';
+    
+    final f = DateFormat('dd/MM');
+    final start = f.format(_currentRange!.start);
+    final end = f.format(_currentRange!.end);
+    
+    return '$start - $end';
+  }
+
+  Future<void> _onScroll() async {
+    print(_loadMoreData);
+    if (_isFetchingMore || _isLoading ) return;
+
+    // Verificar si el scroll ha llegado al final (200px antes)
+    if (_scrollController.hasClients &&
+        _scrollController.position.pixels >=
+            _scrollController.position.maxScrollExtent - 70) {
+      setState(() {
+        _isFetchingMore = true;
+      });
+
+      try {
+        _page++;
+
+        // Siempre llamar a onFilterDate para cargar más registros
+        // Si hay filtro de fecha, se usa; si no, se carga sin filtro
+        if (_currentRange != null) {
+          await widget.onFilterDate?.call(_currentRange!, _page, true);
+        } else {
+          // Llamar al callback sin filtro de fecha
+          await widget.onFilterDate?.call(
+            null,
+            _page,
+            true,
+          );
+        }
+      } finally {
+        if (mounted) {
+          setState(() {
+            _isFetchingMore = false;
+          });
+        }
+      }
+    }
   }
 
   Widget _buildSkeletonCard() {
@@ -301,6 +414,26 @@ class LogbooksListState extends ConsumerState<LogbooksList> {
           const SizedBox(width: 16),
           Container(width: 20, height: 20, color: Colors.grey[700]),
         ],
+      ),
+    );
+  }
+
+  Widget _buildLoadingIndicator() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 20),
+      child: Center(
+        child: Spin(
+          duration: const Duration(seconds: 2),
+          infinite: true,
+          child: Container(
+            padding: const EdgeInsets.all(12),
+            child: const Icon(
+              Icons.sync,
+              color: Colors.white,
+              size: 24,
+            ),
+          ),
+        ),
       ),
     );
   }

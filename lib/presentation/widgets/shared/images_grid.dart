@@ -4,7 +4,7 @@ import 'package:zentinel/presentation/widgets/widgets.dart';
 
 class ImagesGrid extends StatelessWidget {
   final String title;
-  final List<String> images;
+  final List<dynamic> images;
 
   const ImagesGrid({
     super.key, 

@@ -60,25 +60,34 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
   final FocusNode _unitFocus = FocusNode();
   bool isPickingImage = false;
 
+  bool _isInitializing = true;
 
   @override
   void initState() {
     super.initState();
     _getUserLocation();
 
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await Future.wait([
+        ref.read(getAllCategories.notifier).load(),
+        ref.read(getGroupBusinessByIdBusiness.notifier).load(),
+        ref.read(getAllUnitiesWeight.notifier).load(),
+        ref.read(getAllAuthorized.notifier).load(),
+        ref.read(getAllDestinyIntern.notifier).load(),
+      ]);
+
+      if (!mounted) return;
+
+      setState(() {
+        _isInitializing = false;
+      });
+
+    });
+
     if (widget.preloadedData != null && mounted) {
       _loadPreloadedData(widget.preloadedData!);
     }
-
-    WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await Future.delayed(const Duration(seconds: 2));
-
-      ref.read(getAllCategories.notifier).load();
-      ref.read(getGroupBusinessByIdBusiness.notifier).load();
-      ref.read(getAllUnitiesWeight.notifier).load();
-      ref.read(getAllAuthorized.notifier).load();
-      ref.read(getAllDestinyIntern.notifier).load();
-    });
   }
   
   @override
@@ -291,7 +300,7 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
     final userHive = ref.watch(userProfileProvider(userData.email));
 
     final data = {
-      "id_logbook_entry": widget.preloadedData?.idLogbookEntry,
+      "id_logbook_entry": widget.preloadedData?.recordId,
       "external_transaction_id": Uuid().v4(),
       "id_unity": int.parse(_unityId) == 0 ? null : int.parse(_unityId),
       "id_category": int.parse(_categoryEntry),
@@ -480,6 +489,43 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
         borderSide: BorderSide(color: Color.fromARGB(190, 58, 199, 199)),
       ),
     );
+
+    if (_isInitializing) {
+      return Center(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Align(
+              alignment: Alignment.center,
+              child: SizedBox(
+                width: 280,
+                child:
+                  Text(
+                    'Cargando formulario...',
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    softWrap: true,
+                  ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                color: Colors.white,
+                strokeWidth: 2,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
 
     return Card(
       color: const Color.fromARGB(0, 150, 60, 60),

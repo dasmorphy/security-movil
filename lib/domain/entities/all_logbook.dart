@@ -1,68 +1,70 @@
-import 'package:zentinel/domain/entities/logbook_out.dart';
-
 class AllLogbook {
   String authorizedBy;
   int categoryId;
   DateTime createdAt;
   String createdBy;
+  String? description;
+  String destiny;
   int groupBusinessId;
   String groupName;
-  int idSector;
-  int? idLogbookOut;
-  int? idLogbookEntry;
-  List<String>? imagesEntry;
+  int? idSector;
+  List<String> images;
   String? lat;
+  int? logbookOutId;
   String? long;
-  String? nameCategory;
-  String? nameDriver;
+  String nameCategory;
+  String nameDriver;
   String? nameSector;
   String nameUser;
-  String? observations;
-  LogbookOut? out;
-  dynamic quantity;
+  String observations;
+  AllLogbook? out;
   String? personWithdraws;
-  String? shippingGuide;
-  String status;
+  String? provider;
+  dynamic quantity;
+  int recordId;
+  String recordType;
+  String shippingGuide;
+  String? status;
   String truckLicense;
   dynamic unityId;
   DateTime updatedAt;
   String updatedBy;
-  int? weight;
+  dynamic weight;
   String workday;
-  String? destiny;
-  List<String>? imagesOut;
 
   AllLogbook({
     required this.authorizedBy,
     required this.categoryId,
     required this.createdAt,
     required this.createdBy,
+    this.description,
+    required this.destiny,
     required this.groupBusinessId,
     required this.groupName,
-    required this.idSector,
-    this.idLogbookOut,
-    this.idLogbookEntry,
-    this.imagesEntry,
-    this.imagesOut,
+    this.idSector,
+    required this.images,
     this.lat,
+    this.logbookOutId,
     this.long,
-    this.nameCategory,
-    this.nameDriver,
+    required this.nameCategory,
+    required this.nameDriver,
     this.nameSector,
     required this.nameUser,
-    this.observations,
+    required this.observations,
     this.out,
+    required this.personWithdraws,
+    this.provider,
     required this.quantity,
-    this.personWithdraws,
-    this.shippingGuide,
-    required this.status,
+    required this.recordId,
+    required this.recordType,
+    required this.shippingGuide,
+    this.status,
     required this.truckLicense,
     required this.unityId,
     required this.updatedAt,
     required this.updatedBy,
-    this.weight,
+    required this.weight,
     required this.workday,
-    this.destiny,
   });
 
   factory AllLogbook.fromJson(Map<String, dynamic> json) => AllLogbook(
@@ -70,27 +72,26 @@ class AllLogbook {
     categoryId: json["category_id"],
     createdAt: DateTime.parse(json["created_at"]),
     createdBy: json["created_by"],
+    description: json["description"],
+    destiny: json["destiny"],
     groupBusinessId: json["group_business_id"],
     groupName: json["group_name"],
     idSector: json["id_sector"],
-    idLogbookOut: json["id_logbook_out"],
-    idLogbookEntry: json["id_logbook_entry"],
-    imagesEntry: json["images_entry"] == null
-        ? []
-        : List<String>.from(json["images_entry"]!.map((x) => x)),
-    imagesOut: json["images_out"] == null
-        ? []
-        : List<String>.from(json["images_out"]!.map((x) => x)),
+    images: List<String>.from(json["images"].map((x) => x)),
     lat: json["lat"],
+    logbookOutId: json["logbook_out_id"],
     long: json["long"],
     nameCategory: json["name_category"],
     nameDriver: json["name_driver"],
     nameSector: json["name_sector"],
     nameUser: json["name_user"],
     observations: json["observations"],
-    out: json["out"] == null ? null : LogbookOut.fromJson(json["out"]),
-    quantity: json["quantity"],
+    out: json["out"] == null ? null : AllLogbook.fromJson(json["out"]),
     personWithdraws: json["person_withdraws"],
+    provider: json["provider"],
+    quantity: json["quantity"],
+    recordId: json["record_id"],
+    recordType: json["record_type"],
     shippingGuide: json["shipping_guide"],
     status: json["status"],
     truckLicense: json["truck_license"],
@@ -99,7 +100,6 @@ class AllLogbook {
     updatedBy: json["updated_by"],
     weight: json["weight"],
     workday: json["workday"],
-    destiny: json["destiny"]
   );
 
   Map<String, dynamic> toJson() => {
@@ -107,18 +107,14 @@ class AllLogbook {
     "category_id": categoryId,
     "created_at": createdAt.toIso8601String(),
     "created_by": createdBy,
+    "description": description,
+    "destiny": destiny,
     "group_business_id": groupBusinessId,
     "group_name": groupName,
     "id_sector": idSector,
-    "id_logbook_out": idLogbookOut,
-    "id_logbook_entry": idLogbookEntry,
-    "images_entry": imagesEntry == null
-      ? []
-      : List<dynamic>.from(imagesEntry!.map((x) => x)),
-    "images_out": imagesOut == null
-      ? []
-      : List<dynamic>.from(imagesOut!.map((x) => x)),
+    "images": List<dynamic>.from(images.map((x) => x)),
     "lat": lat,
+    "logbook_out_id": logbookOutId,
     "long": long,
     "name_category": nameCategory,
     "name_driver": nameDriver,
@@ -126,8 +122,11 @@ class AllLogbook {
     "name_user": nameUser,
     "observations": observations,
     "out": out?.toJson(),
-    "quantity": quantity,
     "person_withdraws": personWithdraws,
+    "provider": provider,
+    "quantity": quantity,
+    "record_id": recordId,
+    "record_type": recordType,
     "shipping_guide": shippingGuide,
     "status": status,
     "truck_license": truckLicense,
@@ -136,6 +135,5 @@ class AllLogbook {
     "updated_by": updatedBy,
     "weight": weight,
     "workday": workday,
-    "destiny": destiny
   };
 }

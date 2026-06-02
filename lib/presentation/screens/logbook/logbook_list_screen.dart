@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -16,27 +19,29 @@ class LogbookListScreen extends ConsumerStatefulWidget  {
 class _LogbookListScreenState extends ConsumerState<LogbookListScreen> {
   String searchText = '';
 
+  Timer? _debounce;
+
   @override
   void initState() {
     super.initState();
-    ref.read(getHistoryLogbooks.notifier).load();
+    ref.read(getHistoryLogbooks.notifier).load(
+      filters:{
+        "page": 1,
+        "rows": 20,
+      }
+    );
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    super.dispose();
   }
   
 
   @override
   Widget build(BuildContext context) {
     final historyLogbooks = ref.watch(getHistoryLogbooks);
-    final filtered = historyLogbooks.where((item) {
-      final text = searchText.toLowerCase();
-
-      final shippingGuide = (item.shippingGuide ?? '').toLowerCase();
-      final truckLicense = (item.truckLicense).toLowerCase();
-      final nameDriver = (item.nameDriver ?? '').toLowerCase();
-      final nameCategory = (item.nameCategory ?? '').toLowerCase();
-
-      return nameDriver.contains(text) || shippingGuide.contains(text) || truckLicense.contains(text)
-      || nameCategory.contains(text);
-    }).toList();
 
     return Scaffold(
       appBar: PreferredSize(
@@ -53,18 +58,68 @@ class _LogbookListScreenState extends ConsumerState<LogbookListScreen> {
           child: Column(
             children: [
               SearchBarWidget(
-                onChanged: (value) {
-                  setState(() {
-                    searchText = value;
-                  });
-                },
+                onChanged: _onSearchChanged,
               ),
               const SizedBox(height: 30,),
-              Expanded(child: LogbooksList(items: filtered)),
+              Expanded(
+                child: LogbooksList(
+                  items: historyLogbooks,
+                  onFilterDate: (range, page, append) async {
+                    DateTime? endDate;
+
+                    if (range != null) {
+                      endDate = DateTime(
+                        range.end.year,
+                        range.end.month,
+                        range.end.day,
+                        23,
+                        59,
+                        59,
+                      );
+                    }
+                    print(page);
+                    await ref.read(getHistoryLogbooks.notifier).load(
+                      filters: {
+                        "page": page,
+                        "rows": 20,
+
+                        if (range != null)
+                          "start_date": range.start.toIso8601String(),
+
+                        if (endDate != null)
+                          "end_date": formatDateToApi(endDate),
+                      },
+
+                      append: append,
+                    );
+                  },
+                ),
+              ),
             ],
           )
         ),
       ),
     );
+  }
+
+
+  void _onSearchChanged(String value) {
+    _debounce?.cancel();
+
+    _debounce = Timer(const Duration(milliseconds: 750), () async {
+      if (!mounted) return;
+
+      setState(() {
+        searchText = value;
+      });
+
+      await ref.read(getHistoryLogbooks.notifier).load(
+        filters: {
+          "first": 1,
+          "rows": 20,
+          "search": value,
+        },
+      );
+    });
   }
 }

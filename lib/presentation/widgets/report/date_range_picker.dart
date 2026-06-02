@@ -163,6 +163,36 @@ class _DateRangePickerState extends State<DateRangePicker> {
                 ),
               ),
             ),
+            const SizedBox(height: 12),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  foregroundColor: Colors.white,
+                  side: const BorderSide(
+                    color: Color.fromARGB(190, 58, 199, 199),
+                    width: 1.5,
+                  ),
+                ),
+                onPressed: () {
+                  // Retorna un DateTimeRange especial para indicar "limpiar"
+                  // Usamos una fecha especial (año 1969) como marcador
+                  final clearMarker = DateTimeRange(
+                    start: DateTime(1969, 1, 1),
+                    end: DateTime(1969, 1, 1),
+                  );
+                  Navigator.of(context).pop(clearMarker);
+                },
+                child: const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 14),
+                  child: Text(
+                    'Limpiar',
+                    style: TextStyle(fontWeight: FontWeight.w900),
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),

@@ -43,6 +43,8 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
   final _truckLicenseCtrl = TextEditingController();
   final _nameDriverCtrl = TextEditingController();
 
+  bool _isInitializing = true;
+
   List<Uint8List?> _selectedImages = [];
   final ImagePicker _imagePicker = ImagePicker();
 
@@ -68,16 +70,21 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
 
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      await Future.delayed(const Duration(seconds: 2));
+      await Future.wait([
+        ref.read(getAllCategories.notifier).load(),
+        ref.read(getGroupBusinessByIdBusiness.notifier).load(),
+        ref.read(getAllUnitiesWeight.notifier).load(),
+        ref.read(getAllAuthorized.notifier).load(),
+        ref.read(getAllDestinyIntern.notifier).load(),
+      ]);
 
-      ref.read(getAllCategories.notifier).load();
-      ref.read(getGroupBusinessByIdBusiness.notifier).load();
-      ref.read(getAllUnitiesWeight.notifier).load();
-      ref.read(getAllAuthorized.notifier).load();
-      ref.read(getAllDestinyIntern.notifier).load();
+      if (!mounted) return;
+
+      setState(() {
+        _isInitializing = false;
+      });
+
     });
-
-
   }
 
   @override
@@ -454,6 +461,43 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
         borderSide: BorderSide(color: Color.fromARGB(190, 58, 199, 199)),
       ),
     );
+
+    if (_isInitializing) {
+      return Center(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Align(
+              alignment: Alignment.center,
+              child: SizedBox(
+                width: 280,
+                child:
+                  Text(
+                    'Cargando formulario...',
+                    textAlign: TextAlign.center,
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    softWrap: true,
+                  ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                color: Colors.white,
+                strokeWidth: 2,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
 
     return Card(
       color: const Color.fromARGB(0, 150, 60, 60),
