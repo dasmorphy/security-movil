@@ -71,3 +71,4 @@ export 'package:zentinel/presentation/widgets/dashboard/status_progress_bar.dart
 export 'package:zentinel/presentation/widgets/dashboard/shipment_dispatch.dart';
 export 'package:zentinel/presentation/widgets/headers/header_biomar_offline.dart';
 export 'package:zentinel/presentation/widgets/dispatch/received_sku_item.dart';
+export 'package:zentinel/presentation/widgets/forms/employee_intern_form.dart';

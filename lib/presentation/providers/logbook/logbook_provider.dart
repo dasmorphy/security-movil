@@ -8,6 +8,7 @@ import 'package:zentinel/data/models/hive/unity_weight_model.dart';
 import 'package:zentinel/data/models/hive/vehicle_type_model.dart';
 import 'package:zentinel/data/models/hive/group_business_model.dart';
 import 'package:zentinel/domain/entities/all_logbook.dart';
+import 'package:zentinel/domain/entities/api_response.dart';
 import 'package:zentinel/domain/entities/authorized.dart';
 import 'package:zentinel/domain/entities/category.dart';
 import 'package:zentinel/domain/entities/destiny_intern.dart';
@@ -287,6 +288,12 @@ final saveOutLogbookProvider =
   return OutLogbookNotifier(repo);
 });
 
+final saveEmployeeInternProvider =
+    StateNotifierProvider<FetchApiResponse, AsyncValue<ApiResponse<dynamic>>>((ref) {
+  final repo = ref.watch(logbookEntryRepositoryProvider);
+  return FetchApiResponse(repo);
+});
+
 final graphLogbookProvider =
     StateNotifierProvider<ObjectCatalogNotifier<GraphLogbook>, GraphLogbook?>((ref) {
   final repo = ref.watch(logbookEntryRepositoryProvider);
@@ -457,6 +464,28 @@ class OutLogbookNotifier extends StateNotifier<AsyncValue<bool>> {
   }
 }
 
+class FetchApiResponse extends StateNotifier<AsyncValue<ApiResponse>> {
+  final LogbookEntryRepository repository;
+  FetchApiResponse(this.repository) : super(AsyncData(ApiResponse(success: false)));
+
+  Future<ApiResponse> saveEmployeeIntern(Map<String, dynamic> data) async {
+    state = const AsyncLoading();
+    try {
+      final response = await repository.saveEmployeeIntern(data);
+      state = AsyncData(response);
+      return response;
+    } catch (e, st) {
+      print('Error out E, $e');
+      print('Error out ST, $st');
+      state = AsyncError(e, st);
+      return ApiResponse(
+        success: false,
+        message: e.toString(),
+      );
+    }
+  }
+
+}
 
 class ReportDownloadNotifier extends StateNotifier<void> {
   final LogbookEntryRepository repository;

@@ -102,6 +102,11 @@ final appRouter = GoRouter(
               isProductTerm: isProductTerm,
             );
           },
+        ),
+        GoRoute(
+          path: 'new-employee',
+          name: NewEmployeeScreen.name,
+          builder: (context, state) => const NewEmployeeScreen()
         )
       ]
     ),

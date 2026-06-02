@@ -81,6 +81,19 @@ class _BasicServicesStionState extends ConsumerState<BasicServicesSection> {
                     },
                   ),
                 ),
+
+              if (userData.hasPermission(Permissions.nuevaBitacoraSalida))
+                BasicServiceCard(
+                  iconImage: 'iconsalida',
+                  label: 'Personal interno',
+                  childWidget: ExitReportForm(
+                    onSubmit: (data) async {
+                      return await ref
+                          .read(saveOutLogbookProvider.notifier)
+                          .saveLogbookOut(data);
+                    },
+                  ),
+                ),
             ],
           ),
 

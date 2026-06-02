@@ -6,6 +6,7 @@ import 'package:dio/dio.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/domain/datasources/logbook_entry_datasource.dart';
 import 'package:zentinel/domain/entities/all_logbook.dart';
+import 'package:zentinel/domain/entities/api_response.dart';
 import 'package:zentinel/domain/entities/authorized.dart';
 import 'package:zentinel/domain/entities/category.dart';
 import 'package:zentinel/domain/entities/destiny_intern.dart';
@@ -279,5 +280,68 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
     );
     final GraphLogbook graphsJson = GraphLogbook.fromJson(response.data['data']);
     return graphsJson;
+  }
+  
+  @override
+  Future<ApiResponse<dynamic>> saveEmployeeIntern(Map<String, dynamic> data) async {
+    try {
+      final images = data['images'] as List<Uint8List>?;
+      final employeeData = Map<String, dynamic>.from(data);
+      employeeData.remove('images');
+      employeeData['channel'] = 'ZENTINEL';
+      final employeeJson = jsonEncode(employeeData);
+      final employeeBytes = utf8.encode(employeeJson);
+
+      final formData = FormData();
+
+      formData.files.add(
+        MapEntry(
+          'employee_data',
+          MultipartFile.fromBytes(
+            employeeBytes,
+            filename: 'employee_data.json',
+            contentType: MediaType('application', 'json'),
+          ),
+        ),
+      );
+
+      // NUEVO: usar Uint8List directamente
+      if (images != null && images.isNotEmpty) {
+        for (var i = 0; i < images.length; i++) {
+          formData.files.add(
+            MapEntry(
+              'images',
+              MultipartFile.fromBytes(
+                images[i],
+                filename: 'image_$i.webp',         // nombre con índice
+                contentType: MediaType('image', 'webp'),
+              ),
+            ),
+          );
+        }
+      }
+
+      // Aquí puedes agregar la lógica para enviar el JSON al backend usando Dio
+      final response = await dio.post(
+        '/rest/zent-logbook-api/v1.0/employee-intern',
+        data: formData,
+        options: onlyError(),
+      );
+
+      final body = response.data;
+
+      return ApiResponse(
+        success: response.statusCode == 200,
+        errorCode: body['error_code'],
+        message: body['message'],
+      );
+    } catch (e) {
+      print('Error al guardar el personal: $e');
+      return ApiResponse(
+        success: false,
+        errorCode: 'update_error',
+        message: 'Error al guardar el personal',
+      );
+    }
   }
 }
