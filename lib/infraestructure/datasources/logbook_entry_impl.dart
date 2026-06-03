@@ -10,6 +10,7 @@ import 'package:zentinel/domain/entities/api_response.dart';
 import 'package:zentinel/domain/entities/authorized.dart';
 import 'package:zentinel/domain/entities/category.dart';
 import 'package:zentinel/domain/entities/destiny_intern.dart';
+import 'package:zentinel/domain/entities/employee_intern.dart';
 import 'package:zentinel/domain/entities/graph_logbook.dart';
 import 'package:zentinel/domain/entities/group_business.dart';
 import 'package:zentinel/domain/entities/unity_weight.dart';
@@ -285,9 +286,9 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
   @override
   Future<ApiResponse<dynamic>> saveEmployeeIntern(Map<String, dynamic> data) async {
     try {
-      final images = data['images'] as List<Uint8List>?;
+      final images = data['photo'] as List<Uint8List>?;
       final employeeData = Map<String, dynamic>.from(data);
-      employeeData.remove('images');
+      employeeData.remove('photo');
       employeeData['channel'] = 'ZENTINEL';
       final employeeJson = jsonEncode(employeeData);
       final employeeBytes = utf8.encode(employeeJson);
@@ -343,5 +344,22 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
         message: 'Error al guardar el personal',
       );
     }
+  }
+  
+  @override
+  Future<List<EmployeeIntern>> getEmployeeInterns(Map<String, dynamic> filters) async {
+    final response = await dio.get(
+      '/rest/zent-logbook-api/v1.0/employee-intern?start_date=${filters['start_date']}&end_date=${filters['end_date']}',
+      options: Options(
+        headers: {
+          'externalTransactionId': uuid, 
+          'channel': 'ZENTINEL'
+        },
+      ),
+    );
+    final List<EmployeeIntern> graphsJson = (response.data['data'] as List)
+      .map((json) => EmployeeIntern.fromJson(json))
+      .toList();
+    return graphsJson;
   }
 }

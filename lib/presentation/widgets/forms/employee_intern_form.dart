@@ -14,9 +14,8 @@ import 'package:zentinel/presentation/widgets/widgets.dart';
 import 'package:zentinel/service/pending_request_service.dart';
 
 class EmployeeInternForm extends ConsumerStatefulWidget {
-  final AllLogbook? preloadedData;
   final Future<ApiResponse<dynamic>> Function(Map<String, dynamic>)? onSubmit;
-  const EmployeeInternForm({super.key, this.onSubmit, this.preloadedData});
+  const EmployeeInternForm({super.key, this.onSubmit});
 
   @override
   ConsumerState<EmployeeInternForm> createState() => _EmployeeInternFormState();
@@ -26,39 +25,26 @@ class _EmployeeInternFormState extends ConsumerState<EmployeeInternForm> {
   final _formKey = GlobalKey<FormState>();
   String _categoryEntry = '0';
   String _groupBusiness = '0';
-  int _minImages = 5;
-  String _unityId = '0';
-  double _latitude = -0.1865936;
-  double _longitude = -78.5953478;
   bool isLoading = false;
   bool imagesMinError = false;
   bool imagesMaxError = false;
   String _authorized = '0';
 
-  final _guideCtrl = TextEditingController();
-  final _quantityCtrl = TextEditingController();
-  final _weightCtrl = TextEditingController();
-  final _truckLicenseCtrl = TextEditingController();
-  final _nameDriverCtrl = TextEditingController();
-  final _destinyCtrl = TextEditingController();
+  final _dniCtrl = TextEditingController();
+  final _positionCtrl = TextEditingController();
   final _observationsCtrl = TextEditingController();
-  final _personWithdrawsCtrl = TextEditingController();
-  
-  List<Uint8List?> _selectedImages = [];
-  final ImagePicker _imagePicker = ImagePicker();
+  final _namesCtrl = TextEditingController();
+  final _lastnameCtrl = TextEditingController();
 
-  final FocusNode _guideFocus = FocusNode();
-  final FocusNode _weightFocus = FocusNode();
-  final FocusNode _truckLicenseFocus = FocusNode();
-  final FocusNode _nameDriverFocus = FocusNode();
-  final FocusNode _authorizedFocus = FocusNode();
-  final FocusNode _quantityFocus = FocusNode();
-  final FocusNode _descFocus = FocusNode();
+  List<Uint8List?> _selectedImages = [];
+
+  final FocusNode _dniFocus = FocusNode();
+  final FocusNode _positionFocus = FocusNode();
   final FocusNode _groupBusinessFocus = FocusNode();
   final FocusNode _observationsFocus = FocusNode();
   final FocusNode _categoryEntryFocus = FocusNode();
-  final FocusNode _personWithdrawsFocus = FocusNode();
-  final FocusNode _unitFocus = FocusNode();
+  final FocusNode _namesFocus = FocusNode();
+  final FocusNode _lastnameFocus = FocusNode();
   bool isPickingImage = false;
 
   bool _isInitializing = true;
@@ -66,16 +52,11 @@ class _EmployeeInternFormState extends ConsumerState<EmployeeInternForm> {
   @override
   void initState() {
     super.initState();
-    _getUserLocation();
-
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await Future.wait([
         ref.read(getAllCategories.notifier).load(),
         ref.read(getGroupBusinessByIdBusiness.notifier).load(),
-        ref.read(getAllUnitiesWeight.notifier).load(),
-        ref.read(getAllAuthorized.notifier).load(),
-        ref.read(getAllDestinyIntern.notifier).load(),
       ]);
 
       if (!mounted) return;
@@ -83,152 +64,18 @@ class _EmployeeInternFormState extends ConsumerState<EmployeeInternForm> {
       setState(() {
         _isInitializing = false;
       });
-
     });
-
-    if (widget.preloadedData != null && mounted) {
-      _loadPreloadedData(widget.preloadedData!);
-    }
   }
-  
+
   @override
   void dispose() {
-    _guideCtrl.dispose();
-    _quantityCtrl.dispose();
-    _truckLicenseCtrl.dispose();
-    _nameDriverCtrl.dispose();
+    _dniCtrl.dispose();
+    _positionCtrl.dispose();
+    _lastnameCtrl.dispose();
     _observationsCtrl.dispose();
-    _quantityFocus.dispose();
-    _descFocus.dispose();
     _categoryEntryFocus.dispose();
     _groupBusinessFocus.dispose();
     super.dispose();
-  }
-
-  void _getUserLocation() async {
-    final pos = await getLocation();
-
-    if (!mounted) return;
-
-    if (pos == null) {
-      if (mounted) {
-        showDialog(
-          context: context,
-          builder: (_) => const AlertDialog(
-            title: Text("Ubicación no disponible"),
-            content: Text("Activa el GPS o concede permisos."),
-          ),
-        );
-      }
-      return;
-    }
-
-    setState(() {
-      _latitude = pos.latitude;
-      _longitude = pos.longitude;
-    });
-  }
-
-  Future<void> _captureImageFromCamera() async {
-    // Evita doble llamada
-    if (isPickingImage) return;
-
-    if (_selectedImages.length >= 10) {
-      if (mounted) setState(() => imagesMaxError = true);
-      return;
-    }
-
-    setState(() => isPickingImage = true);
-
-    try {
-      final XFile? image = await _imagePicker.pickImage(
-        source: ImageSource.camera,
-        imageQuality: 60,
-        maxWidth: 1024,
-        maxHeight: 1024,
-      );
-
-      if (image != null && mounted) {
-        setState(() {
-          _selectedImages.add(null);
-          imagesMinError = false;
-          imagesMaxError = false;
-        });
-
-        final placeholderIndex = _selectedImages.length - 1;
-        final originalFile = File(image.path);
-        final webpFile = await convertToWebP(originalFile);
-
-        if (!mounted) return;
-
-        if (webpFile == null) {
-          setState(() {
-            if (placeholderIndex < _selectedImages.length &&
-                _selectedImages[placeholderIndex] == null) {
-              _selectedImages.removeAt(placeholderIndex);
-            }
-          });
-          showDialog(
-            context: context,
-            builder: (_) => ShowDialogWidget(title: 'Error al convertir imagen'),
-          );
-          return;
-        }
-
-        print("Peso WebP: ${(webpFile.length / 1024 / 1024).toStringAsFixed(2)} MB");
-
-        if (mounted) {
-          setState(() => _selectedImages[placeholderIndex] = webpFile);
-        }
-      }
-    } on PlatformException catch (e) {
-      if (e.code == 'already_active') return; // ignora silenciosamente
-      if (mounted) {
-        if (_selectedImages.isNotEmpty && _selectedImages.last == null) {
-          setState(() => _selectedImages.removeLast());
-        }
-        showDialog(
-          context: context,
-          builder: (_) => ShowDialogWidget(
-            title: 'Error al capturar imagen',
-            content: e.message ?? '$e',
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        if (_selectedImages.isNotEmpty && _selectedImages.last == null) {
-          setState(() => _selectedImages.removeLast());
-        }
-        showDialog(
-          context: context,
-          builder: (_) => ShowDialogWidget(
-            title: 'Error al capturar imagen',
-            content: '$e',
-          ),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => isPickingImage = false);
-    }
-  }
-
-  void _loadPreloadedData(AllLogbook data) {
-    if (!mounted) return;
-
-    setState(() {
-      _categoryEntry = data.categoryId.toString();
-      _guideCtrl.text = data.shippingGuide ?? '';
-      _unityId = data.unityId?.toString() ?? '0';
-      _truckLicenseCtrl.text = data.truckLicense;
-      _nameDriverCtrl.text = data.nameDriver ?? '';
-    });
-  }
-
-  void _removeImage(int index) {
-    setState(() {
-      _selectedImages.removeAt(index);
-    });
   }
 
   void _submit() async {
@@ -241,48 +88,30 @@ class _EmployeeInternFormState extends ConsumerState<EmployeeInternForm> {
       return;
     }
 
-    // if (_latitude ==  -0.1865936 || _longitude == -78.5953478) {
-    //   if (mounted) {
-    //     showDialog(
-    //       context: context,
-    //       builder: (_) => const AlertDialog(
-    //         title: Text("Ubicación no disponible"),
-    //         content: Text("Activa el GPS o concede permisos."),
-    //       ),
-    //     );
-    //   }
-    //   setState(() => isLoading = false);
+    // if (_selectedImages.isEmpty) {
+    //   setState(() {
+    //     imagesMinError = true;
+    //     isLoading = false;
+    //   });
     //   return;
     // }
+
+    // if (_selectedImages.length > 1) {
+    //   setState(() {
+    //     imagesMaxError = true;
+    //     isLoading = false;
+    //   });
+    //   return;
+    // }
+
     
-    final categories = ref.read(getAllCategories);
-
-    final categoryMap = {
-      for (var c in categories) c.idCategory.toString(): c
-    };
-
-    final categoryName = categoryMap[_categoryEntry]?.nameCategory;
-
-    final requiredImages =
-        categoryName?.toLowerCase() == 'personal interno'
-          ? 3
-          : 5;
-
-    _minImages = requiredImages;
-
-    if (_selectedImages.length < requiredImages) {
-      setState(() {
-        imagesMinError = true;
-        isLoading = false;
-      });
-      return;
-    }
-
-    if (_selectedImages.length > 10) {
-      setState(() {
-        imagesMaxError = true;
-        isLoading = false;
-      });
+    if (_dniCtrl.text.length != 10) {
+      setState(() => isLoading = false);
+      GlobalLoadingBottomSheet.show(
+        status: OverlayStatus.error,
+        message: 'La cédula debe tener 10 caracteres',
+        autoDismiss: const Duration(seconds: 3),
+      );
       return;
     }
 
@@ -291,7 +120,9 @@ class _EmployeeInternFormState extends ConsumerState<EmployeeInternForm> {
     //Usuario no cargado o sesión inválida
     if (!authState.hasValue || authState.value == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Sesión no válida. Vuelva a iniciar sesión')),
+        const SnackBar(
+          content: Text('Sesión no válida. Vuelva a iniciar sesión'),
+        ),
       );
       setState(() => isLoading = false);
       return;
@@ -301,27 +132,19 @@ class _EmployeeInternFormState extends ConsumerState<EmployeeInternForm> {
     final userHive = ref.watch(userProfileProvider(userData.email));
 
     final data = {
-      "id_logbook_entry": widget.preloadedData?.recordId,
       "external_transaction_id": Uuid().v4(),
-      "id_unity": int.parse(_unityId) == 0 ? null : int.parse(_unityId),
-      "id_category": int.parse(_categoryEntry),
-      "shipping_guide": _guideCtrl.text.trim(),
-      "name_driver": _nameDriverCtrl.text.trim(),
-      "quantity": int.tryParse(_quantityCtrl.text) == 0 ? null : int.tryParse(_quantityCtrl.text),
-      "weight": int.tryParse(_weightCtrl.text),
-      "truck_license": _truckLicenseCtrl.text.trim(),
-      "lat": _latitude.toString(),
-      "long": _longitude.toString(),
-      "person_withdraws": _personWithdrawsCtrl.text.trim(),
-      "destiny": _destinyCtrl.text.trim(),
-      "authorized_by": _authorized,
+      "dni": _dniCtrl.text.trim(),
+      "lastname": _lastnameCtrl.text.trim(),
+      "names": _namesCtrl.text.trim(),
+      "position": _positionCtrl.text.trim(),
       "observations": _observationsCtrl.text.trim(),
-      "created_by": userData.user,
+      "user": userData.user,
       "name_user": userHive.value?.name ?? userData.attributes['fullname'],
-      "id_group_business": userData.attributes['group_business'] ?? int.parse(_groupBusiness),
-      "images": _selectedImages
-        .whereType<Uint8List>()
-        .toList(), // Lista de Uint8List directo, sin base64
+      "group_business_id":
+          userData.attributes['group_business'] ?? int.parse(_groupBusiness),
+      "photo": _selectedImages
+          .whereType<Uint8List>()
+          .toList(), // Lista de Uint8List directo, sin base64
     };
 
     // Verificar conexión a internet
@@ -339,7 +162,7 @@ class _EmployeeInternFormState extends ConsumerState<EmployeeInternForm> {
         if (Navigator.canPop(context)) {
           context.pop(); // Cerrar el formulario
         }
-        
+
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             duration: Duration(seconds: 4),
@@ -369,7 +192,7 @@ class _EmployeeInternFormState extends ConsumerState<EmployeeInternForm> {
       if (Navigator.canPop(context)) {
         context.pop(); // Cerrar el formulario
       }
-      
+
       // if (success) {
       //   if (widget.preloadedData != null) {
       //     ref.read(getHistoryLogbooks.notifier).load();
@@ -397,17 +220,13 @@ class _EmployeeInternFormState extends ConsumerState<EmployeeInternForm> {
     _selectedImages = [];
     _formKey.currentState?.reset();
     _categoryEntry = '0';
-    _unityId = '0';
     _groupBusiness = '0';
-    _guideCtrl.clear();
-    _nameDriverCtrl.clear();
-    _quantityCtrl.clear();
-    _weightCtrl.clear();
-    _truckLicenseCtrl.clear();
+    _dniCtrl.clear();
+    _lastnameCtrl.clear();
+    _namesCtrl.clear();
     _authorized = '0';
     _observationsCtrl.clear();
-    _personWithdrawsCtrl.clear();
-    _destinyCtrl.clear();
+    _namesCtrl.clear();
     imagesMinError = false;
     imagesMaxError = false;
   }
@@ -420,62 +239,19 @@ class _EmployeeInternFormState extends ConsumerState<EmployeeInternForm> {
     //Usuario no cargado o sesión inválida
     if (!authState.hasValue || authState.value == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Sesión no válida. Vuelva a iniciar sesión')),
+        const SnackBar(
+          content: Text('Sesión no válida. Vuelva a iniciar sesión'),
+        ),
       );
     }
 
     final userData = authState.value!;
     final categories = ref.watch(getAllCategories);
-    final authorized = ref.watch(getAllAuthorized);
-
-    if (widget.preloadedData != null && widget.preloadedData!.authorizedBy.isNotEmpty) {
-      final authorizedExists = authorized.any(
-        (item) => item.name == widget.preloadedData!.authorizedBy,
-      );
-
-      setState(() {
-        _authorized = authorizedExists ? widget.preloadedData!.authorizedBy : '0';
-      });
-    }
 
     final groupBusiness = ref.watch(getGroupBusinessByIdBusiness);
-    final unitiesWeight = ref.watch(getAllUnitiesWeight);    
     final messageValidatorEmpty = 'Este campo es obligatorio';
     final fieldFill = const Color.fromARGB(255, 20, 21, 23);
     final borderRadius = BorderRadius.circular(8.0);
-
-    final categoryMap = {
-      for (var c in categories) c.idCategory.toString(): c
-    };
-
-    final categoryName = categoryMap[_categoryEntry]?.nameCategory;    
-    const hiddenWeightCategories = {
-      'Ejecutivos de expalsa',
-      'Personal interno',
-      'Personal externo',
-      'Cuadrillas para pesca'
-    };
-
-    const hiddenQuantityCategories = {
-      'Camarón',
-      'Tilapia',
-    };
-
-    const hiddenEjectCategories = {
-      'Ejecutivos de expalsa',
-    };
-
-    const hiddenPersonalCategories = {
-      'Personal interno',
-      'Personal externo',
-    };
-
-
-    final hideWeight = hiddenWeightCategories.contains(categoryName);
-    final hideQuantity = hiddenQuantityCategories.contains(categoryName);
-    final hideEject = hiddenEjectCategories.contains(categoryName);
-    final hidePersonal = hiddenPersonalCategories.contains(categoryName);
-    final isDestinyRequired = categoryName == 'Camarón';
 
     InputDecoration styleDecoration() => InputDecoration(
       filled: true,
@@ -501,17 +277,16 @@ class _EmployeeInternFormState extends ConsumerState<EmployeeInternForm> {
               alignment: Alignment.center,
               child: SizedBox(
                 width: 280,
-                child:
-                  Text(
-                    'Cargando formulario...',
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    softWrap: true,
+                child: Text(
+                  'Cargando formulario...',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
                   ),
+                  softWrap: true,
+                ),
               ),
             ),
             const SizedBox(height: 20),
@@ -528,535 +303,256 @@ class _EmployeeInternFormState extends ConsumerState<EmployeeInternForm> {
       );
     }
 
-    return Card(
-      color: const Color.fromARGB(0, 150, 60, 60),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      margin: const EdgeInsets.only(bottom: 16),
-      child: Form(
-        key: _formKey,
-        child: SingleChildScrollView(
-          keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+    return Column(
+      children: [
+        Expanded(
+          child: Form(
+            key: _formKey,
+            child: SingleChildScrollView(
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 20),
 
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 50,
-                  height: 5,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                const SizedBox(height: 30),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: SizedBox(
-                    width: 280, // ajusta a tu diseño
-                    child: Text(
-                      'Registro Integral de Salida',
-                      textAlign: TextAlign.left,
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        color: Colors.white,
-                        fontSize: 25,
-                        fontWeight: FontWeight.bold,
+                  SizedBox(
+                    width: double.infinity,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        // vertical: 6,
+                        // horizontal: 12,
                       ),
-                      softWrap: true,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-
-                SizedBox(
-                  width: double.infinity,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      // vertical: 6,
-                      // horizontal: 12,
-                    ),
-                    child: Row(
-                      children: [
-                        if (userData.attributes['name_group_business'] != null) ...[
-                          const Icon(Icons.location_on, color: Colors.red),
-                          const SizedBox(width: 8),
+                      child: Row(
+                        children: [
+                          if (userData.attributes['name_group_business'] !=
+                              null) ...[
+                            const Icon(Icons.location_on, color: Colors.red),
+                            const SizedBox(width: 8),
                             Text(
                               userData.attributes['name_group_business'],
                               style: const TextStyle(color: Colors.white),
-                          ),
-                        ] 
-                        else ...[
-                          Expanded(
-                            child: Column(
-                              children: [
-                                CustomFieldLabelRequired(txtLabel: 'Localidad'),
-                                const SizedBox(height: 6),
-                                GlowDropdownFormField<String>(
-                                  value: _groupBusiness,
-                                  focusNode: _groupBusinessFocus,
-                                  decoration: styleDecoration(),
-                                  items: [
-                                    const DropdownMenuItem(
-                                      value: '0',
-                                      child: Text('Seleccione una opción'),
-                                    ),
-                                    ...groupBusiness.map(
-                                      (c) => DropdownMenuItem(
-                                        value: c.idGroupBusiness.toString(),
-                                        child: Text(c.name),
-                                      ),
-                                    ),
-                                  ],
-                                  onChanged: (v) {
-                                    if (v != null) {
-                                      setState(() => _groupBusiness = v);
-                                    }
-                                  },
-                                  validator: (v) {
-                                    if (v == '0' || v == null || v.trim().isEmpty) {
-                                      return messageValidatorEmpty;
-                                    }
-                                    return null;
-                                  },
-                                ),
-                              ],
                             ),
-                          ),
-
-                        ],
-                      ],
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 12),
-                CustomFieldLabelRequired(txtLabel: 'Categoría de salida'),
-                GlowDropdownFormField2<String>(
-                  value: _categoryEntry,
-                  focusNode: _categoryEntryFocus,
-                  decoration: styleDecoration(),
-                  items: [
-                    DropdownMenuItem(
-                      value: '0',
-                      child: Text('Seleccione una opción', style: TextStyle(color: Colors.white),),
-                    ),
-                    ...categories.map(
-                      (c) => DropdownMenuItem(
-                        value: c.idCategory.toString(),
-                        child: Text(c.nameCategory, style: TextStyle(color: Colors.white),),
-                      ),
-                    ),
-                  ],
-                  onChanged: (v) {
-                    if (v != null) {
-                      setState(() => _categoryEntry = v);
-
-                      if (!hideWeight) {
-                        _guideCtrl.clear();
-                        _weightCtrl.clear();
-                      }
-
-                      if (!hideQuantity) {
-                        _quantityCtrl.clear();
-                        _personWithdrawsCtrl.clear();
-                      }
-
-                      if (!hideEject || !hidePersonal) {
-                        _unityId = '0';
-                        _quantityCtrl.clear();
-                      }
-
-                      if (!hideEject) {
-                        _authorized = '0';
-                      }
-
-                    }
-                  },
-                  validator: (v) {
-                    if (v=='0' || v == null || v.trim().isEmpty) {
-                      return messageValidatorEmpty;
-                    }
-                    return null;
-                  },
-                ),
-
-                if (!hideWeight) ...[
-                  const SizedBox(height: 12),
-                  CustomFieldLabelRequired(txtLabel: 'Guía / Documento'),
-                  GlowTextFormField(
-                    controller: _guideCtrl,
-                    focusNode: _guideFocus,
-                    validator: (v) {
-                      if (v == null || v.trim().isEmpty) {
-                        return messageValidatorEmpty;
-                      }
-                      return null;
-                    },
-                  ),
-                ],
-
-                if (hideQuantity && !hideEject && !hidePersonal) ...[
-                  const SizedBox(height: 12),
-                  CustomFieldLabelRequired(txtLabel: 'Cantidad de Bines'),
-                  GlowTextFormField(
-                    controller: _quantityCtrl,
-                    focusNode: _quantityFocus,
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    validator: (v) {
-                      if (v == null || v.isEmpty) return messageValidatorEmpty;
-                      final n = int.tryParse(v);
-                      if (n == null) return 'Cantidad inválida';
-                      return null;
-                    },
-                  ),
-
-                  const SizedBox(height: 12),
-                  CustomFieldLabelRequired(txtLabel: 'Custodia que Retira el Producto'),
-                  GlowTextFormField(
-                    controller: _personWithdrawsCtrl,
-                    focusNode: _personWithdrawsFocus,
-                    validator: (v) {
-                      if (v == null || v.trim().isEmpty) {
-                        return messageValidatorEmpty;
-                      }
-                      return null;
-                    },
-                  ),
-                ],
-
-                if (!hideEject && !hidePersonal) ...[
-                  const SizedBox(height: 12),
-                  CustomFieldLabelRequired(txtLabel: 'Unidad'),
-                  GlowDropdownFormField<String>(
-                    value: _unityId,
-                    focusNode: _unitFocus,
-                    decoration: styleDecoration(),
-                    items: [
-                      DropdownMenuItem(
-                        enabled: false,
-                        value: '0',
-                        child: Text('Seleccione una opción'),
-                      ),
-                      ...unitiesWeight.map(
-                        (c) => DropdownMenuItem(
-                          value: c.idUnity.toString(),
-                          child: Text('${c.name} - ${c.code}'),
-                        ),
-                      ),
-                    ],
-                    onChanged: (v) {
-                      if (v != null) {
-                        setState(() => _unityId = v);
-                      }
-                    },
-                    validator: (v) {
-                      if (v == '0' || v == null || v.trim().isEmpty) {
-                        return messageValidatorEmpty;
-                      }
-                      return null;
-                    },
-                  ),
-                ],
-
-                if (!hideWeight) ...[
-                  const SizedBox(height: 12),
-                  CustomFieldLabelRequired(txtLabel: 'Peso', isRequired: false),
-                  GlowTextFormField(
-                    controller: _weightCtrl,
-                    focusNode: _weightFocus,
-                    keyboardType: TextInputType.number,
-                    // hint: _unit == '0' ? '' : _unit,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                    validator: (v) {
-                      return null;
-                    },
-                  ),
-                ],
-
-                const SizedBox(height: 12),
-                CustomFieldLabelRequired(txtLabel: 'Placa del Camión'),
-                GlowTextFormField(
-                  maxLength: 10,
-                  controller: _truckLicenseCtrl,
-                  focusNode: _truckLicenseFocus,
-                  validator: (v) {
-                    if (v == null || v.trim().isEmpty) {
-                      return messageValidatorEmpty;
-                    }
-                    return null;
-                  },
-                ),
-
-                const SizedBox(height: 12),
-                CustomFieldLabelRequired(txtLabel: 'Nombre del Chofer'),
-                GlowTextFormField(
-                  controller: _nameDriverCtrl,
-                  focusNode: _nameDriverFocus,
-                  validator: (v) {
-                    if (v == null || v.trim().isEmpty) {
-                      return messageValidatorEmpty;
-                    }
-                    return null;
-                  },
-                ),
-
-                const SizedBox(height: 12),
-                CustomFieldLabelRequired(
-                  txtLabel: 'Destino',
-                  isRequired: isDestinyRequired,
-                ),
-                GlowTextFormField(
-                  controller: _destinyCtrl,
-                  focusNode: _descFocus,
-                  validator: (v) {
-                    if (isDestinyRequired && (v == null || v.trim().isEmpty)) {
-                      return messageValidatorEmpty;
-                    }
-                    return null;
-                  },
-                ),
-
-                if (!hideEject) ...[
-                
-                  const SizedBox(height: 12),
-                  CustomFieldLabelRequired(
-                    txtLabel: 'Autorizado por',
-                  ),
-                  GlowDropdownFormField2<String>(
-                    value: _authorized,
-                    focusNode: _authorizedFocus,
-                    decoration: styleDecoration(),
-                    items: [
-                      DropdownMenuItem(
-                        enabled: false,
-                        value: '0',
-                        child: Text('Seleccione una opción', style: TextStyle(color: Colors.white),),
-                      ),
-                      ...authorized.map(
-                        (c) => DropdownMenuItem(
-                          value: c.name,
-                          child: Text(c.name, style: TextStyle(color: Colors.white),),
-                        ),
-                      ),
-                    ],
-                    onChanged: (v) {
-                      if (v != null) {
-                        setState(() => _authorized = v);
-                      }
-                    },
-                    validator: (v) {
-                      if (v == '0' || v == null || v.trim().isEmpty) {
-                        return messageValidatorEmpty;
-                      }
-                      return null;
-                    },
-                  ),
-                ],
-
-                const SizedBox(height: 12),
-                CustomFieldLabelRequired(
-                  txtLabel: 'Observaciones',
-                  isRequired: false,
-                ),
-                GlowTextFormField(
-                  controller: _observationsCtrl,
-                  focusNode: _observationsFocus,
-                  validator: (v) {
-                    return null;
-                  },
-                ),
-
-                const SizedBox(height: 26),
-                CustomFieldLabelRequired(
-                  txtLabel: 'Imágenes desde Cámara (${_selectedImages.length}/10)',
-                ),
-                const SizedBox(height: 8),
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton.icon(
-                    onPressed: () async {
-                      // final granted = await requestCameraPermission(context);
-
-                      // if (!granted) {
-                      //   ScaffoldMessenger.of(context).showSnackBar(
-                      //     const SnackBar(
-                      //       content: Text('Permiso de cámara denegado'),
-                      //     ),
-                      //   );
-                      //   return;
-                      // }
-
-                      _captureImageFromCamera();
-                    },
-                    icon: const Icon(Icons.camera_alt, color: Color.fromARGB(189, 7, 213, 213)),
-                    label: const Text(
-                      'Capturar Imagen',
-                      style: TextStyle(color: Color.fromARGB(189, 7, 213, 213)),
-                    ),
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Color.fromARGB(189, 7, 213, 213)),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                if (_selectedImages.isNotEmpty)
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.white12),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: GridView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 3,
-                        crossAxisSpacing: 8,
-                        mainAxisSpacing: 8,
-                      ),
-                      itemCount: _selectedImages.length,
-                      itemBuilder: (context, index) {
-                        return Stack(
-                          children: [
-                            // Mostrar indicador de progreso cuando la imagen está siendo convertida (placeholder null)
-                            _selectedImages[index] != null
-                                ? Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(8),
-                                      image: DecorationImage(
-                                        image: MemoryImage(_selectedImages[index]!), // directo desde bytes
-                                        fit: BoxFit.cover,
+                          ] else ...[
+                            Expanded(
+                              child: Column(
+                                children: [
+                                  CustomFieldLabelRequired(
+                                    txtLabel: 'Localidad',
+                                  ),
+                                  const SizedBox(height: 6),
+                                  GlowDropdownFormField<String>(
+                                    value: _groupBusiness,
+                                    focusNode: _groupBusinessFocus,
+                                    decoration: styleDecoration(),
+                                    items: [
+                                      const DropdownMenuItem(
+                                        value: '0',
+                                        child: Text('Seleccione una opción'),
                                       ),
-                                    ),
-                                  )
-                                : Container(
-                                    height: double.infinity,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(8),
-                                      color: Colors.black26,
-                                    ),
-                                    child: const Center(
-                                      child: SizedBox(
-                                        width: 28,
-                                        height: 28,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2.5,
-                                          color: Colors.white,
+                                      ...groupBusiness.map(
+                                        (c) => DropdownMenuItem(
+                                          value: c.idGroupBusiness.toString(),
+                                          child: Text(c.name),
                                         ),
                                       ),
-                                    ),
+                                    ],
+                                    onChanged: (v) {
+                                      if (v != null) {
+                                        setState(() => _groupBusiness = v);
+                                      }
+                                    },
+                                    validator: (v) {
+                                      if (v == '0' ||
+                                          v == null ||
+                                          v.trim().isEmpty) {
+                                        return messageValidatorEmpty;
+                                      }
+                                      return null;
+                                    },
                                   ),
-                            Positioned(
-                              top: -8,
-                              right: -8,
-                              child: IconButton(
-                                onPressed: () => _removeImage(index),
-                                icon: const Icon(Icons.close, color: Colors.red),
-                                style: IconButton.styleFrom(
-                                  backgroundColor: Colors.black54,
-                                  iconSize: 16,
-                                ),
+                                ],
                               ),
                             ),
                           ],
-                        );
-                      },
+                        ],
+                      ),
                     ),
-                  )
-                else
-                  Center(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 20),
+                  ),
+
+                  const SizedBox(height: 12),
+                  CustomFieldLabelRequired(txtLabel: 'Cédula'),
+                  GlowTextFormField(
+                    maxLength: 10,
+                    controller: _dniCtrl,
+                    keyboardType: TextInputType.number,
+                    focusNode: _dniFocus,
+                    validator: (v) {
+                      if (v == null || v.trim().isEmpty) {
+                        return messageValidatorEmpty;
+                      }
+                      return null;
+                    },
+                  ),
+
+                  const SizedBox(height: 12),
+                  CustomFieldLabelRequired(txtLabel: 'Nombres Completos'),
+                  GlowTextFormField(
+                    controller: _namesCtrl,
+                    focusNode: _namesFocus,
+                    validator: (v) {
+                      if (v == null || v.trim().isEmpty) {
+                        return messageValidatorEmpty;
+                      }
+                      return null;
+                    },
+                  ),
+
+                  const SizedBox(height: 12),
+                  CustomFieldLabelRequired(txtLabel: 'Apellidos Completos'),
+                  GlowTextFormField(
+                    controller: _lastnameCtrl,
+                    focusNode: _lastnameFocus,
+                    validator: (v) {
+                      if (v == null || v.trim().isEmpty) {
+                        return messageValidatorEmpty;
+                      }
+                      return null;
+                    },
+                  ),
+
+                  const SizedBox(height: 12),
+                  CustomFieldLabelRequired(txtLabel: 'Cargo'),
+                  GlowTextFormField(
+                    maxLength: 10,
+                    controller: _positionCtrl,
+                    focusNode: _positionFocus,
+                    validator: (v) {
+                      if (v == null || v.trim().isEmpty) {
+                        return messageValidatorEmpty;
+                      }
+                      return null;
+                    },
+                  ),
+
+                  const SizedBox(height: 12),
+                  CustomFieldLabelRequired(
+                    txtLabel: 'Observaciones',
+                    isRequired: false,
+                  ),
+                  GlowTextFormField(
+                    controller: _observationsCtrl,
+                    focusNode: _observationsFocus,
+                    validator: (v) {
+                      return null;
+                    },
+                  ),
+
+                  CameraImagePicker(
+                    minImages: 0,
+                    maxImages: 1,
+                    onImagesChanged: (images) {
+                      print("imagenes seleccionadas ${images.length}");
+
+                      _selectedImages = images;
+                    },
+                  ),
+                  if (imagesMinError || imagesMaxError)
+                    SizedBox(
+                      width: double.infinity,
                       child: Text(
-                        'No hay imágenes capturadas',
-                        style: TextStyle(color: Colors.white54),
-                      ),
-                    ),
-                  ),
-                if (imagesMinError || imagesMaxError)
-                  SizedBox(
-                    width: double.infinity,
-                    child: Text(
-                      imagesMinError
-                          ? 'Debe subir mínimo $_minImages imagenes'
-                          : 'Debe subir máximo 10 imagenes',
-                      style: TextStyle(color: Color.fromARGB(255, 185, 28, 16)),
-                    ),
-                  ),
-                const SizedBox(height: 26),
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () {
-                          _clearCntrl();
-                          context.pop();
-                        },
-                        style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: Colors.white24),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                        ),
-                        child: const Text(
-                          'Cancelar',
-                          style: TextStyle(
-                            color: Colors.white, 
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        imagesMinError
+                            ? 'Debe subir mínimo 1 imagen'
+                            : 'Debe subir máximo 1 imagen',
+                        style: TextStyle(
+                          color: Color.fromARGB(255, 185, 28, 16),
                         ),
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: (isLoading || isPickingImage) ? null : _submit,
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
+                  const SizedBox(height: 26),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () {
+                            _clearCntrl();
+                            context.pop();
+                          },
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: Colors.white24),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
-                          backgroundColor: const Color.fromARGB(189, 7, 213, 213),
-                          disabledBackgroundColor: const Color.fromARGB(120, 7, 213, 213),
+                          child: const Text(
+                            'Cancelar',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            if (isLoading) ...[
-                              const SizedBox(
-                                width: 14,
-                                height: 14,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton(
+                          onPressed: (isLoading || isPickingImage)
+                              ? null
+                              : _submit,
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 14),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            backgroundColor: const Color.fromARGB(
+                              189,
+                              7,
+                              213,
+                              213,
+                            ),
+                            disabledBackgroundColor: const Color.fromARGB(
+                              120,
+                              7,
+                              213,
+                              213,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              if (isLoading) ...[
+                                const SizedBox(
+                                  width: 14,
+                                  height: 14,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                              ],
+                              const Text(
+                                'Guardar',
+                                style: TextStyle(
+                                  fontSize: 15,
                                   color: Colors.white,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              const SizedBox(width: 12),
                             ],
-                            const Text(
-                              'Guardar',
-                              style: TextStyle(
-                                fontSize: 15, 
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
         ),
-      ),
+      ],
     );
   }
 }

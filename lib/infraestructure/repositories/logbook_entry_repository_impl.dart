@@ -4,6 +4,7 @@ import 'package:zentinel/domain/entities/api_response.dart';
 import 'package:zentinel/domain/entities/authorized.dart';
 import 'package:zentinel/domain/entities/category.dart';
 import 'package:zentinel/domain/entities/destiny_intern.dart';
+import 'package:zentinel/domain/entities/employee_intern.dart';
 import 'package:zentinel/domain/entities/graph_logbook.dart';
 import 'package:zentinel/domain/entities/group_business.dart';
 import 'package:zentinel/domain/entities/unity_weight.dart';
@@ -68,6 +69,11 @@ class LogbookEntryRepositoryImpl extends LogbookEntryRepository {
   @override
   Future<ApiResponse<dynamic>> saveEmployeeIntern(Map<String, dynamic> data) {
     return datasource.saveEmployeeIntern(data);
+  }
+  
+  @override
+  Future<List<EmployeeIntern>> getEmployeeInterns(Map<String, dynamic> filters) {
+    return datasource.getEmployeeInterns(filters);
   }
   
 }

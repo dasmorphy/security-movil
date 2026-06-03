@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:zentinel/config/constants/permissions.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
@@ -86,13 +87,7 @@ class _BasicServicesStionState extends ConsumerState<BasicServicesSection> {
                 BasicServiceCard(
                   iconImage: 'iconsalida',
                   label: 'Personal interno',
-                  childWidget: ExitReportForm(
-                    onSubmit: (data) async {
-                      return await ref
-                          .read(saveOutLogbookProvider.notifier)
-                          .saveLogbookOut(data);
-                    },
-                  ),
+                  onTap: () => context.push('/new-employee')
                 ),
             ],
           ),

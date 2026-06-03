@@ -154,6 +154,21 @@ class HomeViewState extends ConsumerState<HomeView> {
                 ],
 
                 /// =======================
+                /// PERSONAL INTERNO
+                /// =======================
+                if (effectiveBusiness == "1" &&
+                    (userData.role == "admin_tlsg" ||
+                        userData.hasPermission(Permissions.verBitacoras))) ...[
+                  const SizedBox(height: 10),
+                  RecentListHome(
+                    title: 'Personal interno',
+                    routeLink: '/list-employee-intern',
+                    childListBuild: const ItemRecentEmployeeIntern(),
+                  ),
+                  const SizedBox(height: 30),
+                ],
+
+                /// =======================
                 /// DESPACHOS
                 /// =======================
                 if (effectiveBusiness == "2" &&

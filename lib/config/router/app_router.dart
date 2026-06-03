@@ -64,6 +64,11 @@ final appRouter = GoRouter(
           builder: (context, state) => const EntryAccessListScreen()
         ),
         GoRoute(
+          path: 'list-employee-intern',
+          name: EmployeeInternListScreen.name,
+          builder: (context, state) => const EmployeeInternListScreen()
+        ),
+        GoRoute(
           path: 'confirm-dispatch',
           name: ReceptionConfirmationScreen.name,
           builder: (context, state) {
