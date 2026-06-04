@@ -39,6 +39,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
   final _quantityCtrl = TextEditingController();
   final _weightCtrl = TextEditingController();
   final _providerCtrl = TextEditingController();
+  final _employeeCtrl = TextEditingController();
   final _observationsCtrl = TextEditingController();
   final _truckLicenseCtrl = TextEditingController();
   final _nameDriverCtrl = TextEditingController();
@@ -54,6 +55,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
   final FocusNode _nameDriverFocus = FocusNode();
   final FocusNode _weightFocus = FocusNode();
   final FocusNode _providerFocus = FocusNode();
+  final FocusNode _employeeFocus = FocusNode();
   final FocusNode _destinyFocus = FocusNode();
   final FocusNode _authorizedFocus = FocusNode();
   final FocusNode _quantityFocus = FocusNode();
@@ -92,6 +94,8 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
     _guideCtrl.dispose();
     _descCtrl.dispose();
     _quantityCtrl.dispose();
+    _weightCtrl.dispose();
+    _employeeCtrl.dispose();
     _providerCtrl.dispose();
     _nameDriverCtrl.dispose();
     _truckLicenseCtrl.dispose();
@@ -102,6 +106,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
     _groupBusinessFocus.dispose();
     _truckLicenseFocus.dispose();
     _nameDriverFocus.dispose();
+    _employeeFocus.dispose();
     super.dispose();
   }
 
@@ -303,6 +308,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
       "destiny_intern": _destiny,
       "authorized_by": _authorized,
       "observations": _observationsCtrl.text.trim(),
+      "employee_intern": int.tryParse(_employeeCtrl.text),
       "name_driver": _nameDriverCtrl.text.trim(),
       "truck_license": _truckLicenseCtrl.text.trim(),
       "lat": _latitude.toString(),
@@ -415,6 +421,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
     final userData = authState.value!;
     final categories = ref.watch(getAllCategories);
     final authorized = ref.watch(getAllAuthorized);
+    final employeeIntern = ref.watch(getEmployeeInterns);
     final destinyIntern = ref.watch(getAllDestinyIntern);
     final groupBusiness = ref.watch(getGroupBusinessByIdBusiness);
     final unitiesWeight = ref.watch(getAllUnitiesWeight);
@@ -447,6 +454,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
     final hideWeight = hiddenWeightCategories.contains(categoryName);
     final hideEject = hiddenEjectCategories.contains(categoryName);
     final hidePersonal = hiddenPersonalCategories.contains(categoryName);
+    final isPersonalIntern = 'Personal interno' == categoryName;
 
     InputDecoration styleDecoration() => InputDecoration(
       filled: true,
@@ -649,6 +657,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
 
                       if (!hidePersonal) {
                         _providerCtrl.clear();
+                        _employeeCtrl.clear();
                         _unityId = '0';
                         _quantityCtrl.clear();
                       }
@@ -661,6 +670,40 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                     return null;
                   },
                 ),
+
+                if (isPersonalIntern) ...[
+                  const SizedBox(height: 12),
+                  CustomFieldLabelRequired(txtLabel: 'Empleado Interno'),
+                  GlowDropdownFormField2<int>(
+                    value: _employeeCtrl.text.isEmpty ? 0 : int.tryParse(_employeeCtrl.text),
+                    focusNode: _employeeFocus,
+                    decoration: styleDecoration(),
+                    items: [
+                      DropdownMenuItem(
+                        enabled: false,
+                        value: 0,
+                        child: Text('Seleccione una opción', style: TextStyle(color: Colors.white),),
+                      ),
+                      ...employeeIntern.map(
+                        (c) => DropdownMenuItem(
+                          value: c.idEmployeeIntern,
+                          child: Text('${c.names} ${c.lastname}', style: TextStyle(color: Colors.white),),
+                        ),
+                      ),
+                    ],
+                    onChanged: (v) {
+                      if (v != null) {
+                        setState(() => _employeeCtrl.text = v.toString());
+                      }
+                    },
+                    validator: (v) {
+                      if (v == 0 || v == null || v.toString().trim().isEmpty) {
+                        return messageValidatorEmpty;
+                      }
+                      return null;
+                    },
+                  ),
+                ],
 
                 if (!hideWeight) ...[
                   const SizedBox(height: 12),

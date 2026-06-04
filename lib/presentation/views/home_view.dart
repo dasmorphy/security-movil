@@ -39,6 +39,7 @@ class HomeViewState extends ConsumerState<HomeView> {
       if (userData.attributes['id_business'] == 1 || selectedBusiness == "1") {
         ref.read(getHistoryLogbooks.notifier).load();
         ref.read(graphLogbookProvider.notifier).load();
+        ref.read(getEmployeeInterns.notifier).load();
       } else if (userData.attributes['id_business'] == 2 ||
           selectedBusiness == "2") {
         ref.read(getAllDestinyIntern.notifier).load();

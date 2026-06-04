@@ -51,7 +51,12 @@ final appRouter = GoRouter(
         GoRoute(
           path: 'list-logbooks',
           name: LogbookListScreen.name,
-          builder: (context, state) => const LogbookListScreen()
+          builder: (context, state) {
+            final filters = state.extra as dynamic;
+            return LogbookListScreen(
+              filtersLogbook: filters,
+            );
+          },
         ),
         GoRoute(
           path: 'list-dispatches',

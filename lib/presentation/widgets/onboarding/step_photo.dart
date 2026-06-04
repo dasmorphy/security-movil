@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:video_player/video_player.dart';
 import 'package:zentinel/presentation/providers/onboarding/onboarding_provider.dart';
+import 'package:zentinel/presentation/screens/screens.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
 class StepPhoto extends ConsumerStatefulWidget {
@@ -47,16 +48,13 @@ class _StepPhotoState extends ConsumerState<StepPhoto> {
   }
 
   Future<void> takePhoto() async {
-    final picker = ImagePicker();
+    final File? result = await Navigator.push<File>(
+      context,
+      MaterialPageRoute(builder: (_) => const CameraScreen()),
+    );
 
-    final XFile? image = await picker.pickImage(source: ImageSource.camera);
-
-    if (image != null) {
-      final file = File(image.path);
-
-      setState(() {
-        photo = file;
-      });
+    if (result != null) {
+      setState(() => photo = result);
     }
   }
 

@@ -80,10 +80,10 @@ class ItemRecentEmployeeIntern extends ConsumerWidget {
                   Chip(
                     side: BorderSide.none,
                     label: Text(item.status),
-                    backgroundColor: getStatusColorBckgEntry(item.status),
+                    backgroundColor: getStatusColorEmployees(item.status),
                     padding: EdgeInsets.zero,
                     labelStyle: TextStyle(
-                      color: getStatusColorEntryAccess(item.status),
+                      color: getColorTxtEmployees(item.status),
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
                     ),

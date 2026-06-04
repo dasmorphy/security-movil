@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/domain/entities/employee_intern.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
@@ -51,7 +52,37 @@ class EmployeeInternDetailModal extends StatelessWidget {
                       'Fecha Actualización',
                       formatDateDetails(item.updatedAt.toString()),
                     ),
+
+                    if (item.photo != null)
+                      ImagesGrid(
+                        title: 'Foto personal',
+                        images: [item.photo],
+                      ),
                   ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(188, 25, 156, 156),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                onPressed: () async {
+                  context.push('/logbook-list', extra: {
+                    "employees-intern": item.idEmployeeIntern,
+                  });
+                },
+                child: const Text(
+                  'Ver bitácoras',
+                  style: TextStyle(color: Colors.white),
                 ),
               ),
             ),

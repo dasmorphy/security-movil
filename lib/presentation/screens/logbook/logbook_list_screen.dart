@@ -9,8 +9,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class LogbookListScreen extends ConsumerStatefulWidget  {
 
   static const name = 'logbook-list-screen';
+  final dynamic filtersLogbook;
 
-  const LogbookListScreen({super.key});
+  const LogbookListScreen({super.key, this.filtersLogbook});
 
   @override
   ConsumerState<LogbookListScreen> createState() => _LogbookListScreenState();
@@ -28,6 +29,8 @@ class _LogbookListScreenState extends ConsumerState<LogbookListScreen> {
       filters:{
         "page": 1,
         "rows": 20,
+        if (widget.filtersLogbook != null)
+          "employees-intern": widget.filtersLogbook['employees-intern'],
       }
     );
   }

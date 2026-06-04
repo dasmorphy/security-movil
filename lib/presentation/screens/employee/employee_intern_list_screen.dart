@@ -169,13 +169,13 @@ class _EmployeeInternListScreenState
                                       side: BorderSide.none,
                                       label: Text(item.status),
                                       backgroundColor:
-                                          getStatusColorBckgEntry(
+                                          getStatusColorEmployees(
                                             item.status,
                                           ),
                                       padding: EdgeInsets.zero,
                                       labelStyle: TextStyle(
                                         color:
-                                            getStatusColorEntryAccess(
+                                            getColorTxtEmployees(
                                               item.status,
                                             ),
                                         fontSize: 12,

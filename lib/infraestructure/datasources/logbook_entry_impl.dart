@@ -193,6 +193,7 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
             'externalTransactionId': uuid,
             'channel': 'ZENTINEL',
             'user': filter['user'],
+            'employees-intern': filter['employees-intern'],
           },
         ),
       );

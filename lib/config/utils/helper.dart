@@ -324,6 +324,28 @@ Color getStatusColorBckgEntry(String status) {
   }
 }
 
+Color getStatusColorEmployees(String status) {
+  switch (status.toLowerCase()) {
+    case 'inactivo':
+      return const Color.fromARGB(255, 54, 18, 18);
+    case 'activo':
+      return const Color.fromARGB(255, 18, 54, 42);
+    default:
+      return Colors.grey;
+  }
+}
+
+Color getColorTxtEmployees(String status) {
+  switch (status.toLowerCase()) {
+    case 'inactivo':
+      return const Color.fromARGB(255, 246, 105, 105);
+    case 'activo':
+      return const Color.fromARGB(255, 105, 246, 184);
+    default:
+      return const Color.fromARGB(255, 29, 28, 28);
+  }
+}
+
 String formatDateToApi(DateTime date) {
   return DateFormat('yyyy-MM-dd HH:mm:ss').format(date);
 }

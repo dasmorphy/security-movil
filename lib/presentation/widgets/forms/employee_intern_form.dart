@@ -2,20 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
-import 'package:zentinel/config/utils/helper.dart';
-import 'package:zentinel/domain/entities/all_logbook.dart';
 import 'package:zentinel/domain/entities/api_response.dart';
 import 'package:zentinel/presentation/providers/onboarding/onboarding_provider.dart';
-import 'dart:io';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 import 'package:zentinel/service/pending_request_service.dart';
 
 class EmployeeInternForm extends ConsumerStatefulWidget {
-  final Future<ApiResponse<dynamic>> Function(Map<String, dynamic>)? onSubmit;
-  const EmployeeInternForm({super.key, this.onSubmit});
+  final Future<ApiResponse<dynamic>> Function(Map<String, dynamic>) onSubmit;
+  const EmployeeInternForm({super.key, required this.onSubmit});
 
   @override
   ConsumerState<EmployeeInternForm> createState() => _EmployeeInternFormState();
@@ -23,12 +19,10 @@ class EmployeeInternForm extends ConsumerStatefulWidget {
 
 class _EmployeeInternFormState extends ConsumerState<EmployeeInternForm> {
   final _formKey = GlobalKey<FormState>();
-  String _categoryEntry = '0';
   String _groupBusiness = '0';
   bool isLoading = false;
   bool imagesMinError = false;
   bool imagesMaxError = false;
-  String _authorized = '0';
 
   final _dniCtrl = TextEditingController();
   final _positionCtrl = TextEditingController();
@@ -88,21 +82,21 @@ class _EmployeeInternFormState extends ConsumerState<EmployeeInternForm> {
       return;
     }
 
-    // if (_selectedImages.isEmpty) {
-    //   setState(() {
-    //     imagesMinError = true;
-    //     isLoading = false;
-    //   });
-    //   return;
-    // }
+    if (_selectedImages.isEmpty) {
+      setState(() {
+        imagesMinError = true;
+        isLoading = false;
+      });
+      return;
+    }
 
-    // if (_selectedImages.length > 1) {
-    //   setState(() {
-    //     imagesMaxError = true;
-    //     isLoading = false;
-    //   });
-    //   return;
-    // }
+    if (_selectedImages.length > 1) {
+      setState(() {
+        imagesMaxError = true;
+        isLoading = false;
+      });
+      return;
+    }
 
     
     if (_dniCtrl.text.length != 10) {
@@ -147,84 +141,42 @@ class _EmployeeInternFormState extends ConsumerState<EmployeeInternForm> {
           .toList(), // Lista de Uint8List directo, sin base64
     };
 
-    // Verificar conexión a internet
-    final internetAvailable = await hasInternet();
+    GlobalLoadingBottomSheet.show(
+      status: OverlayStatus.loading, 
+      message: "Guardando registro..."
+    );
 
-    if (!internetAvailable) {
-      // 🔴 SIN INTERNET: Guardar localmente
-      print('❌ Sin conexión, guardando localmente...');
-      data['created_at'] = DateTime.now().toString();
-      await savePendingRequest(data, 'logbook_out');
-
-      if (mounted) {
-        // Navigator.pop(context); // Cerrar dialog de procesamiento
-        _clearCntrl();
-        if (Navigator.canPop(context)) {
-          context.pop(); // Cerrar el formulario
-        }
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            duration: Duration(seconds: 4),
-            content: Text(
-              '📱 Sin conexión. Tu información se guardará localmente y se enviará automáticamente cuando recuperes conexión.',
-              style: TextStyle(color: Colors.white),
-            ),
-            backgroundColor: Color.fromARGB(255, 255, 152, 0),
-          ),
-        );
-      }
-      setState(() => isLoading = false);
-      return;
-    }
-
-    // 🟢 CON INTERNET: Enviar al servidor
-    print('✅ Conexión disponible, enviando al servidor...');
-    final success = await widget.onSubmit?.call(data) ?? false;
+    final response = await widget.onSubmit.call(data);
+    if (!mounted) return;
     setState(() => isLoading = false);
 
-    // if (!success) {
-    //   await savePendingRequest(data, 'logbook_out');
-    // }
+    if (Navigator.canPop(context)) {
+      context.pop();
+    }
 
-    if (mounted) {
-      _clearCntrl();
-      if (Navigator.canPop(context)) {
-        context.pop(); // Cerrar el formulario
-      }
-
-      // if (success) {
-      //   if (widget.preloadedData != null) {
-      //     ref.read(getHistoryLogbooks.notifier).load();
-      //     context.push('/check-success?redirect=/');
-      //   }else{
-      //     context.push('/check-success');
-      //   }
-
-      // } else {
-      //   ScaffoldMessenger.of(context).showSnackBar(
-      //     const SnackBar(
-      //       duration: Duration(seconds: 6),
-      //       content: Text(
-      //         '📱 Error al enviar el formulario. La información se guardará localmente y se enviará automáticamente.',
-      //         style: TextStyle(color: Colors.white),
-      //       ),
-      //       backgroundColor: Color.fromARGB(255, 255, 152, 0),
-      //     ),
-      //   );
-      // }
+    if (response.success) {
+      GlobalLoadingBottomSheet.show(
+        status: OverlayStatus.success, 
+        message: "Registro guardado exitosamente", 
+        autoDismiss: const Duration(seconds: 2)
+      );
+      ref.read(getHistoryDispatch.notifier).load();
+    } else {
+      GlobalLoadingBottomSheet.show(
+        status: OverlayStatus.error,
+        message: 'Error: ${response.message ?? 'Error al guardar el registro. Intente nuevamente.'}',
+        autoDismiss: const Duration(seconds: 3),
+      );
     }
   }
 
   void _clearCntrl() {
     _selectedImages = [];
     _formKey.currentState?.reset();
-    _categoryEntry = '0';
     _groupBusiness = '0';
     _dniCtrl.clear();
     _lastnameCtrl.clear();
     _namesCtrl.clear();
-    _authorized = '0';
     _observationsCtrl.clear();
     _namesCtrl.clear();
     imagesMinError = false;
@@ -246,7 +198,6 @@ class _EmployeeInternFormState extends ConsumerState<EmployeeInternForm> {
     }
 
     final userData = authState.value!;
-    final categories = ref.watch(getAllCategories);
 
     final groupBusiness = ref.watch(getGroupBusinessByIdBusiness);
     final messageValidatorEmpty = 'Este campo es obligatorio';
@@ -448,7 +399,10 @@ class _EmployeeInternFormState extends ConsumerState<EmployeeInternForm> {
                     },
                   ),
 
+                  const SizedBox(height: 20),
+
                   CameraImagePicker(
+                    textBtn: 'Captura fotográfica del personal',
                     minImages: 0,
                     maxImages: 1,
                     onImagesChanged: (images) {
