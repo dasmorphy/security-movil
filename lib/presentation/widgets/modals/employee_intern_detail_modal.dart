@@ -75,8 +75,8 @@ class EmployeeInternDetailModal extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
-                onPressed: () async {
-                  context.push('/logbook-list', extra: {
+                onPressed: () {
+                  context.push('/list-logbooks', extra: {
                     "employees-intern": item.idEmployeeIntern,
                   });
                 },

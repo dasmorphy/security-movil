@@ -8,15 +8,19 @@ import 'package:zentinel/presentation/screens/screens.dart';
 class CameraImagePicker extends StatefulWidget {
   final int minImages;
   final int maxImages;
+  final bool isPickingImage;
   final String? textBtn;
   final Function(List<Uint8List>) onImagesChanged;
+  final ValueChanged<bool>? onPickingChanged;
 
   const CameraImagePicker({
     super.key,
     this.minImages = 0,
     this.maxImages = 10,
+    this.isPickingImage = false,
     this.textBtn = "Adjuntar Evidencia Fotográfica",
     required this.onImagesChanged,
+    this.onPickingChanged,
   });
 
   @override
@@ -32,10 +36,14 @@ class _CameraImagePickerState extends State<CameraImagePicker> {
   @override
   Widget build(BuildContext context) {
     Future<void> captureImageFromCamera() async {
+      if (widget.isPickingImage) return;
+
       if (_selectedImages.length >= widget.maxImages) {
         setState(() => imagesMaxError = true);
         return;
       }
+
+      widget.onPickingChanged?.call(true);
 
       try {
         final File? image = await Navigator.push<File>(
@@ -74,6 +82,10 @@ class _CameraImagePickerState extends State<CameraImagePicker> {
         widget.onImagesChanged(_selectedImages.whereType<Uint8List>().toList());
       } catch (e) {
         debugPrint(e.toString());
+        widget.onPickingChanged?.call(false);
+      }
+      finally {
+        widget.onPickingChanged?.call(false);
       }
     }
 

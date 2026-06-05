@@ -405,6 +405,12 @@ class _EmployeeInternFormState extends ConsumerState<EmployeeInternForm> {
                     textBtn: 'Captura fotográfica del personal',
                     minImages: 0,
                     maxImages: 1,
+                    isPickingImage: isPickingImage,
+                    onPickingChanged: (value) {
+                      setState(() {
+                        isPickingImage = value;
+                      });
+                    },
                     onImagesChanged: (images) {
                       print("imagenes seleccionadas ${images.length}");
 
