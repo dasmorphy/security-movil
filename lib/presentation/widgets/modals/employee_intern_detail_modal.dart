@@ -81,11 +81,108 @@ class EmployeeInternDetailModal extends StatelessWidget {
                   });
                 },
                 child: const Text(
-                  'Ver bitácoras',
+                  'Ver Historial de movimientos',
                   style: TextStyle(color: Colors.white),
                 ),
               ),
             ),
+
+            const SizedBox(height: 10),
+
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(188, 25, 156, 156),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                onPressed: () {
+                  context.push('/list-logbooks', extra: {
+                    "employees-intern": item.idEmployeeIntern,
+                  });
+                },
+                child: const Text(
+                  'Más Opciones...',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ),
+
+            // if (item.status == 'Autorizado')
+            //   if (item.lastStatusMovement == 'Salida' || item.lastStatusMovement == 'Movimiento interno')
+            //     SizedBox(
+            //       width: double.infinity,
+            //       child: ElevatedButton(
+            //         style: ElevatedButton.styleFrom(
+            //           backgroundColor: const Color.fromARGB(188, 25, 156, 156),
+            //           padding: const EdgeInsets.symmetric(vertical: 14),
+            //           shape: RoundedRectangleBorder(
+            //             borderRadius: BorderRadius.circular(12),
+            //           ),
+            //         ),
+            //         onPressed: () {
+            //           context.push('/list-logbooks', extra: {
+            //             "employees-intern": item.idEmployeeIntern,
+            //           });
+            //         },
+            //         child: const Text(
+            //           'Ingreso',
+            //           style: TextStyle(color: Colors.white),
+            //         ),
+            //       ),
+            //     ),
+
+            //   if (item.lastStatusMovement == 'Ingreso') ...[
+            //     const SizedBox(height: 10),
+
+            //     SizedBox(
+            //       width: double.infinity,
+            //       child: ElevatedButton(
+            //         style: ElevatedButton.styleFrom(
+            //           backgroundColor: const Color.fromARGB(188, 25, 156, 156),
+            //           padding: const EdgeInsets.symmetric(vertical: 14),
+            //           shape: RoundedRectangleBorder(
+            //             borderRadius: BorderRadius.circular(12),
+            //           ),
+            //         ),
+            //         onPressed: () {
+            //           context.push('/list-logbooks', extra: {
+            //             "employees-intern": item.idEmployeeIntern,
+            //           });
+            //         },
+            //         child: const Text(
+            //           'Movimiento interno',
+            //           style: TextStyle(color: Colors.white),
+            //         ),
+            //       ),
+            //     ),
+
+            //     const SizedBox(height: 10),
+
+            //     SizedBox(
+            //       width: double.infinity,
+            //       child: ElevatedButton(
+            //         style: ElevatedButton.styleFrom(
+            //           backgroundColor: Colors.red,
+            //           padding: const EdgeInsets.symmetric(vertical: 14),
+            //           shape: RoundedRectangleBorder(
+            //             borderRadius: BorderRadius.circular(12),
+            //           ),
+            //         ),
+            //         onPressed: () {
+            //           // Acción salida
+            //         },
+            //         child: const Text(
+            //           'Salida',
+            //           style: TextStyle(color: Colors.white),
+            //         ),
+            //       ),
+            //     ),
+            //   ],
+              
 
             const SizedBox(height: 20),
           ],

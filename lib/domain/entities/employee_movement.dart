@@ -6,6 +6,7 @@ class EmployeeMovement {
   int employeeId;
   String employeeLastname;
   String employeeNames;
+  String employeeStatus;
   int groupBusinessId;
   String groupName;
   int idMovement;
@@ -19,6 +20,7 @@ class EmployeeMovement {
   String updatedBy;
 
   EmployeeMovement({
+    required this.employeeStatus,
     required this.authorizedId,
     required this.createdAt,
     required this.createdBy,
@@ -48,6 +50,7 @@ class EmployeeMovement {
         employeeId: json["employee_id"],
         employeeLastname: json["employee_lastname"],
         employeeNames: json["employee_names"],
+        employeeStatus: json["employee_status"],
         groupBusinessId: json["group_business_id"],
         groupName: json["group_name"],
         idMovement: json["id_movement"],

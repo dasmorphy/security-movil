@@ -117,13 +117,6 @@ class EmployeeMovementListState extends ConsumerState<EmployeeMovementList> {
                   return _buildSkeletonCard();
                 }
 
-                // final isEntry = item.recordType == 'entry';
-                // final typeText = isEntry ? 'ingreso' : 'salida';
-
-                final createdBy = item.nameUser;
-
-                final description = 'Bitácora en ${item.groupName}';
-
                 final formattedDate = formatDate(item.createdAt);
 
                 return Padding(
@@ -148,7 +141,7 @@ class EmployeeMovementListState extends ConsumerState<EmployeeMovementList> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  createdBy,
+                                  item.createdBy,
                                   style: Theme.of(context)
                                       .textTheme
                                       .bodyMedium
@@ -159,7 +152,7 @@ class EmployeeMovementListState extends ConsumerState<EmployeeMovementList> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  description,
+                                  item.employeeStatus,
                                   style: Theme.of(context).textTheme.bodySmall
                                       ?.copyWith(
                                         color: const Color.fromARGB(
@@ -191,12 +184,12 @@ class EmployeeMovementListState extends ConsumerState<EmployeeMovementList> {
                           Chip(
                             side: BorderSide.none,
                             label: Text(item.status),
-                            backgroundColor: getStatusColorBckgEntry(
+                            backgroundColor: getStatusColorMovements(
                               item.status,
                             ),
                             padding: EdgeInsets.zero,
                             labelStyle: TextStyle(
-                              color: getStatusColorEntryAccess(item.status),
+                              color: getColorTxtMovements(item.status),
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
                             ),

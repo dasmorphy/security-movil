@@ -115,7 +115,7 @@ class _EmployeeInternListScreenState
                                           ),
                                           const SizedBox(height: 2),
                                           Text(
-                                            '${item.position} - ${item.groupName}',
+                                            item.status,
                                             style: Theme.of(context)
                                                 .textTheme
                                                 .bodySmall
@@ -167,16 +167,16 @@ class _EmployeeInternListScreenState
                                     ),
                                     Chip(
                                       side: BorderSide.none,
-                                      label: Text(item.status),
+                                      label: Text(item.lastStatusMovement),
                                       backgroundColor:
-                                          getStatusColorEmployees(
-                                            item.status,
+                                          getStatusColorMovements(
+                                            item.lastStatusMovement,
                                           ),
                                       padding: EdgeInsets.zero,
                                       labelStyle: TextStyle(
                                         color:
-                                            getColorTxtEmployees(
-                                              item.status,
+                                            getColorTxtMovements(
+                                              item.lastStatusMovement,
                                             ),
                                         fontSize: 12,
                                         fontWeight: FontWeight.bold,

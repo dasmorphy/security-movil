@@ -125,22 +125,17 @@ class Reception {
 
 class Skus {
   int idSku;
-  List<Product> products;
   String typeSku;
 
-  Skus({required this.idSku, required this.products, required this.typeSku});
+  Skus({required this.idSku, required this.typeSku});
 
   factory Skus.fromJson(Map<String, dynamic> json) => Skus(
     idSku: json["id_sku"],
-    products: List<Product>.from(
-      json["products"].map((x) => Product.fromJson(x)),
-    ),
     typeSku: json["type_sku"],
   );
 
   Map<String, dynamic> toJson() => {
     "id_sku": idSku,
-    "products": List<dynamic>.from(products.map((x) => x.toJson())),
     "type_sku": typeSku,
   };
 }

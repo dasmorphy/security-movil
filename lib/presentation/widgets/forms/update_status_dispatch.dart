@@ -136,9 +136,9 @@ class _UpdateStatusDispatchState extends ConsumerState<UpdateStatusDispatch> {
 
   @override
   Widget build(BuildContext context) {
-    final products = widget.item.skus
-    .expand((sku) => sku.products)
-    .toList();
+    // final products = widget.item.skus
+    // .expand((sku) => sku.products)
+    // .toList();
 
     final authState = ref.watch(userSessionProvider);
 
@@ -190,32 +190,32 @@ class _UpdateStatusDispatchState extends ConsumerState<UpdateStatusDispatch> {
                         fontWeight: FontWeight.w600,
                       ),
                     ),
-                    Text(
-                      '${products.length} Material(es)',
-                      style: const TextStyle(
-                        color: Color.fromARGB(255, 150, 150, 150),
-                        fontSize: 14,
-                      ),
-                    ),
+                    // Text(
+                    //   '${products.length} Material(es)',
+                    //   style: const TextStyle(
+                    //     color: Color.fromARGB(255, 150, 150, 150),
+                    //     fontSize: 14,
+                    //   ),
+                    // ),
                   ],
                 ),
               ),
               const SizedBox(height: 16),
 
               // Lista de productos
-              ListView.separated(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                itemCount: products.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 12),
-                itemBuilder: (context, index) {
-                  final material = products[index];
-                  return FinishMaterialItemCard(
-                    materialName: material.name,
-                    quantity: material.quantity,
-                  );
-                },
-              ),
+              // ListView.separated(
+              //   shrinkWrap: true,
+              //   physics: const NeverScrollableScrollPhysics(),
+              //   itemCount: products.length,
+              //   separatorBuilder: (_, __) => const SizedBox(height: 12),
+              //   itemBuilder: (context, index) {
+              //     final material = products[index];
+              //     return FinishMaterialItemCard(
+              //       materialName: material.name,
+              //       quantity: material.quantity,
+              //     );
+              //   },
+              // ),
 
               const SizedBox(height: 20),
 

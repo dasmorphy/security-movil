@@ -326,9 +326,9 @@ Color getStatusColorBckgEntry(String status) {
 
 Color getStatusColorEmployees(String status) {
   switch (status.toLowerCase()) {
-    case 'inactivo':
+    case 'no autorizado':
       return const Color.fromARGB(255, 54, 18, 18);
-    case 'activo':
+    case 'autorizado':
       return const Color.fromARGB(255, 18, 54, 42);
     default:
       return Colors.grey;
@@ -337,12 +337,38 @@ Color getStatusColorEmployees(String status) {
 
 Color getColorTxtEmployees(String status) {
   switch (status.toLowerCase()) {
-    case 'inactivo':
+    case 'no autorizado':
       return const Color.fromARGB(255, 246, 105, 105);
-    case 'activo':
+    case 'autorizado':
       return const Color.fromARGB(255, 105, 246, 184);
     default:
-      return const Color.fromARGB(255, 29, 28, 28);
+      return Colors.grey;
+  }
+}
+
+Color getColorTxtMovements(String status) {
+  switch (status.toLowerCase()) {
+    case 'salida':
+      return const Color.fromARGB(255, 246, 105, 105);
+    case 'movimiento interno':
+      return const Color.fromARGB(255, 248, 172, 70);
+    case 'ingreso':
+      return const Color.fromARGB(255, 105, 246, 184);
+    default:
+      return Colors.grey;
+  }
+}
+
+Color getStatusColorMovements(String status) {
+  switch (status.toLowerCase()) {
+    case 'salida':
+      return const Color.fromARGB(255, 54, 18, 18);
+    case 'movimiento interno':
+      return const Color.fromARGB(255, 61, 43, 14);
+    case 'ingreso':
+      return const Color.fromARGB(255, 18, 54, 42);
+    default:
+      return Colors.grey;
   }
 }
 

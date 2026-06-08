@@ -8,6 +8,7 @@ class EmployeeIntern {
   String lastname;
   String nameUser;
   String names;
+  String lastStatusMovement;
   String observations;
   dynamic photo;
   String position;
@@ -31,6 +32,7 @@ class EmployeeIntern {
     required this.status,
     required this.updatedAt,
     required this.updatedBy,
+    required this.lastStatusMovement,
   });
 
   factory EmployeeIntern.fromJson(Map<String, dynamic> json) => EmployeeIntern(
@@ -49,6 +51,7 @@ class EmployeeIntern {
     status: json["status"],
     updatedAt: DateTime.parse(json["updated_at"]),
     updatedBy: json["updated_by"],
+    lastStatusMovement: json["last_status_movement"],
   );
 
   Map<String, dynamic> toJson() => {

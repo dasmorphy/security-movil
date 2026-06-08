@@ -351,7 +351,11 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
   @override
   Future<List<EmployeeIntern>> getEmployeeInterns(Map<String, dynamic> filters) async {
     final response = await dio.get(
-      '/rest/zent-logbook-api/v1.0/employee-intern?start_date=${filters['start_date']}&end_date=${filters['end_date']}',
+      '/rest/zent-logbook-api/v1.0/employee-intern',
+      queryParameters: {
+        'start_date': filters['start_date'],
+        'end_date': filters['end_date'],
+      },
       options: Options(
         headers: {
           'externalTransactionId': uuid, 

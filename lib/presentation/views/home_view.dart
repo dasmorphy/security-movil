@@ -164,7 +164,9 @@ class HomeViewState extends ConsumerState<HomeView> {
                   RecentListHome(
                     title: 'Movimientos personal interno',
                     routeLink: '/list-employee-movements',
-                    childListBuild: const ItemRecentEmployeeMovement(),
+                    childListBuild: ItemRecentEmployeeMovement(
+                      itememployeeMovements: ref.watch(getEmployeeMovements),
+                    ),
                   ),
                   const SizedBox(height: 30),
                 ],

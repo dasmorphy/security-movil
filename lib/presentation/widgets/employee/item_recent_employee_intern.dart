@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zentinel/config/utils/helper.dart';
+import 'package:zentinel/domain/entities/employee_movement.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
 class ItemRecentEmployeeMovement extends ConsumerWidget {
-  const ItemRecentEmployeeMovement({super.key});
+  final List<EmployeeMovement>? itememployeeMovements;
+  const ItemRecentEmployeeMovement({super.key, required this.itememployeeMovements});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -22,10 +24,6 @@ class ItemRecentEmployeeMovement extends ConsumerWidget {
     return Column(
       children: List.generate(limitedList.length, (index) {
         final item = limitedList[index];
-
-        final createdBy = item.createdBy;
-        // final description = '$position - ${item.groupName}';
-
         final formattedDate = formatDate(item.createdAt);
 
         return Padding(
@@ -46,7 +44,7 @@ class ItemRecentEmployeeMovement extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          createdBy,
+                          item.createdBy,
                           style: Theme.of(context).textTheme.bodyMedium
                               ?.copyWith(
                                 color: Colors.white,
@@ -55,13 +53,13 @@ class ItemRecentEmployeeMovement extends ConsumerWidget {
                         ),
                         const SizedBox(height: 2),
 
-                        // Text(
-                        //   description,
-                        //   style: Theme.of(context).textTheme.bodySmall
-                        //       ?.copyWith(
-                        //         color: const Color.fromARGB(255, 180, 180, 180),
-                        //       ),
-                        // ),
+                        Text(
+                          item.employeeStatus,
+                          style: Theme.of(context).textTheme.bodySmall
+                            ?.copyWith(
+                              color: const Color.fromARGB(255, 180, 180, 180),
+                            ),
+                        ),
                         const SizedBox(height: 2),
 
                         Text(
@@ -79,10 +77,10 @@ class ItemRecentEmployeeMovement extends ConsumerWidget {
                   Chip(
                     side: BorderSide.none,
                     label: Text(item.status),
-                    backgroundColor: getStatusColorEmployees(item.status),
+                    backgroundColor: getStatusColorMovements(item.status),
                     padding: EdgeInsets.zero,
                     labelStyle: TextStyle(
-                      color: getColorTxtEmployees(item.status),
+                      color: getColorTxtMovements(item.status),
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
                     ),
