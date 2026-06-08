@@ -13,6 +13,7 @@ import 'package:zentinel/domain/entities/authorized.dart';
 import 'package:zentinel/domain/entities/category.dart';
 import 'package:zentinel/domain/entities/destiny_intern.dart';
 import 'package:zentinel/domain/entities/employee_intern.dart';
+import 'package:zentinel/domain/entities/employee_movement.dart';
 import 'package:zentinel/domain/entities/graph_logbook.dart';
 import 'package:zentinel/domain/entities/group_business.dart';
 import 'package:zentinel/domain/entities/unity_weight.dart';
@@ -356,16 +357,28 @@ final getEmployeeInterns =
 
     return CatalogNotifier<EmployeeIntern>(
       (filters) {
-        final now = DateTime.now();
-        final startDate = DateTime(now.year, now.month, 1);
-        final endDate = startDate.add(const Duration(days: 31));
-
         final mergedFilters = {
-          'start_date': startDate.toIso8601String(),
-          'end_date': endDate.toIso8601String(),
           ...?filters,
         };
         return repo.getEmployeeInterns(mergedFilters);
+      },
+    );
+  },
+);
+
+final getEmployeeMovements =
+    StateNotifierProvider<
+        CatalogNotifier<EmployeeMovement>,
+        List<EmployeeMovement>>(
+  (ref) {
+    final repo = ref.watch(logbookEntryRepositoryProvider);
+
+    return CatalogNotifier<EmployeeMovement>(
+      (filters) {
+        final mergedFilters = {
+          ...?filters,
+        };
+        return repo.getEmployeeMovements(mergedFilters);
       },
     );
   },

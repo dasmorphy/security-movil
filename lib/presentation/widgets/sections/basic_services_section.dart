@@ -86,7 +86,14 @@ class _BasicServicesStionState extends ConsumerState<BasicServicesSection> {
               if (userData.hasPermission(Permissions.nuevaBitacoraSalida))
                 BasicServiceCard(
                   iconImage: 'iconsalida',
-                  label: 'Personal interno',
+                  label: 'Listado de personal interno',
+                  onTap: () => context.push('/list-employee-intern')
+                ),
+              
+              if (userData.hasPermission(Permissions.nuevaBitacoraSalida))
+                BasicServiceCard(
+                  iconImage: 'iconsalida',
+                  label: 'Nuevo personal interno',
                   onTap: () => context.push('/new-employee')
                 ),
             ],

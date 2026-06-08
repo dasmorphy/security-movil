@@ -4,15 +4,15 @@ import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
-class ItemRecentEmployeeIntern extends ConsumerWidget {
-  const ItemRecentEmployeeIntern({super.key});
+class ItemRecentEmployeeMovement extends ConsumerWidget {
+  const ItemRecentEmployeeMovement({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final employeeInterns = ref.watch(getEmployeeInterns);
-    final limitedList = employeeInterns.take(5).toList();
+    final employeeMovements = ref.watch(getEmployeeMovements);
+    final limitedList = employeeMovements.take(5).toList();
 
-    if (employeeInterns.isEmpty) {
+    if (employeeMovements.isEmpty) {
       return const Text(
         'No hay registros',
         style: TextStyle(color: Colors.white54),
@@ -23,9 +23,8 @@ class ItemRecentEmployeeIntern extends ConsumerWidget {
       children: List.generate(limitedList.length, (index) {
         final item = limitedList[index];
 
-        final createdBy = item.names;
-        final position = item.position;
-        final description = '$position - ${item.groupName}';
+        final createdBy = item.createdBy;
+        // final description = '$position - ${item.groupName}';
 
         final formattedDate = formatDate(item.createdAt);
 
@@ -35,7 +34,7 @@ class ItemRecentEmployeeIntern extends ConsumerWidget {
             borderRadius: BorderRadius.circular(8),
             onTap: () => ModalHelper.open(
               context,
-              child: EmployeeInternDetailModal(item: item),
+              child: EmployeeMovementDetailModal(item: item),
             ),
             child: Padding(
               padding: const EdgeInsets.all(8.0),
@@ -56,13 +55,13 @@ class ItemRecentEmployeeIntern extends ConsumerWidget {
                         ),
                         const SizedBox(height: 2),
 
-                        Text(
-                          description,
-                          style: Theme.of(context).textTheme.bodySmall
-                              ?.copyWith(
-                                color: const Color.fromARGB(255, 180, 180, 180),
-                              ),
-                        ),
+                        // Text(
+                        //   description,
+                        //   style: Theme.of(context).textTheme.bodySmall
+                        //       ?.copyWith(
+                        //         color: const Color.fromARGB(255, 180, 180, 180),
+                        //       ),
+                        // ),
                         const SizedBox(height: 2),
 
                         Text(

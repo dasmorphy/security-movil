@@ -108,7 +108,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             if (userData.hasPermission(Permissions.verBitacoras)) {
               ref.read(getHistoryLogbooks.notifier).load();
               ref.read(graphLogbookProvider.notifier).load();
-              ref.read(getEmployeeInterns.notifier).load();
+              ref.read(getEmployeeMovements.notifier).load();
             }
           }
         },

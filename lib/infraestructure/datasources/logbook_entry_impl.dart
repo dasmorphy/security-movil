@@ -11,6 +11,7 @@ import 'package:zentinel/domain/entities/authorized.dart';
 import 'package:zentinel/domain/entities/category.dart';
 import 'package:zentinel/domain/entities/destiny_intern.dart';
 import 'package:zentinel/domain/entities/employee_intern.dart';
+import 'package:zentinel/domain/entities/employee_movement.dart';
 import 'package:zentinel/domain/entities/graph_logbook.dart';
 import 'package:zentinel/domain/entities/group_business.dart';
 import 'package:zentinel/domain/entities/unity_weight.dart';
@@ -358,9 +359,31 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
         },
       ),
     );
-    final List<EmployeeIntern> graphsJson = (response.data['data'] as List)
+    final List<EmployeeIntern> employeeInterns = (response.data['data'] as List)
       .map((json) => EmployeeIntern.fromJson(json))
       .toList();
-    return graphsJson;
+    return employeeInterns;
+  }
+
+  @override
+  Future<List<EmployeeMovement>> getEmployeeMovements(Map<String, dynamic> filters) async {
+    final response = await dio.get(
+      '/rest/zent-logbook-api/v1.0/employee-movement',
+      queryParameters: {
+        'start_date': filters['start_date'],
+        'end_date': filters['end_date'],
+      },
+      options: Options(
+        headers: {
+          'externalTransactionId': uuid, 
+          'channel': 'ZENTINEL'
+        },
+      ),
+    );
+    final List<EmployeeMovement> employeeMovements = (response.data['data'] as List)
+      .map((json) => EmployeeMovement.fromJson(json))
+      .toList();
+
+    return employeeMovements;
   }
 }

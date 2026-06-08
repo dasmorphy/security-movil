@@ -39,7 +39,7 @@ class HomeViewState extends ConsumerState<HomeView> {
       if (userData.attributes['id_business'] == 1 || selectedBusiness == "1") {
         ref.read(getHistoryLogbooks.notifier).load();
         ref.read(graphLogbookProvider.notifier).load();
-        ref.read(getEmployeeInterns.notifier).load();
+        ref.read(getEmployeeMovements.notifier).load();
       } else if (userData.attributes['id_business'] == 2 ||
           selectedBusiness == "2") {
         ref.read(getAllDestinyIntern.notifier).load();
@@ -162,9 +162,9 @@ class HomeViewState extends ConsumerState<HomeView> {
                         userData.hasPermission(Permissions.verBitacoras))) ...[
                   const SizedBox(height: 10),
                   RecentListHome(
-                    title: 'Personal interno',
-                    routeLink: '/list-employee-intern',
-                    childListBuild: const ItemRecentEmployeeIntern(),
+                    title: 'Movimientos personal interno',
+                    routeLink: '/list-employee-movements',
+                    childListBuild: const ItemRecentEmployeeMovement(),
                   ),
                   const SizedBox(height: 30),
                 ],
