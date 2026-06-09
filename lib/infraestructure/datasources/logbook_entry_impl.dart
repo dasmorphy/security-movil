@@ -376,6 +376,7 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
       queryParameters: {
         'start_date': filters['start_date'],
         'end_date': filters['end_date'],
+        'id_employee': filters['id_employee'],
       },
       options: Options(
         headers: {
@@ -384,10 +385,37 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
         },
       ),
     );
-    final List<EmployeeMovement> employeeMovements = (response.data['data'] as List)
-      .map((json) => EmployeeMovement.fromJson(json))
-      .toList();
+    final data = response.data['data'] as List? ?? [];
+    return data
+    .map((json) => EmployeeMovement.fromJson(json))
+    .toList();
+  }
+  
+  @override
+  Future<ApiResponse<dynamic>> saveEmployeeMovement(Map<String, dynamic> data) async {
+    try {
+      final response = await dio.post(
+        '/rest/zent-logbook-api/v1.0/employee-movement',
+        data: data,
+        options: onlyError(),
+      );
 
-    return employeeMovements;
+      final body = response.data;
+
+      return ApiResponse(
+        success: response.statusCode == 200 ||
+            response.statusCode == 201,
+        errorCode: body['error_code']?.toString(),
+        message: body['message'],
+        data: body['data'],
+      );
+    } catch (e) {
+      print('Error al guardar movimiento: $e');
+      return ApiResponse(
+        success: false,
+        errorCode: 'save_error',
+        message: 'Error al guardar movimiento',
+      );
+    }
   }
 }

@@ -4,14 +4,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 import 'package:zentinel/config/utils/helper.dart';
+import 'package:zentinel/domain/entities/api_response.dart';
 import 'package:zentinel/presentation/providers/onboarding/onboarding_provider.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/service/pending_request_service.dart';
 
 class EmployeeMovementForm extends ConsumerStatefulWidget {
-  final Future<bool> Function(Map<String, dynamic>)? onSubmit;
-  const EmployeeMovementForm({super.key, this.onSubmit});
+  final Future<ApiResponse> Function(Map<String, dynamic>) onSubmit;
+  final String typeMovement;
+
+  const EmployeeMovementForm({super.key, required this.onSubmit, required this.typeMovement});
 
   @override
   ConsumerState<EmployeeMovementForm> createState() => _EmployeeMovementFormState();
@@ -261,12 +264,12 @@ class _EmployeeMovementFormState extends ConsumerState<EmployeeMovementForm> {
 
     // 🟢 CON INTERNET: Enviar al servidor
     print('✅ Conexión disponible, enviando al servidor...');
-    final success = await widget.onSubmit?.call(data) ?? false;
+    final success = await widget.onSubmit.call(data);
     setState(() => isLoading = false);
 
-    if (!success) {
-      await savePendingRequest(data, 'logbook_entry');
-    }
+    // if (!success) {
+    //   await savePendingRequest(data, 'logbook_entry');
+    // }
 
     if (!mounted) return;
 
@@ -275,20 +278,20 @@ class _EmployeeMovementFormState extends ConsumerState<EmployeeMovementForm> {
       context.pop();
     }
 
-    if (success) {
-      context.push('/check-success');
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          duration: Duration(seconds: 6),
-          content: Text(
-            '📱 Error al enviar el formulario. La información se guardará localmente y se enviará automáticamente.',
-            style: TextStyle(color: Colors.white),
-          ),
-          backgroundColor: Color.fromARGB(255, 255, 152, 0),
-        ),
-      );
-    }
+    // if (success) {
+    //   context.push('/check-success');
+    // } else {
+    //   ScaffoldMessenger.of(context).showSnackBar(
+    //     const SnackBar(
+    //       duration: Duration(seconds: 6),
+    //       content: Text(
+    //         '📱 Error al enviar el formulario. La información se guardará localmente y se enviará automáticamente.',
+    //         style: TextStyle(color: Colors.white),
+    //       ),
+    //       backgroundColor: Color.fromARGB(255, 255, 152, 0),
+    //     ),
+    //   );
+    // }
   }
 
   void _clearCntrl() {

@@ -76,7 +76,12 @@ final appRouter = GoRouter(
         GoRoute(
           path: 'list-employee-movements',
           name: EmployeeMovementScreen.name,
-          builder: (context, state) => const EmployeeMovementScreen()
+          builder: (context, state) {
+            final filters = state.extra as dynamic;
+            return EmployeeMovementScreen(
+              filtersMovement: filters,
+            );
+          },
         ),
         GoRoute(
           path: 'confirm-dispatch',

@@ -6,8 +6,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class EmployeeMovementScreen extends ConsumerStatefulWidget {
   static const name = 'employee-movement-screen';
+  final dynamic filtersMovement;
 
-  const EmployeeMovementScreen({super.key});
+  const EmployeeMovementScreen({super.key, this.filtersMovement});
 
   @override
   ConsumerState<EmployeeMovementScreen> createState() =>
@@ -21,12 +22,22 @@ class _EmployeeMovementScreenState
   @override
   void initState() {
     super.initState();
-    ref.read(getEmployeeMovements.notifier).load();
+    ref.read(getEmployeeMovements.notifier).load(
+      filters:{
+        "page": 1,
+        "rows": 20,
+        if (widget.filtersMovement != null)
+          "id_employee": widget.filtersMovement['id_employee'],
+      }
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     final employeeInterns = ref.watch(getEmployeeMovements);
+
+
+
     final filtered = employeeInterns.where((item) {
       final text = searchText.toLowerCase();
 

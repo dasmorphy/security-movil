@@ -15,6 +15,7 @@ abstract class LogbookEntryRepository {
   Future<bool> saveLogbookOut(Map<String, dynamic> data);
   Future<bool> saveLogbookEntry(Map<String, dynamic> data);
   Future<ApiResponse<dynamic>> saveEmployeeIntern(Map<String, dynamic> data);
+  Future<ApiResponse<dynamic>> saveEmployeeMovement(Map<String, dynamic> data);
   Future <List<AllLogbook>> getHistoryLogbooks(Map<String, dynamic> filters);
   Future<void> downloadExcel();
   Future <List<GroupBusiness>> getGroupBusinessByIdBusiness(int idBusinness);

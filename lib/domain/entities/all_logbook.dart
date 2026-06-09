@@ -23,7 +23,7 @@ class AllLogbook {
   dynamic quantity;
   int recordId;
   String recordType;
-  String shippingGuide;
+  String? shippingGuide;
   String? status;
   String truckLicense;
   dynamic unityId;
@@ -57,7 +57,7 @@ class AllLogbook {
     required this.quantity,
     required this.recordId,
     required this.recordType,
-    required this.shippingGuide,
+    this.shippingGuide,
     this.status,
     required this.truckLicense,
     required this.unityId,

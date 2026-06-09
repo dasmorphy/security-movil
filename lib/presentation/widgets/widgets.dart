@@ -76,3 +76,5 @@ export 'package:zentinel/presentation/widgets/employee/item_recent_employee_inte
 export 'package:zentinel/presentation/widgets/modals/employee_intern_detail_modal.dart';
 export 'package:zentinel/presentation/widgets/modals/employee_movement_detail_modal.dart';
 export 'package:zentinel/presentation/widgets/employee/employee_movement_list.dart';
+export 'package:zentinel/presentation/widgets/shared/option_bottom_sheet.dart';
+export 'package:zentinel/presentation/widgets/forms/employee_intern/employee_movement_form.dart';

@@ -16,6 +16,7 @@ abstract class LogbookEntryDatasource {
   Future<bool> saveLogbookEntry(Map<String, dynamic> data);
   Future<bool> saveLogbookOut(Map<String, dynamic> data);
   Future<ApiResponse<dynamic>> saveEmployeeIntern(Map<String, dynamic> data);
+  Future<ApiResponse<dynamic>> saveEmployeeMovement(Map<String, dynamic> data);
   Future <List<EmployeeIntern>> getEmployeeInterns(Map<String, dynamic> filters);
   Future <List<EmployeeMovement>> getEmployeeMovements(Map<String, dynamic> filters);
   Future <List<AllLogbook>> getHistoryLogbooks(Map<String, dynamic> filters);
