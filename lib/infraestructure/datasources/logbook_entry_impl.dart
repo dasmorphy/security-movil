@@ -355,6 +355,7 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
       queryParameters: {
         'start_date': filters['start_date'],
         'end_date': filters['end_date'],
+        'id_employee': filters['id_employee'],
       },
       options: Options(
         headers: {
@@ -403,8 +404,7 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
       final body = response.data;
 
       return ApiResponse(
-        success: response.statusCode == 200 ||
-            response.statusCode == 201,
+        success: response.statusCode == 200,
         errorCode: body['error_code']?.toString(),
         message: body['message'],
         data: body['data'],

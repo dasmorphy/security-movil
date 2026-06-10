@@ -3,25 +3,33 @@ import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+class EmployeeMovementArgs {
+  final int idEmployee;
+  final String typeMovement;
+
+  EmployeeMovementArgs({
+    required this.idEmployee,
+    required this.typeMovement,
+  });
+}
+
 class NewEmployeeMovementScreen extends ConsumerStatefulWidget  {
 
   static const name = 'new-employee-movement-screen';
 
   final String typeMovement;
+  final int idEmployee;
   
-  const NewEmployeeMovementScreen({super.key, required this.typeMovement});
+  const NewEmployeeMovementScreen({super.key, required this.typeMovement, required this.idEmployee});
 
   @override
   ConsumerState<NewEmployeeMovementScreen> createState() => _NewEmployeeMovementScreenState();
 }
 
 class _NewEmployeeMovementScreenState extends ConsumerState<NewEmployeeMovementScreen> {
-  String searchText = '';
-
   @override
   void initState() {
     super.initState();
-    ref.read(getHistoryEntryAccess.notifier).load();
   }
   
 
@@ -40,6 +48,7 @@ class _NewEmployeeMovementScreenState extends ConsumerState<NewEmployeeMovementS
         child: 
           EmployeeMovementForm(
             typeMovement: widget.typeMovement,
+            idEmployee: widget.idEmployee,
             onSubmit: (data) async {
               return await ref
                 .read(saveEmployeeInternProvider.notifier)

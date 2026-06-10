@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/domain/entities/employee_intern.dart';
 import 'package:zentinel/presentation/providers/logbook/logbook_provider.dart';
+import 'package:zentinel/presentation/screens/employee/new_employee_movement_screen.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
 class EmployeeInternDetailModal extends ConsumerWidget {
@@ -68,113 +69,193 @@ class EmployeeInternDetailModal extends ConsumerWidget {
 
             const SizedBox(height: 20),
 
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(188, 25, 156, 156),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+            // SizedBox(
+            //   width: double.infinity,
+            //   child: ElevatedButton(
+            //     style: ElevatedButton.styleFrom(
+            //       backgroundColor: const Color.fromARGB(188, 25, 156, 156),
+            //       padding: const EdgeInsets.symmetric(vertical: 14),
+            //       shape: RoundedRectangleBorder(
+            //         borderRadius: BorderRadius.circular(12),
+            //       ),
+            //     ),
+            //     onPressed: () async {
+            //         context.push('/list-employee-movements', extra: {
+            //           "id_employee": item.idEmployeeIntern,
+            //         });
+            //     },
+            //     child: const Text(
+            //       'Ver Historial de movimientos',
+            //       style: TextStyle(color: Colors.white),
+            //     ),
+            //   ),
+            // ),
+
+            if (item.lastStatusMovement == 'Salida' || item.lastStatusMovement == 'Movimiento interno')
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(188, 25, 156, 156),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
-                ),
-                onPressed: () async {
-                    context.push('/list-employee-movements', extra: {
-                      "id_employee": item.idEmployeeIntern,
-                    });
-                },
-                child: const Text(
-                  'Ver Historial de movimientos',
-                  style: TextStyle(color: Colors.white),
+                  onPressed: () async {
+                      context.push('/new-employee-movement', 
+                        extra: EmployeeMovementArgs(
+                          idEmployee: item.idEmployeeIntern,
+                          typeMovement: 'CHECK_IN',
+                        )
+                      );
+                  },
+                  child: const Text(
+                    'Ingreso',
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
               ),
-            ),
 
-            const SizedBox(height: 10),
-
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(188, 25, 156, 156),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+            if (item.lastStatusMovement == 'Ingreso') ...[
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(188, 25, 156, 156),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  onPressed: () async {
+                      context.push('/new-employee-movement', 
+                        extra: EmployeeMovementArgs(
+                          idEmployee: item.idEmployeeIntern,
+                          typeMovement: 'TRANSFER',
+                        )
+                      );
+                  },
+                  child: const Text(
+                    'Movimiento interno',
+                    style: TextStyle(color: Colors.white),
                   ),
                 ),
-                onPressed: () async {
-                  if (isLoading) return;
+              ),
 
-                  final option = await OptionBottomSheet.show<String>(
-                    context,
-                    title: 'Seleccionar movimiento',
-                    options: [
-                      if (item.lastStatusMovement == 'Salida' || item.lastStatusMovement == 'Movimiento interno')
-                        BottomSheetOption(
-                          value: 'INTERNAL_TRANSFER',
-                          label: 'Ingreso',
-                          icon: Icons.swap_horiz,
-                        ),
+              const SizedBox(height: 10),
 
-                      if (item.lastStatusMovement == 'Ingreso') ...[
-                        BottomSheetOption(
-                          value: 'INTERNAL_TRANSFER',
-                          label: 'Movimiento interno',
-                          icon: Icons.swap_horiz,
-                        ),
-                        BottomSheetOption(
-                          value: 'END_SHIFT',
-                          label: 'Salida',
-                          icon: Icons.logout,
-                        ),
-                      ],
-                    ],
-                  );
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(188, 25, 156, 156),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  onPressed: () async {
+                      context.push('/new-employee-movement',
+                        extra: EmployeeMovementArgs(
+                          idEmployee: item.idEmployeeIntern,
+                          typeMovement: 'CHECK_OUT',
+                        )
+                      );
+                  },
+                  child: const Text(
+                    'Salida',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ),
+            ],
 
-                  print(option);
+            // const SizedBox(height: 10),
 
-                  if (option == null) return;
+            // SizedBox(
+            //   width: double.infinity,
+            //   child: ElevatedButton(
+            //     style: ElevatedButton.styleFrom(
+            //       backgroundColor: const Color.fromARGB(188, 25, 156, 156),
+            //       padding: const EdgeInsets.symmetric(vertical: 14),
+            //       shape: RoundedRectangleBorder(
+            //         borderRadius: BorderRadius.circular(12),
+            //       ),
+            //     ),
+            //     onPressed: () async {
+            //       if (isLoading) return;
 
-                  GlobalLoadingBottomSheet.show(
-                    status: OverlayStatus.loading, 
-                    message: "Actualizando personal..."
-                  );
+            //       final option = await OptionBottomSheet.show<String>(
+            //         context,
+            //         title: 'Seleccionar movimiento',
+            //         options: [
+            //           if (item.lastStatusMovement == 'Salida' || item.lastStatusMovement == 'Movimiento interno')
+            //             BottomSheetOption(
+            //               value: 'INTERNAL_TRANSFER',
+            //               label: 'Ingreso',
+            //               icon: Icons.swap_horiz,
+            //             ),
 
-                  final response = await ref.read(saveEmployeeInternProvider.notifier).saveEmployeeMovement(
-                    {
-                      "employeeId": item.idEmployeeIntern,
-                      "movementType": option,
-                    }
-                  );
+            //           if (item.lastStatusMovement == 'Ingreso') ...[
+            //             BottomSheetOption(
+            //               value: 'INTERNAL_TRANSFER',
+            //               label: 'Movimiento interno',
+            //               icon: Icons.swap_horiz,
+            //             ),
+            //             BottomSheetOption(
+            //               value: 'END_SHIFT',
+            //               label: 'Salida',
+            //               icon: Icons.logout,
+            //             ),
+            //           ],
+            //         ],
+            //       );
+
+            //       print(option);
+
+            //       if (option == null) return;
+
+            //       GlobalLoadingBottomSheet.show(
+            //         status: OverlayStatus.loading, 
+            //         message: "Actualizando personal..."
+            //       );
+
+            //       final response = await ref.read(saveEmployeeInternProvider.notifier).saveEmployeeMovement(
+            //         {
+            //           "employeeId": item.idEmployeeIntern,
+            //           "movementType": option,
+            //         }
+            //       );
                   
-                  if (response.success) {
-                    GlobalLoadingBottomSheet.show(
-                      status: OverlayStatus.success, 
-                      message: "Despacho guardado exitosamente", 
-                      autoDismiss: const Duration(seconds: 2)
-                    );
-                    // ref.read(getHistoryDispatch.notifier).load();
-                  } else {
-                    GlobalLoadingBottomSheet.show(
-                      status: OverlayStatus.error,
-                      message: 'Error: ${response.message ?? 'Error al guardar el despacho. La información se guardará localmente y se enviará automáticamente.'}',
-                      autoDismiss: const Duration(seconds: 3),
-                    );
+            //       if (response.success) {
+            //         GlobalLoadingBottomSheet.show(
+            //           status: OverlayStatus.success, 
+            //           message: "Despacho guardado exitosamente", 
+            //           autoDismiss: const Duration(seconds: 2)
+            //         );
+            //         // ref.read(getHistoryDispatch.notifier).load();
+            //       } else {
+            //         GlobalLoadingBottomSheet.show(
+            //           status: OverlayStatus.error,
+            //           message: 'Error: ${response.message ?? 'Error al guardar el despacho. La información se guardará localmente y se enviará automáticamente.'}',
+            //           autoDismiss: const Duration(seconds: 3),
+            //         );
 
-                  }
+            //       }
 
-                  if (context.mounted) {
-                    Navigator.pop(context);
-                  }
+            //       if (context.mounted) {
+            //         Navigator.pop(context);
+            //       }
                 
-                },
+            //     },
 
-                child: const Text(
-                  'Más Opciones...',
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-            ),
+            //     child: const Text(
+            //       'Más Opciones...',
+            //       style: TextStyle(color: Colors.white),
+            //     ),
+            //   ),
+            // ),
             const SizedBox(height: 20),
           ],
         ),

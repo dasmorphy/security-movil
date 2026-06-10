@@ -127,6 +127,17 @@ final appRouter = GoRouter(
           path: 'new-employee',
           name: NewEmployeeScreen.name,
           builder: (context, state) => const NewEmployeeScreen()
+        ),
+        GoRoute(
+          path: 'new-employee-movement',
+          name: NewEmployeeMovementScreen.name,
+          builder: (context, state) {
+            final params = state.extra as EmployeeMovementArgs;
+            return NewEmployeeMovementScreen(
+              typeMovement: params.typeMovement,
+              idEmployee: params.idEmployee,
+            );
+          },
         )
       ]
     ),

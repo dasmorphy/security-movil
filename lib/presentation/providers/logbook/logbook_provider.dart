@@ -366,6 +366,24 @@ final getEmployeeInterns =
   },
 );
 
+final getEmployeeInternById =
+    StateNotifierProvider<
+        CatalogNotifier<EmployeeIntern>,
+        List<EmployeeIntern>>(
+  (ref) {
+    final repo = ref.watch(logbookEntryRepositoryProvider);
+
+    return CatalogNotifier<EmployeeIntern>(
+      (filters) {
+        final mergedFilters = {
+          ...?filters,
+        };
+        return repo.getEmployeeInterns(mergedFilters);
+      },
+    );
+  },
+);
+
 final getEmployeeMovements =
     StateNotifierProvider<
         CatalogNotifier<EmployeeMovement>,
