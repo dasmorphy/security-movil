@@ -7,8 +7,8 @@ class EmployeeMovement {
   String employeeLastname;
   String employeeNames;
   String employeeStatus;
-  int groupBusinessId;
-  String groupName;
+  dynamic groupBusinessId;
+  dynamic groupName;
   int idMovement;
   String nameUser;
   dynamic observations;

@@ -157,15 +157,13 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
           );
         }
       }
-      final stopwatch = Stopwatch()..start();
 
       final response = await dio.post(
         '/rest/zent-logbook-api/v1.0/post/logbook-out',
         data: formData,
         options: onlyError(),
       );
-      stopwatch.stop();
-      print('⏱️ Tiempo total request: ${stopwatch.elapsedMilliseconds} ms');
+
       return response.statusCode == 200 || response.statusCode == 409;
     } on DioException catch (e) {
       print("❌ Error enviando logbook: ${e.message}");
@@ -395,9 +393,49 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
   @override
   Future<ApiResponse<dynamic>> saveEmployeeMovement(Map<String, dynamic> data) async {
     try {
+      final images = (data['images'] as List?)?.whereType<Uint8List>().toList() ?? [];
+      final movementData = Map<String, dynamic>.from(data);
+      movementData.remove('images');
+
+      movementData['channel'] = 'ZENTINEL';
+      // movementData['external_transaction_id'] = "3067dc66-ac5e-49d7-8ef9-eb62c51d4bc6";
+
+      final movementJson = jsonEncode(movementData);
+      final movementBytes = utf8.encode(movementJson);
+
+      final formData = FormData();
+
+      // Agregar logbook_out
+      formData.files.add(
+        MapEntry(
+          'employee_movement',
+          MultipartFile.fromBytes(
+            movementBytes,
+            filename: 'employee_movement.json',
+            contentType: MediaType('application', 'json'),
+          ),
+        ),
+      );
+
+      // NUEVO: usar Uint8List directamente
+      if (images.isNotEmpty) {
+        for (var i = 0; i < images.length; i++) {
+          formData.files.add(
+            MapEntry(
+              'images',
+              MultipartFile.fromBytes(
+                images[i],
+                filename: 'image_$i.webp',         // nombre con índice
+                contentType: MediaType('image', 'webp'),
+              ),
+            ),
+          );
+        }
+      }
+
       final response = await dio.post(
         '/rest/zent-logbook-api/v1.0/employee-movement',
-        data: data,
+        data: formData,
         options: onlyError(),
       );
 
@@ -410,11 +448,54 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
         data: body['data'],
       );
     } catch (e) {
-      print('Error al guardar movimiento: $e');
+      print('Error al guardar registro: $e');
+      String messageError = "Error al guardar el registro";
+      if (e is DioException) {
+        messageError = e.response?.data["message"];
+      }
       return ApiResponse(
         success: false,
         errorCode: 'save_error',
-        message: 'Error al guardar movimiento',
+        message: messageError,
+      );
+    }
+  }
+  
+  @override
+  Future<ApiResponse<dynamic>> updateStatusEmployeeIntern(Map<String, dynamic> data) async {
+    try {
+      final idEmployee = data["id_employee"];
+      final response = await dio.patch(
+        '/rest/zent-logbook-api/v1.0/employee-intern/$idEmployee',
+        data: {
+          'externalTransactionId': uuid, 
+          'channel': 'ZENTINEL',
+          'data': {
+            "status": data["status"],
+            "user_update": data["user_update"]
+          }
+        },
+        options: onlyError(),
+      );
+
+      final body = response.data;
+
+      return ApiResponse(
+        success: response.statusCode == 200,
+        errorCode: body['error_code']?.toString(),
+        message: body['message'],
+        data: body['data'],
+      );
+    } catch (e) {
+      print('Error al guardar estado: $e');
+      String messageError = "Error al guardar estado";
+      if (e is DioException) {
+        messageError = e.response?.data["message"];
+      }
+      return ApiResponse(
+        success: false,
+        errorCode: 'save_error',
+        message: messageError,
       );
     }
   }

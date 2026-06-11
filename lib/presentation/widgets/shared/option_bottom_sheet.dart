@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:path/path.dart';
 
 class BottomSheetOption<T> {
   final T value;
@@ -11,43 +12,44 @@ class BottomSheetOption<T> {
 class OptionBottomSheet {
   static Future<T?> show<T>(
     BuildContext context, {
-    required String title,
+    String? title,
     required List<BottomSheetOption<T>> options,
   }) {
     return showModalBottomSheet<T>(
       context: context,
+      backgroundColor: const Color.fromARGB(255, 23, 24, 28),
       useRootNavigator: true,
       builder: (_) {
         return SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
+          child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+                const SizedBox(height: 10),
 
-                const SizedBox(height: 16),
+                if (title != null)...[
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                ],
 
                 ...options.map(
                   (option) => ListTile(
-                    leading: option.icon != null ? Icon(option.icon) : null,
-                    title: Text(option.label),
+                    leading: option.icon != null ? Icon(option.icon, color: Colors.white) : null,
+                    title: Text(option.label, style: TextStyle(color: Colors.white),),
                     onTap: () {
                       Navigator.pop(context, option.value);
                     },
                   ),
                 ),
-
                 const SizedBox(height: 10),
               ],
             ),
-          ),
         );
       },
     );

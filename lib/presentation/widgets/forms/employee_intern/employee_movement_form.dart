@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/domain/entities/api_response.dart';
-import 'package:zentinel/presentation/providers/onboarding/onboarding_provider.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/service/pending_request_service.dart';
@@ -29,7 +28,6 @@ class EmployeeMovementForm extends ConsumerStatefulWidget {
 
 class _EmployeeMovementFormState extends ConsumerState<EmployeeMovementForm> {
   final _formKey = GlobalKey<FormState>();
-  String _categoryEntry = '0';
   String _groupBusiness = '0';
   bool isLoading = false;
   bool imagesMinError = false;
@@ -37,15 +35,13 @@ class _EmployeeMovementFormState extends ConsumerState<EmployeeMovementForm> {
   String _authorized = '0';
   String _destiny = '0';
 
-  String _unityId = '0';
   double _latitude = -0.1865936;
   double _longitude = -78.5953478;
   final _guideCtrl = TextEditingController();
-  final _descCtrl = TextEditingController();
+  final _reasonCtrl = TextEditingController();
   final _quantityCtrl = TextEditingController();
   final _weightCtrl = TextEditingController();
   final _providerCtrl = TextEditingController();
-  final _employeeCtrl = TextEditingController();
   final _observationsCtrl = TextEditingController();
   final _truckLicenseCtrl = TextEditingController();
   final _nameDriverCtrl = TextEditingController();
@@ -67,6 +63,7 @@ class _EmployeeMovementFormState extends ConsumerState<EmployeeMovementForm> {
   final FocusNode _quantityFocus = FocusNode();
   final FocusNode _groupBusinessFocus = FocusNode();
   final FocusNode _descFocus = FocusNode();
+  final FocusNode _reasonFocus = FocusNode();
   final FocusNode _observationsFocus = FocusNode();
   final FocusNode _categoryEntryFocus = FocusNode();
   bool isPickingImage = false;
@@ -98,10 +95,9 @@ class _EmployeeMovementFormState extends ConsumerState<EmployeeMovementForm> {
   @override
   void dispose() {
     _guideCtrl.dispose();
-    _descCtrl.dispose();
+    _reasonCtrl.dispose();
     _quantityCtrl.dispose();
     _weightCtrl.dispose();
-    _employeeCtrl.dispose();
     _providerCtrl.dispose();
     _nameDriverCtrl.dispose();
     _truckLicenseCtrl.dispose();
@@ -198,58 +194,62 @@ class _EmployeeMovementFormState extends ConsumerState<EmployeeMovementForm> {
     // Construir los datos del formulario
     final data = {
       "external_transaction_id": Uuid().v4(),
-      "provider": _providerCtrl.text.trim(),
-      "destiny_intern": _destiny,
-      "authorized_by": _authorized,
+      "authorized_id": _authorized != '0' ? int.tryParse(_authorized) : null,
+      "employee_id": widget.idEmployee,
+      "group_business_id": _destiny != '0' ? int.tryParse(_destiny) : null,
+      "name_user": userHive.value?.name ?? userData.attributes['fullname'],
+      // "other_destiny"
       "observations": _observationsCtrl.text.trim(),
-      "employee_intern": int.tryParse(_employeeCtrl.text),
-      "name_driver": _nameDriverCtrl.text.trim(),
-      "truck_license": _truckLicenseCtrl.text.trim(),
+      "reason_out": _reasonCtrl.text.trim(),
+      "type_movement": widget.typeMovement,
       "lat": _latitude.toString(),
       "long": _longitude.toString(),
-      "created_by": userData.user,
-      "name_user": userHive.value?.name ?? userData.attributes['fullname'],
-      "id_group_business":
-          userData.attributes['group_business'] ?? int.parse(_groupBusiness),
+      "user": userData.user,
       "images": _selectedImages
           .whereType<Uint8List>()
           .toList(), // Lista de Uint8List directo, sin base64
     };
 
     // Verificar conexión a internet
-    final internetAvailable = await hasInternet();
+    // final internetAvailable = await hasInternet();
 
-    if (!internetAvailable) {
-      // 🔴 SIN INTERNET: Guardar localmente
-      print('❌ Sin conexión, guardando localmente...');
-      data['created_at'] = DateTime.now().toString();
-      await savePendingRequest(data, 'logbook_entry');
+    // if (!internetAvailable) {
+    //   // 🔴 SIN INTERNET: Guardar localmente
+    //   print('❌ Sin conexión, guardando localmente...');
+    //   data['created_at'] = DateTime.now().toString();
+    //   await savePendingRequest(data, 'logbook_entry');
 
-      if (mounted) {
-        // Navigator.pop(context); // Cerrar dialog de procesamiento
-        _clearCntrl();
-        if (Navigator.canPop(context)) {
-          context.pop(); // Cerrar el formulario
-        }
+    //   if (mounted) {
+    //     // Navigator.pop(context); // Cerrar dialog de procesamiento
+    //     _clearCntrl();
+    //     if (Navigator.canPop(context)) {
+    //       context.pop(); // Cerrar el formulario
+    //     }
 
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            duration: Duration(seconds: 6),
-            content: Text(
-              '📱 Sin conexión. Tu información se guardará localmente y se enviará automáticamente cuando recuperes conexión.',
-              style: TextStyle(color: Colors.white),
-            ),
-            backgroundColor: Color.fromARGB(255, 255, 152, 0),
-          ),
-        );
-      }
-      setState(() => isLoading = false);
-      return;
-    }
+    //     ScaffoldMessenger.of(context).showSnackBar(
+    //       const SnackBar(
+    //         duration: Duration(seconds: 6),
+    //         content: Text(
+    //           '📱 Sin conexión. Tu información se guardará localmente y se enviará automáticamente cuando recuperes conexión.',
+    //           style: TextStyle(color: Colors.white),
+    //         ),
+    //         backgroundColor: Color.fromARGB(255, 255, 152, 0),
+    //       ),
+    //     );
+    //   }
+    //   setState(() => isLoading = false);
+    //   return;
+    // }
 
     // 🟢 CON INTERNET: Enviar al servidor
     print('✅ Conexión disponible, enviando al servidor...');
-    final success = await widget.onSubmit.call(data);
+
+    GlobalLoadingBottomSheet.show(
+      status: OverlayStatus.loading, 
+      message: "Guardando registro..."
+    );
+
+    final response = await widget.onSubmit.call(data);
     setState(() => isLoading = false);
 
     // if (!success) {
@@ -263,31 +263,31 @@ class _EmployeeMovementFormState extends ConsumerState<EmployeeMovementForm> {
       context.pop();
     }
 
-    // if (success) {
-    //   context.push('/check-success');
-    // } else {
-    //   ScaffoldMessenger.of(context).showSnackBar(
-    //     const SnackBar(
-    //       duration: Duration(seconds: 6),
-    //       content: Text(
-    //         '📱 Error al enviar el formulario. La información se guardará localmente y se enviará automáticamente.',
-    //         style: TextStyle(color: Colors.white),
-    //       ),
-    //       backgroundColor: Color.fromARGB(255, 255, 152, 0),
-    //     ),
-    //   );
-    // }
+    if (response.success) {
+      GlobalLoadingBottomSheet.show(
+        status: OverlayStatus.success, 
+        message: "Registro guardado exitosamente", 
+        autoDismiss: const Duration(seconds: 2)
+      );
+      ref.read(getEmployeeMovements.notifier).load();
+      ref.read(getEmployeeInterns.notifier).load();
+    } else {
+      // await savePendingBiomar(data, 'dispatch');
+      GlobalLoadingBottomSheet.show(
+        status: OverlayStatus.error,
+        message: 'Error: ${response.message ?? 'Error al guardar el registro.'}',
+        autoDismiss: const Duration(seconds: 3),
+      );
+    }
   }
 
   void _clearCntrl() {
     _selectedImages = [];
     _formKey.currentState?.reset();
-    _categoryEntry = '0';
     _groupBusiness = '0';
-    _unityId = '0';
     _destiny = '0';
     _guideCtrl.clear();
-    _descCtrl.clear();
+    _reasonCtrl.clear();
     _quantityCtrl.clear();
     _weightCtrl.clear();
     _providerCtrl.clear();
@@ -524,8 +524,8 @@ class _EmployeeMovementFormState extends ConsumerState<EmployeeMovementForm> {
                 const SizedBox(height: 12),
                 CustomFieldLabelRequired(txtLabel: 'Motivo'),
                 GlowTextFormField(
-                  controller: _descCtrl,
-                  focusNode: _descFocus,
+                  controller: _reasonCtrl,
+                  focusNode: _reasonFocus,
                   validator: (v) {
                     if (v == null || v.trim().isEmpty) {
                       return messageValidatorEmpty;

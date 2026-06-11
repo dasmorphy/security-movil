@@ -1,6 +1,5 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:zentinel/presentation/providers/onboarding/onboarding_provider.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 
 class DioInterceptor extends Interceptor {

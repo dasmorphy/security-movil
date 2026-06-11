@@ -87,4 +87,9 @@ class LogbookEntryRepositoryImpl extends LogbookEntryRepository {
     return datasource.getEmployeeMovements(filters);
   }
   
+  @override
+  Future<ApiResponse<dynamic>> updateStatusEmployeeIntern(Map<String, dynamic> data) {
+    return datasource.updateStatusEmployeeIntern(data);
+  }
+  
 }
