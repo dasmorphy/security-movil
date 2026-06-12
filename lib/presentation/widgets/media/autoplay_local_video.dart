@@ -39,7 +39,6 @@ class _VideoHeaderState extends ConsumerState<VideoHeader> {
 
   @override
   Widget build(BuildContext context) {
-
     final authState = ref.watch(userSessionProvider);
 
     return authState.when(
@@ -54,9 +53,7 @@ class _VideoHeaderState extends ConsumerState<VideoHeader> {
         final profileAsync = ref.watch(userProfileProvider(userData.email));
 
         return profileAsync.when(
-          loading: () => const Center(
-            child: CircularProgressIndicator(),
-          ),
+          loading: () => const Center(child: CircularProgressIndicator()),
           error: (_, __) => const SizedBox(),
           data: (userProfile) {
             return SizedBox(
@@ -99,36 +96,79 @@ class _VideoHeaderState extends ConsumerState<VideoHeader> {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
-                                if (userData.hasPermission(Permissions.dispatchOffline))...[
-                                  InkWell(
-                                    borderRadius: BorderRadius.circular(20),
-                                    onTap: () => _openModal(context, DispatchOffline()),
-                                    child: const Padding(
-                                      padding: EdgeInsets.all(7),
-                                      child: Icon(Icons.upload_file_rounded, color: Colors.white),
+                                InkWell(
+                                  onTap: () async {
+                                    if (isLoading) return;
+
+                                    final option = await OptionBottomSheet.show<String>(
+                                      context,
+                                      options: [
+                                        if (userData.hasPermission(Permissions.bitacorasOffline))
+                                          BottomSheetOption(
+                                            value: 'BITACORAS',
+                                            label: 'Bitácoras',
+                                            icon: Icons.document_scanner_rounded,
+                                          ),
+                                        if (userData.hasPermission(Permissions.personalInternoOffline))
+                                          BottomSheetOption(
+                                            value: 'PERSONAL_INTERNO',
+                                            label: 'Personal interno',
+                                            icon: Icons.person_outline,
+                                          ),
+                                        if (userData.hasPermission(Permissions.dispatchOffline))
+                                          BottomSheetOption(
+                                            value: 'DESPACHO_INGRESO',
+                                            label: 'Despachos e ingresos',
+                                            icon: Icons.assignment_turned_in_rounded,
+                                          ),
+                                      ],
+                                    );
+
+                                    if (option == null) return;
+
+                                    if (option == 'BITACORAS') {
+                                      if (context.mounted) {
+                                        _openModal(
+                                          context,
+                                          LogbooksOfflineListModal(),
+                                        );
+                                      }
+                                    }
+
+                                    if (option == 'PERSONAL_INTERNO') {
+                                      if (context.mounted) {
+                                        _openModal(
+                                          context,
+                                          EmployeeMovementOffline(),
+                                        );
+                                      }
+                                    }
+
+                                    if (option == 'DESPACHO_INGRESO') {
+                                      if (context.mounted) {
+                                        _openModal(context, DispatchOffline());
+                                      }
+                                    }
+                                  },
+
+                                  child: const Padding(
+                                    padding: EdgeInsets.all(7),
+                                    child: Icon(
+                                      Icons.cloud_sync,
+                                      color: Colors.white,
                                     ),
                                   ),
-                                ],
-                                if (userData.hasPermission(Permissions.bitacorasOffline))...[
-                                  InkWell(
-                                    borderRadius: BorderRadius.circular(20),
-                                    onTap: () => _openModal(context, LogbooksOfflineListModal()),
-                                    child: const Padding(
-                                      padding: EdgeInsets.all(7),
-                                      child: Icon(Icons.upload_file_rounded, color: Colors.white),
-                                    ),
-                                  ),
-                                ]
+                                ),
                               ],
                             ),
-                            
+
                             Align(
                               alignment: Alignment.centerLeft,
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  const SizedBox(height: 15,),
+                                  const SizedBox(height: 15),
                                   const Text(
                                     'Hola,',
                                     style: TextStyle(
@@ -139,8 +179,8 @@ class _VideoHeaderState extends ConsumerState<VideoHeader> {
                                   ),
                                   Text(
                                     userProfile?.name ??
-                                      userData.attributes['fullname'] ??
-                                      'Usuario',
+                                        userData.attributes['fullname'] ??
+                                        'Usuario',
                                     style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 25,
@@ -157,8 +197,8 @@ class _VideoHeaderState extends ConsumerState<VideoHeader> {
                   ],
                 ),
               ),
-            );  
-          }
+            );
+          },
         );
       },
     );

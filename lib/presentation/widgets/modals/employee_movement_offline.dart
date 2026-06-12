@@ -4,23 +4,22 @@ import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
-class LogbooksOfflineListModal extends ConsumerWidget {
-  const LogbooksOfflineListModal({super.key});
+class EmployeeMovementOffline extends ConsumerWidget {
+  const EmployeeMovementOffline({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final pendingAsync = ref.watch(pendingRequestsProvider);
+    final pendingAsync = ref.watch(pendingEmployeeMovementsProvider);
 
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(60),
+        preferredSize: const Size.fromHeight(80),
         child: HeaderOffline(
-          headerTxt: 'Bitácoras offline', 
+          headerTxt: 'Movimientos offline', 
           pendingAsync: pendingAsync, 
-          sync: ref.read(syncPendingProvider.notifier).sync()
+          sync: ref.read(syncPendingProvider.notifier).syncEmployeeMovements()
         ),
       ),
-      
       resizeToAvoidBottomInset: false,
       backgroundColor: const Color.fromARGB(255, 23, 24, 28),
       body: SafeArea(
@@ -35,12 +34,12 @@ class LogbooksOfflineListModal extends ConsumerWidget {
                   ),
                 ),
                 data: (pending) {
-                  final items = pending.map(mapPendingToUI).toList();
+                  final items = pending.map(mapPendingEmployeeMovements).toList();
 
                   if (items.isEmpty) {
                     return const Center(
                       child: Text(
-                        'Sin bitácoras pendientes',
+                        'Sin registros pendientes',
                         style: TextStyle(color: Colors.white70),
                       ),
                     );
@@ -48,7 +47,7 @@ class LogbooksOfflineListModal extends ConsumerWidget {
 
               return ListView.separated(
                 itemCount: items.length,
-                separatorBuilder: (_, __) => const SizedBox(height: 12),
+                separatorBuilder: (_, _) => const SizedBox(height: 12),
                 itemBuilder: (context, index) {
                   final it = items[index];
                   final name = it['name'];

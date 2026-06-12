@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/domain/entities/employee_movement.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
@@ -37,11 +36,13 @@ class EmployeeMovementDetailModal extends StatelessWidget {
                     detailRow('Nombres', item.employeeNames),
                     detailRow('Apellidos', item.employeeLastname),
                     detailRow('Cédula', item.employeeDni),
-                    detailRow('Usuario', item.nameUser),
                     detailRow('Finca', item.groupName),
+                    detailRow('Otro destino', item.otherDestiny),
+                    detailRow('Motivo', item.reasonOut),
                     detailRow('Estado', item.status),
                     detailRow('Observaciones', item.observations),
                     detailRow('Creado por', item.createdBy),
+                    detailRow('Guardia', item.nameUser),
                     detailRow(
                       'Fecha Creación',
                       formatDateDetails(item.createdAt.toString()),
@@ -52,41 +53,37 @@ class EmployeeMovementDetailModal extends StatelessWidget {
                       formatDateDetails(item.updatedAt.toString()),
                     ),
 
-                    // if (item.photo != null)
-                    //   ImagesGrid(
-                    //     title: 'Foto personal',
-                    //     images: [item.photo],
-                    //   ),
+                    if (item.images.isNotEmpty)
+                      ImagesGrid(
+                        title: 'Imágenes',
+                        images: item.images,
+                      ),
                   ],
                 ),
               ),
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
 
-            // SizedBox(
-            //   width: double.infinity,
-            //   child: ElevatedButton(
-            //     style: ElevatedButton.styleFrom(
-            //       backgroundColor: const Color.fromARGB(188, 25, 156, 156),
-            //       padding: const EdgeInsets.symmetric(vertical: 14),
-            //       shape: RoundedRectangleBorder(
-            //         borderRadius: BorderRadius.circular(12),
-            //       ),
-            //     ),
-            //     onPressed: () {
-            //       context.push('/list-logbooks', extra: {
-            //         "employees-intern": item.idMovement,
-            //       });
-            //     },
-            //     child: const Text(
-            //       'Ver bitácoras',
-            //       style: TextStyle(color: Colors.white),
-            //     ),
-            //   ),
-            // ),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF444444),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text(
+                  'Cerrar',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 14),
           ],
         ),
       ),

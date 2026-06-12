@@ -451,6 +451,11 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
       print('Error al guardar registro: $e');
       String messageError = "Error al guardar el registro";
       if (e is DioException) {
+        if (e.type == DioExceptionType.connectionError ||
+            e.type == DioExceptionType.connectionTimeout ||
+            e.type == DioExceptionType.receiveTimeout) {
+          rethrow;
+        }
         messageError = e.response?.data["message"];
       }
       return ApiResponse(

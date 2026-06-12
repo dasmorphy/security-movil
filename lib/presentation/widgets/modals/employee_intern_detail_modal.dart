@@ -44,12 +44,12 @@ class EmployeeInternDetailModal extends ConsumerWidget {
                     detailRow('Nombres', item.names),
                     detailRow('Apellidos', item.lastname),
                     detailRow('Cédula', item.dni),
-                    detailRow('Usuario', item.nameUser),
                     detailRow('Cargo', item.position),
                     detailRow('Finca', item.groupName),
                     detailRow('Estado', item.status),
                     detailRow('Observaciones', item.observations),
                     detailRow('Creado por', item.createdBy),
+                    detailRow('Guardia', item.nameUser),
                     detailRow(
                       'Fecha Creación',
                       formatDateDetails(item.createdAt.toString()),

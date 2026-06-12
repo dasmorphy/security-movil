@@ -18,5 +18,6 @@ class Permissions {
   static const dispatchOffline = 'DISPATCH_OFFLINE';
   static const bitacorasOffline = 'BITACORAS_OFFLINE';
   static const nuevoProductoInterno = 'NUEVO_PRODUCTO_INTERNO';
+  static const personalInternoOffline = 'PERSONAL_INTERNO_OFFLINE';
 
 }

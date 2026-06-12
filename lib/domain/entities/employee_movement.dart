@@ -7,6 +7,7 @@ class EmployeeMovement {
   String employeeLastname;
   String employeeNames;
   String employeeStatus;
+  List<String> images;
   dynamic groupBusinessId;
   dynamic groupName;
   int idMovement;
@@ -39,6 +40,7 @@ class EmployeeMovement {
     required this.typeMovement,
     required this.updatedAt,
     required this.updatedBy,
+    required this.images
   });
 
   factory EmployeeMovement.fromJson(Map<String, dynamic> json) =>
@@ -55,6 +57,7 @@ class EmployeeMovement {
         groupName: json["group_name"],
         idMovement: json["id_movement"],
         nameUser: json["name_user"],
+        images: List<String>.from(json["images"].map((x) => x)),
         observations: json["observations"],
         otherDestiny: json["other_destiny"],
         reasonOut: json["reason_out"],
@@ -71,6 +74,7 @@ class EmployeeMovement {
     "employee_dni": employeeDni,
     "employee_id": employeeId,
     "employee_lastname": employeeLastname,
+    "images": List<dynamic>.from(images.map((x) => x)),
     "employee_names": employeeNames,
     "group_business_id": groupBusinessId,
     "group_name": groupName,

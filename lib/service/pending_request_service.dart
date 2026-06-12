@@ -1,19 +1,20 @@
 import 'dart:async';
-import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import 'package:internet_connection_checker_plus/internet_connection_checker_plus.dart';
 import 'package:path_provider/path_provider.dart';
 
 
 Future<bool> hasInternet() async {
-  final connectivityResult = await Connectivity().checkConnectivity();
-
-  return connectivityResult != ConnectivityResult.none;
+  try {
+    final result = await InternetAddress.lookup('google.com');
+    return result.isNotEmpty && result.first.rawAddress.isNotEmpty;
+  } catch (_) {
+    return false;
+  }
 }
 
 Future<List<String>> saveImagesToDisk(List<Uint8List> images) async {
@@ -77,6 +78,16 @@ Future<void> savePendingBiomar(Map<String, dynamic> data, String nameMethod) asy
 
   await box.add({
     'endpoint': nameMethod,
+    'payload': preparedData,
+    'createdAt': DateTime.now().toIso8601String(),
+  });
+}
+
+Future<void> savePendingEmployeeMovements(Map<String, dynamic> data) async {
+  final box = Hive.box('pending_employee_movements');
+  final preparedData = await _prepareDataForStorage(data);
+
+  await box.add({
     'payload': preparedData,
     'createdAt': DateTime.now().toIso8601String(),
   });

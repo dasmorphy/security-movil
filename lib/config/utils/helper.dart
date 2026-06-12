@@ -231,6 +231,22 @@ Map<String, dynamic> mapPendingBiomar(Map<String, dynamic> raw) {
   };
 }
 
+Map<String, dynamic> mapPendingEmployeeMovements(Map<String, dynamic> raw) {
+  final bool processing = raw['processing'] == true;
+  const movementStatus = {
+    'CHECK_IN': 'Ingreso',
+    'TRANSFER': 'Movimiento interno',
+    'CHECK_OUT': 'Salida',
+  };
+
+  final typeMovement = movementStatus[raw['payload']['type_movement']] ?? 'Desconocido';
+  return {
+    "name": 'Movimiento',
+    "subtitle": typeMovement,
+    "statusText": processing ? 'Subiendo...' : 'Pendiente',
+  };
+}
+
 Future<Uint8List?> convertToWebP(File file) async {
   final result = await FlutterImageCompress.compressWithFile(
     file.absolute.path,

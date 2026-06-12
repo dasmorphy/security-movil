@@ -39,6 +39,7 @@ class _EmployeeMovementFormState extends ConsumerState<EmployeeMovementForm> {
   double _longitude = -78.5953478;
   final _guideCtrl = TextEditingController();
   final _reasonCtrl = TextEditingController();
+  final _otherDestinyCtrl = TextEditingController();
   final _quantityCtrl = TextEditingController();
   final _weightCtrl = TextEditingController();
   final _providerCtrl = TextEditingController();
@@ -63,6 +64,7 @@ class _EmployeeMovementFormState extends ConsumerState<EmployeeMovementForm> {
   final FocusNode _quantityFocus = FocusNode();
   final FocusNode _groupBusinessFocus = FocusNode();
   final FocusNode _descFocus = FocusNode();
+  final FocusNode _otherDestinyFocus = FocusNode();
   final FocusNode _reasonFocus = FocusNode();
   final FocusNode _observationsFocus = FocusNode();
   final FocusNode _categoryEntryFocus = FocusNode();
@@ -196,9 +198,9 @@ class _EmployeeMovementFormState extends ConsumerState<EmployeeMovementForm> {
       "external_transaction_id": Uuid().v4(),
       "authorized_id": _authorized != '0' ? int.tryParse(_authorized) : null,
       "employee_id": widget.idEmployee,
-      "group_business_id": _destiny != '0' ? int.tryParse(_destiny) : null,
+      "group_business_id": _destiny != '0' && _destiny != '1000' ? int.tryParse(_destiny) : null,
       "name_user": userHive.value?.name ?? userData.attributes['fullname'],
-      // "other_destiny"
+      "other_destiny": _destiny == '1000' ? _otherDestinyCtrl.text.trim() : null,
       "observations": _observationsCtrl.text.trim(),
       "reason_out": _reasonCtrl.text.trim(),
       "type_movement": widget.typeMovement,
@@ -211,35 +213,29 @@ class _EmployeeMovementFormState extends ConsumerState<EmployeeMovementForm> {
     };
 
     // Verificar conexión a internet
-    // final internetAvailable = await hasInternet();
+    final internetAvailable = await hasInternet();
 
-    // if (!internetAvailable) {
-    //   // 🔴 SIN INTERNET: Guardar localmente
-    //   print('❌ Sin conexión, guardando localmente...');
-    //   data['created_at'] = DateTime.now().toString();
-    //   await savePendingRequest(data, 'logbook_entry');
+    if (!internetAvailable) {
+      // 🔴 SIN INTERNET: Guardar localmente
+      print('❌ Sin conexión, guardando localmente...');
+      data['created_at'] = DateTime.now().toString();
+      await savePendingEmployeeMovements(data);
 
-    //   if (mounted) {
-    //     // Navigator.pop(context); // Cerrar dialog de procesamiento
-    //     _clearCntrl();
-    //     if (Navigator.canPop(context)) {
-    //       context.pop(); // Cerrar el formulario
-    //     }
-
-    //     ScaffoldMessenger.of(context).showSnackBar(
-    //       const SnackBar(
-    //         duration: Duration(seconds: 6),
-    //         content: Text(
-    //           '📱 Sin conexión. Tu información se guardará localmente y se enviará automáticamente cuando recuperes conexión.',
-    //           style: TextStyle(color: Colors.white),
-    //         ),
-    //         backgroundColor: Color.fromARGB(255, 255, 152, 0),
-    //       ),
-    //     );
-    //   }
-    //   setState(() => isLoading = false);
-    //   return;
-    // }
+      if (mounted) {
+        // Navigator.pop(context); // Cerrar dialog de procesamiento
+        _clearCntrl();
+        if (Navigator.canPop(context)) {
+          context.pop(); // Cerrar el formulario
+        }
+        GlobalLoadingBottomSheet.show(
+          status: OverlayStatus.warning, 
+          message: 'Sin conexión. Tu información se guardará localmente y se enviará automáticamente cuando recuperes conexión.', 
+          autoDismiss: const Duration(seconds: 5)
+        );
+      }
+      setState(() => isLoading = false);
+      return;
+    }
 
     // 🟢 CON INTERNET: Enviar al servidor
     print('✅ Conexión disponible, enviando al servidor...');
@@ -249,33 +245,40 @@ class _EmployeeMovementFormState extends ConsumerState<EmployeeMovementForm> {
       message: "Guardando registro..."
     );
 
-    final response = await widget.onSubmit.call(data);
-    setState(() => isLoading = false);
+    ApiResponse<dynamic> response;
 
-    // if (!success) {
-    //   await savePendingRequest(data, 'logbook_entry');
-    // }
+    try {
+      response = await widget.onSubmit.call(data);
+      setState(() => isLoading = false);
 
-    if (!mounted) return;
+      if (!mounted) return;
 
-    _clearCntrl();
-    if (Navigator.canPop(context)) {
-      context.pop();
-    }
+      _clearCntrl();
+      if (Navigator.canPop(context)) {
+        context.pop();
+      }
 
-    if (response.success) {
-      GlobalLoadingBottomSheet.show(
-        status: OverlayStatus.success, 
-        message: "Registro guardado exitosamente", 
-        autoDismiss: const Duration(seconds: 2)
-      );
-      ref.read(getEmployeeMovements.notifier).load();
-      ref.read(getEmployeeInterns.notifier).load();
-    } else {
-      // await savePendingBiomar(data, 'dispatch');
+      if (response.success) {
+        GlobalLoadingBottomSheet.show(
+          status: OverlayStatus.success, 
+          message: "Registro guardado exitosamente", 
+          autoDismiss: const Duration(seconds: 2)
+        );
+        ref.read(getEmployeeMovements.notifier).load();
+        ref.read(getEmployeeInterns.notifier).load();
+      } else {
+        await savePendingEmployeeMovements(data);
+        GlobalLoadingBottomSheet.show(
+          status: OverlayStatus.error,
+          message: 'Error: ${response.message ?? 'Error al guardar el registro.'}',
+          autoDismiss: const Duration(seconds: 3),
+        );
+      }
+    } catch (e) {
+      await savePendingEmployeeMovements(data);
       GlobalLoadingBottomSheet.show(
         status: OverlayStatus.error,
-        message: 'Error: ${response.message ?? 'Error al guardar el registro.'}',
+        message: 'Error al guardar el registro.',
         autoDismiss: const Duration(seconds: 3),
       );
     }
@@ -559,6 +562,13 @@ class _EmployeeMovementFormState extends ConsumerState<EmployeeMovementForm> {
                         ),
                       ),
                     ),
+                    const DropdownMenuItem(
+                      value: '1000',
+                      child: Text(
+                        'Otros',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
                   ],
                   onChanged: (v) {
                     if (v != null) {
@@ -576,6 +586,20 @@ class _EmployeeMovementFormState extends ConsumerState<EmployeeMovementForm> {
                 ),
               ],
 
+              if (_destiny == '1000')...[
+                const SizedBox(height: 12),
+                CustomFieldLabelRequired(txtLabel: 'Otro destino'),
+                GlowTextFormField(
+                  controller: _otherDestinyCtrl,
+                  focusNode: _otherDestinyFocus,
+                  validator: (v) {
+                    if (v == null || v.trim().isEmpty) {
+                      return messageValidatorEmpty;
+                    }
+                    return null;
+                  },
+                ),
+              ],
 
               if (widget.typeMovement != 'CHECK_IN') ...[
                 const SizedBox(height: 12),
