@@ -5,7 +5,6 @@ import 'dart:typed_data';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
-import 'package:path_provider/path_provider.dart';
 
 
 Future<bool> hasInternet() async {
@@ -17,30 +16,25 @@ Future<bool> hasInternet() async {
   }
 }
 
-Future<List<String>> saveImagesToDisk(List<Uint8List> images) async {
-  final dir = await getApplicationDocumentsDirectory();
-  List<String> paths = [];
-
-  for (int i = 0; i < images.length; i++) {
-    final file = File('${dir.path}/img_${DateTime.now().millisecondsSinceEpoch}_$i.webp');
-    await file.writeAsBytes(images[i]);
-    paths.add(file.path);
-  }
-
-  return paths;
-}
-
-/// Convierte archivos a Base64 para poder ser guardados en Hive
+/// Normaliza las imágenes a `List<Uint8List>` para guardarlas dentro del
+/// propio registro de Hive.
+///
+/// Antes las imágenes se escribían a disco y en Hive se almacenaba solo la
+/// ruta ABSOLUTA del archivo. En iOS el path del contenedor de la app incluye
+/// un UUID que cambia entre actualizaciones y relanzamientos, por lo que la
+/// ruta dejaba de resolver tras horas/días y las imágenes se perdían
+/// silenciosamente. Guardando los bytes en Hive el registro es autocontenido:
+/// Hive re-resuelve su propia ruta en cada arranque, así que sobrevive a
+/// relanzamientos, actualizaciones y cambios de contenedor.
 Future<Map<String, dynamic>> _prepareDataForStorage(
   Map<String, dynamic> data,
 ) async {
   final preparedData = Map<String, dynamic>.from(data);
 
-  if (preparedData['images'] != null && preparedData['images'] is List) {
-    preparedData['images'] = await saveImagesToDisk(
-      (preparedData['images'] as List).whereType<Uint8List>().toList(),
-    );
-    // Ahora 'images' es List<String> de paths
+  if (preparedData['images'] is List) {
+    preparedData['images'] = (preparedData['images'] as List)
+        .whereType<Uint8List>()
+        .toList(); // Bytes guardados directo en Hive
   }
 
   return preparedData;
@@ -49,11 +43,14 @@ Future<Map<String, dynamic>> _prepareDataForStorage(
 Map<String, dynamic> restoreFiles(Map<String, dynamic> data) {
   final restored = Map<String, dynamic>.from(data);
 
-  if (restored['images'] != null && restored['images'] is List) {
+  if (restored['images'] is List) {
     restored['images'] = (restored['images'] as List)
-        .whereType<String>()
-        .where((path) => File(path).existsSync())
-        .map((path) => File(path).readAsBytesSync()) // path → Uint8List
+        .map<Uint8List>(
+          (e) => e is Uint8List
+              ? e
+              // Hive puede devolver List<int> según el tipo almacenado
+              : Uint8List.fromList((e as List).cast<int>()),
+        )
         .toList();
   }
 

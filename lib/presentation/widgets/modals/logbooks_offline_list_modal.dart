@@ -17,7 +17,7 @@ class LogbooksOfflineListModal extends ConsumerWidget {
         child: HeaderOffline(
           headerTxt: 'Bitácoras offline', 
           pendingAsync: pendingAsync, 
-          sync: ref.read(syncPendingProvider.notifier).sync()
+          sync: ref.read(syncPendingProvider.notifier).sync
         ),
       ),
       

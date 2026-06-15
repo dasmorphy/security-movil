@@ -399,6 +399,7 @@ class _EmployeeMovementFormState extends ConsumerState<EmployeeMovementForm> {
         _dniCtrl.text = employeeInternById[0].dni;
         _namesCtrl.text = '${employeeInternById[0].names} ${employeeInternById[0].lastname}';
         _positionCtrl.text = employeeInternById[0].position;
+        _minImages = employeeInternById[0].lastStatusMovement == 'Movimiento interno' && widget.typeMovement == 'CHECK_IN' ? 3 : 5;
       });
     }else {
       return Center(

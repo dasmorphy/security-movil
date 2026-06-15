@@ -6,7 +6,7 @@ import 'package:zentinel/presentation/widgets/widgets.dart';
 class HeaderOffline extends ConsumerWidget {
   final String headerTxt;
   final AsyncValue<List<Map<String, dynamic>>> pendingAsync;
-  final Future<void> sync;
+  final Future<void> Function() sync;
   const HeaderOffline({super.key, required this.headerTxt, required this.pendingAsync, required this.sync});
 
   @override
@@ -58,7 +58,7 @@ class HeaderOffline extends ConsumerWidget {
                     borderRadius: BorderRadius.circular(20),
                     onTap: () {
                       if (canRetry) {
-                        sync;
+                        sync(); // antes era `sync;` (no disparaba nada)
                       } else {
                         _showNoPendingDialog(context);
                       }

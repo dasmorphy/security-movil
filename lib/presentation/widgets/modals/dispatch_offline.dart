@@ -17,7 +17,7 @@ class DispatchOffline extends ConsumerWidget {
         child: HeaderOffline(
           headerTxt: 'Registros offline', 
           pendingAsync: pendingAsync, 
-          sync: ref.read(syncPendingProvider.notifier).syncBiomar(),
+          sync: ref.read(syncPendingProvider.notifier).syncBiomar,
         ),
       ),
       resizeToAvoidBottomInset: false,

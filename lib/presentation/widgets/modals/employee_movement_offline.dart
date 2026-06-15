@@ -17,7 +17,7 @@ class EmployeeMovementOffline extends ConsumerWidget {
         child: HeaderOffline(
           headerTxt: 'Movimientos offline', 
           pendingAsync: pendingAsync, 
-          sync: ref.read(syncPendingProvider.notifier).syncEmployeeMovements()
+          sync: ref.read(syncPendingProvider.notifier).syncEmployeeMovements
         ),
       ),
       resizeToAvoidBottomInset: false,
