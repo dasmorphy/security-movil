@@ -201,7 +201,13 @@ class EmployeeInternDetailModal extends ConsumerWidget {
                           message: "Estado actualizado exitosamente", 
                           autoDismiss: const Duration(seconds: 2)
                         );
-                        ref.read(getEmployeeInterns.notifier).load();
+                        ref.read(getEmployeeInterns.notifier).load(
+                          filters: {
+                            "page": 1,
+                            "rows": 20,
+                            "id_group_business": userData.attributes['group_business'],
+                          },
+                        );
                         if (context.mounted) {
                           context.pop();
                         }

@@ -165,7 +165,7 @@ class _EmployeeMovementFormState extends ConsumerState<EmployeeMovementForm> {
     //   setState(() => isLoading = false);
     //   return;
     // }
-    if (_selectedImages.length < 3) {
+    if (_selectedImages.length < _minImages) {
       setState(() {
         imagesMinError = true;
         isLoading = false;
@@ -270,8 +270,22 @@ class _EmployeeMovementFormState extends ConsumerState<EmployeeMovementForm> {
           message: "Registro guardado exitosamente", 
           autoDismiss: const Duration(seconds: 2)
         );
-        ref.read(getEmployeeMovements.notifier).load();
-        ref.read(getEmployeeInterns.notifier).load();
+        ref.read(getEmployeeMovements.notifier).load(
+          filters:{
+            "page": 1,
+            "rows": 20,
+            "type_movement": "TRANSFER",
+            "group_business_id": userData.attributes['group_business'],
+            "status_employee": "Autorizado"
+          }
+        );
+        ref.read(getEmployeeInterns.notifier).load(
+          filters: {
+            "page": 1,
+            "rows": 20,
+            "id_group_business": userData.attributes['group_business'],
+          },
+        );
       } else {
         await savePendingEmployeeMovements(data);
         GlobalLoadingBottomSheet.show(
@@ -694,7 +708,7 @@ class _EmployeeMovementFormState extends ConsumerState<EmployeeMovementForm> {
                   width: double.infinity,
                   child: Text(
                     imagesMinError
-                        ? 'Debe subir mínimo 3 imagenes'
+                        ? 'Debe subir mínimo $_minImages imagenes'
                         : 'Debe subir máximo 10 imagenes',
                     style: TextStyle(color: Color.fromARGB(255, 185, 28, 16)),
                   ),

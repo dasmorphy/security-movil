@@ -4,10 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 import 'package:zentinel/domain/entities/api_response.dart';
-import 'package:zentinel/presentation/providers/onboarding/onboarding_provider.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
-import 'package:zentinel/service/pending_request_service.dart';
 
 class EmployeeInternForm extends ConsumerStatefulWidget {
   final Future<ApiResponse<dynamic>> Function(Map<String, dynamic>) onSubmit;
@@ -265,8 +263,6 @@ class _EmployeeInternFormState extends ConsumerState<EmployeeInternForm> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 20),
-
                   SizedBox(
                     width: double.infinity,
                     child: Container(

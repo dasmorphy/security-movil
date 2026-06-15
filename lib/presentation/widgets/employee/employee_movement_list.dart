@@ -9,9 +9,11 @@ import 'package:animate_do/animate_do.dart';
 
 class EmployeeMovementList extends ConsumerStatefulWidget {
   final List<EmployeeMovement> items;
+  final bool? isDataEmployee;
+
   final Future<void> Function(DateTimeRange? range, int page, bool append)? onFilterDate;
 
-  const EmployeeMovementList({super.key, required this.items, this.onFilterDate});
+  const EmployeeMovementList({super.key, required this.items, this.onFilterDate, this.isDataEmployee = false});
 
   @override
   ConsumerState<EmployeeMovementList> createState() => EmployeeMovementListState();
@@ -128,7 +130,7 @@ class EmployeeMovementListState extends ConsumerState<EmployeeMovementList> {
                     borderRadius: BorderRadius.circular(8),
                     onTap: () => ModalHelper.open(
                       context,
-                      child: EmployeeMovementDetailModal(item: item),
+                      child: EmployeeMovementDetailModal(item: item, isDataEmployee: widget.isDataEmployee),
                     ),
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),

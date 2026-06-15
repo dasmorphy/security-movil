@@ -9,6 +9,7 @@ class EmployeeMovement {
   String employeeStatus;
   List<String> images;
   dynamic groupBusinessId;
+  dynamic shippingGuide;
   dynamic groupName;
   int idMovement;
   String nameUser;
@@ -30,6 +31,7 @@ class EmployeeMovement {
     required this.employeeLastname,
     required this.employeeNames,
     required this.groupBusinessId,
+    required this.shippingGuide,
     required this.groupName,
     required this.idMovement,
     required this.nameUser,
@@ -64,7 +66,8 @@ class EmployeeMovement {
         status: json["status"],
         typeMovement: json["type_movement"],
         updatedAt: DateTime.parse(json["updated_at"]),
-        updatedBy: json["updated_by"],
+        updatedBy: json["updated_by"], 
+        shippingGuide: json["shipping_guide"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -78,6 +81,7 @@ class EmployeeMovement {
     "employee_names": employeeNames,
     "group_business_id": groupBusinessId,
     "group_name": groupName,
+    "shipping_guide": shippingGuide,
     "id_movement": idMovement,
     "name_user": nameUser,
     "observations": observations,

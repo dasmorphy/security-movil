@@ -113,7 +113,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   "page": 1,
                   "rows": 20,
                   "type_movement": "TRANSFER",
-                  "group_business_id": userData.attributes['group_business']
+                  "group_business_id": userData.attributes['group_business'],
+                  "status_employee": "Autorizado"
                 }
               );
             }

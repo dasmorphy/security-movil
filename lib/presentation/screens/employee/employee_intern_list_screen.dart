@@ -21,7 +21,28 @@ class _EmployeeInternListScreenState
   @override
   void initState() {
     super.initState();
-    ref.read(getEmployeeInterns.notifier).load();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final authState = ref.read(userSessionProvider);
+
+      if (!authState.hasValue || authState.value == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Sesión no válida. Vuelva a iniciar sesión'),
+          ),
+        );
+        return;
+      }
+
+      final userData = authState.value!;
+
+      ref.read(getEmployeeInterns.notifier).load(
+        filters: {
+          "page": 1,
+          "rows": 20,
+          "id_group_business": userData.attributes['group_business'],
+        },
+      );
+    });
   }
 
   @override

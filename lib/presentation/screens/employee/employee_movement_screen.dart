@@ -8,9 +8,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class EmployeeMovementScreen extends ConsumerStatefulWidget {
   static const name = 'employee-movement-screen';
   final dynamic filtersMovement;
-  final bool? isDataEmployee;
 
-  const EmployeeMovementScreen({super.key, this.filtersMovement, this.isDataEmployee = false});
+  const EmployeeMovementScreen({super.key, this.filtersMovement});
 
   @override
   ConsumerState<EmployeeMovementScreen> createState() =>
@@ -24,41 +23,42 @@ class _EmployeeMovementScreenState
   @override
   void initState() {
     super.initState();
-    final authState = ref.watch(userSessionProvider);
 
-    //Usuario no cargado o sesión inválida
-    if (!authState.hasValue || authState.value == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Sesión no válida. Vuelva a iniciar sesión'),
-        ),
-      );
-      setState(() => isLoading = false);
-      return;
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final authState = ref.read(userSessionProvider);
 
-    final userData = authState.value!;
+      if (!authState.hasValue || authState.value == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Sesión no válida. Vuelva a iniciar sesión'),
+          ),
+        );
+        return;
+      }
 
-    if (widget.filtersMovement != null && widget.filtersMovement['id_employee'] != null){
-      ref.read(getEmployeeMovementsById.notifier).load(
-        filters:{
-          "page": 1,
-          "rows": 20,
-          if (widget.filtersMovement != null)
-            "id_employee": widget.filtersMovement['id_employee'],
-        }
-      );
-    }else{
-      ref.read(getEmployeeMovements.notifier).load(
-        filters:{
-          "page": 1,
-          "rows": 20,
-          "type_movement": "TRANSFER",
-          "group_business_id": userData.attributes['group_business']
-        }
-      );
+      final userData = authState.value!;
 
-    }
+      if (widget.filtersMovement != null && widget.filtersMovement['id_employee'] != null){
+        ref.read(getEmployeeMovementsById.notifier).load(
+          filters:{
+            "page": 1,
+            "rows": 20,
+            if (widget.filtersMovement != null)
+              "id_employee": widget.filtersMovement['id_employee'],
+          }
+        );
+      }else{
+        ref.read(getEmployeeMovements.notifier).load(
+          filters:{
+            "page": 1,
+            "rows": 20,
+            "type_movement": "TRANSFER",
+            "group_business_id": userData.attributes['group_business'],
+            "status_employee": "Autorizado"
+          }
+        );
+      }
+    });
   }
 
   @override
@@ -108,6 +108,11 @@ class _EmployeeMovementScreenState
               const SizedBox(height: 30),
               Expanded(
                 child: EmployeeMovementList(
+                  isDataEmployee: 
+                    widget.filtersMovement != null && 
+                    widget.filtersMovement['id_employee'] != null 
+                    ? true 
+                    : false,
                   items: employeeInterns,
                   onFilterDate: (range, page, append) async {
                     DateTime? endDate;
