@@ -402,6 +402,24 @@ final getEmployeeMovements =
   },
 );
 
+final getEmployeeMovementsById =
+    StateNotifierProvider<
+        CatalogNotifier<EmployeeMovement>,
+        List<EmployeeMovement>>(
+  (ref) {
+    final repo = ref.watch(logbookEntryRepositoryProvider);
+
+    return CatalogNotifier<EmployeeMovement>(
+      (filters) {
+        final mergedFilters = {
+          ...?filters,
+        };
+        return repo.getEmployeeMovements(mergedFilters);
+      },
+    );
+  },
+);
+
 
 final getGroupBusinessByIdBusiness =
     StateNotifierProvider<CatalogNotifierWithCache<GroupBusiness>, List<GroupBusiness>>(

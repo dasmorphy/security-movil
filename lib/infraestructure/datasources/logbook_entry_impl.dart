@@ -376,6 +376,8 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
         'start_date': filters['start_date'],
         'end_date': filters['end_date'],
         'id_employee': filters['id_employee'],
+        'type_movement': filters['type_movement'],
+        'group_business_id': filters['group_business_id'],
       },
       options: Options(
         headers: {

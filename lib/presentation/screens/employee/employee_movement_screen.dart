@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:zentinel/config/utils/helper.dart';
+import 'package:zentinel/domain/entities/employee_movement.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -7,8 +8,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class EmployeeMovementScreen extends ConsumerStatefulWidget {
   static const name = 'employee-movement-screen';
   final dynamic filtersMovement;
+  final bool? isDataEmployee;
 
-  const EmployeeMovementScreen({super.key, this.filtersMovement});
+  const EmployeeMovementScreen({super.key, this.filtersMovement, this.isDataEmployee = false});
 
   @override
   ConsumerState<EmployeeMovementScreen> createState() =>
@@ -22,19 +24,52 @@ class _EmployeeMovementScreenState
   @override
   void initState() {
     super.initState();
-    ref.read(getEmployeeMovements.notifier).load(
-      filters:{
-        "page": 1,
-        "rows": 20,
-        if (widget.filtersMovement != null)
-          "id_employee": widget.filtersMovement['id_employee'],
-      }
-    );
+    final authState = ref.watch(userSessionProvider);
+
+    //Usuario no cargado o sesión inválida
+    if (!authState.hasValue || authState.value == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Sesión no válida. Vuelva a iniciar sesión'),
+        ),
+      );
+      setState(() => isLoading = false);
+      return;
+    }
+
+    final userData = authState.value!;
+
+    if (widget.filtersMovement != null && widget.filtersMovement['id_employee'] != null){
+      ref.read(getEmployeeMovementsById.notifier).load(
+        filters:{
+          "page": 1,
+          "rows": 20,
+          if (widget.filtersMovement != null)
+            "id_employee": widget.filtersMovement['id_employee'],
+        }
+      );
+    }else{
+      ref.read(getEmployeeMovements.notifier).load(
+        filters:{
+          "page": 1,
+          "rows": 20,
+          "type_movement": "TRANSFER",
+          "group_business_id": userData.attributes['group_business']
+        }
+      );
+
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final employeeInterns = ref.watch(getEmployeeMovements);
+    List<EmployeeMovement> employeeInterns = [];
+
+    if (widget.filtersMovement != null && widget.filtersMovement['id_employee'] != null){
+      employeeInterns = ref.watch(getEmployeeMovementsById);
+    }else{
+      employeeInterns = ref.watch(getEmployeeMovements);
+    }
 
 
 

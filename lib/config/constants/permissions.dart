@@ -8,7 +8,6 @@ class Permissions {
   static const generarReportes = 'GENERAR_REPORTES';
   static const verDespachos = 'VER_DESPACHOS';
   static const verBitacoras = 'VER_BITACORAS';
-  static const verPersonalInterno = 'VER_PERSONAL_INTERNO';
   static const nuevoDespacho = 'NUEVO_DESPACHO';
   static const despachoCambioEstadoTransito = 'DESPACHO_CAMBIO_ESTADO_TRANSITO';
   static const despachoCambioEstadoRecepcion = 'DESPACHO_CAMBIO_ESTADO_RECEPCION';
@@ -19,5 +18,9 @@ class Permissions {
   static const bitacorasOffline = 'BITACORAS_OFFLINE';
   static const nuevoProductoInterno = 'NUEVO_PRODUCTO_INTERNO';
   static const personalInternoOffline = 'PERSONAL_INTERNO_OFFLINE';
-
+  static const verPersonalInterno = 'VER_PERSONAL_INTERNO';
+  static const verMovimientosPersonalInterno = 'VER_MOVIMIENTOS_PERSONAL_INTERNO';
+  static const nuevoPersonalInterno = 'NUEVO_PERSONAL_INTERNO';
+  static const nuevoMovimientoPersonalInterno = 'NUEVO_MOVIMIENTO_PERSONAL_INTERNO';
+  static const actualizarEstadoPersonalInterno = 'ACTUALIZAR_ESTADO_PERSONAL_INTERNO';
 }

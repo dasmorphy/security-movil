@@ -159,7 +159,7 @@ class HomeViewState extends ConsumerState<HomeView> {
                 /// =======================
                 if (effectiveBusiness == "1" &&
                     (userData.role == "admin_tlsg" ||
-                        userData.hasPermission(Permissions.verBitacoras))) ...[
+                        userData.hasPermission(Permissions.verMovimientosPersonalInterno))) ...[
                   const SizedBox(height: 10),
                   RecentListHome(
                     title: 'Movimientos personal interno',

@@ -83,14 +83,14 @@ class _BasicServicesStionState extends ConsumerState<BasicServicesSection> {
                   ),
                 ),
 
-              if (userData.hasPermission(Permissions.nuevaBitacoraSalida))
+              if (userData.hasPermission(Permissions.verPersonalInterno))
                 BasicServiceCard(
                   iconImage: 'iconsalida',
                   label: 'Listado de personal interno',
                   onTap: () => context.push('/list-employee-intern')
                 ),
               
-              if (userData.hasPermission(Permissions.nuevaBitacoraSalida))
+              if (userData.hasPermission(Permissions.nuevoPersonalInterno))
                 BasicServiceCard(
                   iconImage: 'iconsalida',
                   label: 'Nuevo personal interno',

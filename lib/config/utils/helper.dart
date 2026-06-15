@@ -371,7 +371,7 @@ Color getColorTxtMovements(String status) {
     case 'ingreso':
       return const Color.fromARGB(255, 105, 246, 184);
     default:
-      return Colors.grey;
+      return const Color.fromARGB(255, 255, 255, 255);
   }
 }
 
@@ -384,7 +384,7 @@ Color getStatusColorMovements(String status) {
     case 'ingreso':
       return const Color.fromARGB(255, 18, 54, 42);
     default:
-      return Colors.grey;
+      return const Color.fromARGB(255, 82, 84, 83);
   }
 }
 

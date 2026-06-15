@@ -34,6 +34,7 @@ class _EmployeeMovementFormState extends ConsumerState<EmployeeMovementForm> {
   bool imagesMaxError = false;
   String _authorized = '0';
   String _destiny = '0';
+  int _minImages = 5;
 
   double _latitude = -0.1865936;
   double _longitude = -78.5953478;
@@ -64,6 +65,7 @@ class _EmployeeMovementFormState extends ConsumerState<EmployeeMovementForm> {
   final FocusNode _quantityFocus = FocusNode();
   final FocusNode _groupBusinessFocus = FocusNode();
   final FocusNode _descFocus = FocusNode();
+  final FocusNode _guideFocus = FocusNode();
   final FocusNode _otherDestinyFocus = FocusNode();
   final FocusNode _reasonFocus = FocusNode();
   final FocusNode _observationsFocus = FocusNode();
@@ -74,6 +76,7 @@ class _EmployeeMovementFormState extends ConsumerState<EmployeeMovementForm> {
   void initState() {
     super.initState();
     _getUserLocation();
+    _minImages = widget.typeMovement == 'TRANSFER' ? 3 : 5;
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await Future.wait([
@@ -106,6 +109,7 @@ class _EmployeeMovementFormState extends ConsumerState<EmployeeMovementForm> {
     _observationsCtrl.dispose();
     _quantityFocus.dispose();
     _descFocus.dispose();
+    _guideFocus.dispose();
     _categoryEntryFocus.dispose();
     _groupBusinessFocus.dispose();
     _truckLicenseFocus.dispose();
@@ -198,7 +202,9 @@ class _EmployeeMovementFormState extends ConsumerState<EmployeeMovementForm> {
       "external_transaction_id": Uuid().v4(),
       "authorized_id": _authorized != '0' ? int.tryParse(_authorized) : null,
       "employee_id": widget.idEmployee,
-      "group_business_id": _destiny != '0' && _destiny != '1000' ? int.tryParse(_destiny) : null,
+      "shipping_guide": _guideCtrl.text.trim(),
+      "group_business_id": userData.attributes['group_business'],
+      "destiny_id": _destiny != '0' && _destiny != '1000' ? int.tryParse(_destiny) : null,
       "name_user": userHive.value?.name ?? userData.attributes['fullname'],
       "other_destiny": _destiny == '1000' ? _otherDestinyCtrl.text.trim() : null,
       "observations": _observationsCtrl.text.trim(),
@@ -523,6 +529,18 @@ class _EmployeeMovementFormState extends ConsumerState<EmployeeMovementForm> {
                 },
               ),
               
+              if (widget.typeMovement == 'TRANSFER' || widget.typeMovement == 'CHECK_IN')...[
+                const SizedBox(height: 12),
+                CustomFieldLabelRequired(txtLabel: 'Guía', isRequired: false),
+                GlowTextFormField(
+                  controller: _guideCtrl,
+                  focusNode: _guideFocus,
+                  validator: (v) {
+                    return null;
+                  },
+                ),
+              ],
+
               if (widget.typeMovement == 'TRANSFER')...[
                 const SizedBox(height: 12),
                 CustomFieldLabelRequired(txtLabel: 'Motivo'),
@@ -536,9 +554,7 @@ class _EmployeeMovementFormState extends ConsumerState<EmployeeMovementForm> {
                     return null;
                   },
                 ),
-              ],
 
-              if (widget.typeMovement == 'TRANSFER')...[
                 const SizedBox(height: 12),
                 CustomFieldLabelRequired(txtLabel: 'Destino'),
                 GlowDropdownFormField2<String>(
@@ -659,7 +675,7 @@ class _EmployeeMovementFormState extends ConsumerState<EmployeeMovementForm> {
               const SizedBox(height: 20),
 
               CameraImagePicker(
-                minImages: 3,
+                minImages: _minImages,
                 maxImages: 10,
                 isPickingImage: isPickingImage,
                 onPickingChanged: (value) {
