@@ -71,6 +71,7 @@ class _EmployeeMovementFormState extends ConsumerState<EmployeeMovementForm> {
   final FocusNode _observationsFocus = FocusNode();
   final FocusNode _categoryEntryFocus = FocusNode();
   bool isPickingImage = false;
+  bool isCheckInPostTransfer = false;
 
   @override
   void initState() {
@@ -395,12 +396,15 @@ class _EmployeeMovementFormState extends ConsumerState<EmployeeMovementForm> {
     }
 
     if (employeeInternById.isNotEmpty) {
-      setState(() {
-        _dniCtrl.text = employeeInternById[0].dni;
-        _namesCtrl.text = '${employeeInternById[0].names} ${employeeInternById[0].lastname}';
-        _positionCtrl.text = employeeInternById[0].position;
-        _minImages = employeeInternById[0].lastStatusMovement == 'Movimiento interno' && widget.typeMovement == 'CHECK_IN' ? 3 : 5;
-      });
+      isCheckInPostTransfer = 
+        employeeInternById[0].lastStatusMovement == 'Movimiento interno' 
+        && widget.typeMovement == 'CHECK_IN' 
+        ? true 
+        : false;
+      _dniCtrl.text = employeeInternById[0].dni;
+      _namesCtrl.text = '${employeeInternById[0].names} ${employeeInternById[0].lastname}';
+      _positionCtrl.text = employeeInternById[0].position;
+      _minImages = isCheckInPostTransfer || widget.typeMovement == 'TRANSFER' ? 3 : 5;
     }else {
       return Center(
         child: Column(
@@ -544,7 +548,7 @@ class _EmployeeMovementFormState extends ConsumerState<EmployeeMovementForm> {
                 },
               ),
               
-              if (widget.typeMovement == 'TRANSFER' || widget.typeMovement == 'CHECK_IN')...[
+              if (widget.typeMovement != 'CHECK_OUT' && !isCheckInPostTransfer)...[
                 const SizedBox(height: 12),
                 CustomFieldLabelRequired(txtLabel: 'Guía', isRequired: false),
                 GlowTextFormField(

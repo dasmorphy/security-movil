@@ -44,7 +44,7 @@ class ItemRecentEmployeeMovement extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          item.createdBy,
+                          '${item.employeeNames} ${item.employeeLastname}',
                           style: Theme.of(context).textTheme.bodyMedium
                               ?.copyWith(
                                 color: Colors.white,

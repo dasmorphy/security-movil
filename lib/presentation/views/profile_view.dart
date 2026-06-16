@@ -116,6 +116,14 @@ class ProfileViewState extends ConsumerState<ProfileView> {
                               //     color: Colors.grey,
                               //   ),
                               // ),
+
+                              Text(
+                                userData.user,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey,
+                                ),
+                              )
                             ],
                           ),
                         ),
