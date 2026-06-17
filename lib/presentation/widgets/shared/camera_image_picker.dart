@@ -2,19 +2,25 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:zentinel/config/utils/helper.dart';
+import 'package:zentinel/presentation/screens/screens.dart';
 
 class CameraImagePicker extends StatefulWidget {
   final int minImages;
   final int maxImages;
+  final bool isPickingImage;
+  final String? textBtn;
   final Function(List<Uint8List>) onImagesChanged;
+  final ValueChanged<bool>? onPickingChanged;
 
   const CameraImagePicker({
     super.key,
     this.minImages = 0,
     this.maxImages = 10,
+    this.isPickingImage = false,
+    this.textBtn = "Adjuntar Evidencia Fotográfica",
     required this.onImagesChanged,
+    this.onPickingChanged,
   });
 
   @override
@@ -22,8 +28,6 @@ class CameraImagePicker extends StatefulWidget {
 }
 
 class _CameraImagePickerState extends State<CameraImagePicker> {
-  final ImagePicker _imagePicker = ImagePicker();
-
   final List<Uint8List?> _selectedImages = [];
 
   bool imagesMinError = false;
@@ -32,17 +36,19 @@ class _CameraImagePickerState extends State<CameraImagePicker> {
   @override
   Widget build(BuildContext context) {
     Future<void> captureImageFromCamera() async {
+      if (widget.isPickingImage) return;
+
       if (_selectedImages.length >= widget.maxImages) {
         setState(() => imagesMaxError = true);
         return;
       }
 
+      widget.onPickingChanged?.call(true);
+
       try {
-        final XFile? image = await _imagePicker.pickImage(
-          source: ImageSource.camera,
-          imageQuality: 60,
-          maxWidth: 1024,
-          maxHeight: 1024,
+        final File? image = await Navigator.push<File>(
+          context,
+          MaterialPageRoute(builder: (_) => const CameraScreen()),
         );
 
         if (image == null) return;
@@ -76,6 +82,10 @@ class _CameraImagePickerState extends State<CameraImagePicker> {
         widget.onImagesChanged(_selectedImages.whereType<Uint8List>().toList());
       } catch (e) {
         debugPrint(e.toString());
+        widget.onPickingChanged?.call(false);
+      }
+      finally {
+        widget.onPickingChanged?.call(false);
       }
     }
 
@@ -89,24 +99,6 @@ class _CameraImagePickerState extends State<CameraImagePicker> {
 
     return Column(
       children: [
-        // SizedBox(
-        //   width: double.infinity,
-        //   child: OutlinedButton.icon(
-        //     onPressed: captureImageFromCamera,
-        //     icon: const Icon(
-        //       Icons.camera_alt,
-        //       color: Color.fromARGB(189, 7, 213, 213),
-        //     ),
-        //     label: const Text(
-        //       'Capturar Imagen',
-        //       style: TextStyle(color: Color.fromARGB(189, 7, 213, 213)),
-        //     ),
-        //     style: OutlinedButton.styleFrom(
-        //       side: const BorderSide(color: Color.fromARGB(189, 7, 213, 213)),
-        //       padding: const EdgeInsets.symmetric(vertical: 12),
-        //     ),
-        //   ),
-        // ),
         GestureDetector(
           onTap: () => captureImageFromCamera(),
           child: Container(
@@ -137,8 +129,8 @@ class _CameraImagePickerState extends State<CameraImagePicker> {
                   size: 20,
                 ),
                 const SizedBox(width: 8),
-                const Text(
-                  'Adjuntar Evidencia Fotográfica',
+                Text(
+                  widget.textBtn!,
                   style: TextStyle(
                     color: Color.fromARGB(255, 150, 150, 150),
                     fontSize: 12,
@@ -228,8 +220,8 @@ class _CameraImagePickerState extends State<CameraImagePicker> {
             width: double.infinity,
             child: Text(
               imagesMinError
-                  ? 'Debe subir mínimo 5 imagenes'
-                  : 'Debe subir máximo 10 imagenes',
+                  ? 'Debe subir mínimo ${widget.minImages} imagenes'
+                  : 'Debe subir máximo ${widget.maxImages} imagenes',
               style: TextStyle(color: Color.fromARGB(255, 185, 28, 16)),
             ),
           ),

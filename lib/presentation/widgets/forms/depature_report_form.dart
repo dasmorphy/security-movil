@@ -1,10 +1,7 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/presentation/providers/onboarding/onboarding_provider.dart';
@@ -39,6 +36,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
   final _quantityCtrl = TextEditingController();
   final _weightCtrl = TextEditingController();
   final _providerCtrl = TextEditingController();
+  final _employeeCtrl = TextEditingController();
   final _observationsCtrl = TextEditingController();
   final _truckLicenseCtrl = TextEditingController();
   final _nameDriverCtrl = TextEditingController();
@@ -46,7 +44,6 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
   bool _isInitializing = true;
 
   List<Uint8List?> _selectedImages = [];
-  final ImagePicker _imagePicker = ImagePicker();
 
   final FocusNode _guideFocus = FocusNode();
   final FocusNode _unitFocus = FocusNode();
@@ -54,6 +51,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
   final FocusNode _nameDriverFocus = FocusNode();
   final FocusNode _weightFocus = FocusNode();
   final FocusNode _providerFocus = FocusNode();
+  final FocusNode _employeeFocus = FocusNode();
   final FocusNode _destinyFocus = FocusNode();
   final FocusNode _authorizedFocus = FocusNode();
   final FocusNode _quantityFocus = FocusNode();
@@ -92,6 +90,8 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
     _guideCtrl.dispose();
     _descCtrl.dispose();
     _quantityCtrl.dispose();
+    _weightCtrl.dispose();
+    _employeeCtrl.dispose();
     _providerCtrl.dispose();
     _nameDriverCtrl.dispose();
     _truckLicenseCtrl.dispose();
@@ -102,6 +102,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
     _groupBusinessFocus.dispose();
     _truckLicenseFocus.dispose();
     _nameDriverFocus.dispose();
+    _employeeFocus.dispose();
     super.dispose();
   }
 
@@ -126,96 +127,6 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
     setState(() {
       _latitude = pos.latitude;
       _longitude = pos.longitude;
-    });
-  }
-
-  Future<void> _captureImageFromCamera() async {
-    // Evita doble llamada
-    if (isPickingImage) return;
-
-    if (_selectedImages.length >= 10) {
-      if (mounted) setState(() => imagesMaxError = true);
-      return;
-    }
-
-    setState(() => isPickingImage = true);
-
-    try {
-      final XFile? image = await _imagePicker.pickImage(
-        source: ImageSource.camera,
-        imageQuality: 60,
-        maxWidth: 1024,
-        maxHeight: 1024,
-      );
-
-      if (image != null && mounted) {
-        setState(() {
-          _selectedImages.add(null);
-          imagesMinError = false;
-          imagesMaxError = false;
-        });
-
-        final placeholderIndex = _selectedImages.length - 1;
-        final originalFile = File(image.path);
-        final webpFile = await convertToWebP(originalFile);
-
-        if (!mounted) return;
-
-        if (webpFile == null) {
-          setState(() {
-            if (placeholderIndex < _selectedImages.length &&
-                _selectedImages[placeholderIndex] == null) {
-              _selectedImages.removeAt(placeholderIndex);
-            }
-          });
-          showDialog(
-            context: context,
-            builder: (_) => ShowDialogWidget(title: 'Error al convertir imagen'),
-          );
-          return;
-        }
-
-        print("Peso WebP: ${(webpFile.length / 1024 / 1024).toStringAsFixed(2)} MB");
-
-        if (mounted) {
-          setState(() => _selectedImages[placeholderIndex] = webpFile);
-        }
-      }
-    } on PlatformException catch (e) {
-      if (e.code == 'already_active') return; // ignora silenciosamente
-      if (mounted) {
-        if (_selectedImages.isNotEmpty && _selectedImages.last == null) {
-          setState(() => _selectedImages.removeLast());
-        }
-        showDialog(
-          context: context,
-          builder: (_) => ShowDialogWidget(
-            title: 'Error al capturar imagen',
-            content: e.message ?? '$e',
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        if (_selectedImages.isNotEmpty && _selectedImages.last == null) {
-          setState(() => _selectedImages.removeLast());
-        }
-        showDialog(
-          context: context,
-          builder: (_) => ShowDialogWidget(
-            title: 'Error al capturar imagen',
-            content: '$e',
-          ),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => isPickingImage = false);
-    }
-  }
-
-  void _removeImage(int index) {
-    setState(() {
-      _selectedImages.removeAt(index);
     });
   }
 
@@ -303,6 +214,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
       "destiny_intern": _destiny,
       "authorized_by": _authorized,
       "observations": _observationsCtrl.text.trim(),
+      "employee_intern": int.tryParse(_employeeCtrl.text),
       "name_driver": _nameDriverCtrl.text.trim(),
       "truck_license": _truckLicenseCtrl.text.trim(),
       "lat": _latitude.toString(),
@@ -415,6 +327,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
     final userData = authState.value!;
     final categories = ref.watch(getAllCategories);
     final authorized = ref.watch(getAllAuthorized);
+    final employeeIntern = ref.watch(getEmployeeInterns);
     final destinyIntern = ref.watch(getAllDestinyIntern);
     final groupBusiness = ref.watch(getGroupBusinessByIdBusiness);
     final unitiesWeight = ref.watch(getAllUnitiesWeight);
@@ -447,6 +360,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
     final hideWeight = hiddenWeightCategories.contains(categoryName);
     final hideEject = hiddenEjectCategories.contains(categoryName);
     final hidePersonal = hiddenPersonalCategories.contains(categoryName);
+    final isPersonalIntern = 'Personal interno' == categoryName;
 
     InputDecoration styleDecoration() => InputDecoration(
       filled: true,
@@ -649,6 +563,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
 
                       if (!hidePersonal) {
                         _providerCtrl.clear();
+                        _employeeCtrl.clear();
                         _unityId = '0';
                         _quantityCtrl.clear();
                       }
@@ -661,6 +576,40 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                     return null;
                   },
                 ),
+
+                if (isPersonalIntern) ...[
+                  const SizedBox(height: 12),
+                  CustomFieldLabelRequired(txtLabel: 'Empleado Interno'),
+                  GlowDropdownFormField2<int>(
+                    value: _employeeCtrl.text.isEmpty ? 0 : int.tryParse(_employeeCtrl.text),
+                    focusNode: _employeeFocus,
+                    decoration: styleDecoration(),
+                    items: [
+                      DropdownMenuItem(
+                        enabled: false,
+                        value: 0,
+                        child: Text('Seleccione una opción', style: TextStyle(color: Colors.white),),
+                      ),
+                      ...employeeIntern.map(
+                        (c) => DropdownMenuItem(
+                          value: c.idEmployeeIntern,
+                          child: Text('${c.names} ${c.lastname}', style: TextStyle(color: Colors.white),),
+                        ),
+                      ),
+                    ],
+                    onChanged: (v) {
+                      if (v != null) {
+                        setState(() => _employeeCtrl.text = v.toString());
+                      }
+                    },
+                    validator: (v) {
+                      if (v == 0 || v == null || v.toString().trim().isEmpty) {
+                        return messageValidatorEmpty;
+                      }
+                      return null;
+                    },
+                  ),
+                ],
 
                 if (!hideWeight) ...[
                   const SizedBox(height: 12),
@@ -880,124 +829,22 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                   },
                 ),
 
-                const SizedBox(height: 26),
-                CustomFieldLabelRequired(
-                  txtLabel:
-                      'Imágenes desde Cámara (${_selectedImages.length}/10)',
-                ),
-                const SizedBox(height: 8),
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton.icon(
-                    onPressed: () async {
-                      // final granted = await requestCameraPermission(context);
+                const SizedBox(height: 20),
 
-                      // if (!granted) {
-                      //   ScaffoldMessenger.of(context).showSnackBar(
-                      //     const SnackBar(
-                      //       content: Text('Permiso de cámara denegado'),
-                      //     ),
-                      //   );
-                      //   return;
-                      // }
-
-                      _captureImageFromCamera();
-                    },
-                    icon: const Icon(
-                      Icons.camera_alt,
-                      color: Color.fromARGB(189, 7, 213, 213),
-                    ),
-                    label: const Text(
-                      'Capturar Imagen',
-                      style: TextStyle(color: Color.fromARGB(189, 7, 213, 213)),
-                    ),
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(
-                        color: Color.fromARGB(189, 7, 213, 213),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                    ),
-                  ),
+                CameraImagePicker(
+                  minImages: 3,
+                  maxImages: 10,
+                  isPickingImage: isPickingImage,
+                  onPickingChanged: (value) {
+                    setState(() {
+                      isPickingImage = value;
+                    });
+                  },
+                  onImagesChanged: (images) {
+                    print("imagenes seleccionadas ${images.length}");
+                    _selectedImages = images;
+                  },
                 ),
-                const SizedBox(height: 12),
-                if (_selectedImages.isNotEmpty)
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.white12),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: GridView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 3,
-                            crossAxisSpacing: 8,
-                            mainAxisSpacing: 8,
-                          ),
-                      itemCount: _selectedImages.length,
-                      itemBuilder: (context, index) {
-                        return Stack(
-                          children: [
-                            // Mostrar indicador de progreso cuando la imagen está siendo convertida (placeholder null)
-                            _selectedImages[index] != null
-                                ? Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(8),
-                                      image: DecorationImage(
-                                        image: MemoryImage(_selectedImages[index]!), // directo desde bytes
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-                                  )
-                                : Container(
-                                    height: double.infinity,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(8),
-                                      color: Colors.black26,
-                                    ),
-                                    child: const Center(
-                                      child: SizedBox(
-                                        width: 28,
-                                        height: 28,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2.5,
-                                          color: Colors.white,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                            Positioned(
-                              top: -8,
-                              right: -8,
-                              child: IconButton(
-                                onPressed: () => _removeImage(index),
-                                icon: const Icon(
-                                  Icons.close,
-                                  color: Colors.red,
-                                ),
-                                style: IconButton.styleFrom(
-                                  backgroundColor: Colors.black54,
-                                  iconSize: 16,
-                                ),
-                              ),
-                            ),
-                          ],
-                        );
-                      },
-                    ),
-                  )
-                else
-                  Center(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 20),
-                      child: Text(
-                        'No hay imágenes capturadas',
-                        style: TextStyle(color: Colors.white54),
-                      ),
-                    ),
-                  ),
 
                 if (imagesMinError || imagesMaxError)
                   SizedBox(

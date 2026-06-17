@@ -51,7 +51,12 @@ final appRouter = GoRouter(
         GoRoute(
           path: 'list-logbooks',
           name: LogbookListScreen.name,
-          builder: (context, state) => const LogbookListScreen()
+          builder: (context, state) {
+            final filters = state.extra as dynamic;
+            return LogbookListScreen(
+              filtersLogbook: filters,
+            );
+          },
         ),
         GoRoute(
           path: 'list-dispatches',
@@ -62,6 +67,21 @@ final appRouter = GoRouter(
           path: 'list-entry-access',
           name: EntryAccessListScreen.name,
           builder: (context, state) => const EntryAccessListScreen()
+        ),
+        GoRoute(
+          path: 'list-employee-intern',
+          name: EmployeeInternListScreen.name,
+          builder: (context, state) => const EmployeeInternListScreen()
+        ),
+        GoRoute(
+          path: 'list-employee-movements',
+          name: EmployeeMovementScreen.name,
+          builder: (context, state) {
+            final filters = state.extra as dynamic;
+            return EmployeeMovementScreen(
+              filtersMovement: filters,
+            );
+          },
         ),
         GoRoute(
           path: 'confirm-dispatch',
@@ -100,6 +120,22 @@ final appRouter = GoRouter(
             final isProductTerm = state.extra as dynamic;
             return NewDispatchScreen(
               isProductTerm: isProductTerm,
+            );
+          },
+        ),
+        GoRoute(
+          path: 'new-employee',
+          name: NewEmployeeScreen.name,
+          builder: (context, state) => const NewEmployeeScreen()
+        ),
+        GoRoute(
+          path: 'new-employee-movement',
+          name: NewEmployeeMovementScreen.name,
+          builder: (context, state) {
+            final params = state.extra as EmployeeMovementArgs;
+            return NewEmployeeMovementScreen(
+              typeMovement: params.typeMovement,
+              idEmployee: params.idEmployee,
             );
           },
         )

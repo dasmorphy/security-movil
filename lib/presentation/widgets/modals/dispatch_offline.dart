@@ -14,7 +14,11 @@ class DispatchOffline extends ConsumerWidget {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(60),
-        child: const HeaderBiomarOffline(headerTxt: 'Registros offline'),
+        child: HeaderOffline(
+          headerTxt: 'Registros offline', 
+          pendingAsync: pendingAsync, 
+          sync: ref.read(syncPendingProvider.notifier).syncBiomar,
+        ),
       ),
       resizeToAvoidBottomInset: false,
       backgroundColor: const Color.fromARGB(255, 23, 24, 28),

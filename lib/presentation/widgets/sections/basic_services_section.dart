@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:zentinel/config/constants/permissions.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
@@ -80,6 +81,20 @@ class _BasicServicesStionState extends ConsumerState<BasicServicesSection> {
                           .saveLogbookOut(data);
                     },
                   ),
+                ),
+
+              if (userData.hasPermission(Permissions.verPersonalInterno))
+                BasicServiceCard(
+                  iconImage: 'iconsalida',
+                  label: 'Listado de personal interno',
+                  onTap: () => context.push('/list-employee-intern')
+                ),
+              
+              if (userData.hasPermission(Permissions.nuevoPersonalInterno))
+                BasicServiceCard(
+                  iconImage: 'iconsalida',
+                  label: 'Nuevo personal interno',
+                  onTap: () => context.push('/new-employee')
                 ),
             ],
           ),

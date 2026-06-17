@@ -6,9 +6,12 @@ import 'package:dio/dio.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/domain/datasources/logbook_entry_datasource.dart';
 import 'package:zentinel/domain/entities/all_logbook.dart';
+import 'package:zentinel/domain/entities/api_response.dart';
 import 'package:zentinel/domain/entities/authorized.dart';
 import 'package:zentinel/domain/entities/category.dart';
 import 'package:zentinel/domain/entities/destiny_intern.dart';
+import 'package:zentinel/domain/entities/employee_intern.dart';
+import 'package:zentinel/domain/entities/employee_movement.dart';
 import 'package:zentinel/domain/entities/graph_logbook.dart';
 import 'package:zentinel/domain/entities/group_business.dart';
 import 'package:zentinel/domain/entities/unity_weight.dart';
@@ -154,15 +157,13 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
           );
         }
       }
-      final stopwatch = Stopwatch()..start();
 
       final response = await dio.post(
         '/rest/zent-logbook-api/v1.0/post/logbook-out',
         data: formData,
         options: onlyError(),
       );
-      stopwatch.stop();
-      print('⏱️ Tiempo total request: ${stopwatch.elapsedMilliseconds} ms');
+
       return response.statusCode == 200 || response.statusCode == 409;
     } on DioException catch (e) {
       print("❌ Error enviando logbook: ${e.message}");
@@ -191,6 +192,7 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
             'externalTransactionId': uuid,
             'channel': 'ZENTINEL',
             'user': filter['user'],
+            'employees-intern': filter['employees-intern'],
           },
         ),
       );
@@ -279,5 +281,231 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
     );
     final GraphLogbook graphsJson = GraphLogbook.fromJson(response.data['data']);
     return graphsJson;
+  }
+  
+  @override
+  Future<ApiResponse<dynamic>> saveEmployeeIntern(Map<String, dynamic> data) async {
+    try {
+      final images = data['photo'] as List<Uint8List>?;
+      final employeeData = Map<String, dynamic>.from(data);
+      employeeData.remove('photo');
+      employeeData['channel'] = 'ZENTINEL';
+      final employeeJson = jsonEncode(employeeData);
+      final employeeBytes = utf8.encode(employeeJson);
+
+      final formData = FormData();
+
+      formData.files.add(
+        MapEntry(
+          'employee_data',
+          MultipartFile.fromBytes(
+            employeeBytes,
+            filename: 'employee_data.json',
+            contentType: MediaType('application', 'json'),
+          ),
+        ),
+      );
+
+      // NUEVO: usar Uint8List directamente
+      if (images != null && images.isNotEmpty) {
+        for (var i = 0; i < images.length; i++) {
+          formData.files.add(
+            MapEntry(
+              'images',
+              MultipartFile.fromBytes(
+                images[i],
+                filename: 'image_$i.webp',         // nombre con índice
+                contentType: MediaType('image', 'webp'),
+              ),
+            ),
+          );
+        }
+      }
+
+      // Aquí puedes agregar la lógica para enviar el JSON al backend usando Dio
+      final response = await dio.post(
+        '/rest/zent-logbook-api/v1.0/employee-intern',
+        data: formData,
+        options: onlyError(),
+      );
+
+      final body = response.data;
+
+      return ApiResponse(
+        success: response.statusCode == 200,
+        errorCode: body['error_code'],
+        message: body['message'],
+      );
+    } catch (e) {
+      print('Error al guardar el personal: $e');
+      return ApiResponse(
+        success: false,
+        errorCode: 'update_error',
+        message: 'Error al guardar el personal',
+      );
+    }
+  }
+  
+  @override
+  Future<List<EmployeeIntern>> getEmployeeInterns(Map<String, dynamic> filters) async {
+    final response = await dio.get(
+      '/rest/zent-logbook-api/v1.0/employee-intern',
+      queryParameters: {
+        'start_date': filters['start_date'],
+        'end_date': filters['end_date'],
+        'id_employee': filters['id_employee'],
+        'id_group_business': filters['id_group_business'],
+      },
+      options: Options(
+        headers: {
+          'externalTransactionId': uuid, 
+          'channel': 'ZENTINEL'
+        },
+      ),
+    );
+    final List<EmployeeIntern> employeeInterns = (response.data['data'] as List)
+      .map((json) => EmployeeIntern.fromJson(json))
+      .toList();
+    return employeeInterns;
+  }
+
+  @override
+  Future<List<EmployeeMovement>> getEmployeeMovements(Map<String, dynamic> filters) async {
+    final response = await dio.get(
+      '/rest/zent-logbook-api/v1.0/employee-movement',
+      queryParameters: {
+        'start_date': filters['start_date'],
+        'end_date': filters['end_date'],
+        'id_employee': filters['id_employee'],
+        'type_movement': filters['type_movement'],
+        'group_business_id': filters['group_business_id'],
+        'status_employee': filters['status_employee'],
+      },
+      options: Options(
+        headers: {
+          'externalTransactionId': uuid, 
+          'channel': 'ZENTINEL'
+        },
+      ),
+    );
+    final data = response.data['data'] as List? ?? [];
+    return data
+    .map((json) => EmployeeMovement.fromJson(json))
+    .toList();
+  }
+  
+  @override
+  Future<ApiResponse<dynamic>> saveEmployeeMovement(Map<String, dynamic> data) async {
+    try {
+      final images = (data['images'] as List?)?.whereType<Uint8List>().toList() ?? [];
+      final movementData = Map<String, dynamic>.from(data);
+      movementData.remove('images');
+
+      movementData['channel'] = 'ZENTINEL';
+      // movementData['external_transaction_id'] = "3067dc66-ac5e-49d7-8ef9-eb62c51d4bc6";
+
+      final movementJson = jsonEncode(movementData);
+      final movementBytes = utf8.encode(movementJson);
+
+      final formData = FormData();
+
+      // Agregar logbook_out
+      formData.files.add(
+        MapEntry(
+          'employee_movement',
+          MultipartFile.fromBytes(
+            movementBytes,
+            filename: 'employee_movement.json',
+            contentType: MediaType('application', 'json'),
+          ),
+        ),
+      );
+
+      // NUEVO: usar Uint8List directamente
+      if (images.isNotEmpty) {
+        for (var i = 0; i < images.length; i++) {
+          formData.files.add(
+            MapEntry(
+              'images',
+              MultipartFile.fromBytes(
+                images[i],
+                filename: 'image_$i.webp',         // nombre con índice
+                contentType: MediaType('image', 'webp'),
+              ),
+            ),
+          );
+        }
+      }
+
+      final response = await dio.post(
+        '/rest/zent-logbook-api/v1.0/employee-movement',
+        data: formData,
+        options: onlyError(),
+      );
+
+      final body = response.data;
+
+      return ApiResponse(
+        success: response.statusCode == 200,
+        errorCode: body['error_code']?.toString(),
+        message: body['message'],
+        data: body['data'],
+      );
+    } catch (e) {
+      print('Error al guardar registro: $e');
+      String messageError = "Error al guardar el registro";
+      if (e is DioException) {
+        if (e.type == DioExceptionType.connectionError ||
+            e.type == DioExceptionType.connectionTimeout ||
+            e.type == DioExceptionType.receiveTimeout) {
+          rethrow;
+        }
+        messageError = e.response?.data["message"];
+      }
+      return ApiResponse(
+        success: false,
+        errorCode: 'save_error',
+        message: messageError,
+      );
+    }
+  }
+  
+  @override
+  Future<ApiResponse<dynamic>> updateStatusEmployeeIntern(Map<String, dynamic> data) async {
+    try {
+      final idEmployee = data["id_employee"];
+      final response = await dio.patch(
+        '/rest/zent-logbook-api/v1.0/employee-intern/$idEmployee',
+        data: {
+          'externalTransactionId': uuid, 
+          'channel': 'ZENTINEL',
+          'data': {
+            "status": data["status"],
+            "user_update": data["user_update"]
+          }
+        },
+        options: onlyError(),
+      );
+
+      final body = response.data;
+
+      return ApiResponse(
+        success: response.statusCode == 200,
+        errorCode: body['error_code']?.toString(),
+        message: body['message'],
+        data: body['data'],
+      );
+    } catch (e) {
+      print('Error al guardar estado: $e');
+      String messageError = "Error al guardar estado";
+      if (e is DioException) {
+        messageError = e.response?.data["message"];
+      }
+      return ApiResponse(
+        success: false,
+        errorCode: 'save_error',
+        message: messageError,
+      );
+    }
   }
 }

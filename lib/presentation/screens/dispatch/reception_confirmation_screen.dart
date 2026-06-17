@@ -38,21 +38,6 @@ class ReceptionConfirmationScreen extends ConsumerWidget {
     // })
     // .toList();
 
-    final products = dispatchData.skus
-    .expand((sku) => sku.products)
-    .map((product) {
-      return ReceivedProduct(
-        id: product.idProductSku,
-        productName: product.name,
-        status: 'CORRECTO',
-        expectedQty: product.quantity,
-        receivedQty: product.quantity,
-        commentary: '',
-        hasDiscrepancy: false,
-      );
-    })
-    .toList();
-
     final skus = dispatchData.skus
     .map((sku) {
       return ReceivedSku(

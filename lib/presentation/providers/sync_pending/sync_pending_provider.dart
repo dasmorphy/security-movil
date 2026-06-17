@@ -1,10 +1,7 @@
-import 'dart:io';
-
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:zentinel/domain/entities/api_response.dart';
-import 'package:zentinel/presentation/providers/logbook/logbook_provider.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/service/pending_request_service.dart';
 
@@ -15,9 +12,14 @@ final syncPendingProvider = StateNotifierProvider<SyncPendingNotifier, bool>((
 });
 
 final connectivityProvider = StreamProvider<bool>((ref) {
-  return Connectivity().onConnectivityChanged.map(
-    (result) => result != ConnectivityResult.none,
-  );
+  // connectivity_plus 7.x emite List<ConnectivityResult>. Hay conexión si la
+  // lista contiene algún resultado distinto de `none`. (Antes se comparaba la
+  // List contra el enum, lo que daba SIEMPRE true incluso sin conexión.)
+  return Connectivity().onConnectivityChanged
+      .map((results) => results.any((r) => r != ConnectivityResult.none))
+      // Evita disparar la sincronización en cada micro-evento de red
+      // (connectivity_plus emite varios eventos por transición).
+      .distinct();
 });
 
 final pendingRequestsProvider = StreamProvider<List<Map<String, dynamic>>>((
@@ -60,9 +62,42 @@ final pendingBiomarProvider = StreamProvider<List<Map<String, dynamic>>>((
   }
 });
 
+final pendingEmployeeMovementsProvider = StreamProvider<List<Map<String, dynamic>>>((ref) async* {
+  final box = Hive.box('pending_employee_movements');
+  // emite estado inicial
+  yield box.values
+    .whereType<Map>()
+    .map((e) => Map<String, dynamic>.from(e))
+    .toList();
+
+  // escucha cambios
+  await for (final _ in box.watch()) {
+    yield box.values
+      .whereType<Map>()
+      .map((e) => Map<String, dynamic>.from(e))
+      .toList();
+  }
+});
+
+/// Firma del envío real de un registro al backend.
+/// Recibe el `endpoint` guardado (puede ser null) y el payload ya restaurado,
+/// y devuelve `true` si el backend confirmó la recepción.
+typedef _Sender = Future<bool> Function(
+  String? endpoint,
+  Map<String, dynamic> data,
+);
+
 class SyncPendingNotifier extends StateNotifier<bool> {
   final Ref ref;
+
+  /// Lock global de sincronización. Garantiza que NUNCA corran dos
+  /// sincronizaciones a la vez (ni del mismo box ni de boxes distintos),
+  /// lo que evitaba los dobles envíos y la "resurrección" de registros.
   bool _running = false;
+
+  /// Tiempo máximo que un registro puede permanecer en `processing` antes de
+  /// considerarse colgado por un crash. Solo esos se resetean al iniciar.
+  static const Duration _staleProcessing = Duration(minutes: 2);
 
   SyncPendingNotifier(this.ref) : super(false);
 
@@ -77,277 +112,199 @@ class SyncPendingNotifier extends StateNotifier<bool> {
   }
 
   Future<ApiResponse> providerEntryBiomar(Map<String, dynamic> data) async {
-    return await ref
-        .read(dispatchProvider.notifier)
-        .saveEntry(data);
+    return await ref.read(dispatchProvider.notifier).saveEntry(data);
   }
 
   Future<ApiResponse> providerDispatch(Map<String, dynamic> data) async {
     return await ref.read(dispatchProvider.notifier).saveDispatch(data);
   }
 
-  Future<void> cleanupImages(Map<String, dynamic> storedData) async {
-    final rawImages = storedData['images'];
-    if (rawImages is List) {
-      for (final path in rawImages.whereType<String>()) {
-        final file = File(path);
-        if (await file.exists()) await file.delete();
-      }
-    }
+  Future<ApiResponse> providerEmployeeMovements(
+    Map<String, dynamic> data,
+  ) async {
+    return await ref
+        .read(saveEmployeeInternProvider.notifier)
+        .saveEmployeeMovement(data);
   }
 
-  Future<void> sync() async {
-    // Verifica si ya hay una sincronización en curso
+  /// Adquiere el lock de forma SÍNCRONA (antes de cualquier `await`) y ejecuta
+  /// `action`. Es la pieza clave: poner `_running = true` antes del primer
+  /// `await` cierra la ventana de carrera (TOCTOU) que dejaba pasar varias
+  /// ejecuciones simultáneas. El `finally` garantiza la liberación.
+  Future<void> _withLock(Future<void> Function() action) async {
     if (_running) {
       print('⏳ Sincronización ya en progreso...');
       return;
     }
-
-    // Valida que haya internet disponible
-    if (!await hasInternet()) {
-      print(
-        '❌ Sin conexión a internet. La sincronización será reintentada cuando haya conexión.',
-      );
-      return;
-    }
-
     _running = true;
     state = true;
+    try {
+      if (!await hasInternet()) {
+        print(
+          '❌ Sin conexión a internet. La sincronización será reintentada cuando haya conexión.',
+        );
+        return;
+      }
+      await action();
+    } finally {
+      _running = false;
+      state = false;
+    }
+  }
 
-    final box = Hive.box('pending_requests');
+  /// Sincroniza TODOS los boxes en serie bajo un único lock. Es el punto de
+  /// entrada recomendado para la sincronización automática (conectividad /
+  /// resume de la app).
+  Future<void> syncAll() async {
+    await _withLock(() async {
+      await _drainBox(boxName: 'pending_requests', label: 'logbook', send: _sendLogbook);
+      await _drainBox(boxName: 'pending_biomar', label: 'biomar', send: _sendBiomar);
+      await _drainBox(
+        boxName: 'pending_employee_movements',
+        label: 'employee',
+        send: _sendEmployee,
+      );
+    });
+  }
 
-    // limpiar requests que quedaron en processing por crash
+  /// Sincronización manual de un solo box (botón de reintento por pantalla).
+  Future<void> sync() => _withLock(
+        () => _drainBox(boxName: 'pending_requests', label: 'logbook', send: _sendLogbook),
+      );
+
+  Future<void> syncBiomar() => _withLock(
+        () => _drainBox(boxName: 'pending_biomar', label: 'biomar', send: _sendBiomar),
+      );
+
+  Future<void> syncEmployeeMovements() => _withLock(
+        () => _drainBox(
+          boxName: 'pending_employee_movements',
+          label: 'employee',
+          send: _sendEmployee,
+        ),
+      );
+
+  // --- Senders por tipo de box ---------------------------------------------
+
+  Future<bool> _sendLogbook(String? endpoint, Map<String, dynamic> data) async {
+    if (endpoint == 'logbook_out') return providerOut(data);
+    if (endpoint == 'logbook_entry') return providerEntry(data);
+    return false;
+  }
+
+  Future<bool> _sendBiomar(String? endpoint, Map<String, dynamic> data) async {
+    if (endpoint == 'entry') return (await providerEntryBiomar(data)).success;
+    if (endpoint == 'dispatch') return (await providerDispatch(data)).success;
+    return false;
+  }
+
+  Future<bool> _sendEmployee(String? endpoint, Map<String, dynamic> data) async {
+    return (await providerEmployeeMovements(data)).success;
+  }
+
+  // --- Worker genérico -------------------------------------------------------
+
+  /// Procesa un box completo. NO toma el lock (lo hace `_withLock`), por lo que
+  /// asume que es la única ejecución activa sobre Hive.
+  Future<void> _drainBox({
+    required String boxName,
+    required String label,
+    required _Sender send,
+  }) async {
+    final box = Hive.box(boxName);
+
+    // Recuperación de crash: SOLO resetea registros que quedaron colgados en
+    // `processing` hace más de `_staleProcessing`. Antes se reseteaban todos
+    // de forma incondicional, lo que borraba el flag de un registro en pleno
+    // vuelo de otra ejecución y habilitaba el doble envío.
+    final now = DateTime.now();
     for (final key in box.keys) {
       final data = box.get(key);
-
       if (data is Map && data['processing'] == true) {
-        final Map<String, dynamic> reset = Map<String, dynamic>.from(data);
-        reset['processing'] = false;
-
-        await box.put(key, reset);
-
-        print("♻️ Reset processing para request $key");
+        final started = DateTime.tryParse(
+          data['processingStartedAt']?.toString() ?? '',
+        );
+        final isStale =
+            started == null || now.difference(started) >= _staleProcessing;
+        if (isStale) {
+          final reset = Map<String, dynamic>.from(data);
+          reset['processing'] = false;
+          reset.remove('processingStartedAt');
+          await box.put(key, reset);
+          print('♻️ [$label] Reset processing colgado en request $key');
+        }
       }
     }
 
     final totalPending = box.length;
-
     if (totalPending == 0) {
-      print('✅ No hay requests pendientes para sincronizar');
-      state = false;
-      _running = false;
+      print('✅ [$label] No hay requests pendientes para sincronizar');
       return;
     }
 
     print(
-      '🔄 Iniciando sincronización de $totalPending request(s) pendiente(s)...',
+      '🔄 [$label] Iniciando sincronización de $totalPending request(s) pendiente(s)...',
     );
 
     int synced = 0;
     int failed = 0;
 
-    // Itera sobre una copia de las keys para evitar problemas de iteración durante la eliminación
+    // Copia de las keys para evitar problemas al eliminar durante la iteración.
     final keysList = List.from(box.keys);
 
     for (final key in keysList) {
       final data = box.get(key);
       if (data == null) continue;
 
-      // Si ya está marcado como processing, saltar para evitar dobles envíos
       if (data is Map && data['processing'] == true) {
-        print('⚠️ Request $key ya está en procesamiento, se omite.');
+        print('⚠️ [$label] Request $key ya está en procesamiento, se omite.');
         continue;
       }
 
       try {
-        // Marcar como processing antes de enviar para evitar race conditions
-        final Map<String, dynamic> mark = Map<String, dynamic>.from(
-          data as Map,
-        );
+        // Marca processing ANTES de enviar.
+        final mark = Map<String, dynamic>.from(data as Map);
         mark['processing'] = true;
+        mark['processingStartedAt'] = now.toIso8601String();
         await box.put(key, mark);
 
-        // Restaurar archivos (paths -> File)
         final restoredData = restoreFiles(
           Map<String, dynamic>.from(mark['payload']),
         );
 
-        final originalPayload = Map<String, dynamic>.from(mark['payload']); // paths intactos
+        print('📤 [$label] Enviando request $key');
 
-        print('📤 Enviando request $key con payload: $restoredData');
+        final response = await send(mark['endpoint'] as String?, restoredData);
 
-        bool response = false;
-
-        if (mark['endpoint'] == 'logbook_out') {
-          response = await providerOut(restoredData);
-        } else if (mark['endpoint'] == 'logbook_entry') {
-          response = await providerEntry(restoredData);
-        }
-
-        print('Respuesta api para request $key: $response');
+        print('📥 [$label] Respuesta api para request $key: $response');
 
         if (response) {
-          // Eliminamos en caso de éxito
           await box.delete(key);
           synced++;
-          await cleanupImages(originalPayload);
-          print('✅ Request $key eliminado de Hive tras sincronizar.');
+          print('✅ [$label] Request $key eliminado de Hive tras sincronizar.');
         } else {
-          // Desmarcar processing para reintentar luego
-          final Map<String, dynamic> unmark = Map<String, dynamic>.from(mark);
+          final unmark = Map<String, dynamic>.from(mark);
           unmark['processing'] = false;
+          unmark.remove('processingStartedAt');
           await box.put(key, unmark);
           failed++;
-          print('❌ Request $key falló y se mantendrá para reintento.');
+          print('❌ [$label] Request $key falló y se mantendrá para reintento.');
         }
       } catch (e) {
         failed++;
-        print('❌ Error sincronizando request $key: $e');
-        try {
-          // Intentar desmarcar processing en caso de excepción
-          if (data is Map) {
-            final Map<String, dynamic> unmark = Map<String, dynamic>.from(data);
-            unmark['processing'] = false;
-            await box.put(key, unmark);
-          }
-        } catch (_) {
-          // no hacemos nada si falla el desmarcado
-        }
-        // Continúa con el siguiente en lugar de romper el ciclo
-      }
-    }
-
-    print('🎉 Sincronización completada: $synced enviados, $failed fallidos');
-
-    state = false;
-    _running = false;
-  }
-
-
-  Future<void> syncBiomar() async {
-    // Verifica si ya hay una sincronización en curso
-    if (_running) {
-      print('⏳ Sincronización ya en progreso...');
-      return;
-    }
-
-    // Valida que haya internet disponible
-    if (!await hasInternet()) {
-      print(
-        '❌ Sin conexión a internet. La sincronización será reintentada cuando haya conexión.',
-      );
-      return;
-    }
-
-    _running = true;
-    state = true;
-
-    final box = Hive.box('pending_biomar');
-
-    // limpiar requests que quedaron en processing por crash
-    for (final key in box.keys) {
-      final data = box.get(key);
-
-      if (data is Map && data['processing'] == true) {
-        final Map<String, dynamic> reset = Map<String, dynamic>.from(data);
-        reset['processing'] = false;
-
-        await box.put(key, reset);
-
-        print("♻️ Reset processing para request $key");
-      }
-    }
-
-    final totalPending = box.length;
-
-    if (totalPending == 0) {
-      print('✅ No hay requests pendientes para sincronizar');
-      state = false;
-      _running = false;
-      return;
-    }
-
-    print(
-      '🔄 Iniciando sincronización de $totalPending request(s) pendiente(s)...',
-    );
-
-    int synced = 0;
-    int failed = 0;
-
-    // Itera sobre una copia de las keys para evitar problemas de iteración durante la eliminación
-    final keysList = List.from(box.keys);
-
-    for (final key in keysList) {
-      final data = box.get(key);
-      if (data == null) continue;
-
-      // Si ya está marcado como processing, saltar para evitar dobles envíos
-      if (data is Map && data['processing'] == true) {
-        print('⚠️ Request $key ya está en procesamiento, se omite.');
-        continue;
-      }
-
-      try {
-        // Marcar como processing antes de enviar para evitar race conditions
-        final Map<String, dynamic> mark = Map<String, dynamic>.from(
-          data as Map,
-        );
-        mark['processing'] = true;
-        await box.put(key, mark);
-
-        // Restaurar archivos (paths -> File)
-        final restoredData = restoreFiles(
-          Map<String, dynamic>.from(mark['payload']),
-        );
-
-        final originalPayload = Map<String, dynamic>.from(mark['payload']); // paths intactos
-
-        print('📤 Enviando request $key con payload: $restoredData');
-
-        ApiResponse response = ApiResponse(success: false);
-
-        if (mark['endpoint'] == 'entry') {
-          response = await providerEntryBiomar(restoredData);
-        } else if (mark['endpoint'] == 'dispatch') {
-          response = await providerDispatch(restoredData);
-        }
-
-        print('Respuesta api para request $key: $response');
-
-        if (response.success) {
-          // Eliminamos en caso de éxito
-          await box.delete(key);
-          synced++;
-          await cleanupImages(originalPayload);
-          print('✅ Request biomar $key eliminado de Hive tras sincronizar.');
-        } else {
-          // Desmarcar processing para reintentar luego
-          final Map<String, dynamic> unmark = Map<String, dynamic>.from(mark);
+        print('❌ [$label] Error sincronizando request $key: $e');
+        // Re-lee el estado ACTUAL: si el registro ya fue borrado por un envío
+        // exitoso, no lo "resucitamos" reescribiéndolo.
+        final current = box.get(key);
+        if (current is Map && current['processing'] == true) {
+          final unmark = Map<String, dynamic>.from(current);
           unmark['processing'] = false;
+          unmark.remove('processingStartedAt');
           await box.put(key, unmark);
-          failed++;
-          print('❌ Request biomar $key falló y se mantendrá para reintento.');
         }
-      } catch (e) {
-        failed++;
-        print('❌ Error sincronizando request biomar $key: $e');
-        try {
-          // Intentar desmarcar processing en caso de excepción
-          if (data is Map) {
-            final Map<String, dynamic> unmark = Map<String, dynamic>.from(data);
-            unmark['processing'] = false;
-            await box.put(key, unmark);
-          }
-        } catch (_) {
-          // no hacemos nada si falla el desmarcado
-        }
-        // Continúa con el siguiente en lugar de romper el ciclo
       }
     }
 
-    print('🎉 Sincronización completada: $synced enviados, $failed fallidos');
-
-    state = false;
-    _running = false;
+    print('🎉 [$label] Sincronización completada: $synced enviados, $failed fallidos');
   }
 }

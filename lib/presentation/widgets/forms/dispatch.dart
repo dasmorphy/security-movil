@@ -117,7 +117,7 @@ class _CrearDespachoScreenState extends ConsumerState<DispatchForm> {
     if (isLoading) return;
     setState(() => isLoading = true);
 
-    if (_selectedImages.length < 5) {
+    if (_selectedImages.length < 3) {
       setState(() {
         imagesMinError = true;
         isLoading = false;

@@ -39,12 +39,18 @@ class HomeViewState extends ConsumerState<HomeView> {
       if (userData.attributes['id_business'] == 1 || selectedBusiness == "1") {
         ref.read(getHistoryLogbooks.notifier).load();
         ref.read(graphLogbookProvider.notifier).load();
+        ref.read(getEmployeeMovements.notifier).load(
+          filters:{
+            "page": 1,
+            "rows": 20,
+            "type_movement": "TRANSFER",
+            "group_business_id": userData.attributes['group_business'],
+            "status_employee": "Autorizado"
+          }
+        );
       } else if (userData.attributes['id_business'] == 2 ||
           selectedBusiness == "2") {
         ref.read(getAllDestinyIntern.notifier).load();
-        // ref.read(getAreasVisit.notifier).load();
-        // ref.read(getMaterials.notifier).load();
-        // ref.read(getStaffCharge.notifier).load();
         ref.read(getAllVehicleTypes.notifier).load();
         ref.read(getDispatchStatus.notifier).load();
         ref.read(getAllDispatchProducts.notifier).load();
@@ -149,6 +155,23 @@ class HomeViewState extends ConsumerState<HomeView> {
                     title: 'Bitácoras recientes',
                     routeLink: '/list-logbooks',
                     childListBuild: const ItemRecentLogbook(),
+                  ),
+                  const SizedBox(height: 30),
+                ],
+
+                /// =======================
+                /// PERSONAL INTERNO
+                /// =======================
+                if (effectiveBusiness == "1" &&
+                    (userData.role == "admin_tlsg" ||
+                        userData.hasPermission(Permissions.verMovimientosPersonalInterno))) ...[
+                  const SizedBox(height: 10),
+                  RecentListHome(
+                    title: 'Movimientos personal interno',
+                    routeLink: '/list-employee-movements',
+                    childListBuild: ItemRecentEmployeeMovement(
+                      itememployeeMovements: ref.watch(getEmployeeMovements),
+                    ),
                   ),
                   const SizedBox(height: 30),
                 ],

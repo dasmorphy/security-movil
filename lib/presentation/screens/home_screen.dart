@@ -108,6 +108,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             if (userData.hasPermission(Permissions.verBitacoras)) {
               ref.read(getHistoryLogbooks.notifier).load();
               ref.read(graphLogbookProvider.notifier).load();
+              ref.read(getEmployeeMovements.notifier).load(
+                filters:{
+                  "page": 1,
+                  "rows": 20,
+                  "type_movement": "TRANSFER",
+                  "group_business_id": userData.attributes['group_business'],
+                  "status_employee": "Autorizado"
+                }
+              );
             }
           }
         },

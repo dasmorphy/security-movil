@@ -70,8 +70,8 @@ class _MyAppState extends ConsumerState<MyApp> {
     // 🔄 Callback para sincronizar cuando hay internet
     void onSyncNeeded() {
       print('📡 Internet disponible, iniciando sincronización...');
-      ref.read(syncPendingProvider.notifier).sync();
-      ref.read(syncPendingProvider.notifier).syncBiomar();
+      // syncAll() serializa los 3 boxes bajo un único lock.
+      ref.read(syncPendingProvider.notifier).syncAll();
     }
 
     // 🔄 Inicializar el SyncService con el callback
@@ -81,7 +81,7 @@ class _MyAppState extends ConsumerState<MyApp> {
     _lifecycleObserver = AppLifecycleObserver(
       onResume: () {
       print('📱 App resumed, verificando sincronización...');
-      onSyncNeeded;
+      onSyncNeeded(); // antes era `onSyncNeeded;` (no invocaba nada)
     });
     WidgetsBinding.instance.addObserver(_lifecycleObserver);
   }

@@ -231,6 +231,22 @@ Map<String, dynamic> mapPendingBiomar(Map<String, dynamic> raw) {
   };
 }
 
+Map<String, dynamic> mapPendingEmployeeMovements(Map<String, dynamic> raw) {
+  final bool processing = raw['processing'] == true;
+  const movementStatus = {
+    'CHECK_IN': 'Ingreso',
+    'TRANSFER': 'Movimiento interno',
+    'CHECK_OUT': 'Salida',
+  };
+
+  final typeMovement = movementStatus[raw['payload']['type_movement']] ?? 'Desconocido';
+  return {
+    "name": 'Movimiento',
+    "subtitle": typeMovement,
+    "statusText": processing ? 'Subiendo...' : 'Pendiente',
+  };
+}
+
 Future<Uint8List?> convertToWebP(File file) async {
   final result = await FlutterImageCompress.compressWithFile(
     file.absolute.path,
@@ -321,6 +337,54 @@ Color getStatusColorBckgEntry(String status) {
       return const Color.fromARGB(255, 18, 54, 42);
     default:
       return Colors.grey;
+  }
+}
+
+Color getStatusColorEmployees(String status) {
+  switch (status.toLowerCase()) {
+    case 'no autorizado':
+      return const Color.fromARGB(255, 54, 18, 18);
+    case 'autorizado':
+      return const Color.fromARGB(255, 18, 54, 42);
+    default:
+      return Colors.grey;
+  }
+}
+
+Color getColorTxtEmployees(String status) {
+  switch (status.toLowerCase()) {
+    case 'no autorizado':
+      return const Color.fromARGB(255, 246, 105, 105);
+    case 'autorizado':
+      return const Color.fromARGB(255, 105, 246, 184);
+    default:
+      return Colors.grey;
+  }
+}
+
+Color getColorTxtMovements(String status) {
+  switch (status.toLowerCase()) {
+    case 'salida':
+      return const Color.fromARGB(255, 246, 105, 105);
+    case 'movimiento interno':
+      return const Color.fromARGB(255, 248, 172, 70);
+    case 'ingreso':
+      return const Color.fromARGB(255, 105, 246, 184);
+    default:
+      return const Color.fromARGB(255, 255, 255, 255);
+  }
+}
+
+Color getStatusColorMovements(String status) {
+  switch (status.toLowerCase()) {
+    case 'salida':
+      return const Color.fromARGB(255, 54, 18, 18);
+    case 'movimiento interno':
+      return const Color.fromARGB(255, 61, 43, 14);
+    case 'ingreso':
+      return const Color.fromARGB(255, 18, 54, 42);
+    default:
+      return const Color.fromARGB(255, 82, 84, 83);
   }
 }
 

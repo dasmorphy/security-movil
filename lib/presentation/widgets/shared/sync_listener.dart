@@ -20,8 +20,8 @@ class SyncListener extends ConsumerWidget {
       next.whenData((hasInternet) {
         if (hasInternet) {
           print('📡 Internet detectado: iniciando sincronización...');
-          ref.read(syncPendingProvider.notifier).sync();
-          ref.read(syncPendingProvider.notifier).syncBiomar();
+          // syncAll() serializa los 3 boxes bajo un único lock.
+          ref.read(syncPendingProvider.notifier).syncAll();
         }
       });
     });

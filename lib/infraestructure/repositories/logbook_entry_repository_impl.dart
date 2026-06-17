@@ -1,8 +1,11 @@
 import 'package:zentinel/domain/datasources/logbook_entry_datasource.dart';
 import 'package:zentinel/domain/entities/all_logbook.dart';
+import 'package:zentinel/domain/entities/api_response.dart';
 import 'package:zentinel/domain/entities/authorized.dart';
 import 'package:zentinel/domain/entities/category.dart';
 import 'package:zentinel/domain/entities/destiny_intern.dart';
+import 'package:zentinel/domain/entities/employee_intern.dart';
+import 'package:zentinel/domain/entities/employee_movement.dart';
 import 'package:zentinel/domain/entities/graph_logbook.dart';
 import 'package:zentinel/domain/entities/group_business.dart';
 import 'package:zentinel/domain/entities/unity_weight.dart';
@@ -62,6 +65,31 @@ class LogbookEntryRepositoryImpl extends LogbookEntryRepository {
   @override
   Future<GraphLogbook> getGraphLogbook(Map<String, dynamic> filters) {
     return datasource.getGraphLogbook(filters);
+  }
+  
+  @override
+  Future<ApiResponse<dynamic>> saveEmployeeIntern(Map<String, dynamic> data) {
+    return datasource.saveEmployeeIntern(data);
+  }
+
+  @override
+  Future<ApiResponse<dynamic>> saveEmployeeMovement(Map<String, dynamic> data) {
+    return datasource.saveEmployeeMovement(data);
+  }
+  
+  @override
+  Future<List<EmployeeIntern>> getEmployeeInterns(Map<String, dynamic> filters) {
+    return datasource.getEmployeeInterns(filters);
+  }
+
+  @override
+  Future<List<EmployeeMovement>> getEmployeeMovements(Map<String, dynamic> filters) {
+    return datasource.getEmployeeMovements(filters);
+  }
+  
+  @override
+  Future<ApiResponse<dynamic>> updateStatusEmployeeIntern(Map<String, dynamic> data) {
+    return datasource.updateStatusEmployeeIntern(data);
   }
   
 }
