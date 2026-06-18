@@ -222,7 +222,6 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
       "truck_license": _truckLicenseCtrl.text.trim(),
       "lat": _latitude.toString(),
       "long": _longitude.toString(),
-      "employee_intern": int.tryParse(_employeeCtrl.text),
       "person_withdraws": _personWithdrawsCtrl.text.trim(),
       "destiny": _destinyCtrl.text.trim(),
       "authorized_by": _authorized,
@@ -350,7 +349,6 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
     }
 
     final groupBusiness = ref.watch(getGroupBusinessByIdBusiness);
-    final employeeIntern = ref.watch(getEmployeeInterns);
     final unitiesWeight = ref.watch(getAllUnitiesWeight);    
     final messageValidatorEmpty = 'Este campo es obligatorio';
     final fieldFill = const Color.fromARGB(255, 20, 21, 23);
@@ -388,7 +386,6 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
     final hideEject = hiddenEjectCategories.contains(categoryName);
     final hidePersonal = hiddenPersonalCategories.contains(categoryName);
     final isDestinyRequired = categoryName == 'Camarón';
-    final isPersonalIntern = 'Personal interno' == categoryName;
 
     InputDecoration styleDecoration() => InputDecoration(
       filled: true,
@@ -593,40 +590,6 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                     return null;
                   },
                 ),
-
-                if (isPersonalIntern) ...[
-                  const SizedBox(height: 12),
-                  CustomFieldLabelRequired(txtLabel: 'Empleado Interno'),
-                  GlowDropdownFormField2<int>(
-                    value: _employeeCtrl.text.isEmpty ? 0 : int.tryParse(_employeeCtrl.text),
-                    focusNode: _employeeFocus,
-                    decoration: styleDecoration(),
-                    items: [
-                      DropdownMenuItem(
-                        enabled: false,
-                        value: 0,
-                        child: Text('Seleccione una opción', style: TextStyle(color: Colors.white),),
-                      ),
-                      ...employeeIntern.map(
-                        (c) => DropdownMenuItem(
-                          value: c.idEmployeeIntern,
-                          child: Text('${c.names} ${c.lastname}', style: TextStyle(color: Colors.white),),
-                        ),
-                      ),
-                    ],
-                    onChanged: (v) {
-                      if (v != null) {
-                        setState(() => _employeeCtrl.text = v.toString());
-                      }
-                    },
-                    validator: (v) {
-                      if (v == 0 || v == null || v.toString().trim().isEmpty) {
-                        return messageValidatorEmpty;
-                      }
-                      return null;
-                    },
-                  ),
-                ],
 
                 if (!hideWeight) ...[
                   const SizedBox(height: 12),
