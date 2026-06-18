@@ -96,6 +96,12 @@ class _BasicServicesStionState extends ConsumerState<BasicServicesSection> {
                   label: 'Nuevo personal interno',
                   onTap: () => context.push('/new-employee')
                 ),
+
+              BasicServiceCard(
+                iconImage: 'iconsalida',
+                label: 'Asistencia',
+                onTap: () => context.push('/new-attendance')
+              ),
             ],
           ),
 

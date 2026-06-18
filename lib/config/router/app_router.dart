@@ -138,7 +138,12 @@ final appRouter = GoRouter(
               idEmployee: params.idEmployee,
             );
           },
-        )
+        ),
+        GoRoute(
+          path: 'new-attendance',
+          name: NewAttendanceScreen.name,
+          builder: (context, state) => const NewAttendanceScreen()
+        ),
       ]
     ),
   ]

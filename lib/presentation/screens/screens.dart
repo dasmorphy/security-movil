@@ -17,3 +17,4 @@ export 'package:zentinel/presentation/screens/employee/employee_intern_list_scre
 export 'package:zentinel/presentation/screens/employee/employee_movement_screen.dart';
 export 'package:zentinel/presentation/screens/employee/new_employee_movement_screen.dart';
 export 'package:zentinel/presentation/screens/shared/camera_screen.dart';
+export 'package:zentinel/presentation/screens/attendance/new_attendance_screen.dart';
