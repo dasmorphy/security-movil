@@ -62,7 +62,7 @@ class BitacoraDetailModal extends ConsumerWidget {
             const SizedBox(height: 20),
 
             /// BOTÓN CONTINUAR
-            if (item.status == 'Pendiente Salida' && item.nameCategory != 'Personal interno')
+            if (item.status == 'Pendiente Salida')
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
