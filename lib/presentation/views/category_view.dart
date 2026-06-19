@@ -52,7 +52,7 @@ class CategoryViewState extends ConsumerState<CategoryView> {
               children: [
 
                 SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(8),
                   physics: const BouncingScrollPhysics(
                     parent: AlwaysScrollableScrollPhysics(),
                   ),

@@ -138,7 +138,12 @@ final appRouter = GoRouter(
               idEmployee: params.idEmployee,
             );
           },
-        )
+        ),
+        GoRoute(
+          path: 'new-black-list',
+          name: NewBlackListScreen.name,
+          builder: (context, state) => const NewBlackListScreen()
+        ),
       ]
     ),
   ]
