@@ -5,9 +5,11 @@ class MaterialEntryItem extends StatefulWidget {
   final dynamic materials;
   final String? selectedMaterial;
   final int? quantity;
+  final String? otherMaterial;
 
   final ValueChanged<String>? onMaterialChanged;
   final ValueChanged<int>? onQuantityChanged;
+  final ValueChanged<String>? onOtherMaterialChanged;
   final VoidCallback? onDeleteMaterial;
 
 
@@ -18,8 +20,10 @@ class MaterialEntryItem extends StatefulWidget {
     required this.materials,
     this.selectedMaterial,
     this.quantity,
+    this.otherMaterial,
     this.onMaterialChanged,
     this.onQuantityChanged, 
+    this.onOtherMaterialChanged, 
     this.onRemove, 
     this.onDeleteMaterial,
   });
@@ -32,6 +36,10 @@ class _MaterialEntryItemState extends State<MaterialEntryItem> {
   late TextEditingController _qtyCtrl;
   late FocusNode _qtyFocus;
 
+  late TextEditingController _otherCtrl;
+  late FocusNode _otherFocus;
+
+
   String _materialValue = '0';
 
   @override
@@ -41,14 +49,20 @@ class _MaterialEntryItemState extends State<MaterialEntryItem> {
     _materialValue = widget.selectedMaterial ?? '0';
 
     _qtyCtrl = TextEditingController(text: widget.quantity?.toString() ?? '');
+    _otherCtrl = TextEditingController(text: widget.otherMaterial?.toString() ?? '');
 
     _qtyFocus = FocusNode();
+    _otherFocus = FocusNode();
   }
 
   @override
   void dispose() {
     _qtyCtrl.dispose();
     _qtyFocus.dispose();
+
+    _otherCtrl.dispose();
+    _otherFocus.dispose();
+
     super.dispose();
   }
 
@@ -139,6 +153,13 @@ class _MaterialEntryItemState extends State<MaterialEntryItem> {
                       ),
                     ),
                   ),
+                  const DropdownMenuItem(
+                    value: '1000',
+                    child: Text(
+                      'Otros',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
                 ],
         
                 onChanged: (v) {
@@ -174,6 +195,13 @@ class _MaterialEntryItemState extends State<MaterialEntryItem> {
                 focusNode: _qtyFocus,
                 hint: 'Ingrese la cantidad',
                 keyboardType: TextInputType.number,
+                onChanged: (v) {
+                  if (v != null) {
+                    widget.onQuantityChanged?.call(
+                      int.tryParse(v) ?? 0,
+                    );
+                  }
+                },
                 validator: (v) {
                   if (v == null || v.trim().isEmpty) {
                     return messageValidatorEmpty;
@@ -181,6 +209,37 @@ class _MaterialEntryItemState extends State<MaterialEntryItem> {
                   return null;
                 },
               ),
+
+              const SizedBox(height: 16),
+              
+              if (_materialValue == '1000')...[
+                const Text(
+                  'OTRO',
+                  style: TextStyle(
+                    color: Color.fromARGB(255, 150, 150, 150),
+                    fontSize: 11,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                GlowTextFormField(
+                  controller: _otherCtrl,
+                  focusNode: _otherFocus,
+                  onChanged: (v) {
+                    if (v != null) {
+                      widget.onOtherMaterialChanged?.call(v);
+                    }
+                  },
+                  validator: (v) {
+                    if (v == null || v.trim().isEmpty) {
+                      return messageValidatorEmpty;
+                    }
+                    return null;
+                  },
+                ),
+              ],
+
               const SizedBox(height: 12,)
             ],
           ),

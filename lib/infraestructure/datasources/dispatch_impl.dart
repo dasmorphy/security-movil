@@ -118,6 +118,7 @@ class DispatchImpl extends DispatchDatasource {
             'externalTransactionId': uuid,
             'channel': 'ZENTINEL',
             'user': filters['user'],
+            'destiny': filters['destiny'],
           },
         ),
       );

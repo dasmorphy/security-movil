@@ -69,6 +69,16 @@ class ItemRecentDispatch extends ConsumerWidget {
                           ),
                           const SizedBox(height: 2),
                           Text(
+                            item.typeProcess == 'dispatch' ? 'Materia prima' : 'Producto terminado',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodySmall
+                                ?.copyWith(
+                                  color: const Color.fromARGB(255, 180, 180, 180),
+                                ),
+                          ),
+                          const SizedBox(height: 2),
+                          Text(
                             formattedDate,
                             style: Theme.of(context)
                                 .textTheme

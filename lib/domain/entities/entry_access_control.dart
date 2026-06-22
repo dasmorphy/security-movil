@@ -11,8 +11,9 @@ class EntryAccessControl {
   String observationsEntry;
   dynamic observationsOut;
   String reasonVisit;
-  int staffChargeId;
-  String staffChargeName;
+  int? staffChargeId;
+  String? staffChargeName;
+  String? otherStaff;
   String status;
   DateTime updatedAt;
   String updatedBy;
@@ -30,8 +31,9 @@ class EntryAccessControl {
     required this.observationsEntry,
     required this.observationsOut,
     required this.reasonVisit,
-    required this.staffChargeId,
-    required this.staffChargeName,
+    this.staffChargeId,
+    this.staffChargeName,
+    this.otherStaff,
     required this.status,
     required this.updatedAt,
     required this.updatedBy,
@@ -55,6 +57,7 @@ class EntryAccessControl {
         reasonVisit: json["reason_visit"],
         staffChargeId: json["staff_charge_id"],
         staffChargeName: json["staff_charge_name"],
+        otherStaff: json["other_staff"],
         status: json["status"],
         updatedAt: DateTime.parse(json["updated_at"]),
         updatedBy: json["updated_by"],
@@ -75,6 +78,7 @@ class EntryAccessControl {
     "reason_visit": reasonVisit,
     "staff_charge_id": staffChargeId,
     "staff_charge_name": staffChargeName,
+    "other_staff": otherStaff,
     "status": status,
     "updated_at": updatedAt.toIso8601String(),
     "updated_by": updatedBy,
@@ -97,13 +101,15 @@ class Image {
 }
 
 class Material {
-  int idMaterial;
-  String name;
+  int? idMaterial;
+  String? name;
   int quantity;
+  String? otherMaterial;
 
   Material({
-    required this.idMaterial,
-    required this.name,
+    this.idMaterial,
+    this.name,
+    this.otherMaterial,
     required this.quantity,
   });
 
@@ -111,11 +117,13 @@ class Material {
     idMaterial: json["id_material"],
     name: json["name"],
     quantity: json["quantity"],
+    otherMaterial: json["other_material"],
   );
 
   Map<String, dynamic> toJson() => {
     "id_material": idMaterial,
     "name": name,
     "quantity": quantity,
+    "otherMaterial": otherMaterial,
   };
 }

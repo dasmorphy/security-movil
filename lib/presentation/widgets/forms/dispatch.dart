@@ -73,6 +73,8 @@ class _CrearDespachoScreenState extends ConsumerState<DispatchForm> {
   @override
   void initState() {
     super.initState();
+    ref.read(getAllDestinyIntern.notifier).load();
+    ref.read(getAllVehicleTypes.notifier).load();
   }
 
   @override

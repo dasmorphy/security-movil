@@ -7,6 +7,7 @@ class GlowTextFormField extends StatelessWidget {
   final FocusNode focusNode;
   final String? hint;
   final int? maxLength;
+  final ValueChanged<String?>? onChanged;
   final int maxLines;
   final bool enabled;
   final TextInputType keyboardType;
@@ -19,6 +20,7 @@ class GlowTextFormField extends StatelessWidget {
     required this.focusNode,
     this.hint,
     this.maxLength,
+    this.onChanged,
     this.enabled = true,
     this.maxLines = 1,
     this.keyboardType = TextInputType.text,
@@ -60,6 +62,7 @@ class GlowTextFormField extends StatelessWidget {
             style: const TextStyle(color: Colors.white),
             maxLines: maxLines,
             maxLength: maxLength,
+            onChanged: onChanged,
             keyboardType: keyboardType,
             inputFormatters: inputFormatters,
             validator: validator,
