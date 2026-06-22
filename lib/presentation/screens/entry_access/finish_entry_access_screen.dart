@@ -28,7 +28,8 @@ class FinishEntryAccessScreen extends ConsumerWidget {
       return MaterialEntry(
         id: material.idMaterial,
         name: material.name,
-        quantity: material.quantity
+        quantity: material.quantity,
+        otherMaterial: material.otherMaterial
       );
     }).toList();
 

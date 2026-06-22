@@ -14,6 +14,7 @@ class AllDispatch {
   String truckLicense;
   DateTime updatedAt;
   String updatedBy;
+  String typeProcess;
   dynamic weight;
 
   AllDispatch({
@@ -24,6 +25,7 @@ class AllDispatch {
     required this.images,
     required this.nameDestiny,
     required this.nameVehicleType,
+    required this.typeProcess,
     required this.observations,
     required this.orderNumber,
     required this.reception,
@@ -42,6 +44,7 @@ class AllDispatch {
     idDispatch: json["id_dispatch"],
     images: List<Image>.from(json["images"].map((x) => Image.fromJson(x))),
     nameDestiny: json["name_destiny"],
+    typeProcess: json["type_process"],
     nameVehicleType: json["name_vehicle_type"],
     observations: json["observations"],
     orderNumber: json["order_number"],
@@ -62,6 +65,7 @@ class AllDispatch {
     "images": List<dynamic>.from(images.map((x) => x.toJson())),
     "name_destiny": nameDestiny,
     "name_vehicle_type": nameVehicleType,
+    "type_process": typeProcess,
     "observations": observations,
     "order_number": orderNumber,
     "reception": reception,

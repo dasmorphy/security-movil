@@ -17,7 +17,7 @@ class ItemDetailEntry extends StatelessWidget {
         detailRow('Cédula', item.dni),
         detailRow('Área', item.areaName),
         detailRow('Motivo de Visita', item.reasonVisit),
-        detailRow('Personal a Cargo', item.staffChargeName),
+        detailRow('Personal a Cargo', item.staffChargeName ?? item.otherStaff),
         detailRow('Creado por', item.createdBy),
         detailRow('Observaciones', item.observationsEntry),
         detailRow(

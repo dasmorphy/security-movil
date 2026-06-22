@@ -237,7 +237,7 @@ final getAllDestinyIntern = StateNotifierProvider<CatalogNotifierWithCache<Desti
   return CatalogNotifierWithCache<DestinyIntern>(
     fetch: (filters) async {
       final mergedFilters = {
-        'business': userData.attributes['id_business']
+        'business': 2
       };
       final destinyIntern = await repo.getAllDestinyIntern(mergedFilters);
       final destinyModels = destinyIntern

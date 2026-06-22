@@ -32,6 +32,7 @@ class _BiomarEntryReportFormState extends ConsumerState<BiomarEntryReportForm> {
   final _observationsCtrl = TextEditingController();
   final _nameVisitCtrl = TextEditingController();
   final _reasonVisitCtrl = TextEditingController();
+  final _otherCtrl = TextEditingController();
 
   List<Uint8List?> _selectedImages = [];
 
@@ -44,13 +45,14 @@ class _BiomarEntryReportFormState extends ConsumerState<BiomarEntryReportForm> {
   final FocusNode _personChargeFocus = FocusNode();
   final FocusNode _areaVisitFocus = FocusNode();
   final FocusNode _typeAccessFocus = FocusNode();
+  final FocusNode _otherFocus = FocusNode();
 
   @override
   void initState() {
     super.initState();
     ref.read(getMaterials.notifier).load();
     ref.read(getAreasVisit.notifier).load();
-    ref.read(getStaffCharge.notifier).load();
+    // ref.read(getStaffCharge.notifier).load();
 
   }
 
@@ -79,8 +81,8 @@ class _BiomarEntryReportFormState extends ConsumerState<BiomarEntryReportForm> {
   }
 
   void _submit() async {
-    if (isLoading) return;
-    setState(() => isLoading = true);
+    // if (isLoading) return;
+    // setState(() => isLoading = true);
 
     FocusScope.of(context).unfocus();
     if (!(_formKey.currentState?.validate() ?? false)) {
@@ -88,7 +90,7 @@ class _BiomarEntryReportFormState extends ConsumerState<BiomarEntryReportForm> {
       return;
     }
 
-    if (_selectedImages.length < 5) {
+    if (_selectedImages.length < 3) {
       setState(() {
         imagesMinError = true;
         isLoading = false;
@@ -127,13 +129,21 @@ class _BiomarEntryReportFormState extends ConsumerState<BiomarEntryReportForm> {
       "quantity": int.tryParse(_quantityCtrl.text) ?? 0,
       "names_visit": _nameVisitCtrl.text.trim(),
       "observations": _observationsCtrl.text.trim(),
-      "person_charge": int.parse(_personCharge),
+      // "person_charge": _personCharge != '1000'
+      //   ? int.parse(_personCharge)
+      //   : null,
+      "other_staff": _otherCtrl.text.trim(),
       "reason_visit": _reasonVisitCtrl.text.trim(),
       "type_access": _typeAccess,
       "user": userData.user,
       "material_entry": materialsAdded.map((p) => {
-        "id_material": int.parse(p['id_material']),
+        "id_material": p['id_material'] != '1000'
+          ? int.parse(p['id_material'])
+          : null,
         "quantity": p['quantity'],
+        "other_material": p['other_material'] != ''
+          ? p['other_material']
+          : null,
       }).toList(),
       "images": _selectedImages
         .whereType<Uint8List>()
@@ -227,6 +237,7 @@ class _BiomarEntryReportFormState extends ConsumerState<BiomarEntryReportForm> {
   List<Map<String, dynamic>> materialsAdded = [{
     'id_material': '0',
     'quantity': 1,
+    'other_material': ''
   }];
 
   @override
@@ -244,7 +255,7 @@ class _BiomarEntryReportFormState extends ConsumerState<BiomarEntryReportForm> {
 
     final areasVisit = ref.watch(getAreasVisit);
     final materials = ref.watch(getMaterials);
-    final staffCharge = ref.watch(getStaffCharge);
+    // final staffCharge = ref.watch(getStaffCharge);
     final theme = Theme.of(context);
     final messageValidatorEmpty = 'Este campo es obligatorio';
     final fieldFill = const Color.fromARGB(255, 20, 21, 23);
@@ -432,41 +443,63 @@ class _BiomarEntryReportFormState extends ConsumerState<BiomarEntryReportForm> {
 
                 const SizedBox(height: 12),
                 CustomFieldLabelRequired(txtLabel: 'Personal responsable'),
-                GlowDropdownFormField2<String>(
-                  value: _personCharge,
-                  focusNode: _personChargeFocus,
-                  decoration: styleDecoration(),
-                  items: [
-                    DropdownMenuItem(
-                      enabled: false,
-                      value: '0',
-                      child: Text(
-                        'Seleccione una opción',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                    ...staffCharge.map(
-                      (c) => DropdownMenuItem(
-                        value: c['id_staff'].toString(),
-                        child: Text(
-                          c['name'],
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ),
-                  ],
-                  onChanged: (v) {
-                    if (v != null) {
-                      setState(() => _personCharge = v);
-                    }
-                  },
-                  validator: (v) {
-                    if (v == '0' || v == null || v.trim().isEmpty) {
-                      return messageValidatorEmpty;
-                    }
-                    return null;
-                  },
-                ),
+                // GlowDropdownFormField2<String>(
+                //   value: _personCharge,
+                //   focusNode: _personChargeFocus,
+                //   decoration: styleDecoration(),
+                //   items: [
+                //     DropdownMenuItem(
+                //       enabled: false,
+                //       value: '0',
+                //       child: Text(
+                //         'Seleccione una opción',
+                //         style: TextStyle(color: Colors.white),
+                //       ),
+                //     ),
+                //     ...staffCharge.map(
+                //       (c) => DropdownMenuItem(
+                //         value: c['id_staff'].toString(),
+                //         child: Text(
+                //           c['name'],
+                //           style: TextStyle(color: Colors.white),
+                //         ),
+                //       ),
+                //     ),
+                //     DropdownMenuItem(
+                //       value: '1000',
+                //       child: Text(
+                //         'Otro',
+                //         style: TextStyle(color: Colors.white),
+                //       ),
+                //     ),
+                //   ],
+                //   onChanged: (v) {
+                //     if (v != null) {
+                //       setState(() => _personCharge = v);
+                //     }
+                //   },
+                //   validator: (v) {
+                //     if (v == '0' || v == null || v.trim().isEmpty) {
+                //       return messageValidatorEmpty;
+                //     }
+                //     return null;
+                //   },
+                // ),
+
+                // if (_personCharge == '1000')...[
+                //   const SizedBox(height: 12),
+                  // CustomFieldLabelRequired(txtLabel: 'Otro personal'),
+                  GlowTextFormField(
+                    controller: _otherCtrl,
+                    focusNode: _otherFocus,
+                    validator: (v) {
+                      if (v == null || v.trim().isEmpty) {
+                        return messageValidatorEmpty;
+                      }
+                      return null;
+                    },
+                  ),
+                // ],
 
                 const SizedBox(height: 12),
 
@@ -491,6 +524,7 @@ class _BiomarEntryReportFormState extends ConsumerState<BiomarEntryReportForm> {
                   return MaterialEntryItem(
                     selectedMaterial: item['id_material'],
                     quantity: item['quantity'],
+                    otherMaterial: item['other_material'],
                     materials: availableMaterials,
 
                     onDeleteMaterial: materialsAdded.length > 1
@@ -510,6 +544,12 @@ class _BiomarEntryReportFormState extends ConsumerState<BiomarEntryReportForm> {
                     onQuantityChanged: (v) {
                       setState(() {
                         materialsAdded[index]['quantity'] = v;
+                      });
+                    },
+
+                    onOtherMaterialChanged: (v) {
+                      setState(() {
+                        materialsAdded[index]['other_material'] = v;
                       });
                     },
 
@@ -572,7 +612,7 @@ class _BiomarEntryReportFormState extends ConsumerState<BiomarEntryReportForm> {
                 const SizedBox(height: 26),
                 
                 CameraImagePicker(
-                  minImages: 5,
+                  minImages: 3,
                   maxImages: 10,
                   onImagesChanged: (images) {
                     print("imagenes seleccionadas ${images.length}");
@@ -587,7 +627,7 @@ class _BiomarEntryReportFormState extends ConsumerState<BiomarEntryReportForm> {
                     width: double.infinity,
                     child: Text(
                       imagesMinError
-                          ? 'Debe subir mínimo 5 imagenes'
+                          ? 'Debe subir mínimo 3 imagenes'
                           : 'Debe subir máximo 10 imagenes',
                       style: TextStyle(color: Color.fromARGB(255, 185, 28, 16)),
                     ),

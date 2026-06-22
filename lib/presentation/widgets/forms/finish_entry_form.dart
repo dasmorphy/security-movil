@@ -178,7 +178,7 @@ class _FinishEntryFormState extends ConsumerState<FinishEntryForm> {
                 itemBuilder: (context, index) {
                   final material = _materials[index];
                   return FinishMaterialItemCard(
-                    materialName: material.name,
+                    materialName: material.name ?? material.otherMaterial ?? '',
                     quantity: material.quantity,
                     isChecked: checkedList[index],
                     onChanged: (value) {
@@ -189,6 +189,8 @@ class _FinishEntryFormState extends ConsumerState<FinishEntryForm> {
                   );
                 },
               ),
+
+              const SizedBox(height: 12),
 
               CommentaryReception(
                 controller: _observationsCtrl,

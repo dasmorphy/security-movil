@@ -1,4 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:zentinel/config/constants/permissions.dart';
+import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/domain/entities/all_dispatch.dart';
 import 'package:zentinel/domain/entities/api_response.dart';
 import 'package:zentinel/domain/entities/dispatch_products.dart';
@@ -87,8 +89,10 @@ final getHistoryDispatch =
     return CatalogNotifier<AllDispatch>(
       (filters) {
         final mergedFilters = {
-          if (userData.role == 'admin' || userData.role == 'admin_tlsg')
+          if (userData.role == 'admin' || userData.role == 'admin_tlsg' || userData.hasPermission(Permissions.dataAdmin))
             'id_business': userData.attributes['id_business']
+          else if (userData.role == 'recepcion_bodegas')
+            'destiny': userData.attributes['destiny']
           else
             'user': userData.user,
           ...?filters,
@@ -116,7 +120,7 @@ final getHistoryEntryAccess =
     return CatalogNotifier<EntryAccessControl>(
       (filters) {
         final mergedFilters = {
-          if (userData.role == 'admin' || userData.role == 'admin_tlsg')
+          if (userData.role == 'admin' || userData.role == 'admin_tlsg' || userData.hasPermission(Permissions.dataAdmin))
             'id_business': userData.attributes['id_business']
           else
             'user': userData.user,
