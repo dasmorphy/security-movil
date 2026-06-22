@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 
 class MaterialEntry {
-  final int id;
-  final String name;
+  final int? id;
+  final String? name;
+  final String? otherMaterial;
   final int quantity;
 
   MaterialEntry({
-    required this.id,
-    required this.name,
+    this.id,
+    this.name,
+    this.otherMaterial,
     required this.quantity,
   });
 }
