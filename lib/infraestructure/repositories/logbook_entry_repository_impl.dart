@@ -92,4 +92,9 @@ class LogbookEntryRepositoryImpl extends LogbookEntryRepository {
     return datasource.updateStatusEmployeeIntern(data);
   }
   
+  @override
+  Future<ApiResponse<dynamic>> saveDriverBlacklist(Map<String, dynamic> data) {
+    return datasource.saveDriverBlacklist(data);
+  }
+  
 }

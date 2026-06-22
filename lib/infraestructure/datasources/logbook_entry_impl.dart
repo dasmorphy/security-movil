@@ -508,4 +508,80 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
       );
     }
   }
+  
+  @override
+  Future<ApiResponse<dynamic>> saveDriverBlacklist(Map<String, dynamic> data) async {
+    try {
+      final images = (data['images'] as List?)?.whereType<Uint8List>().toList() ?? [];
+      final blacklistData = Map<String, dynamic>.from(data);
+      blacklistData.remove('images');
+
+      blacklistData['channel'] = 'ZENTINEL';
+      // blacklistData['external_transaction_id'] = "3067dc66-ac5e-49d7-8ef9-eb62c51d4bc6";
+
+      final blacklistJson = jsonEncode(blacklistData);
+      final blacklistBytes = utf8.encode(blacklistJson);
+
+      final formData = FormData();
+
+      // Agregar logbook_out
+      formData.files.add(
+        MapEntry(
+          'data',
+          MultipartFile.fromBytes(
+            blacklistBytes,
+            filename: 'data.json',
+            contentType: MediaType('application', 'json'),
+          ),
+        ),
+      );
+
+      // NUEVO: usar Uint8List directamente
+      if (images.isNotEmpty) {
+        for (var i = 0; i < images.length; i++) {
+          formData.files.add(
+            MapEntry(
+              'images',
+              MultipartFile.fromBytes(
+                images[i],
+                filename: 'image_$i.webp',         // nombre con índice
+                contentType: MediaType('image', 'webp'),
+              ),
+            ),
+          );
+        }
+      }
+
+      final response = await dio.post(
+        '/rest/zent-logbook-api/v1.0/blacklist-driver',
+        data: formData,
+        options: onlyError(),
+      );
+
+      final body = response.data;
+
+      return ApiResponse(
+        success: response.statusCode == 200,
+        errorCode: body['error_code']?.toString(),
+        message: body['message'],
+        data: body['data'],
+      );
+    } catch (e) {
+      print('Error al guardar registro: $e');
+      String messageError = "Error al guardar el registro";
+      if (e is DioException) {
+        if (e.type == DioExceptionType.connectionError ||
+            e.type == DioExceptionType.connectionTimeout ||
+            e.type == DioExceptionType.receiveTimeout) {
+          rethrow;
+        }
+        messageError = e.response?.data["message"];
+      }
+      return ApiResponse(
+        success: false,
+        errorCode: 'save_error',
+        message: messageError,
+      );
+    }
+  }
 }

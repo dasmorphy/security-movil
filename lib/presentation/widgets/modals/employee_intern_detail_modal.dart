@@ -189,7 +189,7 @@ class EmployeeInternDetailModal extends ConsumerWidget {
                         message: "Actualizando estado..."
                       );
 
-                      final response =  await ref.read(saveEmployeeInternProvider.notifier).updateStatusEmployeeIntern({
+                      final response =  await ref.read(postApiResponseProvider.notifier).updateStatusEmployeeIntern({
                         "id_employee": item.idEmployeeIntern,
                         "status": newStatus,
                         "user_update": userData.user

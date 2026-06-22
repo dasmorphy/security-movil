@@ -290,7 +290,7 @@ final saveOutLogbookProvider =
   return OutLogbookNotifier(repo);
 });
 
-final saveEmployeeInternProvider =
+final postApiResponseProvider =
     StateNotifierProvider<FetchApiResponse, AsyncValue<ApiResponse<dynamic>>>((ref) {
   final repo = ref.watch(logbookEntryRepositoryProvider);
   return FetchApiResponse(repo);
@@ -577,6 +577,23 @@ class FetchApiResponse extends StateNotifier<AsyncValue<ApiResponse>> {
   }
 
   Future<ApiResponse> saveEmployeeMovement(Map<String, dynamic> data) async {
+    state = const AsyncLoading();
+    try {
+      final response = await repository.saveEmployeeMovement(data);
+      state = AsyncData(response);
+      return response;
+    } catch (e, st) {
+      print('Error out E, $e');
+      print('Error out ST, $st');
+      state = AsyncError(e, st);
+      return ApiResponse(
+        success: false,
+        message: e.toString(),
+      );
+    }
+  }
+
+  Future<ApiResponse> saveDriverBlacklist(Map<String, dynamic> data) async {
     state = const AsyncLoading();
     try {
       final response = await repository.saveEmployeeMovement(data);

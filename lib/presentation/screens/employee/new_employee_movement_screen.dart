@@ -51,7 +51,7 @@ class _NewEmployeeMovementScreenState extends ConsumerState<NewEmployeeMovementS
             idEmployee: widget.idEmployee,
             onSubmit: (data) async {
               return await ref
-                .read(saveEmployeeInternProvider.notifier)
+                .read(postApiResponseProvider.notifier)
                 .saveEmployeeMovement(data);
             },
           ),

@@ -26,18 +26,18 @@ class _NewBlackListScreenState extends ConsumerState<NewBlackListScreen> {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(60),
-        child: HeaderOptionsProfile(headerTxt: 'Nuevo personal'),
+        child: HeaderOptionsProfile(headerTxt: 'Nuevo registro'),
       ),
       resizeToAvoidBottomInset: true,
       backgroundColor: const Color.fromARGB(255, 23, 24, 28),
       body: SafeArea(
         top: false,
         // bottom: false,
-        child: EmployeeInternForm(
+        child: BlackListForm(
           onSubmit: (data) async {
             return await ref
-              .read(saveEmployeeInternProvider.notifier)
-              .saveEmployeeIntern(data);
+              .read(postApiResponseProvider.notifier)
+              .saveDriverBlacklist(data);
           },
         ),
       ),

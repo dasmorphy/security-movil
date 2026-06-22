@@ -78,3 +78,4 @@ export 'package:zentinel/presentation/widgets/employee/employee_movement_list.da
 export 'package:zentinel/presentation/widgets/shared/option_bottom_sheet.dart';
 export 'package:zentinel/presentation/widgets/forms/employee_intern/employee_movement_form.dart';
 export 'package:zentinel/presentation/widgets/modals/employee_movement_offline.dart';
+export 'package:zentinel/presentation/widgets/forms/black_list_form.dart';

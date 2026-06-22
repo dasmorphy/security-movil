@@ -25,4 +25,5 @@ abstract class LogbookEntryRepository {
   Future <GraphLogbook> getGraphLogbook(Map<String, dynamic> filters);
   Future <List<EmployeeIntern>> getEmployeeInterns(Map<String, dynamic> filters);
   Future <List<EmployeeMovement>> getEmployeeMovements(Map<String, dynamic> filters);
+  Future<ApiResponse<dynamic>> saveDriverBlacklist(Map<String, dynamic> data);
 }

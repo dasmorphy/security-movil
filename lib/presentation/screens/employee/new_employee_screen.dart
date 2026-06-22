@@ -36,7 +36,7 @@ class _NewEmployeeScreenState extends ConsumerState<NewEmployeeScreen> {
         child: EmployeeInternForm(
           onSubmit: (data) async {
             return await ref
-              .read(saveEmployeeInternProvider.notifier)
+              .read(postApiResponseProvider.notifier)
               .saveEmployeeIntern(data);
           },
         ),

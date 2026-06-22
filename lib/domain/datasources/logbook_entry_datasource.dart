@@ -26,4 +26,5 @@ abstract class LogbookEntryDatasource {
   Future <List<Authorized>> getAllAuthorized();
   Future <List<DestinyIntern>> getAllDestinyIntern(Map<String, dynamic> filters);
   Future <GraphLogbook> getGraphLogbook(Map<String, dynamic> filters);
+  Future<ApiResponse<dynamic>> saveDriverBlacklist(Map<String, dynamic> data);
 }
