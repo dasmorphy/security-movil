@@ -38,7 +38,6 @@ class _BlackListFormState extends ConsumerState<BlackListForm> {
   final FocusNode _observationsFocus = FocusNode();
   final FocusNode _categoryEntryFocus = FocusNode();
   final FocusNode _namesFocus = FocusNode();
-  final FocusNode _lastnameFocus = FocusNode();
   bool isPickingImage = false;
 
   bool _isInitializing = true;
@@ -51,6 +50,7 @@ class _BlackListFormState extends ConsumerState<BlackListForm> {
       await Future.wait([
         ref.read(getAllCategories.notifier).load(),
         ref.read(getGroupBusinessByIdBusiness.notifier).load(),
+        ref.read(getReasonRestriction.notifier).load(),
       ]);
 
       if (!mounted) return;
@@ -79,14 +79,6 @@ class _BlackListFormState extends ConsumerState<BlackListForm> {
     FocusScope.of(context).unfocus();
     if (!(_formKey.currentState?.validate() ?? false)) {
       setState(() => isLoading = false);
-      return;
-    }
-
-    if (_selectedImages.isEmpty) {
-      setState(() {
-        imagesMinError = true;
-        isLoading = false;
-      });
       return;
     }
 
@@ -127,15 +119,12 @@ class _BlackListFormState extends ConsumerState<BlackListForm> {
 
     final data = {
       "external_transaction_id": Uuid().v4(),
+      "business_id": userData.attributes['id_business'],
       "dni": _dniCtrl.text.trim(),
-      "lastname": _lastnameCtrl.text.trim(),
-      "names": _namesCtrl.text.trim(),
-      "position": _positionCtrl.text.trim(),
+      "full_names": _namesCtrl.text.trim(),
+      "reason_restriction": _reasonId.trim(),
       "observations": _observationsCtrl.text.trim(),
       "user": userData.user,
-      "name_user": userHive.value?.name ?? userData.attributes['fullname'],
-      "group_business_id":
-          userData.attributes['group_business'] ?? int.parse(_groupBusiness),
       "photo": _selectedImages
           .whereType<Uint8List>()
           .toList(), // Lista de Uint8List directo, sin base64
@@ -160,7 +149,7 @@ class _BlackListFormState extends ConsumerState<BlackListForm> {
         message: "Registro guardado exitosamente", 
         autoDismiss: const Duration(seconds: 2)
       );
-      ref.read(getHistoryDispatch.notifier).load();
+      // ref.read(getHistoryDispatch.notifier).load();
     } else {
       GlobalLoadingBottomSheet.show(
         status: OverlayStatus.error,
@@ -187,7 +176,7 @@ class _BlackListFormState extends ConsumerState<BlackListForm> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final authState = ref.watch(userSessionProvider);
-    final unitiesWeight = ref.watch(getAllUnitiesWeight);
+    final resonRestriction = ref.watch(getReasonRestriction);
 
 
     //Usuario no cargado o sesión inválida
@@ -267,71 +256,6 @@ class _BlackListFormState extends ConsumerState<BlackListForm> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(
-                    width: double.infinity,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        // vertical: 6,
-                        // horizontal: 12,
-                      ),
-                      child: Row(
-                        children: [
-                          if (userData.attributes['name_group_business'] !=
-                              null) ...[
-                            const Icon(Icons.location_on, color: Colors.red),
-                            const SizedBox(width: 8),
-                            Text(
-                              userData.attributes['name_group_business'],
-                              style: const TextStyle(color: Colors.white),
-                            ),
-                          ] else ...[
-                            Expanded(
-                              child: Column(
-                                children: [
-                                  CustomFieldLabelRequired(
-                                    txtLabel: 'Localidad',
-                                  ),
-                                  const SizedBox(height: 6),
-                                  GlowDropdownFormField<String>(
-                                    value: _groupBusiness,
-                                    focusNode: _groupBusinessFocus,
-                                    decoration: styleDecoration(),
-                                    items: [
-                                      const DropdownMenuItem(
-                                        value: '0',
-                                        child: Text('Seleccione una opción'),
-                                      ),
-                                      ...groupBusiness.map(
-                                        (c) => DropdownMenuItem(
-                                          value: c.idGroupBusiness.toString(),
-                                          child: Text(c.name),
-                                        ),
-                                      ),
-                                    ],
-                                    onChanged: (v) {
-                                      if (v != null) {
-                                        setState(() => _groupBusiness = v);
-                                      }
-                                    },
-                                    validator: (v) {
-                                      if (v == '0' ||
-                                          v == null ||
-                                          v.trim().isEmpty) {
-                                        return messageValidatorEmpty;
-                                      }
-                                      return null;
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 12),
                   CustomFieldLabelRequired(txtLabel: 'Cédula'),
                   GlowTextFormField(
                     maxLength: 10,
@@ -361,7 +285,7 @@ class _BlackListFormState extends ConsumerState<BlackListForm> {
 
                   const SizedBox(height: 12),
                   CustomFieldLabelRequired(txtLabel: 'Motivo de restricción'),
-                  GlowDropdownFormField<String>(
+                  GlowDropdownFormField2<String>(
                     value: _reasonId,
                     focusNode: _reasonFocus,
                     decoration: styleDecoration(),
@@ -369,12 +293,12 @@ class _BlackListFormState extends ConsumerState<BlackListForm> {
                       DropdownMenuItem(
                         enabled: false,
                         value: '0',
-                        child: Text('Seleccione una opción'),
+                        child: Text('Seleccione una opción', style: TextStyle(color: Colors.white),),
                       ),
-                      ...unitiesWeight.map(
+                      ...resonRestriction.map(
                         (c) => DropdownMenuItem(
-                          value: c.idUnity.toString(),
-                          child: Text('${c.name} - ${c.code}'),
+                          value: c.reason.toString(),
+                          child: Text(c.reason, style: TextStyle(color: Colors.white)),
                         ),
                       ),
                     ],

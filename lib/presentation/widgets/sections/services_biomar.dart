@@ -71,6 +71,7 @@ class _ServicesBiomarState extends ConsumerState<ServicesBiomar> {
             ),
 
             GridView.count(
+              padding: const EdgeInsetsGeometry.only(top: 10),
               crossAxisCount: 3,
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
@@ -107,6 +108,7 @@ class _ServicesBiomarState extends ConsumerState<ServicesBiomar> {
             ),
 
             GridView.count(
+              padding: const EdgeInsetsGeometry.only(top: 10),
               crossAxisCount: 3,
               shrinkWrap: true,
               physics: const BouncingScrollPhysics(),
@@ -128,6 +130,7 @@ class _ServicesBiomarState extends ConsumerState<ServicesBiomar> {
                   ),
               ],
             ),
+            const SizedBox(height: 10),
           ],
         ],
       ),

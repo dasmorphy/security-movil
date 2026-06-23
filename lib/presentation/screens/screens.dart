@@ -18,3 +18,4 @@ export 'package:zentinel/presentation/screens/employee/employee_movement_screen.
 export 'package:zentinel/presentation/screens/employee/new_employee_movement_screen.dart';
 export 'package:zentinel/presentation/screens/shared/camera_screen.dart';
 export 'package:zentinel/presentation/screens/black-list/new_black_list_screen.dart';
+export 'package:zentinel/presentation/screens/black-list/backlist_list_screen.dart';

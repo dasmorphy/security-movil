@@ -79,3 +79,6 @@ export 'package:zentinel/presentation/widgets/shared/option_bottom_sheet.dart';
 export 'package:zentinel/presentation/widgets/forms/employee_intern/employee_movement_form.dart';
 export 'package:zentinel/presentation/widgets/modals/employee_movement_offline.dart';
 export 'package:zentinel/presentation/widgets/forms/black_list_form.dart';
+export 'package:zentinel/presentation/widgets/blacklist_driver/list_blacklist_driver.dart';
+export 'package:zentinel/presentation/widgets/modals/blacklist_detail_modal.dart';
+export 'package:zentinel/presentation/widgets/blacklist_driver/item_detail_blacklist.dart';

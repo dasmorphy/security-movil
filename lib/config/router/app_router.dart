@@ -144,6 +144,11 @@ final appRouter = GoRouter(
           name: NewBlackListScreen.name,
           builder: (context, state) => const NewBlackListScreen()
         ),
+        GoRoute(
+          path: 'list-blacklist',
+          name: BacklistListScreen.name,
+          builder: (context, state) => const BacklistListScreen()
+        ),
       ]
     ),
   ]

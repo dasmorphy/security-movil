@@ -10,12 +10,14 @@ import 'package:zentinel/data/models/hive/group_business_model.dart';
 import 'package:zentinel/domain/entities/all_logbook.dart';
 import 'package:zentinel/domain/entities/api_response.dart';
 import 'package:zentinel/domain/entities/authorized.dart';
+import 'package:zentinel/domain/entities/blacklist_driver.dart';
 import 'package:zentinel/domain/entities/category.dart';
 import 'package:zentinel/domain/entities/destiny_intern.dart';
 import 'package:zentinel/domain/entities/employee_intern.dart';
 import 'package:zentinel/domain/entities/employee_movement.dart';
 import 'package:zentinel/domain/entities/graph_logbook.dart';
 import 'package:zentinel/domain/entities/group_business.dart';
+import 'package:zentinel/domain/entities/reason_restriction.dart';
 import 'package:zentinel/domain/entities/unity_weight.dart';
 import 'package:zentinel/domain/entities/vehicle_type.dart';
 import 'package:zentinel/domain/repositories/logbook_entry_repository.dart';
@@ -366,6 +368,24 @@ final getEmployeeInterns =
   },
 );
 
+final getReasonRestriction = StateNotifierProvider<CatalogNotifier<ReasonRestriction>, List<ReasonRestriction>>((ref) {
+  final repo = ref.watch(logbookEntryRepositoryProvider);
+  return CatalogNotifier<ReasonRestriction>(
+    (filters) {
+      return repo.getReasonRestriction();
+    },
+  );
+});
+
+final getBlacklistDriver = StateNotifierProvider<CatalogNotifier<BlacklistDriver>, List<BlacklistDriver>>((ref) {
+  final repo = ref.watch(logbookEntryRepositoryProvider);
+  return CatalogNotifier<BlacklistDriver>(
+    (filters) {
+      return repo.getBlacklistDriver();
+    },
+  );
+});
+
 final getEmployeeInternById =
     StateNotifierProvider<
         CatalogNotifier<EmployeeIntern>,
@@ -596,7 +616,7 @@ class FetchApiResponse extends StateNotifier<AsyncValue<ApiResponse>> {
   Future<ApiResponse> saveDriverBlacklist(Map<String, dynamic> data) async {
     state = const AsyncLoading();
     try {
-      final response = await repository.saveEmployeeMovement(data);
+      final response = await repository.saveDriverBlacklist(data);
       state = AsyncData(response);
       return response;
     } catch (e, st) {

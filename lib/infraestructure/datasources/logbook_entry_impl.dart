@@ -8,12 +8,14 @@ import 'package:zentinel/domain/datasources/logbook_entry_datasource.dart';
 import 'package:zentinel/domain/entities/all_logbook.dart';
 import 'package:zentinel/domain/entities/api_response.dart';
 import 'package:zentinel/domain/entities/authorized.dart';
+import 'package:zentinel/domain/entities/blacklist_driver.dart';
 import 'package:zentinel/domain/entities/category.dart';
 import 'package:zentinel/domain/entities/destiny_intern.dart';
 import 'package:zentinel/domain/entities/employee_intern.dart';
 import 'package:zentinel/domain/entities/employee_movement.dart';
 import 'package:zentinel/domain/entities/graph_logbook.dart';
 import 'package:zentinel/domain/entities/group_business.dart';
+import 'package:zentinel/domain/entities/reason_restriction.dart';
 import 'package:zentinel/domain/entities/unity_weight.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:uuid/uuid.dart';
@@ -508,13 +510,28 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
       );
     }
   }
+
+  @override
+  Future<List<BlacklistDriver>> getBlacklistDriver() async {
+    final response = await dio.get(
+      '/rest/zent-logbook-api/v1.0/blacklist-driver',
+      options: Options(
+        headers: {
+          'externalTransactionId': uuid, 
+          'channel': 'ZENTINEL'
+        },
+      ),
+    );
+    final data = response.data['data'] as List? ?? [];
+    return data.map((json) => BlacklistDriver.fromJson(json)).toList();
+  }
   
   @override
   Future<ApiResponse<dynamic>> saveDriverBlacklist(Map<String, dynamic> data) async {
     try {
-      final images = (data['images'] as List?)?.whereType<Uint8List>().toList() ?? [];
+      final images = (data['photo'] as List?)?.whereType<Uint8List>().toList() ?? [];
       final blacklistData = Map<String, dynamic>.from(data);
-      blacklistData.remove('images');
+      blacklistData.remove('photo');
 
       blacklistData['channel'] = 'ZENTINEL';
       // blacklistData['external_transaction_id'] = "3067dc66-ac5e-49d7-8ef9-eb62c51d4bc6";
@@ -583,5 +600,20 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
         message: messageError,
       );
     }
+  }
+
+  @override
+  Future<List<ReasonRestriction>> getReasonRestriction() async {
+    final response = await dio.get(
+      '/rest/zent-logbook-api/v1.0/reason_restriction',
+      options: Options(
+        headers: {
+          'externalTransactionId': uuid, 
+          'channel': 'ZENTINEL'
+        },
+      ),
+    );
+    final data = response.data['data'] as List? ?? [];
+    return data.map((json) => ReasonRestriction.fromJson(json)).toList();
   }
 }
