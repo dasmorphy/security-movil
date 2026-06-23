@@ -114,7 +114,7 @@ class _ServicesBiomarState extends ConsumerState<ServicesBiomar> {
               crossAxisSpacing: 11,
               childAspectRatio: 0.9,
               children: [
-                // if (userData.hasPermission(Permissions.listaReportes))
+                if (userData.hasPermission(Permissions.nuevoIngresoBiomar))
                   BasicServiceCard(
                     iconImage: 'iconregistro',
                     label: 'Ingresos',

@@ -73,7 +73,9 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
         ref.read(getGroupBusinessByIdBusiness.notifier).load(),
         ref.read(getAllUnitiesWeight.notifier).load(),
         ref.read(getAllAuthorized.notifier).load(),
-        ref.read(getAllDestinyIntern.notifier).load(),
+        ref.read(getAllDestinyIntern.notifier).load(filters: {
+          'business': 1
+        }),
       ]);
 
       if (!mounted) return;
