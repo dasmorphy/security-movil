@@ -616,4 +616,44 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
     final data = response.data['data'] as List? ?? [];
     return data.map((json) => ReasonRestriction.fromJson(json)).toList();
   }
+  
+  @override
+  Future<ApiResponse<dynamic>> savePurchaseOrder(Map<String, dynamic> data) async {
+    try {
+      final response = await dio.post(
+        '/rest/zent-logbook-api/v1.0/purchase-order',
+        data: {
+          'order': data,
+          'externalTransactionId': uuid,
+          'channel': "ZENTINEL"
+        },
+        options: onlyError(),
+      );
+
+      final body = response.data;
+
+      return ApiResponse(
+        success: response.statusCode == 200,
+        errorCode: body['error_code']?.toString(),
+        message: body['message'],
+        data: body['data'],
+      );
+    } catch (e) {
+      print('Error al guardar registro: $e');
+      String messageError = "Error al guardar el registro";
+      if (e is DioException) {
+        if (e.type == DioExceptionType.connectionError ||
+            e.type == DioExceptionType.connectionTimeout ||
+            e.type == DioExceptionType.receiveTimeout) {
+          rethrow;
+        }
+        messageError = e.response?.data["message"];
+      }
+      return ApiResponse(
+        success: false,
+        errorCode: 'save_error',
+        message: messageError,
+      );
+    }
+  }
 }

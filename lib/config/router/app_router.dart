@@ -149,6 +149,11 @@ final appRouter = GoRouter(
           name: BacklistListScreen.name,
           builder: (context, state) => const BacklistListScreen()
         ),
+        GoRoute(
+          path: 'new-purchase-order',
+          name: NewPurchaseOrderScreen.name,
+          builder: (context, state) => const NewPurchaseOrderScreen()
+        ),
       ]
     ),
   ]

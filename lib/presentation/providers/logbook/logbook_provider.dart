@@ -630,6 +630,23 @@ class FetchApiResponse extends StateNotifier<AsyncValue<ApiResponse>> {
     }
   }
 
+  Future<ApiResponse> savePurchaseOrder(Map<String, dynamic> data) async {
+    state = const AsyncLoading();
+    try {
+      final response = await repository.savePurchaseOrder(data);
+      state = AsyncData(response);
+      return response;
+    } catch (e, st) {
+      print('Error out E, $e');
+      print('Error out ST, $st');
+      state = AsyncError(e, st);
+      return ApiResponse(
+        success: false,
+        message: e.toString(),
+      );
+    }
+  }
+
 }
 
 class ReportDownloadNotifier extends StateNotifier<void> {

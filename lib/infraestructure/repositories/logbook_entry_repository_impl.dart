@@ -109,4 +109,9 @@ class LogbookEntryRepositoryImpl extends LogbookEntryRepository {
     return datasource.getBlacklistDriver();
   }
   
+  @override
+  Future<ApiResponse<dynamic>> savePurchaseOrder(Map<String, dynamic> data) {
+    return datasource.savePurchaseOrder(data);
+  }
+  
 }

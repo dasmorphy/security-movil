@@ -157,7 +157,7 @@ class _DateRangePickerState extends State<DateRangePicker> {
                 child: const Padding(
                   padding: EdgeInsets.symmetric(vertical: 14),
                   child: Text(
-                    'Ver registros',
+                    'Aceptar',
                     style: TextStyle(fontWeight: FontWeight.w900),
                   ),
                 ),
