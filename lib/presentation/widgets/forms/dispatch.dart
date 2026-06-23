@@ -85,6 +85,7 @@ class _CrearDespachoScreenState extends ConsumerState<DispatchForm> {
     _driverCtrl.dispose();
     _orderNumberCtrl.dispose();
     _observationsCtrl.dispose();
+    _selectedImages = [];
     super.dispose();
   }
 
@@ -119,9 +120,13 @@ class _CrearDespachoScreenState extends ConsumerState<DispatchForm> {
 
   void _crearDespacho() async {
     if (isLoading) return;
-    setState(() => isLoading = true);
+    setState(() {
+      imagesMinError = false;
+      isLoading = true;
+      imagesMaxError = false;
+    });
 
-    if (_selectedImages.length < 3) {
+    if (_selectedImages.length < 2) {
       setState(() {
         imagesMinError = true;
         isLoading = false;

@@ -44,6 +44,12 @@ class _FinishEntryFormState extends ConsumerState<FinishEntryForm> {
     checkedList = List.generate(_materials.length, (_) => false);
   }
 
+  @override
+  void dispose(){
+    _selectedImages = [];
+    super.dispose();
+  }
+
   Future<void> _handleSubmit() async {
     if (_isLoading) return;
 
@@ -61,7 +67,7 @@ class _FinishEntryFormState extends ConsumerState<FinishEntryForm> {
       return;
     }
 
-    if (_selectedImages.length < 5) {
+    if (_selectedImages.length < 2) {
       setState(() {
         imagesMinError = true;
         _isLoading = false;
@@ -207,7 +213,7 @@ class _FinishEntryFormState extends ConsumerState<FinishEntryForm> {
               const SizedBox(height: 20),
 
               CameraImagePicker(
-                minImages: 5,
+                minImages: 2,
                 maxImages: 10,
                 onImagesChanged: (images) {
               
@@ -225,7 +231,7 @@ class _FinishEntryFormState extends ConsumerState<FinishEntryForm> {
                     width: double.infinity,
                     child: Text(
                       imagesMinError
-                          ? 'Debe subir mínimo 5 imagenes'
+                          ? 'Debe subir mínimo 2 imagenes'
                           : 'Debe subir máximo 10 imagenes',
                       style: TextStyle(color: Color.fromARGB(255, 239, 28, 13)),
                     ),
