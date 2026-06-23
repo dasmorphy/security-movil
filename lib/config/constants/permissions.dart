@@ -23,5 +23,6 @@ class Permissions {
   static const nuevoPersonalInterno = 'NUEVO_PERSONAL_INTERNO';
   static const nuevoMovimientoPersonalInterno = 'NUEVO_MOVIMIENTO_PERSONAL_INTERNO';
   static const actualizarEstadoPersonalInterno = 'ACTUALIZAR_ESTADO_PERSONAL_INTERNO';
+  static const nuevoIngresoBiomar = 'NUEVO_INGRESO_BIOMAR';
   static const dataAdmin = 'DATA_ADMIN';
 }

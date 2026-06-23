@@ -73,7 +73,9 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
         ref.read(getGroupBusinessByIdBusiness.notifier).load(),
         ref.read(getAllUnitiesWeight.notifier).load(),
         ref.read(getAllAuthorized.notifier).load(),
-        ref.read(getAllDestinyIntern.notifier).load(),
+        ref.read(getAllDestinyIntern.notifier).load(filters: {
+          'business': 1
+        }),
       ]);
 
       if (!mounted) return;
