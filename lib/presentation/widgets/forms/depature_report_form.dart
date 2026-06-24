@@ -343,8 +343,8 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
     final categoryName = categoryMap[_categoryEntry]?.nameCategory;    
     const hiddenWeightCategories = {
       'Ejecutivos de expalsa',
-      'Personal interno',
-      'Personal externo',
+      // 'Personal interno',
+      // 'Personal externo',
       'Cuadrillas para pesca'
     };
 
@@ -561,6 +561,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                       }
 
                       if (!hidePersonal) {
+                        _guideCtrl.clear();
                         _providerCtrl.clear();
                         _employeeCtrl.clear();
                         _unityId = '0';
@@ -578,11 +579,17 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
 
                 if (!hideWeight) ...[
                   const SizedBox(height: 12),
-                  CustomFieldLabelRequired(txtLabel: 'OC/ Guia de remision'),
+                  CustomFieldLabelRequired(
+                    txtLabel: 'OC/ Guia de remision',
+                    isRequired: hidePersonal ? false : true,
+                  ),
                   GlowTextFormField(
                     controller: _guideCtrl,
                     focusNode: _guideFocus,
                     validator: (v) {
+                      if (hidePersonal) {
+                        return null;
+                      }
                       if (v == null || v.trim().isEmpty) {
                         return messageValidatorEmpty;
                       }

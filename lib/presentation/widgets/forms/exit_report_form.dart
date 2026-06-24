@@ -363,8 +363,8 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
     final categoryName = categoryMap[_categoryEntry]?.nameCategory;    
     const hiddenWeightCategories = {
       'Ejecutivos de expalsa',
-      'Personal interno',
-      'Personal externo',
+      // 'Personal interno',
+      // 'Personal externo',
       'Cuadrillas para pesca'
     };
 
@@ -577,6 +577,7 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                       if (!hideEject || !hidePersonal) {
                         _unityId = '0';
                         _quantityCtrl.clear();
+                        _guideCtrl.clear();
                       }
 
                       if (!hideEject) {
@@ -595,11 +596,17 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
 
                 if (!hideWeight) ...[
                   const SizedBox(height: 12),
-                  CustomFieldLabelRequired(txtLabel: 'Guía / Documento'),
+                  CustomFieldLabelRequired(
+                    txtLabel: 'Guía / Documento',
+                    isRequired: hidePersonal ? false : true,
+                  ),
                   GlowTextFormField(
                     controller: _guideCtrl,
                     focusNode: _guideFocus,
                     validator: (v) {
+                      if (hidePersonal) {
+                        return null;
+                      }
                       if (v == null || v.trim().isEmpty) {
                         return messageValidatorEmpty;
                       }
