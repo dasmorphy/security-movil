@@ -33,4 +33,5 @@ abstract class LogbookEntryRepository {
   Future<List<BlacklistDriver>> getBlacklistDriver();
   Future<List<PurchaseOrder>> getPurchaseOrder();
   Future<ApiResponse<dynamic>> savePurchaseOrder(Map<String, dynamic> data);
+  Future<ApiResponse<dynamic>> savePurchaseOrderReceipts(Map<String, dynamic> data);
 }

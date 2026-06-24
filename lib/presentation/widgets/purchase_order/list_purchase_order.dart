@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/domain/entities/purchase_order.dart';
+import 'package:zentinel/presentation/widgets/modals/purchase_order_modal.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
@@ -101,7 +102,7 @@ class ListPurchaseOrderState extends ConsumerState<ListPurchaseOrder> {
                     child: InkWell(
                       borderRadius: BorderRadius.circular(8),
                       onTap: () =>
-                        ModalHelper.open(context, child: BlacklistDetailModal(item: item)),
+                        ModalHelper.open(context, child: PurchaseOrderModal(item: item)),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Row(
@@ -113,7 +114,7 @@ class ListPurchaseOrderState extends ConsumerState<ListPurchaseOrder> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [                
                                   Text(
-                                    item.fullNames,
+                                    item.numberOrder,
                                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                                       color: Colors.white,
                                       fontWeight: FontWeight.w600,
@@ -121,7 +122,7 @@ class ListPurchaseOrderState extends ConsumerState<ListPurchaseOrder> {
                                   ),
                                   const SizedBox(height: 2),            
                                   Text(
-                                    item.dni,
+                                    item.typeOrder,
                                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                       color: const Color.fromARGB(255, 180, 180, 180),
                                     ),

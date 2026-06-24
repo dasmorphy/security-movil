@@ -13,10 +13,9 @@ class ItemDetailPurchaseOrder extends StatelessWidget {
     return Column(
       children: [
         const SizedBox(height: 20),
-        // detailRow('Identificación', item.dni),
-        // detailRow('Nombres completos', item.fullNames),
-        // detailRow('Restricción', item.reasonRestriction),
-        detailRow('Usuario', item.createdBy),
+        detailRow('Orden', item.numberOrder),
+        detailRow('Cantidad', item.quantity),
+        detailRow('Destino', item.destinyName),
         detailRow(
           'Fecha Ingreso',
           formatDateDetails(item.createdAt.toString()),

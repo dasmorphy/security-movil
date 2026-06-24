@@ -165,7 +165,7 @@ class _BasicServicesStionState extends ConsumerState<BasicServicesSection> {
                     BasicServiceCard(
                       iconImage: 'iconsalida',
                       label: 'Lista órdenes',
-                      onTap: () => context.push('/new-employee')
+                      onTap: () => context.push('/list-purchase-order')
                     ),
 
                     BasicServiceCard(

@@ -2,12 +2,13 @@ class PurchaseOrder {
   DateTime createdAt;
   String createdBy;
   int destinyId;
+  String destinyName;
   DateTime endDate;
   int idOrder;
   String numberOrder;
   String observations;
   String provider;
-  int quantity;
+  double quantity;
   DateTime startDate;
   int statusId;
   String statusName;
@@ -19,6 +20,7 @@ class PurchaseOrder {
     required this.createdAt,
     required this.createdBy,
     required this.destinyId,
+    required this.destinyName,
     required this.endDate,
     required this.idOrder,
     required this.numberOrder,
@@ -37,6 +39,7 @@ class PurchaseOrder {
     createdAt: DateTime.parse(json["created_at"]),
     createdBy: json["created_by"],
     destinyId: json["destiny_id"],
+    destinyName: json["destiny_name"],
     endDate: DateTime.parse(json["end_date"]),
     idOrder: json["id_order"],
     numberOrder: json["number_order"],
@@ -55,6 +58,7 @@ class PurchaseOrder {
     "created_at": createdAt.toIso8601String(),
     "created_by": createdBy,
     "destiny_id": destinyId,
+    "destiny_name": destinyName,
     "end_date": endDate.toIso8601String(),
     "id_order": idOrder,
     "number_order": numberOrder,

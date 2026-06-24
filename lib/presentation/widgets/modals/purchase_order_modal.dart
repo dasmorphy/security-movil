@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:zentinel/domain/entities/purchase_order.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
@@ -62,7 +63,26 @@ class PurchaseOrderModalState extends ConsumerState<PurchaseOrderModal> {
               ),
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 28),
+
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(188, 25, 156, 156),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                onPressed: () => context.push('/register-quantity-order', extra: widget.item),
+                child: const Text(
+                  'Registro de cantidades',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ),
+
             const SizedBox(height: 8),
 
             SizedBox(

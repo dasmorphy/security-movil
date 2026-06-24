@@ -120,4 +120,8 @@ class LogbookEntryRepositoryImpl extends LogbookEntryRepository {
     return datasource.getPurchaseOrder();
   }
   
+  @override
+  Future<ApiResponse<dynamic>> savePurchaseOrderReceipts(Map<String, dynamic> data) {
+    return datasource.savePurchaseOrderReceipts(data);
+  }
 }

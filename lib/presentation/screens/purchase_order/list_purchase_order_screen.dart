@@ -3,17 +3,17 @@ import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ListPuschaseOrderScreen extends ConsumerStatefulWidget  {
+class ListPurchaseOrderScreen extends ConsumerStatefulWidget  {
 
-  static const name = 'list-blacklist-screen';
+  static const name = 'list-purchase-order-screen';
 
-  const ListPuschaseOrderScreen({super.key});
+  const ListPurchaseOrderScreen({super.key});
 
   @override
-  ConsumerState<ListPuschaseOrderScreen> createState() => _ListPuschaseOrderScreenState();
+  ConsumerState<ListPurchaseOrderScreen> createState() => _ListPurchaseOrderScreenState();
 }
 
-class _ListPuschaseOrderScreenState extends ConsumerState<ListPuschaseOrderScreen> {
+class _ListPurchaseOrderScreenState extends ConsumerState<ListPurchaseOrderScreen> {
   String searchText = '';
 
   @override
@@ -38,7 +38,7 @@ class _ListPuschaseOrderScreenState extends ConsumerState<ListPuschaseOrderScree
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(60),
-        child: const HeaderOptionsProfile(headerTxt: 'Lista negra',),
+        child: const HeaderOptionsProfile(headerTxt: 'Órdenes de compra',),
       ),
       resizeToAvoidBottomInset: false,
       backgroundColor: const Color.fromARGB(255, 23, 24, 28),

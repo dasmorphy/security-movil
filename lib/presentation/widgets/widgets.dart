@@ -85,3 +85,5 @@ export 'package:zentinel/presentation/widgets/modals/blacklist_detail_modal.dart
 export 'package:zentinel/presentation/widgets/blacklist_driver/item_detail_blacklist.dart';
 export 'package:zentinel/presentation/widgets/purchase_order/list_purchase_order.dart';
 export 'package:zentinel/presentation/widgets/purchase_order/item_detail_purchase_order.dart';
+export 'package:zentinel/presentation/widgets/purchase_order/puchase_order_header_card.dart';
+export 'package:zentinel/presentation/widgets/forms/register_quantity_form.dart';
