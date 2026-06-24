@@ -15,6 +15,7 @@ import 'package:zentinel/domain/entities/employee_intern.dart';
 import 'package:zentinel/domain/entities/employee_movement.dart';
 import 'package:zentinel/domain/entities/graph_logbook.dart';
 import 'package:zentinel/domain/entities/group_business.dart';
+import 'package:zentinel/domain/entities/purchase_order.dart';
 import 'package:zentinel/domain/entities/reason_restriction.dart';
 import 'package:zentinel/domain/entities/unity_weight.dart';
 import 'package:open_filex/open_filex.dart';
@@ -655,5 +656,20 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
         message: messageError,
       );
     }
+  }
+
+  @override
+  Future<List<PurchaseOrder>> getPurchaseOrder() async {
+    final response = await dio.get(
+      '/rest/zent-logbook-api/v1.0/purchase-order',
+      options: Options(
+        headers: {
+          'externalTransactionId': uuid, 
+          'channel': 'ZENTINEL'
+        },
+      ),
+    );
+    final data = response.data['data'] as List? ?? [];
+    return data.map((json) => PurchaseOrder.fromJson(json)).toList();
   }
 }

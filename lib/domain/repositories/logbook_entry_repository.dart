@@ -8,6 +8,7 @@ import 'package:zentinel/domain/entities/employee_intern.dart';
 import 'package:zentinel/domain/entities/employee_movement.dart';
 import 'package:zentinel/domain/entities/graph_logbook.dart';
 import 'package:zentinel/domain/entities/group_business.dart';
+import 'package:zentinel/domain/entities/purchase_order.dart';
 import 'package:zentinel/domain/entities/reason_restriction.dart';
 import 'package:zentinel/domain/entities/unity_weight.dart';
 
@@ -30,5 +31,6 @@ abstract class LogbookEntryRepository {
   Future<ApiResponse<dynamic>> saveDriverBlacklist(Map<String, dynamic> data);
   Future<List<ReasonRestriction>> getReasonRestriction();
   Future<List<BlacklistDriver>> getBlacklistDriver();
+  Future<List<PurchaseOrder>> getPurchaseOrder();
   Future<ApiResponse<dynamic>> savePurchaseOrder(Map<String, dynamic> data);
 }

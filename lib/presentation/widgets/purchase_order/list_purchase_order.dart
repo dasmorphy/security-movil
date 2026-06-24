@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zentinel/config/utils/helper.dart';
-import 'package:zentinel/domain/entities/blacklist_driver.dart';
+import 'package:zentinel/domain/entities/purchase_order.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
-class ListBlacklistDriver extends ConsumerStatefulWidget {
-  final List<BlacklistDriver> items;
+class ListPurchaseOrder extends ConsumerStatefulWidget {
+  final List<PurchaseOrder> items;
   final int? limit;
 
-  const ListBlacklistDriver({super.key, required this.items, this.limit = 15});
+  const ListPurchaseOrder({super.key, required this.items, this.limit = 15});
 
   @override
-  ConsumerState<ListBlacklistDriver> createState() => ListBlacklistDriverState();
+  ConsumerState<ListPurchaseOrder> createState() => ListPurchaseOrderState();
 }
 
-class ListBlacklistDriverState extends ConsumerState<ListBlacklistDriver> {
+class ListPurchaseOrderState extends ConsumerState<ListPurchaseOrder> {
   late List<dynamic> _filteredItems;
   bool _isLoading = false;
   DateTimeRange? _currentRange;
@@ -27,7 +27,7 @@ class ListBlacklistDriverState extends ConsumerState<ListBlacklistDriver> {
   }
 
   @override
-  void didUpdateWidget(ListBlacklistDriver oldWidget) {
+  void didUpdateWidget(ListPurchaseOrder oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.items != widget.items) {
       _filteredItems = List.from(widget.items);

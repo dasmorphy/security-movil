@@ -9,6 +9,7 @@ import 'package:zentinel/domain/entities/employee_intern.dart';
 import 'package:zentinel/domain/entities/employee_movement.dart';
 import 'package:zentinel/domain/entities/graph_logbook.dart';
 import 'package:zentinel/domain/entities/group_business.dart';
+import 'package:zentinel/domain/entities/purchase_order.dart';
 import 'package:zentinel/domain/entities/reason_restriction.dart';
 import 'package:zentinel/domain/entities/unity_weight.dart';
 import 'package:zentinel/domain/repositories/logbook_entry_repository.dart';
@@ -112,6 +113,11 @@ class LogbookEntryRepositoryImpl extends LogbookEntryRepository {
   @override
   Future<ApiResponse<dynamic>> savePurchaseOrder(Map<String, dynamic> data) {
     return datasource.savePurchaseOrder(data);
+  }
+
+  @override
+  Future<List<PurchaseOrder>> getPurchaseOrder() {
+    return datasource.getPurchaseOrder();
   }
   
 }
