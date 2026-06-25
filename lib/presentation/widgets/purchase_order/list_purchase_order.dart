@@ -138,6 +138,20 @@ class ListPurchaseOrderState extends ConsumerState<ListPurchaseOrder> {
                                 ],
                               ),
                             ),
+
+                            Chip(
+                              side: BorderSide.none,
+                              label: Text(item.statusName),
+                              backgroundColor: getStatusColorOrder(
+                                item.statusName,
+                              ),
+                              padding: EdgeInsets.zero,
+                              labelStyle: TextStyle(
+                                color: getColorTxtOrder(item.statusName),
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ],
                         ),
                       ),

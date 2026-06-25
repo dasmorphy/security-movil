@@ -65,25 +65,31 @@ class PurchaseOrderModalState extends ConsumerState<PurchaseOrderModal> {
 
             const SizedBox(height: 28),
 
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(188, 25, 156, 156),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+            if (widget.item.statusName == 'Programado')... [
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color.fromARGB(188, 25, 156, 156),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  onPressed: () {
+                    final router = GoRouter.of(context);
+                    Navigator.of(context).pop(); // cierra el modal
+                    router.push('/register-quantity-order', extra: widget.item);
+                  },
+                  child: const Text(
+                    'Registro de cantidades',
+                    style: TextStyle(color: Colors.white),
                   ),
                 ),
-                onPressed: () => context.push('/register-quantity-order', extra: widget.item),
-                child: const Text(
-                  'Registro de cantidades',
-                  style: TextStyle(color: Colors.white),
-                ),
               ),
-            ),
+              const SizedBox(height: 8),
+            ],
 
-            const SizedBox(height: 8),
 
             SizedBox(
               width: double.infinity,

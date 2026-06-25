@@ -63,6 +63,15 @@ class _RegisterQuantityFormState extends ConsumerState<RegisterQuantityForm> {
       return;
     }
 
+    if (_dniDriverCtrl.text.length < 10) {
+      GlobalLoadingBottomSheet.show(
+        status: OverlayStatus.error,
+        message: 'La cédula debe ser de 10 dígitos',
+        autoDismiss: const Duration(seconds: 3),
+      );
+      return;
+    }
+
     // if (_selectedImages.length < 5) {
     //   setState(() {
     //     imagesMinError = true;
@@ -125,9 +134,7 @@ class _RegisterQuantityFormState extends ConsumerState<RegisterQuantityForm> {
           message: "Registro guardado exitosamente", 
           autoDismiss: const Duration(seconds: 2)
         );
-        // ref.read(getHistoryEntryAccess.notifier).load();
-        // Navigator.of(context).popUntil((route) => route.isFirst);
-        // context.go('/');
+        ref.read(getPurchaseOrder.notifier).load();
         context.pop();
       } else {
         GlobalLoadingBottomSheet.show(
@@ -171,6 +178,7 @@ class _RegisterQuantityFormState extends ConsumerState<RegisterQuantityForm> {
                 const SizedBox(height: 24),
                 CustomFieldLabelRequired(txtLabel: 'Cédula Chofer'),
                 GlowTextFormField(
+                  maxLength: 10,
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   keyboardType: TextInputType.number,
                   controller: _dniDriverCtrl,

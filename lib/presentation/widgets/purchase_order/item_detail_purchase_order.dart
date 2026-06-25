@@ -21,6 +21,7 @@ class ItemDetailPurchaseOrder extends StatelessWidget {
           formatDateDetails(item.createdAt.toString()),
         ),
         detailRow('Observaciones', item.observations),
+        detailRow('Estado', item.statusName),
       ],
     );
   }

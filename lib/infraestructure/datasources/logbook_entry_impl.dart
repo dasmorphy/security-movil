@@ -625,7 +625,7 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
         '/rest/zent-logbook-api/v1.0/purchase-order',
         data: {
           'order': data,
-          'externalTransactionId': uuid,
+          'externalTransactionId': Uuid().v4(),
           'channel': "ZENTINEL"
         },
         options: onlyError(),

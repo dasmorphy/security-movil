@@ -147,7 +147,7 @@ class _PurchaseOrderFormState extends ConsumerState<PurchaseOrderForm> {
       "type_order": _typeOrder.toUpperCase(),
       "destiny_id": int.tryParse(_destinyId),
       "number_order": _numberOrderCtrl.text.trim(),
-      "quantity": int.tryParse(_quantityCtrl.text.trim()),
+      "quantity": _quantityCtrl.text.trim(),
       "provider": _providerCtrl.text.trim(),
       "observations": _observationsCtrl.text.trim(),
       "user": userData.user,
@@ -376,8 +376,14 @@ class _PurchaseOrderFormState extends ConsumerState<PurchaseOrderForm> {
                   GlowTextFormField(
                     controller: _quantityCtrl,
                     focusNode: _quantityFocus,
-                    keyboardType: TextInputType.number,
-                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    keyboardType: const TextInputType.numberWithOptions(
+                      decimal: true,
+                    ),
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(
+                        RegExp(r'^\d*\.?\d{0,3}')
+                      )
+                    ],
                     validator: (v) {
                       if (v == null || v.trim().isEmpty) {
                         return messageValidatorEmpty;
