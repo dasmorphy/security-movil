@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 import 'package:zentinel/config/utils/helper.dart';
-import 'package:zentinel/presentation/providers/onboarding/onboarding_provider.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/service/pending_request_service.dart';
@@ -22,6 +21,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
   String _categoryEntry = '0';
   String _groupBusiness = '0';
   bool isLoading = false;
+  bool isBlacklist = false;
   bool imagesMinError = false;
   bool imagesMaxError = false;
   String _authorized = '0';
@@ -40,6 +40,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
   final _observationsCtrl = TextEditingController();
   final _truckLicenseCtrl = TextEditingController();
   final _nameDriverCtrl = TextEditingController();
+  final _dniCtrl = TextEditingController();
 
   bool _isInitializing = true;
 
@@ -59,6 +60,8 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
   final FocusNode _descFocus = FocusNode();
   final FocusNode _observationsFocus = FocusNode();
   final FocusNode _categoryEntryFocus = FocusNode();
+  final FocusNode _dniFocus = FocusNode();
+
   bool isPickingImage = false;
 
   @override
@@ -85,6 +88,12 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
       });
 
     });
+
+    _dniFocus.addListener(() {
+      if (!_dniFocus.hasFocus) {
+        _validateDni();
+      }
+    });
   }
 
   @override
@@ -106,6 +115,41 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
     _nameDriverFocus.dispose();
     _employeeFocus.dispose();
     super.dispose();
+  }
+
+  void _validateDni() async {
+    setState(() => isBlacklist = false);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await Future.wait([
+        ref.read(getBlacklistDriverByDni.notifier).load(filters: {
+          'dni': _dniCtrl.text
+        }),
+      ]);
+
+      if (!mounted) return;
+
+      final blacklistDni = ref.watch(getBlacklistDriverByDni);
+
+      if (blacklistDni.isNotEmpty) {
+        setState(() => isBlacklist = true);
+        BlacklistBottomSheet.show(
+          context,
+          personName: blacklistDni[0].fullNames,
+          documentId: blacklistDni[0].dni,
+          restrictionReason: blacklistDni[0].reasonRestriction,
+          registrationDate: formatDate(blacklistDni[0].createdAt),
+          photoUrl: blacklistDni[0].imagePath != null ? 'http://st.telearseg.net${blacklistDni[0].imagePath}' : null
+        );
+      }else {
+        GlobalLoadingBottomSheet.show(
+          status: OverlayStatus.success, 
+          message: "Cédula verificada correctamente", 
+          autoDismiss: const Duration(seconds: 2)
+        );
+      }
+
+    });
   }
 
   void _getUserLocation() async {
@@ -171,6 +215,16 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
 
     _minImages = requiredImages;
 
+    if (isBlacklist) {
+      setState(() => isLoading = false);
+      GlobalLoadingBottomSheet.show(
+        status: OverlayStatus.error,
+        message: 'Conductor se encuentra lista negra',
+        autoDismiss: const Duration(seconds: 3),
+      );
+      return;
+    }
+
     if (_selectedImages.length < requiredImages) {
       setState(() {
         imagesMinError = true;
@@ -184,6 +238,15 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
         imagesMaxError = true;
         isLoading = false;
       });
+      return;
+    }
+
+    if (_dniCtrl.text.length < 10) {
+      GlobalLoadingBottomSheet.show(
+        status: OverlayStatus.error,
+        message: 'La cédula debe ser de 10 dígitos',
+        autoDismiss: const Duration(seconds: 3),
+      );
       return;
     }
 
@@ -575,6 +638,34 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                     return null;
                   },
                 ),
+
+                const SizedBox(height: 12),
+                CustomFieldLabelRequired(txtLabel: 'Cédula'),
+                GlowTextFormField(
+                  maxLength: 10,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  keyboardType: TextInputType.number,
+                  controller: _dniCtrl,
+                  focusNode: _dniFocus,
+                  validator: (v) {
+                    if (v == null || v.trim().isEmpty) {
+                      return messageValidatorEmpty;
+                    }
+                    return null;
+                  },
+                ),
+
+                if (isBlacklist)
+                  SizedBox(
+                    width: double.infinity,
+                    child: const Text(
+                      'Conductor en lista negra',
+                      textAlign: TextAlign.left, 
+                      style: TextStyle(
+                        color: Color.fromARGB(255, 196, 39, 28)
+                      ),
+                    ),
+                  ),
 
                 if (!hideWeight) ...[
                   const SizedBox(height: 12),

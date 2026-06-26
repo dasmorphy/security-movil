@@ -382,7 +382,22 @@ final getBlacklistDriver = StateNotifierProvider<CatalogNotifier<BlacklistDriver
   final repo = ref.watch(logbookEntryRepositoryProvider);
   return CatalogNotifier<BlacklistDriver>(
     (filters) {
-      return repo.getBlacklistDriver();
+      final mergedFilters = {
+        ...?filters,
+      };
+      return repo.getBlacklistDriver(mergedFilters);
+    },
+  );
+});
+
+final getBlacklistDriverByDni = StateNotifierProvider<CatalogNotifier<BlacklistDriver>, List<BlacklistDriver>>((ref) {
+  final repo = ref.watch(logbookEntryRepositoryProvider);
+  return CatalogNotifier<BlacklistDriver>(
+    (filters) {
+      final mergedFilters = {
+        ...?filters,
+      };
+      return repo.getBlacklistDriver(mergedFilters);
     },
   );
 });

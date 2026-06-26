@@ -513,9 +513,12 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
   }
 
   @override
-  Future<List<BlacklistDriver>> getBlacklistDriver() async {
+  Future<List<BlacklistDriver>> getBlacklistDriver(Map<String, dynamic> filters) async {
     final response = await dio.get(
       '/rest/zent-logbook-api/v1.0/blacklist-driver',
+      queryParameters: {
+        'dni': filters['dni'],
+      },
       options: Options(
         headers: {
           'externalTransactionId': uuid, 

@@ -106,8 +106,8 @@ class LogbookEntryRepositoryImpl extends LogbookEntryRepository {
   }
 
   @override
-  Future<List<BlacklistDriver>> getBlacklistDriver() {
-    return datasource.getBlacklistDriver();
+  Future<List<BlacklistDriver>> getBlacklistDriver(Map<String, dynamic> filters) {
+    return datasource.getBlacklistDriver(filters);
   }
   
   @override

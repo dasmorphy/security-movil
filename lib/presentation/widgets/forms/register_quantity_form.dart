@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
+import 'package:zentinel/config/utils/helper.dart' show formatDate;
 import 'package:zentinel/domain/entities/api_response.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
@@ -28,6 +29,7 @@ class _RegisterQuantityFormState extends ConsumerState<RegisterQuantityForm> {
   bool imagesMinError = false;
   bool imagesMaxError = false;
   bool _isLoading = false;
+  bool isBlacklist = false;
   List<Uint8List?> _selectedImages = [];
   bool isPickingImage = false;
 
@@ -45,12 +47,53 @@ class _RegisterQuantityFormState extends ConsumerState<RegisterQuantityForm> {
   @override
   void initState() {
     super.initState();
+
+    _dniDriverFocus.addListener(() {
+      if (!_dniDriverFocus.hasFocus) {
+        _validateDni();
+      }
+    });
   }
 
   @override
   void dispose() {
     super.dispose();
     _formKey.currentState?.reset();
+  }
+
+  void _validateDni() async {
+    setState(() => isBlacklist = false);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await Future.wait([
+        ref.read(getBlacklistDriverByDni.notifier).load(filters: {
+          'dni': _dniDriverCtrl.text
+        }),
+      ]);
+
+      if (!mounted) return;
+
+      final blacklistDni = ref.watch(getBlacklistDriverByDni);
+
+      if (blacklistDni.isNotEmpty) {
+        setState(() => isBlacklist = true);
+        BlacklistBottomSheet.show(
+          context,
+          personName: blacklistDni[0].fullNames,
+          documentId: blacklistDni[0].dni,
+          restrictionReason: blacklistDni[0].reasonRestriction,
+          registrationDate: formatDate(blacklistDni[0].createdAt),
+          photoUrl: blacklistDni[0].imagePath != null ? 'http://st.telearseg.net${blacklistDni[0].imagePath}' : null
+        );
+      }else {
+        GlobalLoadingBottomSheet.show(
+          status: OverlayStatus.success, 
+          message: "Cédula verificada correctamente", 
+          autoDismiss: const Duration(seconds: 2)
+        );
+      }
+
+    });
   }
 
   Future<void> _handleSubmit() async {
@@ -60,6 +103,16 @@ class _RegisterQuantityFormState extends ConsumerState<RegisterQuantityForm> {
     FocusScope.of(context).unfocus();
     if (!(_formKey.currentState?.validate() ?? false)) {
       setState(() => _isLoading = false);
+      return;
+    }
+
+    if (isBlacklist) {
+      setState(() => isLoading = false);
+      GlobalLoadingBottomSheet.show(
+        status: OverlayStatus.error,
+        message: 'Conductor se encuentra lista negra',
+        autoDismiss: const Duration(seconds: 3),
+      );
       return;
     }
 
@@ -190,6 +243,17 @@ class _RegisterQuantityFormState extends ConsumerState<RegisterQuantityForm> {
                     return null;
                   },
                 ),
+                if (isBlacklist)
+                  SizedBox(
+                    width: double.infinity,
+                    child: const Text(
+                      'Conductor en lista negra',
+                      textAlign: TextAlign.left, 
+                      style: TextStyle(
+                        color: Color.fromARGB(255, 196, 39, 28)
+                      ),
+                    ),
+                  ),
         
                 const SizedBox(height: 12),
                 CustomFieldLabelRequired(txtLabel: 'Cantidad (Sacos)'),

@@ -30,7 +30,7 @@ abstract class LogbookEntryRepository {
   Future <List<EmployeeMovement>> getEmployeeMovements(Map<String, dynamic> filters);
   Future<ApiResponse<dynamic>> saveDriverBlacklist(Map<String, dynamic> data);
   Future<List<ReasonRestriction>> getReasonRestriction();
-  Future<List<BlacklistDriver>> getBlacklistDriver();
+  Future<List<BlacklistDriver>> getBlacklistDriver(Map<String, dynamic> filters);
   Future<List<PurchaseOrder>> getPurchaseOrder();
   Future<ApiResponse<dynamic>> savePurchaseOrder(Map<String, dynamic> data);
   Future<ApiResponse<dynamic>> savePurchaseOrderReceipts(Map<String, dynamic> data);
