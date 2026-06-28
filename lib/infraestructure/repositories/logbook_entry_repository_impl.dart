@@ -116,8 +116,8 @@ class LogbookEntryRepositoryImpl extends LogbookEntryRepository {
   }
 
   @override
-  Future<List<PurchaseOrder>> getPurchaseOrder() {
-    return datasource.getPurchaseOrder();
+  Future<List<PurchaseOrder>> getPurchaseOrder(Map<String, dynamic> filters) {
+    return datasource.getPurchaseOrder(filters);
   }
   
   @override

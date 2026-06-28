@@ -662,9 +662,17 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
   }
 
   @override
-  Future<List<PurchaseOrder>> getPurchaseOrder() async {
+  Future<List<PurchaseOrder>> getPurchaseOrder(Map<String, dynamic> filters) async {
     final response = await dio.get(
       '/rest/zent-logbook-api/v1.0/purchase-order',
+      queryParameters: {
+        'destiny_id': filters['destiny_id'],
+        'groups_business_id': filters['groups_business_id'],
+        'user': filters['user'],
+        'rol': filters['rol'],
+        'id_business': filters['id_business'],
+        'status': filters['status'],
+      },
       options: Options(
         headers: {
           'externalTransactionId': uuid, 

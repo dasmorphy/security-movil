@@ -784,10 +784,18 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                 GlowTextFormField(
                   maxLength: 10,
                   controller: _truckLicenseCtrl,
+                  uppercase: true,
                   focusNode: _truckLicenseFocus,
                   validator: (v) {
                     if (v == null || v.trim().isEmpty) {
                       return messageValidatorEmpty;
+                    }
+                    if (!v.contains('-')) {
+                      return 'La placa debe contener un guion (-)';
+                    }
+
+                    if (!RegExp(r'\d').hasMatch(v)) {
+                      return 'La placa debe contener al menos un número';
                     }
                     return null;
                   },
@@ -796,6 +804,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                 const SizedBox(height: 12),
                 CustomFieldLabelRequired(txtLabel: 'Nombre del Chofer'),
                 GlowTextFormField(
+                  uppercase: true,
                   controller: _nameDriverCtrl,
                   focusNode: _nameDriverFocus,
                   validator: (v) {

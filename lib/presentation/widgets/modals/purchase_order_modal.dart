@@ -65,7 +65,7 @@ class PurchaseOrderModalState extends ConsumerState<PurchaseOrderModal> {
 
             const SizedBox(height: 28),
 
-            if (widget.item.statusName == 'Programado')... [
+            if (widget.item.statusName == 'Programado' || widget.item.statusName == 'Incompleto')... [
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(

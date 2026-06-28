@@ -379,11 +379,19 @@ class _BiomarEntryReportFormState extends ConsumerState<BiomarEntryReportForm> {
 
                 CustomFieldLabelRequired(txtLabel: 'Nombres Completos'),
                 GlowTextFormField(
+                  uppercase: true,
                   controller: _nameVisitCtrl,
                   focusNode: _truckLicenseFocus,
                   validator: (v) {
                     if (v == null || v.trim().isEmpty) {
                       return messageValidatorEmpty;
+                    }
+                    if (!v.contains('-')) {
+                      return 'La placa debe contener un guion (-)';
+                    }
+
+                    if (!RegExp(r'\d').hasMatch(v)) {
+                      return 'La placa debe contener al menos un número';
                     }
                     return null;
                   },

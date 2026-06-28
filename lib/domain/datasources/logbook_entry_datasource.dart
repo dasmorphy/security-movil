@@ -33,6 +33,6 @@ abstract class LogbookEntryDatasource {
   Future<List<ReasonRestriction>> getReasonRestriction();
   Future<List<BlacklistDriver>> getBlacklistDriver(Map<String, dynamic> filters);
   Future<ApiResponse<dynamic>> savePurchaseOrder(Map<String, dynamic> data);
-  Future<List<PurchaseOrder>> getPurchaseOrder();
+  Future<List<PurchaseOrder>> getPurchaseOrder(Map<String, dynamic> filters);
   Future<ApiResponse<dynamic>> savePurchaseOrderReceipts(Map<String, dynamic> data);
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:zentinel/config/utils/helper.dart';
 
 class GlowTextFormField extends StatelessWidget {
   final TextEditingController controller;
@@ -10,6 +11,7 @@ class GlowTextFormField extends StatelessWidget {
   final ValueChanged<String?>? onChanged;
   final int maxLines;
   final bool enabled;
+  final bool uppercase;
   final TextInputType keyboardType;
   final List<TextInputFormatter>? inputFormatters;
   final String? Function(String?)? validator;
@@ -23,6 +25,7 @@ class GlowTextFormField extends StatelessWidget {
     this.onChanged,
     this.enabled = true,
     this.maxLines = 1,
+    this.uppercase = false,
     this.keyboardType = TextInputType.text,
     this.inputFormatters,
     this.validator,
@@ -64,7 +67,10 @@ class GlowTextFormField extends StatelessWidget {
             maxLength: maxLength,
             onChanged: onChanged,
             keyboardType: keyboardType,
-            inputFormatters: inputFormatters,
+            inputFormatters: [
+              if (uppercase) UpperCaseTextFormatter(),
+              ...?inputFormatters,
+            ],
             validator: validator,
             decoration: InputDecoration(
               filled: true,

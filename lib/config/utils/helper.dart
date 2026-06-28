@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:zentinel/domain/entities/unity_weight.dart';
@@ -243,6 +244,19 @@ Map<String, dynamic> mapPendingEmployeeMovements(Map<String, dynamic> raw) {
     "subtitle": typeMovement,
     "statusText": processing ? 'Subiendo...' : 'Pendiente',
   };
+}
+
+class UpperCaseTextFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    return newValue.copyWith(
+      text: newValue.text.toUpperCase(),
+      selection: newValue.selection,
+    );
+  }
 }
 
 Future<Uint8List?> convertToWebP(File file) async {

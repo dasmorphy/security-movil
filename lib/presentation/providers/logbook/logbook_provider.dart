@@ -404,9 +404,30 @@ final getBlacklistDriverByDni = StateNotifierProvider<CatalogNotifier<BlacklistD
 
 final getPurchaseOrder = StateNotifierProvider<CatalogNotifier<PurchaseOrder>, List<PurchaseOrder>>((ref) {
   final repo = ref.watch(logbookEntryRepositoryProvider);
+  final authState = ref.watch(userSessionProvider);
+
+  if (!authState.hasValue || authState.value == null) {
+    return CatalogNotifier<PurchaseOrder>((_) async => []);
+  }
+
+  final userData = authState.value!;
+
   return CatalogNotifier<PurchaseOrder>(
     (filters) {
-      return repo.getPurchaseOrder();
+      final mergedFilters = {
+        'rol': userData.role,
+        if (userData.hasPermission(Permissions.dataGroupBusiness))
+          'groups_business_id': userData.attributes['group_business'],
+        if (userData.role == 'admin' || userData.role == 'admin_tlsg')
+          'id_business': userData.attributes['id_business'],
+        if (userData.role == 'guardia')... {
+          'user': userData.user,
+          'destiny_id': userData.attributes['group_business'],
+        },
+        ...?filters,
+      };
+      
+      return repo.getPurchaseOrder(mergedFilters);
     },
   );
 });
