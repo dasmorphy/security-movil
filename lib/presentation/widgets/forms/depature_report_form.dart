@@ -105,6 +105,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
     _employeeCtrl.dispose();
     _providerCtrl.dispose();
     _nameDriverCtrl.dispose();
+    _dniCtrl.dispose();
     _truckLicenseCtrl.dispose();
     _observationsCtrl.dispose();
     _quantityFocus.dispose();

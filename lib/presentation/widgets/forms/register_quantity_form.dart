@@ -57,8 +57,9 @@ class _RegisterQuantityFormState extends ConsumerState<RegisterQuantityForm> {
 
   @override
   void dispose() {
-    super.dispose();
     _formKey.currentState?.reset();
+    _dniDriverCtrl.dispose();
+    super.dispose();
   }
 
   void _validateDni() async {
@@ -125,13 +126,13 @@ class _RegisterQuantityFormState extends ConsumerState<RegisterQuantityForm> {
       return;
     }
 
-    // if (_selectedImages.length < 5) {
-    //   setState(() {
-    //     imagesMinError = true;
-    //     _isLoading = false;
-    //   });
-    //   return;
-    // }
+    if (_selectedImages.length < 5) {
+      setState(() {
+        imagesMinError = true;
+        _isLoading = false;
+      });
+      return;
+    }
 
     if (_selectedImages.length > 10) {
       setState(() {

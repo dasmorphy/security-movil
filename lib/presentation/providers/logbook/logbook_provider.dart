@@ -390,7 +390,7 @@ final getBlacklistDriver = StateNotifierProvider<CatalogNotifier<BlacklistDriver
   );
 });
 
-final getBlacklistDriverByDni = StateNotifierProvider<CatalogNotifier<BlacklistDriver>, List<BlacklistDriver>>((ref) {
+final getBlacklistDriverByDni = StateNotifierProvider.autoDispose<CatalogNotifier<BlacklistDriver>, List<BlacklistDriver>>((ref) {
   final repo = ref.watch(logbookEntryRepositoryProvider);
   return CatalogNotifier<BlacklistDriver>(
     (filters) {
