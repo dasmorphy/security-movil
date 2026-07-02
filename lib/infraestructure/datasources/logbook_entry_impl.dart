@@ -517,7 +517,7 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
     final response = await dio.get(
       '/rest/zent-logbook-api/v1.0/blacklist-driver',
       queryParameters: {
-        'dni': filters['dni'],
+        'dni': filters['dni'] != "" ? filters['dni'] : null,
       },
       options: Options(
         headers: {

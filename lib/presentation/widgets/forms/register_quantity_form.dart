@@ -66,6 +66,12 @@ class _RegisterQuantityFormState extends ConsumerState<RegisterQuantityForm> {
     setState(() => isBlacklist = false);
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      ref.invalidate(getBlacklistDriverByDni);
+
+      if (_dniDriverCtrl.text.length < 10) {
+        return;
+      }
+
       await Future.wait([
         ref.read(getBlacklistDriverByDni.notifier).load(filters: {
           'dni': _dniDriverCtrl.text
@@ -74,7 +80,7 @@ class _RegisterQuantityFormState extends ConsumerState<RegisterQuantityForm> {
 
       if (!mounted) return;
 
-      final blacklistDni = ref.watch(getBlacklistDriverByDni);
+      final blacklistDni = ref.read(getBlacklistDriverByDni);
 
       if (blacklistDni.isNotEmpty) {
         setState(() => isBlacklist = true);

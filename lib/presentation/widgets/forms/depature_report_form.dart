@@ -122,6 +122,12 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
     setState(() => isBlacklist = false);
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      // Limpia el estado anterior antes de consultar
+      ref.invalidate(getBlacklistDriverByDni);
+      if (_dniCtrl.text.length < 10) {
+        return;
+      }
+
       await Future.wait([
         ref.read(getBlacklistDriverByDni.notifier).load(filters: {
           'dni': _dniCtrl.text
@@ -130,7 +136,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
 
       if (!mounted) return;
 
-      final blacklistDni = ref.watch(getBlacklistDriverByDni);
+      final blacklistDni = ref.read(getBlacklistDriverByDni); // usa read no watch
 
       if (blacklistDni.isNotEmpty) {
         setState(() => isBlacklist = true);
@@ -140,16 +146,17 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
           documentId: blacklistDni[0].dni,
           restrictionReason: blacklistDni[0].reasonRestriction,
           registrationDate: formatDate(blacklistDni[0].createdAt),
-          photoUrl: blacklistDni[0].imagePath != null ? 'http://st.telearseg.net${blacklistDni[0].imagePath}' : null
+          photoUrl: blacklistDni[0].imagePath != null
+            ? 'http://st.telearseg.net${blacklistDni[0].imagePath}'
+            : null,
         );
-      }else {
+      } else {
         GlobalLoadingBottomSheet.show(
-          status: OverlayStatus.success, 
-          message: "Cédula verificada correctamente", 
-          autoDismiss: const Duration(seconds: 2)
+          status: OverlayStatus.success,
+          message: "Cédula verificada correctamente",
+          autoDismiss: const Duration(seconds: 2),
         );
       }
-
     });
   }
 
@@ -277,6 +284,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
       "quantity": int.tryParse(_quantityCtrl.text) == 0 ? null : int.tryParse(_quantityCtrl.text),
       "weight": int.tryParse(_weightCtrl.text),
       "provider": _providerCtrl.text.trim(),
+      "dni_driver": _dniCtrl.text.trim(),
       "destiny_intern": _destiny,
       "authorized_by": _authorized,
       "observations": _observationsCtrl.text.trim(),

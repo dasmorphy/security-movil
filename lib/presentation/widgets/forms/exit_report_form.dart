@@ -120,6 +120,12 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
     setState(() => isBlacklist = false);
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      ref.invalidate(getBlacklistDriverByDni);
+
+      if (_dniCtrl.text.length < 10) {
+        return;
+      }
+
       await Future.wait([
         ref.read(getBlacklistDriverByDni.notifier).load(filters: {
           'dni': _dniCtrl.text
@@ -128,7 +134,7 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
 
       if (!mounted) return;
 
-      final blacklistDni = ref.watch(getBlacklistDriverByDni);
+      final blacklistDni = ref.read(getBlacklistDriverByDni);
 
       if (blacklistDni.isNotEmpty) {
         setState(() => isBlacklist = true);
@@ -285,6 +291,7 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
       "quantity": int.tryParse(_quantityCtrl.text) == 0 ? null : int.tryParse(_quantityCtrl.text),
       "weight": int.tryParse(_weightCtrl.text),
       "truck_license": _truckLicenseCtrl.text.trim(),
+      "dni_driver": _dniCtrl.text.trim(),
       "lat": _latitude.toString(),
       "long": _longitude.toString(),
       "person_withdraws": _personWithdrawsCtrl.text.trim(),

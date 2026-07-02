@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/domain/entities/purchase_order.dart';
+import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/modals/purchase_order_modal.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -52,6 +53,9 @@ class ListPurchaseOrderState extends ConsumerState<ListPurchaseOrder> {
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(userSessionProvider);
+    final userData = authState.value!;
+
     final items = _isLoading
     ? List.generate(5, (_) => null) // Placeholder para skeletons
     : (_currentRange != null
@@ -138,20 +142,21 @@ class ListPurchaseOrderState extends ConsumerState<ListPurchaseOrder> {
                                 ],
                               ),
                             ),
-
-                            Chip(
-                              side: BorderSide.none,
-                              label: Text(item.statusName),
-                              backgroundColor: getStatusColorOrder(
-                                item.statusName,
+                            
+                            if (userData.role != 'guardia')
+                              Chip(
+                                side: BorderSide.none,
+                                label: Text(item.statusName),
+                                backgroundColor: getStatusColorOrder(
+                                  item.statusName,
+                                ),
+                                padding: EdgeInsets.zero,
+                                labelStyle: TextStyle(
+                                  color: getColorTxtOrder(item.statusName),
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                              padding: EdgeInsets.zero,
-                              labelStyle: TextStyle(
-                                color: getColorTxtOrder(item.statusName),
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
                           ],
                         ),
                       ),
