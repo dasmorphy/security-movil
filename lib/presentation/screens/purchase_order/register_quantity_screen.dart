@@ -17,7 +17,7 @@ class RegisterQuantityScreen extends ConsumerWidget {
       purchaseOrderId: purchaseOrder.idOrder,
       numberOrder: purchaseOrder.numberOrder,
       typeOrder: purchaseOrder.typeOrder,
-      destinyName: purchaseOrder.destinyName
+      // destinyName: purchaseOrder.destinyName
     );
 
     return RegisterQuantityForm(

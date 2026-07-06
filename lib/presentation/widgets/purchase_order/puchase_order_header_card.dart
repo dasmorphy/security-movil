@@ -3,13 +3,13 @@ import 'package:flutter/material.dart';
 class HeaderInfoPurchaseOrder {
   final int purchaseOrderId;
   final String typeOrder;
-  final String destinyName;
+  // final String destinyName;
   final String numberOrder;
 
   const HeaderInfoPurchaseOrder({
     required this.purchaseOrderId,
     required this.typeOrder,
-    required this.destinyName,
+    // required this.destinyName,
     required this.numberOrder,
   });
 }
@@ -77,13 +77,13 @@ class PuchaseOrderHeaderCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 16),
-              Expanded(
-                child: _InfoColumn(
-                  label: 'DESTINO',
-                  value: purchaseOrder.destinyName,
-                  icon: Icons.person,
-                ),
-              ),
+              // Expanded(
+              //   child: _InfoColumn(
+              //     label: 'DESTINO',
+              //     value: purchaseOrder.destinyName,
+              //     icon: Icons.person,
+              //   ),
+              // ),
             ],
           ),
         ],

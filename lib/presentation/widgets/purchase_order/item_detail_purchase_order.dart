@@ -24,7 +24,7 @@ class ItemDetailPurchaseOrder extends ConsumerWidget {
 
         if (userData.role != 'guardia')...[
           detailRow('Cantidad', item.quantity),
-          detailRow('Destino', item.destinyName),
+          // detailRow('Destino', item.destinyName),
           detailRow(
             'Fecha Ingreso',
             formatDateDetails(item.createdAt.toString()),
