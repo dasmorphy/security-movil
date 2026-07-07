@@ -3,18 +3,18 @@ class AllDispatch {
   String createdBy;
   String driver;
   int idDispatch;
-  List<Image> images;
-  String nameDestiny;
-  String nameVehicleType;
+  List<dynamic> images;
+  dynamic nameDestiny;
+  dynamic nameVehicleType;
   String observations;
   String orderNumber;
   dynamic reception;
-  List<Skus> skus;
+  List<dynamic> skus;
   String status;
   String truckLicense;
   DateTime updatedAt;
   String updatedBy;
-  String typeProcess;
+  dynamic typeProcess;
   dynamic weight;
 
   AllDispatch({

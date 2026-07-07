@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
-import 'package:zentinel/config/constants/permissions.dart';
-import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/domain/entities/all_dispatch.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
@@ -128,41 +125,41 @@ class DispatchDetailModalState extends ConsumerState<DispatchDetailModal> {
             //   ),
 
             // BOTON CONFIRMAR RECEPCION
-            if (widget.item.status == 'Salida de planta' && userData.hasPermission(Permissions.despachoCambioEstadoRecepcion))
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () => context.push('/confirm-dispatch', extra: widget.item),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    backgroundColor: const Color.fromARGB(189, 7, 213, 213),
-                    disabledBackgroundColor: const Color.fromARGB(
-                      120,
-                      7,
-                      213,
-                      213,
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text(
-                        'Confirmar recepción',
-                        style: TextStyle(
-                          fontSize: 15,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+            // if (widget.item.status == 'Salida de planta' && userData.hasPermission(Permissions.despachoCambioEstadoRecepcion))
+            //   SizedBox(
+            //     width: double.infinity,
+            //     child: ElevatedButton(
+            //       onPressed: () => context.push('/confirm-dispatch', extra: widget.item),
+            //       style: ElevatedButton.styleFrom(
+            //         padding: const EdgeInsets.symmetric(vertical: 14),
+            //         shape: RoundedRectangleBorder(
+            //           borderRadius: BorderRadius.circular(8),
+            //         ),
+            //         backgroundColor: const Color.fromARGB(189, 7, 213, 213),
+            //         disabledBackgroundColor: const Color.fromARGB(
+            //           120,
+            //           7,
+            //           213,
+            //           213,
+            //         ),
+            //       ),
+            //       child: Row(
+            //         mainAxisAlignment: MainAxisAlignment.center,
+            //         children: [
+            //           const Text(
+            //             'Confirmar recepción',
+            //             style: TextStyle(
+            //               fontSize: 15,
+            //               color: Colors.white,
+            //               fontWeight: FontWeight.bold,
+            //             ),
+            //           ),
+            //         ],
+            //       ),
+            //     ),
+            //   ),
 
-            const SizedBox(height: 8),
+            // const SizedBox(height: 8),
 
             SizedBox(
               width: double.infinity,

@@ -54,9 +54,9 @@ class _CrearDespachoScreenState extends ConsumerState<DispatchForm> {
   bool imagesMaxError = false;
   final _formKey = GlobalKey<FormState>();
 
-  final List<SkuItem> _skus = [
-    SkuItem(),
-  ];
+  // final List<SkuItem> _skus = [
+  //   SkuItem(),
+  // ];
 
   int? _vehicleSelected = 0;
   int? _destinySelected = 0;
@@ -88,46 +88,46 @@ class _CrearDespachoScreenState extends ConsumerState<DispatchForm> {
     super.dispose();
   }
 
-  void _agregarProducto(int skuIndex) {
-    if (skuIndex < 0 || skuIndex >= _skus.length) return;
-    setState(() {
-      _skus[skuIndex];
-    });
-  }
+  // void _agregarProducto(int skuIndex) {
+  //   if (skuIndex < 0 || skuIndex >= _skus.length) return;
+  //   setState(() {
+  //     _skus[skuIndex];
+  //   });
+  // }
 
-  void _skuChangeChecked(int skuIndex, bool check) {
-    if (skuIndex < 0 || skuIndex >= _skus.length) return;
+  // void _skuChangeChecked(int skuIndex, bool check) {
+  //   if (skuIndex < 0 || skuIndex >= _skus.length) return;
 
-    setState(() {
-      _skus[skuIndex].typeSku =
-        check ? 'Multiple' : 'Individual';
-    });
-  }
+  //   setState(() {
+  //     _skus[skuIndex].typeSku =
+  //       check ? 'Multiple' : 'Individual';
+  //   });
+  // }
 
-  void _addSku() {
-    setState(() {
-      _skus.add(SkuItem());
-    });
-  }
+  // void _addSku() {
+  //   setState(() {
+  //     _skus.add(SkuItem());
+  //   });
+  // }
 
-  void _deleteSku(int index) {
-    if (_skus.length <= 1) return;
-    setState(() {
-      _skus.removeAt(index);
-    });
-  }
+  // void _deleteSku(int index) {
+  //   if (_skus.length <= 1) return;
+  //   setState(() {
+  //     _skus.removeAt(index);
+  //   });
+  // }
 
   void _crearDespacho() async {
     if (isLoading) return;
     setState(() => isLoading = true);
 
-    if (_selectedImages.length < 3) {
-      setState(() {
-        imagesMinError = true;
-        isLoading = false;
-      });
-      return;
-    }
+    // if (_selectedImages.length < 3) {
+    //   setState(() {
+    //     imagesMinError = true;
+    //     isLoading = false;
+    //   });
+    //   return;
+    // }
 
     if (_selectedImages.length > 10) {
       setState(() {
@@ -173,32 +173,32 @@ class _CrearDespachoScreenState extends ConsumerState<DispatchForm> {
 
     final userData = authState.value!;
 
-    final skusData = _skus.map((sku) {
-      return {
-        "type_sku": sku.typeSku,
-        // "products": sku.productos
-        //   .where((p) => p.productoId != null)
-        //   .map((p) => {
-        //     "id_product": int.parse(p.productoId!),
-        //     "quantity": p.cantidad,
-        //   })
-        //   .toList(),
-      };
-    }).toList();
+    // final skusData = _skus.map((sku) {
+    //   return {
+    //     "type_sku": sku.typeSku,
+    //     // "products": sku.productos
+    //     //   .where((p) => p.productoId != null)
+    //     //   .map((p) => {
+    //     //     "id_product": int.parse(p.productoId!),
+    //     //     "quantity": p.cantidad,
+    //     //   })
+    //     //   .toList(),
+    //   };
+    // }).toList();
     
-    final dynamic destinyProduct = _destinyProduct != '0' ? _destinyProduct : null;
+    // final dynamic destinyProduct = _destinyProduct != '0' ? _destinyProduct : null;
 
     final data = {
       "order_number": _orderNumberCtrl.text.trim(),
       "external_transaction_id": Uuid().v4(),
-      "destiny": _destinySelected == 0 ? null : _destinySelected,
+      // "destiny": _destinySelected == 0 ? null : _destinySelected,
       "driver": _driverCtrl.text.trim(),
       "observations": _observationsCtrl.text.trim(),
       "truck_license": _truckLicenseCtrl.text.trim(),
-      "vehicle_type": _vehicleSelected,
+      // "vehicle_type": _vehicleSelected,
       "type_process": widget.isProductTerm != true ? 'dispatch' : 'product',
-      "destiny_product": widget.isProductTerm != true && destinyProduct == null ? null : _clientCtrl.text.trim(),
-      "sku": skusData,
+      // "destiny_product": widget.isProductTerm != true && destinyProduct == null ? null : _clientCtrl.text.trim(),
+      // "sku": skusData,
       // "weight": int.tryParse(_weightCtrl.text),
       "user": userData.user,
       "images": _selectedImages
@@ -284,13 +284,13 @@ class _CrearDespachoScreenState extends ConsumerState<DispatchForm> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    NewSkuListCard(
-                      skus: _skus,
-                      onDeleteSku: _deleteSku,
-                      onAddSku: _addSku,
-                      onAgregarProducto: _agregarProducto,
-                      onSkuCheckedChanged: _skuChangeChecked
-                    ),
+                    // NewSkuListCard(
+                    //   skus: _skus,
+                    //   onDeleteSku: _deleteSku,
+                    //   onAddSku: _addSku,
+                    //   onAgregarProducto: _agregarProducto,
+                    //   onSkuCheckedChanged: _skuChangeChecked
+                    // ),
                     const SizedBox(height: 6),
                     InformacionLogisticaCard(
                       clientCtrl: _clientCtrl,
