@@ -65,6 +65,9 @@ class CategoryViewState extends ConsumerState<CategoryView> {
                       if (userData.attributes['id_business'] == 2 || 
                           userData.attributes['id_business'] == 3)
                         ServicesBiomar(),
+
+                      if (userData.hasPermission(Permissions.verBitacoras))
+                        ServicesTechnical(),
                     ],
                   ),
                 ),
