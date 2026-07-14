@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,7 +9,7 @@ import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
 class RegisterQuantityForm extends ConsumerStatefulWidget {
-  final HeaderInfoPurchaseOrder puchaseOrder;
+  final dynamic puchaseOrder;
   final Future<ApiResponse> Function(Map<String, dynamic>) onSubmit;
 
   const RegisterQuantityForm({
@@ -167,7 +165,7 @@ class _RegisterQuantityFormState extends ConsumerState<RegisterQuantityForm> {
       final userHive = ref.watch(userProfileProvider(userData.email));
 
       final data = {
-        "purchase_order_id": widget.puchaseOrder.purchaseOrderId,
+        "purchase_order_id": widget.puchaseOrder != false ? widget.puchaseOrder.purchaseOrderId : null,
         "dni_driver": _dniDriverCtrl.text.trim(),
         "truck_license": _truckLicenseCtrl.text.trim(),
         "driver": _nameDriverCtrl.text.trim(),
@@ -233,9 +231,46 @@ class _RegisterQuantityFormState extends ConsumerState<RegisterQuantityForm> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header data del ingreso
-                PuchaseOrderHeaderCard(purchaseOrder: widget.puchaseOrder,),
-                const SizedBox(height: 24),
+                if (widget.puchaseOrder != false)...[
+                  // Header data del ingreso
+                  PuchaseOrderHeaderCard(purchaseOrder: widget.puchaseOrder,),
+                  const SizedBox(height: 24),
+                ]
+                else
+                  Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.only(bottom: 20),
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: Colors.amber.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(
+                        color: Colors.amber.shade700,
+                        width: 1,
+                      ),
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Icon(
+                          Icons.warning_amber_rounded,
+                          color: Colors.amber.shade700,
+                          size: 28,
+                        ),
+                        const SizedBox(width: 12),
+                        const Expanded(
+                          child: Text(
+                            'Este registro se guardará sin una orden de compra asignada.',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 CustomFieldLabelRequired(txtLabel: 'Cédula Chofer'),
                 GlowTextFormField(
                   maxLength: 10,

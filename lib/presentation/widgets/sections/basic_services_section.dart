@@ -171,6 +171,13 @@ class _BasicServicesStionState extends ConsumerState<BasicServicesSection> {
                     label: 'Nueva orden',
                     onTap: () => context.push('/new-purchase-order')
                   ),
+
+                if (userData.hasPermission(Permissions.nuevoOrdenesCompra))
+                  BasicServiceCard(
+                    iconImage: 'iconsalida',
+                    label: 'Registro de cantidades',
+                    onTap: () => context.push('/register-quantity-order', extra: false)
+                  ),
               ],
             ),
             const SizedBox(height: 18),

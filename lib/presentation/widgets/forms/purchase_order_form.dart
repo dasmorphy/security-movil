@@ -372,7 +372,7 @@ class _PurchaseOrderFormState extends ConsumerState<PurchaseOrderForm> {
 
                   const SizedBox(height: 12),
                   // ─── Cantidad ──────────────────────────────────────────
-                  const CustomFieldLabelRequired(txtLabel: 'Cantidad (Toneladas)'),
+                  const CustomFieldLabelRequired(txtLabel: 'Cantidad (Kg)'),
                   GlowTextFormField(
                     controller: _quantityCtrl,
                     focusNode: _quantityFocus,

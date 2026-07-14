@@ -223,16 +223,6 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
 
     _minImages = requiredImages;
 
-    if (isBlacklist) {
-      setState(() => isLoading = false);
-      GlobalLoadingBottomSheet.show(
-        status: OverlayStatus.error,
-        message: 'Conductor se encuentra lista negra',
-        autoDismiss: const Duration(seconds: 3),
-      );
-      return;
-    }
-
     if (_selectedImages.length < requiredImages) {
       setState(() {
         imagesMinError = true;
@@ -285,6 +275,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
       "weight": int.tryParse(_weightCtrl.text),
       "provider": _providerCtrl.text.trim(),
       "dni_driver": _dniCtrl.text.trim(),
+      "is_blacklist": isBlacklist,
       "destiny_intern": _destiny,
       "authorized_by": _authorized,
       "observations": _observationsCtrl.text.trim(),

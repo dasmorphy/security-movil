@@ -164,7 +164,7 @@ final appRouter = GoRouter(
           path: 'register-quantity-order',
           name: RegisterQuantityScreen.name,
           builder: (context, state) {
-            final purchaseOrderData = state.extra as PurchaseOrder;
+            final purchaseOrderData = state.extra as dynamic;
             return RegisterQuantityScreen(
               purchaseOrder: purchaseOrderData,
             );
