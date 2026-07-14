@@ -82,7 +82,7 @@ class _ServicesTechnicalState extends ConsumerState<ServicesTechnical> {
                   BasicServiceCard(
                       iconImage: 'iconentrada',
                       label: 'Lista de tareas',
-                      onTap: () => context.push('/new-dispatch')
+                      onTap: () => context.push('/list-task-technical')
                     ),
 
                 if (userData.hasPermission(Permissions.nuevoIngresoBiomar))

@@ -138,7 +138,12 @@ final appRouter = GoRouter(
               idEmployee: params.idEmployee,
             );
           },
-        )
+        ),
+        GoRoute(
+          path: 'list-task-technical',
+          name: TaskListScreen.name,
+          builder: (context, state) => const TaskListScreen()
+        ),
       ]
     ),
   ]

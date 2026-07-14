@@ -79,3 +79,5 @@ export 'package:zentinel/presentation/widgets/shared/option_bottom_sheet.dart';
 export 'package:zentinel/presentation/widgets/forms/employee_intern/employee_movement_form.dart';
 export 'package:zentinel/presentation/widgets/modals/employee_movement_offline.dart';
 export 'package:zentinel/presentation/widgets/sections/services_technical.dart';
+export 'package:zentinel/presentation/widgets/forms/technical/technical_record.dart';
+export 'package:zentinel/presentation/widgets/modals/task_detail_modal.dart';
