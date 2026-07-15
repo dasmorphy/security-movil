@@ -88,7 +88,7 @@ class _MaterialEntryItemState extends State<MaterialEntryItem> {
               Row(
                 children: [
                   const Text(
-                    'MATERIAL',
+                    'NOMBRE',
                     style: TextStyle(
                       color: Color.fromARGB(255, 150, 150, 150),
                       fontSize: 11,

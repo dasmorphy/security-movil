@@ -3,7 +3,7 @@ class TaskTechnical {
   String code;
   DateTime createdAt;
   String createdBy;
-  String description;
+  String? description;
   int idTask;
   String location;
   String name;
@@ -16,7 +16,7 @@ class TaskTechnical {
     required this.code,
     required this.createdAt,
     required this.createdBy,
-    required this.description,
+    this.description,
     required this.idTask,
     required this.location,
     required this.name,

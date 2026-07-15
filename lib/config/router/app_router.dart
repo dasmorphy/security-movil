@@ -144,6 +144,11 @@ final appRouter = GoRouter(
           name: TaskListScreen.name,
           builder: (context, state) => const TaskListScreen()
         ),
+        GoRoute(
+          path: 'new-task-technical',
+          name: NewTaskScreen.name,
+          builder: (context, state) => const NewTaskScreen()
+        ),
       ]
     ),
   ]

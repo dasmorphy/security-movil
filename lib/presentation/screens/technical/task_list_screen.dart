@@ -155,21 +155,21 @@ class _TaskListScreenState
                                         ],
                                       ),
                                     ),
-                                    // Chip(
-                                    //   side: BorderSide.none,
-                                    //   label: Text(item.lastStatusMovement),
-                                    //   backgroundColor: getStatusColorMovements(
-                                    //     item.lastStatusMovement,
-                                    //   ),
-                                    //   padding: EdgeInsets.zero,
-                                    //   labelStyle: TextStyle(
-                                    //     color: getColorTxtMovements(
-                                    //       item.lastStatusMovement,
-                                    //     ),
-                                    //     fontSize: 12,
-                                    //     fontWeight: FontWeight.bold,
-                                    //   ),
-                                    // ),
+                                    Chip(
+                                      side: BorderSide.none,
+                                      label: Text(item.status),
+                                      backgroundColor: getStatusColorMovements(
+                                        item.status,
+                                      ),
+                                      padding: EdgeInsets.zero,
+                                      labelStyle: TextStyle(
+                                        color: getColorTxtMovements(
+                                          item.status,
+                                        ),
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),

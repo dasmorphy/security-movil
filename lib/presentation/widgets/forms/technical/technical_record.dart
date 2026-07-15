@@ -280,7 +280,7 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
     );
 
     return Card(
-      color: const Color.fromARGB(0, 150, 60, 60),
+      color: const Color.fromARGB(255, 23, 24, 28),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       margin: const EdgeInsets.only(bottom: 16),
       child: Form(
@@ -296,218 +296,20 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Container(
-                  width: 50,
-                  height: 5,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                const SizedBox(height: 30),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: SizedBox(
-                    width: 280, // ajusta a tu diseño
-                    child: Text(
-                      'Registro de ingresos',
-                      textAlign: TextAlign.left,
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        color: Colors.white,
-                        fontSize: 25,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      softWrap: true,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-
-                CustomFieldLabelRequired(txtLabel: 'Tipo de visita'),
-                GlowDropdownFormField2<String>(
-                  value: _typeAccess,
-                  focusNode: _typeAccessFocus,
-                  decoration: styleDecoration(),
-                  items: [
-                    DropdownMenuItem(
-                      enabled: false,
-                      value: '0',
-                      child: Text(
-                        'Seleccione una opción',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                    DropdownMenuItem(
-                      value: 'Proveedor',
-                      child: Text(
-                        'Proveedor',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                    DropdownMenuItem(
-                      value: 'Visitante',
-                      child: Text(
-                        'Visitante',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                  ],
-                  onChanged: (v) {
-                    if (v != null) {
-                      setState(() => _typeAccess = v);
-                    }
-                  },
-                  validator: (v) {
-                    if (v == '0' || v == null || v.trim().isEmpty) {
-                      return messageValidatorEmpty;
-                    }
-                    return null;
+                CommentaryReception(
+                  controller: _observationsCtrl,
+                  focusNode: _observationsFocus,
+                  label: 'RESUMEN DEL TRABAJO',
+                  onChanged: (value) {
+                    setState(() {
+                      _observationsCtrl.text = value;
+                    });
                   },
                 ),
 
                 const SizedBox(height: 12),
-                CustomFieldLabelRequired(txtLabel: 'Cédula'),
-                GlowTextFormField(
-                  maxLength: 10,
-                  keyboardType: TextInputType.number,
-                  controller: _dniCtrl,
-                  focusNode: _dniFocus,
-                  validator: (v) {
-                    if (v == null || v.trim().isEmpty) {
-                      return messageValidatorEmpty;
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 12),
 
-                CustomFieldLabelRequired(txtLabel: 'Nombres Completos'),
-                GlowTextFormField(
-                  controller: _nameVisitCtrl,
-                  focusNode: _truckLicenseFocus,
-                  validator: (v) {
-                    if (v == null || v.trim().isEmpty) {
-                      return messageValidatorEmpty;
-                    }
-                    return null;
-                  },
-                ),
-
-                const SizedBox(height: 12),
-                
-                CustomFieldLabelRequired(txtLabel: 'Motivo ingreso'),
-                GlowTextFormField(
-                  controller: _reasonVisitCtrl,
-                  focusNode: _reasonVisitFocus,
-                  validator: (v) {
-                    if (v == null || v.trim().isEmpty) {
-                      return messageValidatorEmpty;
-                    }
-                    return null;
-                  },
-                ),
-
-                const SizedBox(height: 12),
-                CustomFieldLabelRequired(txtLabel: 'Área de ingreso'),
-                GlowDropdownFormField2<String>(
-                  value: _areaVisit,
-                  focusNode: _areaVisitFocus,
-                  decoration: styleDecoration(),
-                  items: [
-                    DropdownMenuItem(
-                      enabled: false,
-                      value: '0',
-                      child: Text(
-                        'Seleccione una opción',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                    ),
-                    ...areasVisit.map(
-                      (c) => DropdownMenuItem(
-                        value: c['id_area'].toString(),
-                        child: Text(
-                          c['name'],
-                          style: TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    ),
-                  ],
-                  onChanged: (v) {
-                    if (v != null) {
-                      setState(() => _areaVisit = v);
-                    }
-                  },
-                  validator: (v) {
-                    if (v == '0' || v == null || v.trim().isEmpty) {
-                      return messageValidatorEmpty;
-                    }
-                    return null;
-                  },
-                ),
-
-                const SizedBox(height: 12),
-                CustomFieldLabelRequired(txtLabel: 'Personal responsable'),
-                // GlowDropdownFormField2<String>(
-                //   value: _personCharge,
-                //   focusNode: _personChargeFocus,
-                //   decoration: styleDecoration(),
-                //   items: [
-                //     DropdownMenuItem(
-                //       enabled: false,
-                //       value: '0',
-                //       child: Text(
-                //         'Seleccione una opción',
-                //         style: TextStyle(color: Colors.white),
-                //       ),
-                //     ),
-                //     ...staffCharge.map(
-                //       (c) => DropdownMenuItem(
-                //         value: c['id_staff'].toString(),
-                //         child: Text(
-                //           c['name'],
-                //           style: TextStyle(color: Colors.white),
-                //         ),
-                //       ),
-                //     ),
-                //     DropdownMenuItem(
-                //       value: '1000',
-                //       child: Text(
-                //         'Otro',
-                //         style: TextStyle(color: Colors.white),
-                //       ),
-                //     ),
-                //   ],
-                //   onChanged: (v) {
-                //     if (v != null) {
-                //       setState(() => _personCharge = v);
-                //     }
-                //   },
-                //   validator: (v) {
-                //     if (v == '0' || v == null || v.trim().isEmpty) {
-                //       return messageValidatorEmpty;
-                //     }
-                //     return null;
-                //   },
-                // ),
-
-                // if (_personCharge == '1000')...[
-                //   const SizedBox(height: 12),
-                  // CustomFieldLabelRequired(txtLabel: 'Otro personal'),
-                  GlowTextFormField(
-                    controller: _otherCtrl,
-                    focusNode: _otherFocus,
-                    validator: (v) {
-                      if (v == null || v.trim().isEmpty) {
-                        return messageValidatorEmpty;
-                      }
-                      return null;
-                    },
-                  ),
-                // ],
-
-                const SizedBox(height: 12),
-
-                CustomFieldLabelRequired(txtLabel: 'Materiales'),
+                CustomFieldLabelRequired(txtLabel: 'Equipos'),
 
                 ...materialsAdded.asMap().entries.map((entry) {
                   final index = entry.key;
@@ -567,7 +369,7 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
                 }),
 
                 if (materialsAdded.length < materials.length) ...[
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 9),
                   GestureDetector(
                     onTap: () {
                       setState(() {
@@ -586,7 +388,7 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
                           Icon(Icons.add_rounded, color: kTextSecondary, size: 18),
                           SizedBox(width: 2),
                           Text(
-                            "Añadir Material",
+                            "Añadir equipo",
                             style: Theme.of(context).textTheme.titleMedium?.copyWith(
                               color: const Color.fromARGB(255, 137, 172, 255),
                               fontSize: 12,
@@ -597,23 +399,9 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
                       ),
                     ),
                   )
-                ],
+                ],                
 
-                const SizedBox(height: 12),
-                
-                CustomFieldLabelRequired(
-                  txtLabel: 'Observaciones',
-                  isRequired: false,
-                ),
-                GlowTextFormField(
-                  controller: _observationsCtrl,
-                  focusNode: _observationsFocus,
-                  validator: (v) {
-                    return null;
-                  },
-                ),
-
-                const SizedBox(height: 26),
+                const SizedBox(height: 18),
                 
                 CameraImagePicker(
                   minImages: 2,
