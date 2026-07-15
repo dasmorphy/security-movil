@@ -6,6 +6,6 @@ import 'package:zentinel/infraestructure/repositories/logbook_entry_repository_i
 //Este repositorio es inmutable ya que se esta usando Provider
 //Su objetivo es proporcionar a todos los demas providers la informacion necesaria para consultar el datasourceimpl
 final logbookEntryRepositoryProvider = Provider((ref) {
-  final dio = ref.watch(dioProvider);
+  final dio = ref.watch(dioLocalDevProvider);
   return LogbookEntryRepositoryImpl(LogbookEntryImpl(dio: dio));
 });

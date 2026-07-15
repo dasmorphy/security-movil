@@ -28,6 +28,8 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
   String _destiny = '0';
 
   String _unityId = '0';
+  int _orderId = 0;
+  bool _confirmWithoutOrder = false;
   int _minImages = 5;
   double _latitude = -0.1865936;
   double _longitude = -78.5953478;
@@ -61,6 +63,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
   final FocusNode _observationsFocus = FocusNode();
   final FocusNode _categoryEntryFocus = FocusNode();
   final FocusNode _dniFocus = FocusNode();
+  final FocusNode _orderFocus = FocusNode();
 
   bool isPickingImage = false;
 
@@ -76,6 +79,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
         ref.read(getGroupBusinessByIdBusiness.notifier).load(),
         ref.read(getAllUnitiesWeight.notifier).load(),
         ref.read(getAllAuthorized.notifier).load(),
+        ref.read(getPurchaseOrder.notifier).load(),
         ref.read(getAllDestinyIntern.notifier).load(filters: {
           'business': 1
         }),
@@ -223,13 +227,13 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
 
     _minImages = requiredImages;
 
-    if (_selectedImages.length < requiredImages) {
-      setState(() {
-        imagesMinError = true;
-        isLoading = false;
-      });
-      return;
-    }
+    // if (_selectedImages.length < requiredImages) {
+    //   setState(() {
+    //     imagesMinError = true;
+    //     isLoading = false;
+    //   });
+    //   return;
+    // }
 
     if (_selectedImages.length > 10) {
       setState(() {
@@ -270,6 +274,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
       "id_unity": int.parse(_unityId) == 0 ? null : int.parse(_unityId),
       "id_category": int.parse(_categoryEntry),
       "shipping_guide": _guideCtrl.text.trim(),
+      "order_id": _confirmWithoutOrder ? null : _orderId,
       "description": _descCtrl.text.trim(),
       "quantity": int.tryParse(_quantityCtrl.text) == 0 ? null : int.tryParse(_quantityCtrl.text),
       "weight": int.tryParse(_weightCtrl.text),
@@ -362,6 +367,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
     _groupBusiness = '0';
     _unityId = '0';
     _destiny = '0';
+    _orderId = 0;
     _guideCtrl.clear();
     _descCtrl.clear();
     _quantityCtrl.clear();
@@ -390,6 +396,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
 
     final userData = authState.value!;
     final categories = ref.watch(getAllCategories);
+    final purchaseOrders = ref.watch(getPurchaseOrder);
     final authorized = ref.watch(getAllAuthorized);
     final destinyIntern = ref.watch(getAllDestinyIntern);
     final groupBusiness = ref.watch(getGroupBusinessByIdBusiness);
@@ -420,9 +427,15 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
       'Personal externo',
     };
 
+    const hiddenBalancedFuelCategories = {
+      'Balanceado',
+      'Combustibles',
+    };
+
     final hideWeight = hiddenWeightCategories.contains(categoryName);
     final hideEject = hiddenEjectCategories.contains(categoryName);
     final hidePersonal = hiddenPersonalCategories.contains(categoryName);
+    final hideBalancedFuel = hiddenBalancedFuelCategories.contains(categoryName);
 
     InputDecoration styleDecoration() => InputDecoration(
       filled: true,
@@ -439,40 +452,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
     );
 
     if (_isInitializing) {
-      return Center(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Align(
-              alignment: Alignment.center,
-              child: SizedBox(
-                width: 280,
-                child:
-                  Text(
-                    'Cargando formulario...',
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    softWrap: true,
-                  ),
-              ),
-            ),
-            const SizedBox(height: 20),
-            SizedBox(
-              width: 20,
-              height: 20,
-              child: CircularProgressIndicator(
-                color: Colors.white,
-                strokeWidth: 2,
-              ),
-            ),
-          ],
-        ),
-      );
+      return LoadWidget();
     }
 
     return Card(
@@ -639,6 +619,113 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                   },
                 ),
 
+                if (hideBalancedFuel) ...[
+                  const SizedBox(height: 12),
+                  CustomFieldLabelRequired(txtLabel: 'Orden de compra'),
+                  GlowDropdownFormField2<int>(
+                    enabled: !_confirmWithoutOrder,
+                    value: _orderId,
+                    focusNode: _orderFocus,
+                    decoration: styleDecoration(),
+                    items: [
+                      DropdownMenuItem(
+                        enabled: false,
+                        value: 0,
+                        child: Text(
+                          'Seleccione una opción',
+                          style: TextStyle(color: Colors.white)
+                        ),
+                      ),
+                      ...purchaseOrders.map(
+                        (c) => DropdownMenuItem(
+                          value: c.idOrder,
+                          child: Text(
+                            '${c.numberOrder} - ${c.typeOrder}',
+                            style: TextStyle(color: Colors.white)
+                          ),
+                        ),
+                      ),
+                    ],
+                    onChanged: (v) {
+                      if (v != null) {
+                        setState(() => _orderId = v);
+                      }
+                    },
+                    validator: (v) {
+                      if (v == 0 || v == null) {
+                        return messageValidatorEmpty;
+                      }
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 12),
+
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Checkbox(
+                        value: _confirmWithoutOrder,
+                        onChanged: (value) {
+                          setState(() {
+                            _confirmWithoutOrder = value ?? false;
+                            setState(() => _orderId = 0);
+                          });
+                        },
+                        activeColor: const Color.fromARGB(188, 7, 83, 196),
+                        checkColor: Colors.white,
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
+                      ),
+                      const SizedBox(width: 4),
+                      const Expanded(
+                        child: Text(
+                          'Orden de compra sin asignar.',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  if (_confirmWithoutOrder)
+                    Container(
+                      width: double.infinity,
+                      margin: const EdgeInsets.only(top: 15),
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: Colors.amber.withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(
+                          color: Colors.amber.shade700,
+                          width: 1,
+                        ),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Icon(
+                            Icons.warning_amber_rounded,
+                            color: Colors.amber.shade700,
+                            size: 28,
+                          ),
+                          const SizedBox(width: 12),
+                          const Expanded(
+                            child: Text(
+                              'Este registro se guardará sin una orden de compra asignada.',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+
                 const SizedBox(height: 12),
                 CustomFieldLabelRequired(txtLabel: 'Cédula'),
                 GlowTextFormField(
@@ -682,7 +769,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                   ),
                 ],
 
-                if (!hideEject) ...[
+                if (!hideEject && !hideBalancedFuel) ...[
                   const SizedBox(height: 12),
                   CustomFieldLabelRequired(txtLabel: 'Descripción'),
                   GlowTextFormField(
@@ -699,7 +786,11 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
 
                 if (!hideEject && !hidePersonal) ...[
                   const SizedBox(height: 12),
-                  CustomFieldLabelRequired(txtLabel: 'Cantidad'),
+                  CustomFieldLabelRequired(
+                    txtLabel: hideBalancedFuel 
+                    ? 'Cantidad'
+                    : 'Cantidad (Sacos)'
+                  ),
                   GlowTextFormField(
                     controller: _quantityCtrl,
                     focusNode: _quantityFocus,
@@ -714,7 +805,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                   ),
                 ],
                 
-                if (!hideEject && !hidePersonal) ...[
+                if (!hideEject && !hidePersonal && !hideBalancedFuel) ...[
                   const SizedBox(height: 12),
                   CustomFieldLabelRequired(txtLabel: 'Unidad'),
                   GlowDropdownFormField<String>(
@@ -749,7 +840,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                   ),
                 ], 
 
-                if (!hideWeight) ...[
+                if (!hideWeight && !hideBalancedFuel) ...[
                   const SizedBox(height: 12),
                   CustomFieldLabelRequired(txtLabel: 'Peso', isRequired: false),
                   GlowTextFormField(
@@ -764,7 +855,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                   ),
                 ],
                 
-                if (!hideEject && !hidePersonal) ...[
+                if (!hideEject && !hidePersonal && !hideBalancedFuel) ...[
                   const SizedBox(height: 12),
                   CustomFieldLabelRequired(txtLabel: 'Proveedor / Origen'),
                   GlowTextFormField(
@@ -815,39 +906,41 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                   },
                 ),
 
-                const SizedBox(height: 12),
-                CustomFieldLabelRequired(txtLabel: 'Destino Interno'),
-                GlowDropdownFormField2<String>(
-                  value: _destiny,
-                  focusNode: _destinyFocus,
-                  decoration: styleDecoration(),
-                  items: [
-                    DropdownMenuItem(
-                      enabled: false,
-                      value: '0',
-                      child: Text('Seleccione una opción', style: TextStyle(color: Colors.white),),
-                    ),
-                    ...destinyIntern.map(
-                      (c) => DropdownMenuItem(
-                        value: c.name,
-                        child: Text(c.name, style: TextStyle(color: Colors.white),),
+                if (!hideBalancedFuel)...[
+                  const SizedBox(height: 12),
+                  CustomFieldLabelRequired(txtLabel: 'Destino Interno'),
+                  GlowDropdownFormField2<String>(
+                    value: _destiny,
+                    focusNode: _destinyFocus,
+                    decoration: styleDecoration(),
+                    items: [
+                      DropdownMenuItem(
+                        enabled: false,
+                        value: '0',
+                        child: Text('Seleccione una opción', style: TextStyle(color: Colors.white),),
                       ),
-                    ),
-                  ],
-                  onChanged: (v) {
-                    if (v != null) {
-                      setState(() => _destiny = v);
-                    }
-                  },
-                  validator: (v) {
-                    if (v == '0' || v == null || v.trim().isEmpty) {
-                      return messageValidatorEmpty;
-                    }
-                    return null;
-                  },
-                ),
+                      ...destinyIntern.map(
+                        (c) => DropdownMenuItem(
+                          value: c.name,
+                          child: Text(c.name, style: TextStyle(color: Colors.white),),
+                        ),
+                      ),
+                    ],
+                    onChanged: (v) {
+                      if (v != null) {
+                        setState(() => _destiny = v);
+                      }
+                    },
+                    validator: (v) {
+                      if (v == '0' || v == null || v.trim().isEmpty) {
+                        return messageValidatorEmpty;
+                      }
+                      return null;
+                    },
+                  ),
+                ],
 
-                if (!hideEject) ...[
+                if (!hideEject && !hideBalancedFuel) ...[
                   const SizedBox(height: 12),
                   CustomFieldLabelRequired(txtLabel: 'Autorizado por'),
                   GlowDropdownFormField2<String>(
@@ -881,18 +974,20 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                   ),
                 ],
 
-                const SizedBox(height: 12),
-                CustomFieldLabelRequired(
-                  txtLabel: 'Observaciones',
-                  isRequired: false,
-                ),
-                GlowTextFormField(
-                  controller: _observationsCtrl,
-                  focusNode: _observationsFocus,
-                  validator: (v) {
-                    return null;
-                  },
-                ),
+                if (!hideBalancedFuel) ...[
+                  const SizedBox(height: 12),
+                  CustomFieldLabelRequired(
+                    txtLabel: 'Observaciones',
+                    isRequired: false,
+                  ),
+                  GlowTextFormField(
+                    controller: _observationsCtrl,
+                    focusNode: _observationsFocus,
+                    validator: (v) {
+                      return null;
+                    },
+                  ),
+                ],
 
                 const SizedBox(height: 20),
 

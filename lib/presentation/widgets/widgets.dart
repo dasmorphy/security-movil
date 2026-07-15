@@ -88,3 +88,4 @@ export 'package:zentinel/presentation/widgets/purchase_order/item_detail_purchas
 export 'package:zentinel/presentation/widgets/purchase_order/puchase_order_header_card.dart';
 export 'package:zentinel/presentation/widgets/forms/register_quantity_form.dart';
 export 'package:zentinel/presentation/widgets/blacklist_driver/blacklist_bottom_sheet.dart';
+export 'package:zentinel/presentation/widgets/shared/load_widget.dart';
