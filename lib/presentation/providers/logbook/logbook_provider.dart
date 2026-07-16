@@ -235,8 +235,6 @@ final getAllDestinyIntern = StateNotifierProvider<CatalogNotifierWithCache<Desti
     );
   }
 
-  final userData = authState.value!;
-
   return CatalogNotifierWithCache<DestinyIntern>(
     fetch: (filters) async {
       final mergedFilters = {

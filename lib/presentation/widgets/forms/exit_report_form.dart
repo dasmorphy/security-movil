@@ -189,7 +189,8 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
       _guideCtrl.text = data.shippingGuide ?? '';
       _unityId = data.unityId?.toString() ?? '0';
       _truckLicenseCtrl.text = data.truckLicense;
-      _nameDriverCtrl.text = data.nameDriver ?? '';
+      _nameDriverCtrl.text = data.nameDriver;
+      _dniCtrl.text = data.dniDriver ?? '';
     });
   }
 
@@ -232,13 +233,13 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
 
     _minImages = requiredImages;
 
-    if (_selectedImages.length < requiredImages) {
-      setState(() {
-        imagesMinError = true;
-        isLoading = false;
-      });
-      return;
-    }
+    // if (_selectedImages.length < requiredImages) {
+    //   setState(() {
+    //     imagesMinError = true;
+    //     isLoading = false;
+    //   });
+    //   return;
+    // }
 
     if (_selectedImages.length > 10) {
       setState(() {

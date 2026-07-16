@@ -392,6 +392,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
           content: Text('Sesión no válida. Vuelva a iniciar sesión'),
         ),
       );
+      // return const SizedBox.shrink(); pendiente probar para no crashear la app
     }
 
     final userData = authState.value!;
@@ -652,7 +653,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                       }
                     },
                     validator: (v) {
-                      if (v == 0 || v == null) {
+                      if (!_confirmWithoutOrder && (v == 0 || v == null)) {
                         return messageValidatorEmpty;
                       }
                       return null;
@@ -787,7 +788,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                 if (!hideEject && !hidePersonal) ...[
                   const SizedBox(height: 12),
                   CustomFieldLabelRequired(
-                    txtLabel: hideBalancedFuel 
+                    txtLabel: !hideBalancedFuel
                     ? 'Cantidad'
                     : 'Cantidad (Sacos)'
                   ),
