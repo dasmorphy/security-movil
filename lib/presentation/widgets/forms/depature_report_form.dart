@@ -680,7 +680,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                       const SizedBox(width: 4),
                       const Expanded(
                         child: Text(
-                          'Orden de compra sin asignar.',
+                          'Sin orden de compra',
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 14,
