@@ -2,6 +2,7 @@ import 'package:zentinel/domain/entities/all_dispatch.dart';
 import 'package:zentinel/domain/entities/entry_access_control.dart';
 import 'package:zentinel/presentation/screens/screens.dart';
 import 'package:go_router/go_router.dart';
+import 'package:zentinel/presentation/widgets/widgets.dart';
 import 'package:zentinel/service/navigation_service.dart';
 
 final appRouter = GoRouter(
@@ -147,7 +148,12 @@ final appRouter = GoRouter(
         GoRoute(
           path: 'new-task-technical',
           name: NewTaskScreen.name,
-          builder: (context, state) => const NewTaskScreen()
+          builder: (context, state) {
+            final taskSelected = state.extra as TechTaskHeader;
+            return NewTaskScreen(
+              taskHeader: taskSelected,
+            );
+          },
         ),
       ]
     ),

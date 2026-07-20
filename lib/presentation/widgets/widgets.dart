@@ -81,3 +81,4 @@ export 'package:zentinel/presentation/widgets/modals/employee_movement_offline.d
 export 'package:zentinel/presentation/widgets/sections/services_technical.dart';
 export 'package:zentinel/presentation/widgets/forms/technical/technical_record.dart';
 export 'package:zentinel/presentation/widgets/modals/task_detail_modal.dart';
+export 'package:zentinel/presentation/widgets/technical/record_technical_header.dart';

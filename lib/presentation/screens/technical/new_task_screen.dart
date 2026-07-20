@@ -5,9 +5,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class NewTaskScreen extends ConsumerStatefulWidget  {
   static const name = 'new-task-screen';
+  final TechTaskHeader taskHeader;
+
 
   
-  const NewTaskScreen({super.key});
+  const NewTaskScreen({super.key, required this.taskHeader});
 
   @override
   ConsumerState<NewTaskScreen> createState() => _NewTaskScreenState();
@@ -34,6 +36,7 @@ class _NewTaskScreenState extends ConsumerState<NewTaskScreen> {
         // bottom: false,
         child: 
           TechnicalRecord(
+            taskData: widget.taskHeader,
             onSubmit: (data) async {
               return await ref
                 .read(saveEmployeeInternProvider.notifier)

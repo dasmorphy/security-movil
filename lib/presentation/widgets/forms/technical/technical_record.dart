@@ -10,7 +10,9 @@ import 'package:zentinel/service/pending_request_service.dart';
 
 class TechnicalRecord extends ConsumerStatefulWidget {
   final Future<ApiResponse> Function(Map<String, dynamic>) onSubmit;
-  const TechnicalRecord({super.key, required this.onSubmit});
+  final TechTaskHeader taskData;
+
+  const TechnicalRecord({super.key, required this.taskData, required this.onSubmit});
 
   @override
   ConsumerState<TechnicalRecord> createState() => _TechnicalRecordState();
@@ -296,6 +298,8 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
+                RecordTechnicalHeader(taskData: widget.taskData,),
+                const SizedBox(height: 10,),
                 CommentaryReception(
                   controller: _observationsCtrl,
                   focusNode: _observationsFocus,

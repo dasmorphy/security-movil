@@ -74,7 +74,14 @@ class TaskDetailModal extends ConsumerWidget {
                   ),
                 ),
                 onPressed: () async {
-                    context.push('/new-task-technical');
+                    context.push('/new-task-technical', 
+                      extra: TechTaskHeader(
+                        client: item.client, 
+                        codeTask: item.code, 
+                        location: item.location,
+                        createdBy: item.createdBy,
+                      )
+                    );
                 },
                 child: const Text(
                   'Registro',
