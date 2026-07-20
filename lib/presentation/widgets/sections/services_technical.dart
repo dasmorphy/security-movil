@@ -35,26 +35,6 @@ class _ServicesTechnicalState extends ConsumerState<ServicesTechnical> {
 
     final userData = authState.value!;
 
-    final hasDispatchOptions =
-      userData.hasPermission(Permissions.nuevoDespacho) ||
-      userData.hasPermission(Permissions.nuevoProductoInterno);
-
-    final hasAccessOptions = userData.hasPermission(Permissions.verIngresosBiomar);
-
-    final hasAnyOption = hasDispatchOptions || hasAccessOptions;
-
-    if (!hasAnyOption) {
-      return const Center(
-        child: Text(
-          'No tiene permisos para acceder a ningún módulo',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-          ),
-        ),
-      );
-    }
-
     return Padding(
       padding: const EdgeInsetsGeometry.only(left: 15, right: 15, bottom: 20, top: 0),
       child: Column(
