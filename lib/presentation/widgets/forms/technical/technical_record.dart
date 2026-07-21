@@ -45,9 +45,6 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
   final FocusNode _materialEntryFocus = FocusNode();
   final FocusNode _observationsFocus = FocusNode();
   final FocusNode _personChargeFocus = FocusNode();
-  final FocusNode _areaVisitFocus = FocusNode();
-  final FocusNode _typeAccessFocus = FocusNode();
-  final FocusNode _otherFocus = FocusNode();
 
   @override
   void initState() {
@@ -130,88 +127,75 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
     // Construir los datos del formulario
     final data = {
       "external_transaction_id": Uuid().v4(),
-      "area_visit": int.parse(_areaVisit),
-      "dni": _dniCtrl.text.trim(),
-      "quantity": int.tryParse(_quantityCtrl.text) ?? 0,
-      "names_visit": _nameVisitCtrl.text.trim(),
       "observations": _observationsCtrl.text.trim(),
-      // "person_charge": _personCharge != '1000'
-      //   ? int.parse(_personCharge)
-      //   : null,
-      "other_staff": _otherCtrl.text.trim(),
-      "reason_visit": _reasonVisitCtrl.text.trim(),
-      "type_access": _typeAccess,
       "user": userData.user,
       "material_entry": materialsAdded.map((p) => {
-        "id_material": p['id_material'] != '1000'
-          ? int.parse(p['id_material'])
-          : null,
+        "id_material": p['id_material'],
         "quantity": p['quantity'],
-        "other_material": p['other_material'] != ''
-          ? p['other_material']
-          : null,
       }).toList(),
       "images": _selectedImages
         .whereType<Uint8List>()
         .toList(), // Lista de Uint8List directo, sin base64
     };
 
+    print(data);
+
     // Verificar conexión a internet
-    final internetAvailable = await hasInternet();
+    // final internetAvailable = await hasInternet();
 
-    if (!internetAvailable) {
-      // 🔴 SIN INTERNET: Guardar localmente
-      print('❌ Sin conexión, guardando localmente...');
-      data['created_at'] = DateTime.now().toString();
-      await savePendingBiomar(data, 'entry');
+    // if (!internetAvailable) {
+    //   // 🔴 SIN INTERNET: Guardar localmente
+    //   print('❌ Sin conexión, guardando localmente...');
+    //   data['created_at'] = DateTime.now().toString();
+    //   await savePendingBiomar(data, 'entry');
 
-      if (mounted) {
-        _clearCntrl();
-        context.pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            duration: Duration(seconds: 6),
-            content: Text(
-              '📱 Sin conexión. Tu información se guardará localmente y se enviará automáticamente cuando recuperes conexión.',
-              style: TextStyle(color: Colors.white),
-            ),
-            backgroundColor: Color.fromARGB(255, 255, 152, 0),
-          ),
-        );
-      }
-      setState(() => isLoading = false);
-      return;
-    }
+    //   if (mounted) {
+    //     _clearCntrl();
+    //     context.pop();
+    //     ScaffoldMessenger.of(context).showSnackBar(
+    //       const SnackBar(
+    //         duration: Duration(seconds: 6),
+    //         content: Text(
+    //           '📱 Sin conexión. Tu información se guardará localmente y se enviará automáticamente cuando recuperes conexión.',
+    //           style: TextStyle(color: Colors.white),
+    //         ),
+    //         backgroundColor: Color.fromARGB(255, 255, 152, 0),
+    //       ),
+    //     );
+    //   }
+    //   setState(() => isLoading = false);
+    //   return;
+    // }
 
-    GlobalLoadingBottomSheet.show(
-      status: OverlayStatus.loading, 
-      message: "Guardando ingreso..."
-    );
-    final response = await widget.onSubmit.call(data);
+    // GlobalLoadingBottomSheet.show(
+    //   status: OverlayStatus.loading, 
+    //   message: "Guardando ingreso..."
+    // );
+    // final response = await widget.onSubmit.call(data);
 
-    if (!mounted) return;
+    // if (!mounted) return;
 
-    setState(() => isLoading = false);
+    // setState(() => isLoading = false);
 
-    if (Navigator.canPop(context)) {
-      context.pop();
-    }
+    // if (Navigator.canPop(context)) {
+    //   context.pop();
+    // }
 
-    if (response.success) {
-      GlobalLoadingBottomSheet.show(
-        status: OverlayStatus.success, 
-        message: "Ingreso guardado exitosamente", 
-        autoDismiss: const Duration(seconds: 2)
-      );
-      ref.read(getHistoryEntryAccess.notifier).load();
-    } else {
-      await savePendingBiomar(data, 'entry');
-      GlobalLoadingBottomSheet.show(
-        status: OverlayStatus.error,
-        message: 'Error: ${response.message ?? 'Error al guardar el ingreso'}',
-        autoDismiss: const Duration(seconds: 3),
-      );
-    }
+    // if (response.success) {
+    //   GlobalLoadingBottomSheet.show(
+    //     status: OverlayStatus.success, 
+    //     message: "Ingreso guardado exitosamente", 
+    //     autoDismiss: const Duration(seconds: 2)
+    //   );
+    //   ref.read(getHistoryEntryAccess.notifier).load();
+    // } else {
+    //   await savePendingBiomar(data, 'entry');
+    //   GlobalLoadingBottomSheet.show(
+    //     status: OverlayStatus.error,
+    //     message: 'Error: ${response.message ?? 'Error al guardar el ingreso'}',
+    //     autoDismiss: const Duration(seconds: 3),
+    //   );
+    // }
 
     // if (!success) {
     //   await savePendingRequest(data, 'logbook_entry');
@@ -259,10 +243,8 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
       );
     }
 
-    final areasVisit = ref.watch(getAreasVisit);
     final materials = ref.watch(getMaterials);
     // final staffCharge = ref.watch(getStaffCharge);
-    final theme = Theme.of(context);
     final messageValidatorEmpty = 'Este campo es obligatorio';
     final fieldFill = const Color.fromARGB(255, 20, 21, 23);
     final borderRadius = BorderRadius.circular(8.0);
@@ -319,23 +301,10 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
                   final index = entry.key;
                   final item = entry.value;
 
-                  final selectedIds = materialsAdded
-                      .asMap()
-                      .entries
-                      .where((e) => e.key != index) // excluir este item
-                      .map((e) => e.value['id_material'])
-                      .where((id) => id != '0')
-                      .toList();
-
-                  final availableMaterials = materials
-                      .where((m) => !selectedIds.contains(m['id_material'].toString()))
-                      .toList();
-
-                  return MaterialEntryItem(
+                  return TeamsItem(
                     selectedMaterial: item['id_material'],
                     quantity: item['quantity'],
                     otherMaterial: item['other_material'],
-                    materials: availableMaterials,
 
                     onDeleteMaterial: materialsAdded.length > 1
                           ? () {

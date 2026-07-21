@@ -39,8 +39,8 @@ class _NewTaskScreenState extends ConsumerState<NewTaskScreen> {
             taskData: widget.taskHeader,
             onSubmit: (data) async {
               return await ref
-                .read(saveEmployeeInternProvider.notifier)
-                .saveEmployeeMovement(data);
+                .read(saveTechnicalRecordProvider.notifier)
+                .saveTechnicalRecord(data);
             },
           ),
             

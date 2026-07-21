@@ -31,24 +31,23 @@ class TechnicalImpl extends TechnicalDatasource {
   Future<ApiResponse<dynamic>> saveTechnicalRecord(Map<String, dynamic> data) async {
     try {
       final images = (data['images'] as List?)?.whereType<Uint8List>().toList() ?? [];
-      final movementData = Map<String, dynamic>.from(data);
-      movementData.remove('images');
+      final techRecordData = Map<String, dynamic>.from(data);
+      techRecordData.remove('images');
 
-      movementData['channel'] = 'ZENTINEL';
-      // movementData['external_transaction_id'] = "3067dc66-ac5e-49d7-8ef9-eb62c51d4bc6";
+      techRecordData['channel'] = 'ZENTINEL';
 
-      final movementJson = jsonEncode(movementData);
-      final movementBytes = utf8.encode(movementJson);
+      final techRecordJson = jsonEncode(techRecordData);
+      final techRecordBytes = utf8.encode(techRecordJson);
 
       final formData = FormData();
 
       // Agregar logbook_out
       formData.files.add(
         MapEntry(
-          'employee_movement',
+          'technical_data',
           MultipartFile.fromBytes(
-            movementBytes,
-            filename: 'employee_movement.json',
+            techRecordBytes,
+            filename: 'technical_data.json',
             contentType: MediaType('application', 'json'),
           ),
         ),
@@ -71,7 +70,7 @@ class TechnicalImpl extends TechnicalDatasource {
       }
 
       final response = await dio.post(
-        '/rest/zent-logbook-api/v1.0/employee-movement',
+        '/rest/technical-control-api/v1.0/technical_record',
         data: formData,
         options: onlyError(),
       );
