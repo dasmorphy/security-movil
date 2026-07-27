@@ -8,6 +8,7 @@ import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/domain/datasources/technical_datasource.dart';
 import 'package:zentinel/domain/entities/api_response.dart';
 import 'package:zentinel/domain/entities/task_technical.dart';
+import 'package:zentinel/domain/entities/tech_material.dart';
 
 class TechnicalImpl extends TechnicalDatasource {
   final Dio dio;
@@ -100,6 +101,18 @@ class TechnicalImpl extends TechnicalDatasource {
         message: messageError,
       );
     }
+  }
+
+  @override
+  Future<List<TechMaterial>> getTechMeterial() async {
+    final response = await dio.get(
+      '/rest/technical-control-api/v1.0/tech-materials',
+      options: Options(
+        headers: {'externalTransactionId': uuid, 'channel': 'ZENTINEL'},
+      ),
+    );
+    final List taskJson = response.data['data'];
+    return taskJson.map((json) => TechMaterial.fromJson(json)).toList();
   }
 
 }

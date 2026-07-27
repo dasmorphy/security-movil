@@ -23,18 +23,13 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
   bool isLoading = false;
   bool imagesMinError = false;
   bool imagesMaxError = false;
+  bool _isInitializing = true;
 
-  String _areaVisit = '0';
-  String _typeAccess = '0';
-  String _personCharge = '0';
-
-  final _dniCtrl = TextEditingController();
   final _quantityCtrl = TextEditingController();
   final _providerCtrl = TextEditingController();
   final _observationsCtrl = TextEditingController();
   final _nameVisitCtrl = TextEditingController();
   final _reasonVisitCtrl = TextEditingController();
-  final _otherCtrl = TextEditingController();
 
   List<Uint8List?> _selectedImages = [];
 
@@ -49,9 +44,19 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
   @override
   void initState() {
     super.initState();
-    ref.read(getMaterials.notifier).load();
-    ref.read(getAreasVisit.notifier).load();
-    // ref.read(getStaffCharge.notifier).load();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await Future.wait([
+        ref.read(getTechMaterial.notifier).load()
+      ]);
+
+      if (!mounted) return;
+
+      setState(() {
+        _isInitializing = false;
+      });
+
+    });
 
   }
 
@@ -127,10 +132,10 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
     // Construir los datos del formulario
     final data = {
       "external_transaction_id": Uuid().v4(),
-      "observations": _observationsCtrl.text.trim(),
+      "resume": _observationsCtrl.text.trim(),
       "user": userData.user,
-      "material_entry": materialsAdded.map((p) => {
-        "id_material": p['id_material'],
+      "materials": materialsAdded.map((p) => {
+        "material": p['name'],
         "quantity": p['quantity'],
       }).toList(),
       "images": _selectedImages
@@ -167,35 +172,35 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
     //   return;
     // }
 
-    // GlobalLoadingBottomSheet.show(
-    //   status: OverlayStatus.loading, 
-    //   message: "Guardando ingreso..."
-    // );
-    // final response = await widget.onSubmit.call(data);
+    GlobalLoadingBottomSheet.show(
+      status: OverlayStatus.loading, 
+      message: "Guardando registro..."
+    );
+    final response = await widget.onSubmit.call(data);
 
-    // if (!mounted) return;
+    if (!mounted) return;
 
-    // setState(() => isLoading = false);
+    setState(() => isLoading = false);
 
-    // if (Navigator.canPop(context)) {
-    //   context.pop();
-    // }
+    if (Navigator.canPop(context)) {
+      context.pop();
+    }
 
-    // if (response.success) {
-    //   GlobalLoadingBottomSheet.show(
-    //     status: OverlayStatus.success, 
-    //     message: "Ingreso guardado exitosamente", 
-    //     autoDismiss: const Duration(seconds: 2)
-    //   );
-    //   ref.read(getHistoryEntryAccess.notifier).load();
-    // } else {
-    //   await savePendingBiomar(data, 'entry');
-    //   GlobalLoadingBottomSheet.show(
-    //     status: OverlayStatus.error,
-    //     message: 'Error: ${response.message ?? 'Error al guardar el ingreso'}',
-    //     autoDismiss: const Duration(seconds: 3),
-    //   );
-    // }
+    if (response.success) {
+      GlobalLoadingBottomSheet.show(
+        status: OverlayStatus.success, 
+        message: "Registro guardado exitosamente", 
+        autoDismiss: const Duration(seconds: 2)
+      );
+      ref.read(getHistoryEntryAccess.notifier).load();
+    } else {
+      // await savePendingBiomar(data, 'entry');
+      GlobalLoadingBottomSheet.show(
+        status: OverlayStatus.error,
+        message: 'Error: ${response.message ?? 'Error al guardar el registro'}',
+        autoDismiss: const Duration(seconds: 3),
+      );
+    }
 
     // if (!success) {
     //   await savePendingRequest(data, 'logbook_entry');
@@ -225,9 +230,10 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
   }
 
   List<Map<String, dynamic>> materialsAdded = [{
-    'id_material': '0',
+    'uid': const Uuid().v4(),
+    'id_equipment': '0',
+    'name': '',
     'quantity': 1,
-    'other_material': ''
   }];
 
   @override
@@ -243,7 +249,7 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
       );
     }
 
-    final materials = ref.watch(getMaterials);
+    final materials = ref.watch(getTechMaterial);
     // final staffCharge = ref.watch(getStaffCharge);
     final messageValidatorEmpty = 'Este campo es obligatorio';
     final fieldFill = const Color.fromARGB(255, 20, 21, 23);
@@ -262,6 +268,38 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
         borderSide: BorderSide(color: Color.fromARGB(190, 58, 199, 199)),
       ),
     );
+
+    if (_isInitializing) {
+      return Center(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Align(
+              alignment: Alignment.center,
+              child: SizedBox(
+                width: 280,
+                child:
+                  Text(
+                    'Cargando formulario...',
+                    textAlign: TextAlign.center,
+                    softWrap: true,
+                  ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                color: Colors.white,
+                strokeWidth: 2,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
 
     return Card(
       color: const Color.fromARGB(255, 23, 24, 28),
@@ -295,16 +333,16 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
 
                 const SizedBox(height: 12),
 
-                CustomFieldLabelRequired(txtLabel: 'Equipos'),
+                CustomFieldLabelRequired(txtLabel: 'Equipos', isRequired: false,),
 
                 ...materialsAdded.asMap().entries.map((entry) {
                   final index = entry.key;
                   final item = entry.value;
 
                   return TeamsItem(
-                    selectedMaterial: item['id_material'],
+                    key: ValueKey(item['uid']),
+                    selectedMaterial: item['id_equipment'],
                     quantity: item['quantity'],
-                    otherMaterial: item['other_material'],
 
                     onDeleteMaterial: materialsAdded.length > 1
                           ? () {
@@ -315,9 +353,12 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
                           : null,
 
                     onMaterialChanged: (v) {
-                      setState(() {
-                        materialsAdded[index]['id_material'] = v;
-                      });
+                      final material = materials.firstWhere(
+                      (e) => e.idEquipment.toString() == v,
+                    );
+
+                      materialsAdded[index]['id_equipment'] = v;
+                      materialsAdded[index]['name'] = material.product;
                     },
 
                     onQuantityChanged: (v) {
@@ -326,17 +367,13 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
                       });
                     },
 
-                    onOtherMaterialChanged: (v) {
-                      setState(() {
-                        materialsAdded[index]['other_material'] = v;
-                      });
-                    },
-
                     onRemove: () {
                       setState(() {
                         materialsAdded.removeAt(index);
                       });
                     },
+
+                    materials: materials,
 
                   );
                 }),
@@ -347,7 +384,9 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
                     onTap: () {
                       setState(() {
                         materialsAdded.add({
-                          'id_material': '0',
+                          'uid': const Uuid().v4(),
+                          'id_equipment': '0',
+                          'name': '',
                           'quantity': 1,
                         });
                       });

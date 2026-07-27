@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zentinel/domain/entities/api_response.dart';
 import 'package:zentinel/domain/entities/task_technical.dart';
+import 'package:zentinel/domain/entities/tech_material.dart';
 import 'package:zentinel/domain/repositories/technical_repository.dart';
 import 'package:zentinel/presentation/providers/catalog_notifier.dart';
 import 'package:zentinel/presentation/providers/technical/technical_repository_provider.dart';
@@ -11,6 +12,14 @@ final getTaskTechnical =
 
   return CatalogNotifier<TaskTechnical>(
     (_) => repo.getTaskTechnical(),
+  );
+});
+
+final getTechMaterial =
+    StateNotifierProvider<CatalogNotifier<TechMaterial>, List<TechMaterial>>((ref) {
+  final repo = ref.watch(technicalRepositoryProvider);
+  return CatalogNotifier<TechMaterial>(
+  (_) => repo.getTechMeterial(),
   );
 });
 

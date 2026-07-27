@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:zentinel/config/constants/permissions.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/domain/entities/task_technical.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
-import 'package:zentinel/presentation/screens/employee/new_employee_movement_screen.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
 class TaskDetailModal extends ConsumerWidget {

@@ -158,12 +158,12 @@ class _TaskListScreenState
                                     Chip(
                                       side: BorderSide.none,
                                       label: Text(item.status),
-                                      backgroundColor: getStatusColorMovements(
+                                      backgroundColor: getStatusColorTaskTech(
                                         item.status,
                                       ),
                                       padding: EdgeInsets.zero,
                                       labelStyle: TextStyle(
-                                        color: getColorTxtMovements(
+                                        color: getColorTxtTaskTech(
                                           item.status,
                                         ),
                                         fontSize: 12,

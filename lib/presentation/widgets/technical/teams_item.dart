@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/domain/entities/tech_material.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
 class TeamsItem extends StatefulWidget {
   final String? selectedMaterial;
   final int? quantity;
-  final String? otherMaterial;
+  final List<TechMaterial> materials;
+
 
   final ValueChanged<String>? onMaterialChanged;
   final ValueChanged<int>? onQuantityChanged;
-  final ValueChanged<String>? onOtherMaterialChanged;
   final VoidCallback? onDeleteMaterial;
 
 
@@ -18,12 +19,11 @@ class TeamsItem extends StatefulWidget {
     super.key,
     this.selectedMaterial,
     this.quantity,
-    this.otherMaterial,
     this.onMaterialChanged,
     this.onQuantityChanged, 
-    this.onOtherMaterialChanged, 
     this.onRemove, 
     this.onDeleteMaterial,
+    required this.materials,
   });
 
   @override
@@ -34,33 +34,31 @@ class _TeamsItemState extends State<TeamsItem> {
   late TextEditingController _qtyCtrl;
   late FocusNode _qtyFocus;
 
-  late TextEditingController _otherCtrl;
-  late FocusNode _otherFocus;
+  late FocusNode _nameTeamFocus;
+  late TextEditingController _nameTeamCtrl;
 
-  final FocusNode _nameTeamFocus = FocusNode();
-  final _nameTeamCtrl = TextEditingController();
+  String _materialValue = '0';
   
 
   @override
   void initState() {
     super.initState();
-
-    final _materialValue = widget.selectedMaterial ?? '';
+    _materialValue = widget.selectedMaterial ?? '0';
 
     _qtyCtrl = TextEditingController(text: widget.quantity?.toString() ?? '');
-    _otherCtrl = TextEditingController(text: widget.otherMaterial?.toString() ?? '');
+    _nameTeamCtrl = TextEditingController(text: widget.selectedMaterial?.toString() ?? '');
 
     _qtyFocus = FocusNode();
-    _otherFocus = FocusNode();
+    _nameTeamFocus = FocusNode();
   }
 
   @override
   void dispose() {
     _qtyCtrl.dispose();
     _qtyFocus.dispose();
-
-    _otherCtrl.dispose();
-    _otherFocus.dispose();
+    
+    _nameTeamCtrl.dispose();
+    _nameTeamFocus.dispose();
 
     super.dispose();
   }
@@ -84,13 +82,81 @@ class _TeamsItemState extends State<TeamsItem> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // const SizedBox(height: 12),
+              // CustomFieldLabelRequired(txtLabel: 'Nombre'),
+              Row(
+                children: [
+                  const SizedBox(height: 12),
+                  CustomFieldLabelRequired(txtLabel: 'Nombre'),
+                  const Spacer(),
+                  if (widget.onDeleteMaterial != null)
+                    GestureDetector(
+                      onTap: widget.onRemove,
+                      child: const Icon(
+                        Icons.close_rounded,
+                        size: 16,
+                        color: kTextHint,
+                      ),
+                    ),
+                ],
+              ),
+
               const SizedBox(height: 12),
-              CustomFieldLabelRequired(txtLabel: 'Nombre'),
-              GlowTextFormField(
-                controller: _nameTeamCtrl,
-                focusNode: _nameTeamFocus,
+
+              GlowDropdownFormField2<String>(
+                value: _materialValue,
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: const Color.fromARGB(255, 25, 25, 30),
+                  contentPadding: const EdgeInsets.symmetric(
+                    vertical: 14,
+                    horizontal: 12,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(
+                      color: Color.fromARGB(255, 75, 83, 83),
+                    ),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                    borderSide: const BorderSide(
+                      color: Color.fromARGB(190, 58, 199, 199),
+                      width: 1.5,
+                    ),
+                  ),
+                ),
+                items: [
+                  const DropdownMenuItem(
+                    enabled: false,
+                    value: '0',
+                    child: Text(
+                      'Seleccione una opción',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+        
+                  ...widget.materials.map(
+                      (c) => DropdownMenuItem(
+                        value: c.idEquipment.toString(),
+                        child: Text(
+                          c.product,
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    ),
+                ],
+        
+                onChanged: (v) {
+                  if (v != null) {
+                    setState(() => _materialValue = v);
+        
+                    widget.onMaterialChanged?.call(v);
+                  }
+                },
+        
                 validator: (v) {
-                  if (v == null || v.trim().isEmpty) {
+                  if (v == '0' || v == null || v.trim().isEmpty) {
                     return messageValidatorEmpty;
                   }
                   return null;

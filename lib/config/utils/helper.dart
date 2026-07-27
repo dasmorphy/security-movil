@@ -4,12 +4,10 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:http_parser/http_parser.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:zentinel/domain/entities/unity_weight.dart';
 import 'package:intl/intl.dart';
 import 'package:zentinel/domain/entities/user_session.dart';
-import 'package:path/path.dart' as p;
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -390,4 +388,30 @@ Color getStatusColorMovements(String status) {
 
 String formatDateToApi(DateTime date) {
   return DateFormat('yyyy-MM-dd HH:mm:ss').format(date);
+}
+
+Color getColorTxtTaskTech(String status) {
+  switch (status.toLowerCase()) {
+    case 'finalizado':
+      return const Color.fromARGB(255, 246, 105, 105);
+    case 'en ejecución':
+      return const Color.fromARGB(255, 137, 172, 255);
+    case 'aprobado':
+      return const Color.fromARGB(255, 105, 246, 184);
+    default:
+      return const Color.fromARGB(255, 255, 255, 255);
+  }
+}
+
+Color getStatusColorTaskTech(String status) {
+  switch (status.toLowerCase()) {
+    case 'finalizado':
+      return const Color.fromARGB(255, 54, 18, 18);
+    case 'en ejecución':
+      return const Color.fromARGB(255, 34, 44, 63);
+    case 'aprobado':
+      return const Color.fromARGB(255, 18, 54, 42);
+    default:
+      return const Color.fromARGB(255, 82, 84, 83);
+  }
 }
