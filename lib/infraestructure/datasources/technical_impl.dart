@@ -7,6 +7,7 @@ import 'package:uuid/uuid.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/domain/datasources/technical_datasource.dart';
 import 'package:zentinel/domain/entities/api_response.dart';
+import 'package:zentinel/domain/entities/auditing_section.dart';
 import 'package:zentinel/domain/entities/task_technical.dart';
 import 'package:zentinel/domain/entities/tech_material.dart';
 
@@ -113,6 +114,18 @@ class TechnicalImpl extends TechnicalDatasource {
     );
     final List taskJson = response.data['data'];
     return taskJson.map((json) => TechMaterial.fromJson(json)).toList();
+  }
+
+  @override
+  Future<List<AuditingSection>> getAuditingSection() async {
+    final response = await dio.get(
+      '/rest/technical-control-api/v1.0/auditing-sections',
+      options: Options(
+        headers: {'externalTransactionId': uuid, 'channel': 'ZENTINEL'},
+      ),
+    );
+    final List sectionJson = response.data['data'];
+    return sectionJson.map((json) => AuditingSection.fromJson(json)).toList();
   }
 
 }

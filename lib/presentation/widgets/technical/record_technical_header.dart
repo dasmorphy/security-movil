@@ -99,7 +99,7 @@ class RecordTechnicalHeader extends StatelessWidget {
               const SizedBox(width: 16),
               Expanded(
                 child: _InfoColumn(
-                  label: 'REALIZADA POR',
+                  label: 'RESPONSABLE',
                   value: taskData.createdBy,
                   icon: Icons.person,
                 ),
@@ -136,13 +136,17 @@ class _InfoColumn extends StatelessWidget {
               size: 14,
             ),
             const SizedBox(width: 6),
-            Text(
-              label,
-              style: const TextStyle(
-                color: Color.fromARGB(255, 150, 150, 150),
-                fontSize: 10,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 0.5,
+            Flexible(
+              child: Text(
+                label,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  color: Color.fromARGB(255, 150, 150, 150),
+                  fontSize: 10,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.5,
+                ),
               ),
             ),
           ],

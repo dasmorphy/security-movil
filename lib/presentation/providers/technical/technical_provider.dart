@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zentinel/domain/entities/api_response.dart';
+import 'package:zentinel/domain/entities/auditing_section.dart';
 import 'package:zentinel/domain/entities/task_technical.dart';
 import 'package:zentinel/domain/entities/tech_material.dart';
 import 'package:zentinel/domain/repositories/technical_repository.dart';
@@ -12,6 +13,15 @@ final getTaskTechnical =
 
   return CatalogNotifier<TaskTechnical>(
     (_) => repo.getTaskTechnical(),
+  );
+});
+
+final getAuditingSections =
+    StateNotifierProvider<CatalogNotifier<AuditingSection>, List<AuditingSection>>((ref) {
+  final repo = ref.watch(technicalRepositoryProvider);
+
+  return CatalogNotifier<AuditingSection>(
+    (_) => repo.getAuditingSection(),
   );
 });
 

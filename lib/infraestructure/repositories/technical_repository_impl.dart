@@ -1,5 +1,6 @@
 import 'package:zentinel/domain/datasources/technical_datasource.dart';
 import 'package:zentinel/domain/entities/api_response.dart';
+import 'package:zentinel/domain/entities/auditing_section.dart';
 import 'package:zentinel/domain/entities/task_technical.dart';
 import 'package:zentinel/domain/entities/tech_material.dart';
 import 'package:zentinel/domain/repositories/technical_repository.dart';
@@ -22,6 +23,11 @@ class TechnicalRepositoryImpl extends TechnicalRepository {
   @override
   Future<List<TechMaterial>> getTechMeterial() {
     return datasource.getTechMeterial();
+  }
+
+  @override
+  Future<List<AuditingSection>> getAuditingSection() {
+    return datasource.getAuditingSection();
   }
 
 }

@@ -239,6 +239,7 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(userSessionProvider);
+    final theme = Theme.of(context);
 
     //Usuario no cargado o sesión inválida
     if (!authState.hasValue || authState.value == null) {
@@ -283,6 +284,11 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
                   Text(
                     'Cargando formulario...',
                     textAlign: TextAlign.center,
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                     softWrap: true,
                   ),
               ),

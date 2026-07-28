@@ -61,31 +61,60 @@ class TaskDetailModal extends ConsumerWidget {
 
             const SizedBox(height: 20),
 
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color.fromARGB(188, 25, 156, 156),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    style: OutlinedButton.styleFrom(
+                      side: const BorderSide(color: Color.fromARGB(188, 25, 156, 156)),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: () async {
+                      context.push('/auditing-record',
+                        extra: TechTaskHeader(
+                          client: item.client,
+                          codeTask: item.code,
+                          location: item.location,
+                          createdBy: item.createdBy,
+                        )
+                      );
+                    },
+                    child: const Text(
+                      'Fiscalización',
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                 ),
-                onPressed: () async {
-                    context.push('/new-task-technical', 
-                      extra: TechTaskHeader(
-                        client: item.client, 
-                        codeTask: item.code, 
-                        location: item.location,
-                        createdBy: item.createdBy,
-                      )
-                    );
-                },
-                child: const Text(
-                  'Registro',
-                  style: TextStyle(color: Colors.white),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(188, 25, 156, 156),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    onPressed: () async {
+                        context.push('/new-task-technical',
+                          extra: TechTaskHeader(
+                            client: item.client,
+                            codeTask: item.code,
+                            location: item.location,
+                            createdBy: item.createdBy,
+                          )
+                        );
+                    },
+                    child: const Text(
+                      'Registro',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
                 ),
-              ),
+              ],
             ),
 
             const SizedBox(height: 20),
