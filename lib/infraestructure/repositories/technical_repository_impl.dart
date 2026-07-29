@@ -29,5 +29,10 @@ class TechnicalRepositoryImpl extends TechnicalRepository {
   Future<List<AuditingSection>> getAuditingSection() {
     return datasource.getAuditingSection();
   }
+  
+  @override
+  Future<ApiResponse<dynamic>> saveAuditing(Map<String, dynamic> data) {
+    return datasource.saveAuditing(data);
+  }
 
 }

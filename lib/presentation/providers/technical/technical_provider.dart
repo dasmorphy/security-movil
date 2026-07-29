@@ -33,7 +33,7 @@ final getTechMaterial =
   );
 });
 
-final saveTechnicalRecordProvider =
+final technicalRecordProvider =
     StateNotifierProvider<FetchTechnicalProvider, AsyncValue<ApiResponse<dynamic>>>((ref) {
   final repo = ref.watch(technicalRepositoryProvider);
   return FetchTechnicalProvider(repo);
@@ -49,6 +49,23 @@ class FetchTechnicalProvider extends StateNotifier<AsyncValue<ApiResponse>> {
     state = const AsyncLoading();
     try {
       final response = await repository.saveTechnicalRecord(data);
+      state = AsyncData(response);
+      return response;
+    } catch (e, st) {
+      print('Error out E, $e');
+      print('Error out ST, $st');
+      state = AsyncError(e, st);
+      return ApiResponse(
+        success: false,
+        message: e.toString(),
+      );
+    }
+  }
+
+  Future<ApiResponse> saveAuditing(Map<String, dynamic> data) async {
+    state = const AsyncLoading();
+    try {
+      final response = await repository.saveAuditing(data);
       state = AsyncData(response);
       return response;
     } catch (e, st) {

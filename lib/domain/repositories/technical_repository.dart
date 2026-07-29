@@ -9,4 +9,5 @@ abstract class TechnicalRepository {
   Future<ApiResponse<dynamic>> saveTechnicalRecord(Map<String, dynamic> data);
   Future<List<TechMaterial>> getTechMeterial();
   Future<List<AuditingSection>> getAuditingSection();
+  Future<ApiResponse<dynamic>> saveAuditing(Map<String, dynamic> data);
 }

@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -51,6 +53,7 @@ class _AuditingRecordFormState extends ConsumerState<AuditingRecordForm> {
   bool _isInitializing = true;
   bool _isLoading = false;
   int _currentStep = 0;
+  bool isPickingImage = false;
 
   /// idItem -> 'SI' | 'NO' | 'N/A'
   final Map<int, String> _responses = {};
@@ -197,7 +200,7 @@ class _AuditingRecordFormState extends ConsumerState<AuditingRecordForm> {
   }
 
   void _addFinding() {
-    setState(() => _findings.add(FindingEntry(uid: const Uuid().v4())));
+    setState(() => _findings.add(FindingEntry(uid: const Uuid().v4(), image: [])));
   }
 
   void _removeFinding(int index) {
@@ -276,15 +279,29 @@ class _AuditingRecordFormState extends ConsumerState<AuditingRecordForm> {
 
     final findings = _findings
         .where((finding) => !finding.isEmpty)
-        .map((finding) => finding.toJson())
+        // .map((finding) => finding.toJson())
         .toList();
+
+    final findingsJson = findings.asMap().entries.map((entry) {
+      final findingIndex = entry.key;
+      final finding = entry.value;
+
+      return {
+        ...finding.toJson(),
+        'images': List.generate(
+          finding.image.length,
+          (imageIndex) => 'finding_${findingIndex}_$imageIndex',
+        ),
+      };
+    }).toList();
 
     final data = <String, dynamic>{
       // Firmas en bytes (Uint8List) para que el datasource decida el formato.
+      "external_transaction_id": Uuid().v4(),
       'auditor_img': auditorImg,
       'responsible_img': responsibleImg,
       'client_img': clientImg,
-      'channel': 'Tech control',
+      'finding_images': findings,
       'externalTransactionId': const Uuid().v4(),
       'data': {
         // Estos tres los completa quien consume el widget.
@@ -293,9 +310,11 @@ class _AuditingRecordFormState extends ConsumerState<AuditingRecordForm> {
         'responsible': widget.responsible,
         'user': authState.value!.user,
         'responses': responses,
-        'findings': findings,
+        'findings': findingsJson,
       },
     };
+
+    print(findingsJson);
 
     GlobalLoadingBottomSheet.show(
       status: OverlayStatus.loading,
@@ -316,7 +335,7 @@ class _AuditingRecordFormState extends ConsumerState<AuditingRecordForm> {
         autoDismiss: const Duration(seconds: 2),
       );
 
-      if (Navigator.canPop(context)) context.pop();
+      // if (Navigator.canPop(context)) context.pop();
     } else {
       GlobalLoadingBottomSheet.show(
         status: OverlayStatus.error,
@@ -411,7 +430,7 @@ class _AuditingRecordFormState extends ConsumerState<AuditingRecordForm> {
               const SizedBox(width: 12),
               Expanded(
                 child: ElevatedButton(
-                  onPressed: _isLoading ? null : () => _onNext(groups),
+                  onPressed: _isLoading || isPickingImage ? null : () => _onNext(groups),
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
@@ -542,6 +561,19 @@ class _AuditingRecordFormState extends ConsumerState<AuditingRecordForm> {
             finding: _findings[i],
             position: i + 1,
             onRemove: () => _removeFinding(i),
+            onPickingChanged: (value) {
+              setState(() {
+                isPickingImage = value;
+              });
+            },
+            isPickingImage: isPickingImage,
+            onImagesChanged: (images) {
+              print(images);
+              _findings[i].image = images
+                .whereType<Uint8List>()
+                .toList();
+            },
+            imagesMaxError: _findings[i].image.length > 2
           ),
     ];
   }

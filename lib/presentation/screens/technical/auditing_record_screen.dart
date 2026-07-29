@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zentinel/domain/entities/api_response.dart';
+import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
 class AuditingRecordScreen extends ConsumerWidget {
@@ -37,15 +38,9 @@ class AuditingRecordScreen extends ConsumerWidget {
           taskId: null,
           responsible: null,
           onSubmit: (data) async {
-            // TODO: conectar con el repositorio cuando exista el endpoint.
-            // Aquí sólo se imprime el payload ya armado.
-            _debugPayload(data);
-
-            return ApiResponse(
-              success: true,
-              message: 'Payload construido (aún sin envío al API)',
-              data: data,
-            );
+            return await ref
+              .read(technicalRecordProvider.notifier)
+              .saveAuditing(data);
           },
         ),
       ),

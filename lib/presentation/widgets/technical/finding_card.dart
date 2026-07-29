@@ -1,6 +1,7 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
-import 'package:zentinel/presentation/widgets/inputs/glow_text_form_field.dart';
-import 'package:zentinel/presentation/widgets/technical/auditing_colors.dart';
+import 'package:zentinel/presentation/widgets/widgets.dart';
 
 /// Controladores de un hallazgo. Vive en el estado del formulario para que los
 /// textos no se pierdan al cambiar de paso.
@@ -10,13 +11,14 @@ class FindingEntry {
   final TextEditingController criticality = TextEditingController();
   final TextEditingController responsible = TextEditingController();
   final TextEditingController commitment = TextEditingController();
+  late List<Uint8List> image = [];
 
   final FocusNode descriptionFocus = FocusNode();
   final FocusNode criticalityFocus = FocusNode();
   final FocusNode responsibleFocus = FocusNode();
   final FocusNode commitmentFocus = FocusNode();
 
-  FindingEntry({required this.uid});
+  FindingEntry({required this.uid, required this.image});
 
   bool get isEmpty =>
       description.text.trim().isEmpty &&
@@ -29,6 +31,7 @@ class FindingEntry {
     'criticality': criticality.text.trim(),
     'responsible': responsible.text.trim(),
     'commitment': commitment.text.trim(),
+    'images': image.whereType<Uint8List>().toList(),
   };
 
   void dispose() {
@@ -48,12 +51,20 @@ class FindingCard extends StatelessWidget {
   final FindingEntry finding;
   final int position;
   final VoidCallback onRemove;
+  final ValueChanged<bool>? onPickingChanged;
+  final Function(List<Uint8List>) onImagesChanged;
+  final bool imagesMaxError;
+  final bool isPickingImage;
 
   const FindingCard({
     super.key,
     required this.finding,
     required this.position,
     required this.onRemove,
+    required this.onPickingChanged,
+    required this.onImagesChanged,
+    required this.imagesMaxError,
+    required this.isPickingImage,
   });
 
   @override
@@ -130,6 +141,24 @@ class FindingCard extends StatelessWidget {
             hint: 'Acción y fecha comprometida',
             isLast: true,
           ),
+
+          const SizedBox(height: 20),
+
+          CameraImagePicker(
+            minImages: 0,
+            maxImages: 2,
+            isPickingImage: isPickingImage,
+            onPickingChanged: onPickingChanged,
+            onImagesChanged: onImagesChanged,
+          ),
+
+          if (imagesMaxError)
+            SizedBox(
+              width: double.infinity,
+              child: Text('Debe subir máximo 2 imágenes',
+                style: TextStyle(color: Color.fromARGB(255, 185, 28, 16)),
+              ),
+            ),
         ],
       ),
     );

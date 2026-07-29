@@ -51,8 +51,10 @@ class _FakeDatasource extends TechnicalDatasource {
   Future<List<TechMaterial>> getTechMeterial() => throw UnimplementedError();
 
   @override
-  Future<ApiResponse> saveTechnicalRecord(Map<String, dynamic> data) =>
-      throw UnimplementedError();
+  Future<ApiResponse> saveTechnicalRecord(Map<String, dynamic> data) => throw UnimplementedError();
+
+  @override
+  Future<ApiResponse<dynamic>> saveAuditing(Map<String, dynamic> data) => throw UnimplementedError();  
 }
 
 void main() {
