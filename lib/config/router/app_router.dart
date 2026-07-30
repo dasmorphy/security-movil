@@ -159,7 +159,7 @@ final appRouter = GoRouter(
           path: 'auditing-record',
           name: AuditingRecordScreen.name,
           builder: (context, state) {
-            final taskSelected = state.extra as TechTaskHeader?;
+            final taskSelected = state.extra as TechTaskHeader;
             return AuditingRecordScreen(
               taskHeader: taskSelected,
             );

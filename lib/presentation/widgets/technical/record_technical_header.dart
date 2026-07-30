@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 
 
 class TechTaskHeader {
+  final int cliendId;
+  final int locationId;
+  final int taskId;
   final String client;
   final String codeTask;
   final String location;
@@ -11,7 +14,10 @@ class TechTaskHeader {
     required this.client,
     required this.codeTask,
     required this.location,
-    required this.createdBy,
+    required this.createdBy, 
+    required this.cliendId, 
+    required this.locationId, 
+    required this.taskId,
   });
 }
 

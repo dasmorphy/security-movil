@@ -25,16 +25,16 @@ class AuditingRecordForm extends ConsumerStatefulWidget {
   final Future<ApiResponse> Function(Map<String, dynamic> data) onSubmit;
 
   /// Datos que se agregan desde afuera (los completa quien consume el widget).
-  final int? locationId;
-  final int? taskId;
+  final int locationId;
+  final int taskId;
   final String? responsible;
 
   const AuditingRecordForm({
     super.key,
     required this.taskData,
     required this.onSubmit,
-    this.locationId,
-    this.taskId,
+    required this.locationId,
+    required this.taskId,
     this.responsible,
   });
 

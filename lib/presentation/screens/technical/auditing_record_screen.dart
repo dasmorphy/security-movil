@@ -9,16 +9,9 @@ class AuditingRecordScreen extends ConsumerWidget {
   static const name = 'auditing-record-screen';
 
   /// Datos del encabezado. Si no llegan, se usan los del diseño.
-  final TechTaskHeader? taskHeader;
+  final TechTaskHeader taskHeader;
 
-  const AuditingRecordScreen({super.key, this.taskHeader});
-
-  static const _mockHeader = TechTaskHeader(
-    client: 'Pycca',
-    codeTask: '',
-    location: 'Daule Matriz',
-    createdBy: 'dmales',
-  );
+  const AuditingRecordScreen({super.key, required this.taskHeader});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -32,11 +25,11 @@ class AuditingRecordScreen extends ConsumerWidget {
       body: SafeArea(
         top: false,
         child: AuditingRecordForm(
-          taskData: taskHeader ?? _mockHeader,
+          taskData: taskHeader,
           // location_id, task_id y responsible se agregan desde afuera.
-          locationId: null,
-          taskId: null,
-          responsible: null,
+          locationId: taskHeader.locationId,
+          taskId: taskHeader.taskId,
+          responsible: taskHeader.createdBy,
           onSubmit: (data) async {
             return await ref
               .read(technicalRecordProvider.notifier)
@@ -48,14 +41,14 @@ class AuditingRecordScreen extends ConsumerWidget {
   }
 
   /// Imprime el payload sin volcar los bytes de las firmas.
-  void _debugPayload(Map<String, dynamic> data) {
-    final preview = Map<String, dynamic>.from(data);
+  // void _debugPayload(Map<String, dynamic> data) {
+  //   final preview = Map<String, dynamic>.from(data);
 
-    for (final key in ['auditor_img', 'responsible_img', 'client_img']) {
-      final bytes = preview[key];
-      preview[key] = bytes is Uint8List ? '<${bytes.lengthInBytes} bytes png>' : null;
-    }
+  //   for (final key in ['auditor_img', 'responsible_img', 'client_img']) {
+  //     final bytes = preview[key];
+  //     preview[key] = bytes is Uint8List ? '<${bytes.lengthInBytes} bytes png>' : null;
+  //   }
 
-    debugPrint(preview.toString());
-  }
+  //   debugPrint(preview.toString());
+  // }
 }

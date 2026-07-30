@@ -26,7 +26,7 @@ class TaskDetailModal extends ConsumerWidget {
           children: [
             /// HEADER
             Text(
-              'Detalle Tarea',
+              'Detalle Proyecto',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
@@ -41,19 +41,19 @@ class TaskDetailModal extends ConsumerWidget {
                   children: [
                     const SizedBox(height: 20),
                     detailRow('Nombres', item.name),
-                    detailRow('Apellidos', item.code),
-                    detailRow('Cédula', item.description),
+                    detailRow('Código tarea', item.code),
+                    detailRow('Descripción', item.description),
                     detailRow('Estado', item.status),
-                    detailRow('Cargo', item.createdBy),
+                    detailRow('Creado por', item.createdBy),
                     detailRow(
                       'Fecha Creación',
                       formatDateDetails(item.createdAt.toString()),
                     ),
-                    detailRow('Actualizado por', item.updatedBy),
-                    detailRow(
-                      'Fecha Actualización',
-                      formatDateDetails(item.updatedAt.toString()),
-                    ),
+                    // detailRow('Actualizado por', item.updatedBy),
+                    // detailRow(
+                    //   'Fecha Actualización',
+                    //   formatDateDetails(item.updatedAt.toString()),
+                    // ),
                   ],
                 ),
               ),
@@ -75,6 +75,9 @@ class TaskDetailModal extends ConsumerWidget {
                     onPressed: () async {
                       context.push('/auditing-record',
                         extra: TechTaskHeader(
+                          taskId: item.idTask,
+                          cliendId: item.clientId,
+                          locationId: item.locatonId,
                           client: item.client,
                           codeTask: item.code,
                           location: item.location,
@@ -101,6 +104,9 @@ class TaskDetailModal extends ConsumerWidget {
                     onPressed: () async {
                         context.push('/new-task-technical',
                           extra: TechTaskHeader(
+                            taskId: item.idTask,
+                            cliendId: item.clientId,
+                            locationId: item.locatonId,
                             client: item.client,
                             codeTask: item.code,
                             location: item.location,

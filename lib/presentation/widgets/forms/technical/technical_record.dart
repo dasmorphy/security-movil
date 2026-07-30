@@ -133,6 +133,9 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
     final data = {
       "external_transaction_id": Uuid().v4(),
       "resume": _observationsCtrl.text.trim(),
+      "client_id": widget.taskData.cliendId,
+      "location_id": widget.taskData.locationId,
+      "task_id": widget.taskData.taskId,
       "user": userData.user,
       "materials": materialsAdded.map((p) => {
         "material": p['name'],

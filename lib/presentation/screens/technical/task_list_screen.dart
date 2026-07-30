@@ -42,7 +42,7 @@ class _TaskListScreenState
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(60),
-        child: const HeaderOptionsProfile(headerTxt: 'Tareas'),
+        child: const HeaderOptionsProfile(headerTxt: 'Proyectos'),
       ),
       resizeToAvoidBottomInset: false,
       backgroundColor: const Color.fromARGB(255, 23, 24, 28),
@@ -108,22 +108,7 @@ class _TaskListScreenState
                                           ),
                                           const SizedBox(height: 2),
                                           Text(
-                                            item.status,
-                                            style: Theme.of(context)
-                                                .textTheme
-                                                .bodySmall
-                                                ?.copyWith(
-                                                  color: const Color.fromARGB(
-                                                    255,
-                                                    180,
-                                                    180,
-                                                    180,
-                                                  ),
-                                                ),
-                                          ),
-                                          const SizedBox(height: 2),
-                                          Text(
-                                            'Cédula',
+                                            item.code,
                                             style: Theme.of(context)
                                                 .textTheme
                                                 .bodySmall

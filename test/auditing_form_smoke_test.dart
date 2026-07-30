@@ -51,7 +51,7 @@ class _FakeDatasource extends TechnicalDatasource {
   Future<List<TechMaterial>> getTechMeterial() => throw UnimplementedError();
 
   @override
-  Future<ApiResponse> saveTechnicalRecord(Map<String, dynamic> data) => throw UnimplementedError();
+   Future<ApiResponse> saveTechnicalRecord(Map<String, dynamic> data) => throw UnimplementedError();
 
   @override
   Future<ApiResponse<dynamic>> saveAuditing(Map<String, dynamic> data) => throw UnimplementedError();  
@@ -74,7 +74,13 @@ void main() {
           home: Scaffold(
             backgroundColor: kAuditBg,
             body: AuditingRecordForm(
+              locationId: 1,
+              responsible: 'kj',
+              taskId: 1,
               taskData: const TechTaskHeader(
+                cliendId: 1,
+                locationId: 1,
+                taskId: 1,
                 client: 'Pycca',
                 codeTask: '',
                 location: 'Daule Matriz',
