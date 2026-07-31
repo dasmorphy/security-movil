@@ -1,6 +1,8 @@
 import 'package:zentinel/domain/datasources/technical_datasource.dart';
 import 'package:zentinel/domain/entities/api_response.dart';
 import 'package:zentinel/domain/entities/auditing_section.dart';
+import 'package:zentinel/domain/entities/client_technical.dart';
+import 'package:zentinel/domain/entities/location_technical.dart';
 import 'package:zentinel/domain/entities/task_technical.dart';
 import 'package:zentinel/domain/entities/tech_material.dart';
 import 'package:zentinel/domain/repositories/technical_repository.dart';
@@ -33,6 +35,21 @@ class TechnicalRepositoryImpl extends TechnicalRepository {
   @override
   Future<ApiResponse<dynamic>> saveAuditing(Map<String, dynamic> data) {
     return datasource.saveAuditing(data);
+  }
+
+  @override
+  Future<List<ClientTechnical>> getClientsTechnical() {
+    return datasource.getClientsTechnical();
+  }
+
+  @override
+  Future<List<LocationTechnical>> getLocationTechnical(Map<String, dynamic> filters) {
+    return datasource.getLocationTechnical(filters);
+  }
+  
+  @override
+  Future<ApiResponse<dynamic>> saveProjectTechnical(Map<String, dynamic> data) {
+    return datasource.saveProjectTechnical(data);
   }
 
 }

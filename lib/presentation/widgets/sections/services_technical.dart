@@ -40,7 +40,7 @@ class _ServicesTechnicalState extends ConsumerState<ServicesTechnical> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (userData.hasPermission(Permissions.nuevoDespacho) || userData.hasPermission(Permissions.nuevoProductoInterno))...[
+          if (userData.hasPermission(Permissions.verProyectos))...[
             const Text(
               'Técnicos',
               style: TextStyle(
@@ -58,32 +58,19 @@ class _ServicesTechnicalState extends ConsumerState<ServicesTechnical> {
               crossAxisSpacing: 11,
               childAspectRatio: 0.9,
               children: [
-                if (userData.hasPermission(Permissions.nuevoDespacho))
+                if (userData.hasPermission(Permissions.verProyectos))
                   BasicServiceCard(
                       iconImage: 'iconentrada',
                       label: 'Proyectos',
                       onTap: () => context.push('/list-task-technical')
                     ),
 
-                if (userData.hasPermission(Permissions.nuevoIngresoBiomar))
+                if (userData.hasPermission(Permissions.nuevoProyecto))
                   BasicServiceCard(
-                    iconImage: 'iconregistro',
-                    label: 'Refistro fiscalización',
-                    childWidget: BiomarEntryReportForm(
-                      onSubmit: (data) async {
-                      return await ref
-                        .read(dispatchProvider.notifier)
-                        .saveEntry(data);
-                    },
+                      iconImage: 'iconentrada',
+                      label: 'Nuevo proyecto',
+                      onTap: () => context.push('/new-project-technical')
                     ),
-                  ),
-                // if (userData.hasPermission(Permissions.nuevoProductoInterno))
-                //   BasicServiceCard(
-                //     iconImage: 'iconentrada',
-                //     label: 'Producto terminado',
-                //     onTap: () => context.push('/new-dispatch', extra: true)
-                //   ),
-
               ],
             ),
           ],

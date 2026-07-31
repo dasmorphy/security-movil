@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zentinel/domain/entities/api_response.dart';
 import 'package:zentinel/domain/entities/auditing_section.dart';
+import 'package:zentinel/domain/entities/client_technical.dart';
+import 'package:zentinel/domain/entities/location_technical.dart';
 import 'package:zentinel/domain/entities/task_technical.dart';
 import 'package:zentinel/domain/entities/tech_material.dart';
 import 'package:zentinel/domain/repositories/technical_repository.dart';
@@ -39,6 +41,34 @@ final technicalRecordProvider =
   return FetchTechnicalProvider(repo);
 });
 
+final getClientsTechnical =
+    StateNotifierProvider<CatalogNotifier<ClientTechnical>, List<ClientTechnical>>((ref) {
+  final repo = ref.watch(technicalRepositoryProvider);
+
+  return CatalogNotifier<ClientTechnical>(
+    (_) => repo.getClientsTechnical(),
+  );
+});
+
+
+final getLocationTechnical =
+    StateNotifierProvider.autoDispose<
+        CatalogNotifier<LocationTechnical>,
+        List<LocationTechnical>>(
+  (ref) {
+    final repo = ref.watch(technicalRepositoryProvider);
+
+    return CatalogNotifier<LocationTechnical>(
+      (filters) {
+        final mergedFilters = {
+          ...?filters,
+        };
+        return repo.getLocationTechnical(mergedFilters);
+      },
+    );
+  },
+);
+
 
 class FetchTechnicalProvider extends StateNotifier<AsyncValue<ApiResponse>> {
   final TechnicalRepository repository;
@@ -66,6 +96,23 @@ class FetchTechnicalProvider extends StateNotifier<AsyncValue<ApiResponse>> {
     state = const AsyncLoading();
     try {
       final response = await repository.saveAuditing(data);
+      state = AsyncData(response);
+      return response;
+    } catch (e, st) {
+      print('Error out E, $e');
+      print('Error out ST, $st');
+      state = AsyncError(e, st);
+      return ApiResponse(
+        success: false,
+        message: e.toString(),
+      );
+    }
+  }
+
+  Future<ApiResponse> saveProjectTechnical(Map<String, dynamic> data) async {
+    state = const AsyncLoading();
+    try {
+      final response = await repository.saveProjectTechnical(data);
       state = AsyncData(response);
       return response;
     } catch (e, st) {

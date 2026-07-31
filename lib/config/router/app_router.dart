@@ -165,6 +165,11 @@ final appRouter = GoRouter(
             );
           },
         ),
+        GoRoute(
+          path: 'new-project-technical',
+          name: NewProyectTechnicalScreen.name,
+          builder: (context, state) => const NewProyectTechnicalScreen()
+        ),
       ]
     ),
   ]

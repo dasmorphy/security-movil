@@ -40,14 +40,15 @@ class _BasicServicesStionState extends ConsumerState<BasicServicesSection> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
-            'Servicios básicos',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
+          if (userData.hasPermission(Permissions.verBitacoras))
+            const Text(
+              'Servicios básicos',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
 
           GridView.count(
             crossAxisCount: 3,

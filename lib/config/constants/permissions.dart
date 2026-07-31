@@ -26,4 +26,9 @@ class Permissions {
   static const nuevoIngresoBiomar = 'NUEVO_INGRESO_BIOMAR';
   static const dataAdmin = 'DATA_ADMIN';
   static const nuevoRegistroTecnico = 'NUEVO_REGISTRO_TECNICO';
+  static const nuevaFiscalizacion = 'NUEVA_FISCALIZACION';
+  static const solicitarFinalizacionProyecto = 'SOLICITAR_FINALIZACION_PROYECTO';
+  static const verProyectos = 'VER_PROYECTOS';
+  static const aprobarFinalizacion = 'APROBAR_FINALIZACION';
+  static const nuevoProyecto = 'NUEVO_PROYECTO';
 }

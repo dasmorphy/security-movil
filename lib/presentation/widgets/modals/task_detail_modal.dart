@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:zentinel/config/constants/permissions.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/domain/entities/task_technical.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
@@ -63,46 +64,18 @@ class TaskDetailModal extends ConsumerWidget {
 
             Row(
               children: [
-                Expanded(
-                  child: OutlinedButton(
-                    style: OutlinedButton.styleFrom(
-                      side: const BorderSide(color: Color.fromARGB(188, 25, 156, 156)),
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                if (userData.hasPermission(Permissions.nuevaFiscalizacion))...[
+                  Expanded(
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Color.fromARGB(188, 25, 156, 156)),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
                       ),
-                    ),
-                    onPressed: () async {
-                      context.push('/auditing-record',
-                        extra: TechTaskHeader(
-                          taskId: item.idTask,
-                          cliendId: item.clientId,
-                          locationId: item.locatonId,
-                          client: item.client,
-                          codeTask: item.code,
-                          location: item.location,
-                          createdBy: item.createdBy,
-                        )
-                      );
-                    },
-                    child: const Text(
-                      'Fiscalización',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(188, 25, 156, 156),
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    onPressed: () async {
-                        context.push('/new-task-technical',
+                      onPressed: () async {
+                        context.push('/auditing-record',
                           extra: TechTaskHeader(
                             taskId: item.idTask,
                             cliendId: item.clientId,
@@ -113,13 +86,79 @@ class TaskDetailModal extends ConsumerWidget {
                             createdBy: item.createdBy,
                           )
                         );
-                    },
-                    child: const Text(
-                      'Registro',
-                      style: TextStyle(color: Colors.white),
+                      },
+                      child: const Text(
+                        'Fiscalización',
+                        style: TextStyle(color: Colors.white),
+                      ),
                     ),
                   ),
-                ),
+                  const SizedBox(width: 12),
+                ],
+
+                if (userData.hasPermission(Permissions.solicitarFinalizacionProyecto) && item.status != 'Finalizado')...[
+                  Expanded(
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Color.fromARGB(188, 25, 156, 156)),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      onPressed: () async {
+                        context.push('/auditing-record',
+                          extra: TechTaskHeader(
+                            taskId: item.idTask,
+                            cliendId: item.clientId,
+                            locationId: item.locatonId,
+                            client: item.client,
+                            codeTask: item.code,
+                            location: item.location,
+                            createdBy: item.createdBy,
+                          )
+                        );
+                      },
+                      child: const Text(
+                        'Solicitar finalización',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                ],
+
+                if (userData.hasPermission(Permissions.nuevoRegistroTecnico))...[
+                  Expanded(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color.fromARGB(188, 25, 156, 156),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      onPressed: () async {
+                          context.push('/new-task-technical',
+                            extra: TechTaskHeader(
+                              taskId: item.idTask,
+                              cliendId: item.clientId,
+                              locationId: item.locatonId,
+                              client: item.client,
+                              codeTask: item.code,
+                              location: item.location,
+                              createdBy: item.createdBy,
+                            )
+                          );
+                      },
+                      child: const Text(
+                        'Registro',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ],
+
               ],
             ),
 

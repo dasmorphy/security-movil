@@ -87,7 +87,7 @@ class HomeViewState extends ConsumerState<HomeView> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Dropdown solo visible para grupo 3
-                if (idBusiness == 3)
+                if (idBusiness == 3 && userData.role == 'admin_tlsg')
                   GlowDropdownFormField2<String>(
                     value: selectedBusiness,
                     items: [

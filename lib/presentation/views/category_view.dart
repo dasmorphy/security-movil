@@ -58,6 +58,9 @@ class CategoryViewState extends ConsumerState<CategoryView> {
                   ),
                   child: Column(
                     children: [
+                      if (userData.hasPermission(Permissions.verProyectos))
+                        ServicesTechnical(),
+
                       if (userData.attributes['id_business'] == 1 || 
                           userData.attributes['id_business'] == 3)
                         BasicServicesSection(),
@@ -66,8 +69,6 @@ class CategoryViewState extends ConsumerState<CategoryView> {
                           userData.attributes['id_business'] == 3)
                         ServicesBiomar(),
 
-                      if (userData.hasPermission(Permissions.verBitacoras))
-                        ServicesTechnical(),
                     ],
                   ),
                 ),
