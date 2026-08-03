@@ -18,6 +18,46 @@ class TaskDetailModal extends ConsumerWidget {
     final authState = ref.watch(userSessionProvider);
     final userData = authState.value!;
 
+    showConfirmationDialog(int taskId) async {
+      final confirmed = await ConfirmBottomSheet.show(
+        context,
+        title: "Finalizar proyecto",
+        message: "Se enviará la solicitud para finalización del proyecto. ¿Desea continuar?",
+      );
+
+      if (confirmed == true) {
+        GlobalLoadingBottomSheet.show(
+          status: OverlayStatus.loading, 
+          message: "Enviando solicitud..."
+        );
+
+        final response =  await ref.read(technicalRecordProvider.notifier).updateStatusProject({
+          "id_project": taskId,
+          "new_status": "Pendiente aprobación",
+          "user": userData.user
+        });
+
+        if (response.success) {
+          GlobalLoadingBottomSheet.show(
+            status: OverlayStatus.success, 
+            message: "Solicitud enviada exitosamente", 
+            autoDismiss: const Duration(seconds: 2)
+          );
+          ref.read(getTaskTechnical.notifier).load();
+          if (context.mounted) {
+            context.pop();
+          }
+        } else {
+          GlobalLoadingBottomSheet.show(
+            status: OverlayStatus.error,
+            message: 'Error: ${response.message ?? 'Error al enviar la solicitud'}',
+            autoDismiss: const Duration(seconds: 3),
+          );
+        }
+      }
+
+    }
+
     return SafeArea(
       child: Container(
         margin: const EdgeInsets.only(top: 30),
@@ -96,7 +136,8 @@ class TaskDetailModal extends ConsumerWidget {
                   const SizedBox(width: 12),
                 ],
 
-                if (userData.hasPermission(Permissions.solicitarFinalizacionProyecto) && item.status != 'Finalizado')...[
+                if (userData.hasPermission(Permissions.solicitarFinalizacionProyecto) && 
+                  item.status != 'Finalizado' && item.status != 'Pendiente aprobación')...[
                   Expanded(
                     child: OutlinedButton(
                       style: OutlinedButton.styleFrom(
@@ -107,17 +148,7 @@ class TaskDetailModal extends ConsumerWidget {
                         ),
                       ),
                       onPressed: () async {
-                        context.push('/auditing-record',
-                          extra: TechTaskHeader(
-                            taskId: item.idTask,
-                            cliendId: item.clientId,
-                            locationId: item.locatonId,
-                            client: item.client,
-                            codeTask: item.code,
-                            location: item.location,
-                            createdBy: item.createdBy,
-                          )
-                        );
+                        showConfirmationDialog(item.idTask);
                       },
                       child: const Text(
                         'Solicitar finalización',
@@ -128,7 +159,8 @@ class TaskDetailModal extends ConsumerWidget {
                   const SizedBox(width: 12),
                 ],
 
-                if (userData.hasPermission(Permissions.nuevoRegistroTecnico))...[
+                if (userData.hasPermission(Permissions.nuevoRegistroTecnico)
+                && item.status != 'Finalizado' && item.status != 'Pendiente aprobación')...[
                   Expanded(
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(

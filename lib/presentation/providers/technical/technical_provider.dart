@@ -125,4 +125,21 @@ class FetchTechnicalProvider extends StateNotifier<AsyncValue<ApiResponse>> {
       );
     }
   }
+
+    Future<ApiResponse> updateStatusProject(Map<String, dynamic> data) async {
+    state = const AsyncLoading();
+    try {
+      final response = await repository.updateStatusProject(data);
+      state = AsyncData(response);
+      return response;
+    } catch (e, st) {
+      print('Error out E, $e');
+      print('Error out ST, $st');
+      state = AsyncError(e, st);
+      return ApiResponse(
+        success: false,
+        message: e.toString(),
+      );
+    }
+  }
 }

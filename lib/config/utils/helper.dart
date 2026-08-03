@@ -396,6 +396,8 @@ Color getColorTxtTaskTech(String status) {
       return const Color.fromARGB(255, 246, 105, 105);
     case 'en ejecución':
       return const Color.fromARGB(255, 137, 172, 255);
+    case 'pendiente aprobación':
+      return const Color.fromARGB(255, 248, 172, 70);
     case 'aprobado':
       return const Color.fromARGB(255, 105, 246, 184);
     default:
@@ -409,6 +411,8 @@ Color getStatusColorTaskTech(String status) {
       return const Color.fromARGB(255, 54, 18, 18);
     case 'en ejecución':
       return const Color.fromARGB(255, 34, 44, 63);
+    case 'pendiente aprobación':
+      return const Color.fromARGB(255, 61, 43, 14);
     case 'aprobado':
       return const Color.fromARGB(255, 18, 54, 42);
     default:

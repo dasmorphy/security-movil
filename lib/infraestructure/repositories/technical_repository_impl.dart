@@ -52,4 +52,9 @@ class TechnicalRepositoryImpl extends TechnicalRepository {
     return datasource.saveProjectTechnical(data);
   }
 
+  @override
+  Future<ApiResponse<dynamic>> updateStatusProject(Map<String, dynamic> data) {
+    return datasource.updateStatusProject(data);
+  }
+
 }

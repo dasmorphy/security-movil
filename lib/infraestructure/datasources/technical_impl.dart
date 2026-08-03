@@ -323,4 +323,43 @@ class TechnicalImpl extends TechnicalDatasource {
     }
   }
 
+  @override
+  Future<ApiResponse<dynamic>> updateStatusProject(Map<String, dynamic> data) async {
+    try {
+      final idProject = data["id_project"];
+      final response = await dio.patch(
+        '/rest/technical-control-api/v1.0/update-status-project/$idProject',
+        data: {
+          'externalTransactionId': uuid, 
+          'channel': 'ZENTINEL',
+          'data': {
+            "new_status": data["new_status"],
+            "user": data["user"]
+          }
+        },
+        options: onlyError(),
+      );
+
+      final body = response.data;
+
+      return ApiResponse(
+        success: response.statusCode == 200,
+        errorCode: body['error_code']?.toString(),
+        message: body['message'],
+        data: body['data'],
+      );
+    } catch (e) {
+      print('Error al guardar estado: $e');
+      String messageError = "Error al guardar estado";
+      if (e is DioException) {
+        messageError = e.response?.data["message"];
+      }
+      return ApiResponse(
+        success: false,
+        errorCode: 'save_error',
+        message: messageError,
+      );
+    }
+  }
+
 }

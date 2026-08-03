@@ -14,4 +14,5 @@ abstract class TechnicalDatasource {
   Future<List<ClientTechnical>> getClientsTechnical();
   Future<List<LocationTechnical>> getLocationTechnical(Map<String, dynamic> filters);
   Future<ApiResponse<dynamic>> saveProjectTechnical(Map<String, dynamic> data);
+  Future<ApiResponse<dynamic>> updateStatusProject(Map<String, dynamic> data);
 }

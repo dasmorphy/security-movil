@@ -195,7 +195,7 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
         message: "Registro guardado exitosamente", 
         autoDismiss: const Duration(seconds: 2)
       );
-      ref.read(getHistoryEntryAccess.notifier).load();
+      ref.read(getTaskTechnical.notifier).load();
     } else {
       // await savePendingBiomar(data, 'entry');
       GlobalLoadingBottomSheet.show(

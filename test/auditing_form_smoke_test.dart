@@ -74,6 +74,12 @@ class _FakeDatasource extends TechnicalDatasource {
   Future<ApiResponse<dynamic>> saveProjectTechnical(Map<String, dynamic> data) {
     // TODO: implement saveProjectTechnical
     throw UnimplementedError();
+  }
+
+  @override
+  Future<ApiResponse<dynamic>> updateStatusProject(Map<String, dynamic> data) {
+    // TODO: implement updateStatusProject
+    throw UnimplementedError();
   }  
 }
 
