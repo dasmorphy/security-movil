@@ -4,6 +4,7 @@ import 'package:zentinel/domain/entities/client_technical.dart';
 import 'package:zentinel/domain/entities/location_technical.dart';
 import 'package:zentinel/domain/entities/task_technical.dart';
 import 'package:zentinel/domain/entities/tech_material.dart';
+import 'package:zentinel/domain/entities/technical_staff.dart';
 
 abstract class TechnicalDatasource {
   Future<List<TaskTechnical>> getTaskTechnical();
@@ -15,4 +16,5 @@ abstract class TechnicalDatasource {
   Future<List<LocationTechnical>> getLocationTechnical(Map<String, dynamic> filters);
   Future<ApiResponse<dynamic>> saveProjectTechnical(Map<String, dynamic> data);
   Future<ApiResponse<dynamic>> updateStatusProject(Map<String, dynamic> data);
+  Future<List<TechnicalStaff>> getTechnicalStaff();
 }

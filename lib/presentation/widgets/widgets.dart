@@ -90,3 +90,4 @@ export 'package:zentinel/presentation/widgets/technical/finding_card.dart';
 export 'package:zentinel/presentation/widgets/technical/signature_pad.dart';
 export 'package:zentinel/presentation/widgets/forms/technical/auditing_record_form.dart';
 export 'package:zentinel/presentation/widgets/forms/technical/new_project_technical.dart';
+export 'package:zentinel/presentation/widgets/shared/multi_select_dialog.dart';

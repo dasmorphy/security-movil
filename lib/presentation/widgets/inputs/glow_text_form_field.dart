@@ -1,6 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:zentinel/presentation/widgets/widgets.dart';
+
+class MultiSelectItem<T> {
+  final T value;
+  final String label;
+
+  const MultiSelectItem({
+    required this.value,
+    required this.label,
+  });
+}
 
 class GlowTextFormField extends StatelessWidget {
   final TextEditingController controller;
@@ -275,6 +286,72 @@ class _GlowDropdownFormField2State<T> extends State<GlowDropdownFormField2<T>> {
             ),
           );
         }).toList();
+      },
+    );
+  }
+}
+
+class GlowMultiSelectFormField<T> extends StatelessWidget {
+  final List<T> values;
+  final List<MultiSelectItem<T>> items;
+  final ValueChanged<List<T>> onChanged;
+  final InputDecoration decoration;
+  final bool enabled;
+  final FocusNode? focusNode;
+  final Color glowColor;
+  final FormFieldValidator<List<T>>? validator;
+
+  const GlowMultiSelectFormField({
+    super.key,
+    required this.values,
+    required this.items,
+    required this.onChanged,
+    required this.decoration,
+    this.enabled = true,
+    this.focusNode,
+    this.validator,
+    this.glowColor = const Color.fromARGB(190, 58, 199, 199),
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return FormField<List<T>>(
+      initialValue: values,
+      validator: validator,
+      builder: (field) {
+        return GestureDetector(
+          onTap: enabled
+              ? () async {
+                  final result = await showDialog<List<T>>(
+                    context: context,
+                    builder: (_) => MultiSelectDialog<T>(
+                      values: List.from(field.value ?? []),
+                      items: items,
+                    ),
+                  );
+
+                  if (result != null) {
+                    field.didChange(result);
+                    onChanged(result);
+                  }
+                }
+              : null,
+          child: InputDecorator(
+            decoration: decoration.copyWith(
+              errorText: field.errorText,
+            ),
+            child: Wrap(
+              spacing: 6,
+              children: (field.value ?? []).map((e) {
+                final item = items.firstWhere((i) => i.value == e);
+
+                return Chip(
+                  label: Text(item.label),
+                );
+              }).toList(),
+            ),
+          ),
+        );
       },
     );
   }

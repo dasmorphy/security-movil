@@ -32,6 +32,7 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
   final _reasonVisitCtrl = TextEditingController();
 
   List<Uint8List?> _selectedImages = [];
+  List<int> selectedUsers = <int>[];
 
   final FocusNode _truckLicenseFocus = FocusNode();
   final FocusNode _reasonVisitFocus = FocusNode();
@@ -47,7 +48,8 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await Future.wait([
-        ref.read(getTechMaterial.notifier).load()
+        ref.read(getTechMaterial.notifier).load(),
+        ref.read(getTechnicalStaff.notifier).load()
       ]);
 
       if (!mounted) return;
@@ -136,6 +138,7 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
       "client_id": widget.taskData.cliendId,
       "location_id": widget.taskData.locationId,
       "task_id": widget.taskData.taskId,
+      "technical_staff": selectedUsers,
       "user": userData.user,
       "materials": materialsAdded.map((p) => {
         "material": p['name'],
@@ -243,6 +246,8 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
   Widget build(BuildContext context) {
     final authState = ref.watch(userSessionProvider);
     final theme = Theme.of(context);
+    final materials = ref.watch(getTechMaterial);
+    final techStaff = ref.watch(getTechnicalStaff);
 
     //Usuario no cargado o sesión inválida
     if (!authState.hasValue || authState.value == null) {
@@ -253,7 +258,6 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
       );
     }
 
-    final materials = ref.watch(getTechMaterial);
     // final staffCharge = ref.watch(getStaffCharge);
     final messageValidatorEmpty = 'Este campo es obligatorio';
     final fieldFill = const Color.fromARGB(255, 20, 21, 23);
@@ -337,6 +341,29 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
                     setState(() {
                       _observationsCtrl.text = value;
                     });
+                  },
+                ),
+
+
+                const SizedBox(height: 12),
+                CustomFieldLabelRequired(txtLabel: 'Personal'),
+                GlowMultiSelectFormField<int>(
+                  values: selectedUsers,
+                  items: techStaff.map((user) => MultiSelectItem<int>(
+                    value: user.idStaff,
+                    label: user.name,
+                  )).toList(),
+                  onChanged: (values) {
+                    setState(() => selectedUsers = values);
+                  },
+                  decoration: const InputDecoration(
+                    labelText: "Equipo técnico",
+                  ),
+                  validator: (values) {
+                    if (values == null || values.isEmpty) {
+                      return 'Seleccione al menos un elemento';
+                    }
+                    return null;
                   },
                 ),
 

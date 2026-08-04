@@ -12,6 +12,7 @@ import 'package:zentinel/domain/entities/client_technical.dart';
 import 'package:zentinel/domain/entities/location_technical.dart';
 import 'package:zentinel/domain/entities/task_technical.dart';
 import 'package:zentinel/domain/entities/tech_material.dart';
+import 'package:zentinel/domain/entities/technical_staff.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
 class TechnicalImpl extends TechnicalDatasource {
@@ -360,6 +361,18 @@ class TechnicalImpl extends TechnicalDatasource {
         message: messageError,
       );
     }
+  }
+
+  @override
+  Future<List<TechnicalStaff>> getTechnicalStaff() async {
+    final response = await dio.get(
+      '/rest/technical-control-api/v1.0/technical-staff',
+      options: Options(
+        headers: {'externalTransactionId': uuid, 'channel': 'ZENTINEL'},
+      ),
+    );
+    final List techStaffJson = response.data['data'];
+    return techStaffJson.map((json) => TechnicalStaff.fromJson(json)).toList();
   }
 
 }

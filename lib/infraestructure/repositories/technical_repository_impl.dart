@@ -5,6 +5,7 @@ import 'package:zentinel/domain/entities/client_technical.dart';
 import 'package:zentinel/domain/entities/location_technical.dart';
 import 'package:zentinel/domain/entities/task_technical.dart';
 import 'package:zentinel/domain/entities/tech_material.dart';
+import 'package:zentinel/domain/entities/technical_staff.dart';
 import 'package:zentinel/domain/repositories/technical_repository.dart';
 
 class TechnicalRepositoryImpl extends TechnicalRepository {
@@ -55,6 +56,11 @@ class TechnicalRepositoryImpl extends TechnicalRepository {
   @override
   Future<ApiResponse<dynamic>> updateStatusProject(Map<String, dynamic> data) {
     return datasource.updateStatusProject(data);
+  }
+
+  @override
+  Future<List<TechnicalStaff>> getTechnicalStaff() {
+    return datasource.getTechnicalStaff();
   }
 
 }

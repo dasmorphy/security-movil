@@ -5,6 +5,7 @@ import 'package:zentinel/domain/entities/client_technical.dart';
 import 'package:zentinel/domain/entities/location_technical.dart';
 import 'package:zentinel/domain/entities/task_technical.dart';
 import 'package:zentinel/domain/entities/tech_material.dart';
+import 'package:zentinel/domain/entities/technical_staff.dart';
 import 'package:zentinel/domain/repositories/technical_repository.dart';
 import 'package:zentinel/presentation/providers/catalog_notifier.dart';
 import 'package:zentinel/presentation/providers/technical/technical_repository_provider.dart';
@@ -47,6 +48,16 @@ final getClientsTechnical =
 
   return CatalogNotifier<ClientTechnical>(
     (_) => repo.getClientsTechnical(),
+  );
+});
+
+
+final getTechnicalStaff =
+    StateNotifierProvider<CatalogNotifier<TechnicalStaff>, List<TechnicalStaff>>((ref) {
+  final repo = ref.watch(technicalRepositoryProvider);
+
+  return CatalogNotifier<TechnicalStaff>(
+    (_) => repo.getTechnicalStaff(),
   );
 });
 
