@@ -5,3 +5,4 @@ export 'package:zentinel/presentation/providers/sync_pending/sync_pending_provid
 export 'package:zentinel/presentation/providers/dispatch/dispatch_provider.dart';
 export 'package:zentinel/presentation/providers/onboarding/onboarding_provider.dart';
 export 'package:zentinel/presentation/providers/technical/technical_provider.dart';
+export 'package:zentinel/presentation/providers/shared/push_notification_provider.dart';
