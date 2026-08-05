@@ -123,6 +123,9 @@ class PushNotificationProvider {
     try {
       final token = await _firebaseMessaging.getToken();
 
+      print('Token FCM: $token');
+
+
       if (token != null) {
         await _saveFcmToken(token);
       }

@@ -12,6 +12,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/data/services/hive_service.dart';
+import 'package:zentinel/firebase_options.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/service/pending_request_service.dart';
 import 'package:zentinel/presentation/widgets/shared/sync_listener.dart';
@@ -22,7 +23,9 @@ Future<void> main() async {
   await dotenv.load(fileName: '.env');
   WidgetsFlutterBinding.ensureInitialized();
   await FlutterLocalization.instance.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   await PushNotificationProvider.instance.initialize();
   await initializeDateFormatting('es_ES', null);
   Intl.defaultLocale = 'es_ES';
