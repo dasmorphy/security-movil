@@ -21,3 +21,4 @@ export 'package:zentinel/presentation/screens/technical/task_list_screen.dart';
 export 'package:zentinel/presentation/screens/technical/new_task_screen.dart';
 export 'package:zentinel/presentation/screens/technical/auditing_record_screen.dart';
 export 'package:zentinel/presentation/screens/technical/new_proyect_technical_screen.dart';
+export 'package:zentinel/presentation/screens/push_notifications/push_notifications_screen.dart';

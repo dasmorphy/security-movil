@@ -170,6 +170,11 @@ final appRouter = GoRouter(
           name: NewProyectTechnicalScreen.name,
           builder: (context, state) => const NewProyectTechnicalScreen()
         ),
+        GoRoute(
+          path: '/notifications',
+          name: PushNotificationsScreen.name,
+          builder: (context, state) => const PushNotificationsScreen(),
+        ),
       ]
     ),
   ]

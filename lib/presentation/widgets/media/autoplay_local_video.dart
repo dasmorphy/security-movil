@@ -159,6 +159,19 @@ class _VideoHeaderState extends ConsumerState<VideoHeader> {
                                     ),
                                   ),
                                 ),
+
+                                InkWell(
+                                  onTap: () async {
+                                    
+                                  },
+                                  child: const Padding(
+                                    padding: EdgeInsets.all(7),
+                                    child: Icon(
+                                      Icons.notifications,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
                               ],
                             ),
 
