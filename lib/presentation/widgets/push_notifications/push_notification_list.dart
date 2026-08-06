@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/domain/entities/notification_push.dart';
 
 class _Palette {
   static const background = Color(0xFF18191A);
@@ -16,7 +17,7 @@ class NotificationList extends StatefulWidget {
   final String? apiUrl;
 
   /// Alternativa a [apiUrl]: notificaciones ya cargadas por el padre.
-  final List<NotificationItemModel>? notifications;
+  final List<NotificationPush>? notifications;
 
   /// URL para el DELETE al backend. Usa "{id}" como marcador, ej:
   /// "https://tu-api.com/notifications/{id}"
@@ -45,7 +46,7 @@ class NotificationList extends StatefulWidget {
 }
 
 class _NotificationListState extends State<NotificationList> {
-  List<NotificationItemModel> _items = [];
+  List<NotificationPush> _items = [];
   bool _loading = false;
   String? _error;
 
@@ -86,7 +87,7 @@ class _NotificationListState extends State<NotificationList> {
     //   setState(() {
     //     _items = rawList
     //         .map(
-    //           (e) => NotificationItemModel.fromJson(e as Map<String, dynamic>),
+    //           (e) => NotificationPush.fromJson(e as Map<String, dynamic>),
     //         )
     //         .toList();
     //     _loading = false;
@@ -99,7 +100,7 @@ class _NotificationListState extends State<NotificationList> {
     // }
   }
 
-  Future<void> _handleDelete(NotificationItemModel item) async {
+  Future<void> _handleDelete(NotificationPush item) async {
     if (widget.deleteUrlBuilder != null) {
       try {
         // await http.delete(Uri.parse(widget.deleteUrlBuilder!(item.id)));
@@ -108,17 +109,17 @@ class _NotificationListState extends State<NotificationList> {
         // ajusta este comportamiento segun lo que necesite tu app.
       }
     }
-    widget.onDelete?.call(item.id);
-    setState(() => _items.removeWhere((n) => n.id == item.id));
+    widget.onDelete?.call(item.idNotification);
+    setState(() => _items.removeWhere((n) => n.idNotification == item.idNotification));
   }
 
-  Map<String, List<NotificationItemModel>> _grouped() {
-    final map = <String, List<NotificationItemModel>>{};
-    for (final item in _items) {
-      map.putIfAbsent(item.group, () => []).add(item);
-    }
-    return map;
-  }
+  // Map<String, List<NotificationPush>> _grouped() {
+  //   final map = <String, List<NotificationPush>>{};
+  //   for (final item in _items) {
+  //     map.putIfAbsent(item.group, () => []).add(item);
+  //   }
+  //   return map;
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -164,22 +165,22 @@ class _NotificationListState extends State<NotificationList> {
       );
     }
 
-    final grouped = _grouped();
+    // final grouped = _grouped();
 
     return ColoredBox(
       color: _Palette.background,
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
-          for (final entry in grouped.entries) ...[
-            if (entry.key.isNotEmpty) _GroupHeader(title: entry.key),
-            for (final item in entry.value)
-              _NotificationTile(
-                key: ValueKey(item.id),
-                item: item,
-                onDelete: () => _handleDelete(item),
-              ),
-          ],
+          // for (final entry in grouped.entries) ...[
+          //   if (entry.key.isNotEmpty) _GroupHeader(title: entry.key),
+          //   for (final item in entry.value)
+          //     _NotificationTile(
+          //       key: ValueKey(item.idNotification),
+          //       item: item,
+          //       onDelete: () => _handleDelete(item),
+          //     ),
+          // ],
         ],
       ),
     );
@@ -211,7 +212,7 @@ class _GroupHeader extends StatelessWidget {
 // ---------------------------------------------------------------------------
 
 class _NotificationTile extends StatelessWidget {
-  final NotificationItemModel item;
+  final NotificationPush item;
   final VoidCallback onDelete;
 
   const _NotificationTile({
@@ -223,7 +224,7 @@ class _NotificationTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dismissible(
-      key: ValueKey('dismiss-${item.id}'),
+      key: ValueKey('dismiss-${item.idNotification}'),
       direction: DismissDirection.endToStart,
       background: Container(color: _Palette.itemBg),
       secondaryBackground: Container(
@@ -250,7 +251,7 @@ class _NotificationTile extends StatelessWidget {
       confirmDismiss: (_) async => true,
       onDismissed: (_) => onDelete(),
       child: Container(
-        color: item.unread ? _Palette.itemUnreadBg : _Palette.itemBg,
+        color: item.isRead ? _Palette.itemUnreadBg : _Palette.itemBg,
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -281,7 +282,7 @@ class _NotificationTile extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    item.time,
+                    item.sentAt,
                     style: const TextStyle(
                       color: _Palette.textSecondary,
                       fontSize: 13,
@@ -290,12 +291,12 @@ class _NotificationTile extends StatelessWidget {
                 ],
               ),
             ),
-            if (item.thumbnailUrl != null) ...[
+            if (item.imgUrl != null) ...[
               const SizedBox(width: 8),
               ClipRRect(
                 borderRadius: BorderRadius.circular(8),
                 child: Image.network(
-                  item.thumbnailUrl!,
+                  item.imgUrl!,
                   width: 56,
                   height: 56,
                   fit: BoxFit.cover,
@@ -310,7 +311,7 @@ class _NotificationTile extends StatelessWidget {
 }
 
 class _Avatar extends StatelessWidget {
-  final NotificationItemModel item;
+  final NotificationPush item;
   const _Avatar({required this.item});
 
   @override
@@ -322,9 +323,9 @@ class _Avatar extends StatelessWidget {
         clipBehavior: Clip.none,
         children: [
           ClipOval(
-            child: item.avatarUrl != null
+            child: item.imgUrl != null
                 ? Image.network(
-                    item.avatarUrl!,
+                    item.imgUrl!,
                     width: 48,
                     height: 48,
                     fit: BoxFit.cover,
