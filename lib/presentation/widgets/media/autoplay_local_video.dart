@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:video_player/video_player.dart';
 import 'package:zentinel/config/constants/permissions.dart';
 import 'package:zentinel/config/utils/helper.dart';
@@ -162,7 +163,7 @@ class _VideoHeaderState extends ConsumerState<VideoHeader> {
 
                                 InkWell(
                                   onTap: () async {
-                                    
+                                    context.push('/notifications');
                                   },
                                   child: const Padding(
                                     padding: EdgeInsets.all(7),

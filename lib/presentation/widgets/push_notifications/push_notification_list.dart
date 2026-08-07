@@ -17,7 +17,7 @@ class NotificationList extends StatefulWidget {
   final String? apiUrl;
 
   /// Alternativa a [apiUrl]: notificaciones ya cargadas por el padre.
-  final List<NotificationPush>? notifications;
+  final List<NotificationPush> notifications;
 
   /// URL para el DELETE al backend. Usa "{id}" como marcador, ej:
   /// "https://tu-api.com/notifications/{id}"
@@ -32,41 +32,29 @@ class NotificationList extends StatefulWidget {
   const NotificationList({
     super.key,
     this.apiUrl,
-    this.notifications,
+    required this.notifications,
     this.deleteUrlBuilder,
     this.onDelete,
     this.emptyMessage = 'No tienes notificaciones.',
-  }) : assert(
-         apiUrl != null || notifications != null,
-         'Provee apiUrl o notifications',
-       );
+  });
 
   @override
   State<NotificationList> createState() => _NotificationListState();
 }
 
 class _NotificationListState extends State<NotificationList> {
-  List<NotificationPush> _items = [];
+  List<NotificationPush> get _items => widget.notifications;
   bool _loading = false;
   String? _error;
 
   @override
   void initState() {
     super.initState();
-    if (widget.notifications != null) {
-      _items = widget.notifications!;
-    } else {
-      _fetch();
-    }
   }
 
   @override
   void didUpdateWidget(covariant NotificationList old) {
     super.didUpdateWidget(old);
-    if (widget.notifications != null &&
-        widget.notifications != old.notifications) {
-      setState(() => _items = widget.notifications!);
-    }
   }
 
   Future<void> _fetch() async {
@@ -171,17 +159,15 @@ class _NotificationListState extends State<NotificationList> {
       color: _Palette.background,
       child: ListView(
         padding: EdgeInsets.zero,
-        children: [
-          // for (final entry in grouped.entries) ...[
-          //   if (entry.key.isNotEmpty) _GroupHeader(title: entry.key),
-          //   for (final item in entry.value)
-          //     _NotificationTile(
-          //       key: ValueKey(item.idNotification),
-          //       item: item,
-          //       onDelete: () => _handleDelete(item),
-          //     ),
-          // ],
-        ],
+        children: _items
+            .map(
+              (item) => _NotificationTile(
+                key: ValueKey(item.idNotification),
+                item: item,
+                onDelete: () => _handleDelete(item),
+              ),
+            )
+            .toList(),
       ),
     );
   }

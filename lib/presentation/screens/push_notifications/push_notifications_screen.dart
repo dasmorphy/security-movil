@@ -16,11 +16,14 @@ class _PushNotificationsScreenState extends ConsumerState<PushNotificationsScree
   @override
   void initState() {
     super.initState();
+    ref.read(getNotifications.notifier).load();
   }
   
 
   @override
   Widget build(BuildContext context) {
+    final notifications = ref.watch(getNotifications);
+
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(60),
@@ -32,16 +35,9 @@ class _PushNotificationsScreenState extends ConsumerState<PushNotificationsScree
         top: false,
         // bottom: false,
         child: 
-          SizedBox()
-          // TechnicalRecord(
-          //   taskData: widget.taskHeader,
-          //   onSubmit: (data) async {
-          //     return await ref
-          //       .read(technicalRecordProvider.notifier)
-          //       .saveTechnicalRecord(data);
-          //   },
-          // ),
-            
+          NotificationList(
+            notifications: notifications
+          ),
       ),
     );
   }

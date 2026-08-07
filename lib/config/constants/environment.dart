@@ -4,4 +4,5 @@ class Environments {
   static String baseUrl = dotenv.env['ZENTINEL_BASE_URL'] ?? 'No hay api key';
   static String localDevUrl = dotenv.env['ZENTINEL_LOCAL_DEV_URL'] ?? 'No hay api key';
   static String technicalUrl = dotenv.env['TECHNICAL_BASE_URL'] ?? 'No hay api key';
+  static String notificationUrl = dotenv.env['NOTIFICATION_BASE_URL'] ?? 'No hay api key';
 }
