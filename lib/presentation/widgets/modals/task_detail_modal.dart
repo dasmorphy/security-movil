@@ -137,7 +137,7 @@ class TaskDetailModal extends ConsumerWidget {
                 ],
 
                 if (userData.hasPermission(Permissions.solicitarFinalizacionProyecto) && 
-                  item.status != 'Finalizado' && item.status != 'Pendiente aprobación')...[
+                  item.status == 'En ejecución')...[
                   Expanded(
                     child: OutlinedButton(
                       style: OutlinedButton.styleFrom(

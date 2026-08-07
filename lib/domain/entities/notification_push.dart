@@ -1,7 +1,7 @@
 class NotificationPush {
   String body;
   String createdAt;
-  Data data;
+  Map<String, dynamic> data;
   String idNotification;
   dynamic imgUrl;
   bool isDeleted;
@@ -35,7 +35,7 @@ class NotificationPush {
       NotificationPush(
         body: json["body"],
         createdAt: json["created_at"],
-        data: Data.fromJson(json["data"]),
+        data: Map<String, dynamic>.from(json["data"] ?? {}),
         idNotification: json["id_notification"],
         imgUrl: json["img_url"],
         isDeleted: json["is_deleted"],
@@ -52,7 +52,7 @@ class NotificationPush {
   Map<String, dynamic> toJson() => {
     "body": body,
     "created_at": createdAt,
-    "data": data.toJson(),
+    "data": data,
     "id_notification": idNotification,
     "img_url": imgUrl,
     "is_deleted": isDeleted,

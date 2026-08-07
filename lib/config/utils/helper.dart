@@ -10,6 +10,7 @@ import 'package:intl/intl.dart';
 import 'package:zentinel/domain/entities/user_session.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:zentinel/presentation/widgets/widgets.dart';
 
 final GlobalKey<ScaffoldMessengerState> scaffoldMessengerKey =
     GlobalKey<ScaffoldMessengerState>();
@@ -418,4 +419,39 @@ Color getStatusColorTaskTech(String status) {
     default:
       return const Color.fromARGB(255, 82, 84, 83);
   }
+}
+
+getNotificationStyle(String? type) {
+  switch (type) {
+    case 'TECHNICAL_APPROVAL_REQUEST_REJECTED':
+      return const NotificationStyle(
+        color: Colors.red,
+        icon: Icons.do_disturb_alt_sharp,
+      );
+
+    case 'TECHNICAL_APPROVAL_REQUEST_APPROVED':
+      return const NotificationStyle(
+        color: Colors.green,
+        icon: Icons.check_circle_rounded,
+      );
+
+    case 'TECHNICAL_APPROVAL_REQUEST_CREATED':
+      return const NotificationStyle(
+        color: Colors.blue,
+        icon: Icons.assignment_rounded,
+      );
+
+    case 'NEW_TECHNICAL_REQUEST':
+      return const NotificationStyle(
+        color: Colors.orange,
+        icon: Icons.engineering_rounded,
+      );
+
+    default:
+      return const NotificationStyle(
+        color: Colors.grey,
+        icon: Icons.notifications_rounded,
+      );
+  }
+
 }

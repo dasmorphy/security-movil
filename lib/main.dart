@@ -60,6 +60,11 @@ class _MyAppState extends ConsumerState<MyApp> {
   void initState() {
     super.initState();
 
+    // El singleton de push se inicializa en main(), fuera del ProviderScope,
+    // así que aquí le damos acceso a la sesión para reenviar el token rotado.
+    PushNotificationProvider.instance.onTokenRefreshed = (token) =>
+        ref.read(userSessionProvider.notifier).syncFcmToken(token);
+
     _localization.init(
       mapLocales: const [
         MapLocale('en', AppLocale.EN),

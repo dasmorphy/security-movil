@@ -25,6 +25,9 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
   bool imagesMaxError = false;
   bool _isInitializing = true;
 
+  String _vehicle = '0';
+  final FocusNode _vehicleFocus = FocusNode();
+
   final _quantityCtrl = TextEditingController();
   final _providerCtrl = TextEditingController();
   final _observationsCtrl = TextEditingController();
@@ -82,6 +85,9 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
     _materialEntryFocus.dispose();
     _truckLicenseFocus.dispose();
     _reasonVisitFocus.dispose();
+    _vehicleFocus.dispose();
+    _observationsFocus.dispose();
+    _vehicle = '0';
     imagesMinError = false;
     imagesMaxError = false;
   }
@@ -100,7 +106,7 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
       return;
     }
 
-    if (_selectedImages.length < 2) {
+    if (_selectedImages.length < 6) {
       setState(() {
         imagesMinError = true;
         isLoading = false;
@@ -138,6 +144,7 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
       "client_id": widget.taskData.cliendId,
       "location_id": widget.taskData.locationId,
       "task_id": widget.taskData.taskId,
+      "vehicle": _vehicle,
       "technical_staff": selectedUsers,
       "user": userData.user,
       "materials": materialsAdded.map((p) => {
@@ -248,6 +255,23 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
     final theme = Theme.of(context);
     final materials = ref.watch(getTechMaterial);
     final techStaff = ref.watch(getTechnicalStaff);
+    final vehicle = [
+      {'id': '1',
+        'name': 'GTW-8534',
+      },
+      {'id': '2',
+        'name': 'GTW-8533',
+      },
+      {'id': '3',
+        'name': 'GTA-9251',
+      },
+      {'id': '4',
+        'name': 'GSW-7476',
+      },
+      {'id': '5',
+        'name': 'GST-6597',
+      },
+    ];
 
     //Usuario no cargado o sesión inválida
     if (!authState.hasValue || authState.value == null) {
@@ -367,6 +391,39 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
                   },
                 ),
 
+
+                const SizedBox(height: 12),
+                CustomFieldLabelRequired(txtLabel: 'Vehículo'),
+                GlowDropdownFormField2<String>(
+                  value: _vehicle,
+                  focusNode: _vehicleFocus,
+                  decoration: styleDecoration(),
+                  items: [
+                    DropdownMenuItem(
+                      enabled: false,
+                      value: '0',
+                      child: Text('Seleccione una opción', style: TextStyle(color: Colors.white),),
+                    ),
+                    ...vehicle.map(
+                      (c) => DropdownMenuItem(
+                        value: c['name'],
+                        child: Text(c['name']!, style: TextStyle(color: Colors.white),),
+                      ),
+                    ),
+                  ],
+                  onChanged: (v) {
+                    if (v != null) {
+                      setState(() => _vehicle = v);
+                    }
+                  },
+                  validator: (v) {
+                    if (v == '0' || v == null || v.trim().isEmpty) {
+                      return messageValidatorEmpty;
+                    }
+                    return null;
+                  },
+                ),
+
                 const SizedBox(height: 12),
 
                 CustomFieldLabelRequired(txtLabel: 'Equipos', isRequired: false,),
@@ -452,7 +509,7 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
                 const SizedBox(height: 18),
                 
                 CameraImagePicker(
-                  minImages: 2,
+                  minImages: 6,
                   maxImages: 10,
                   onImagesChanged: (images) {
                     print("imagenes seleccionadas ${images.length}");
@@ -467,7 +524,7 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
                     width: double.infinity,
                     child: Text(
                       imagesMinError
-                          ? 'Debe subir mínimo 2 imagenes'
+                          ? 'Debe subir mínimo 6 imagenes'
                           : 'Debe subir máximo 10 imagenes',
                       style: TextStyle(color: Color.fromARGB(255, 185, 28, 16)),
                     ),

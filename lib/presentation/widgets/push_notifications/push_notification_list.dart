@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/domain/entities/notification_push.dart';
 
 class _Palette {
@@ -10,6 +11,15 @@ class _Palette {
   static const textSecondary = Color(0xFFB0B3B8);
   static const deleteBg = Color(0xFFF16A63);
   static const deleteFg = Color(0xFF3A1210);
+}
+class NotificationStyle {
+  final Color color;
+  final IconData icon;
+
+  const NotificationStyle({
+    required this.color,
+    required this.icon,
+  });
 }
 
 class NotificationList extends StatefulWidget {
@@ -55,37 +65,6 @@ class _NotificationListState extends State<NotificationList> {
   @override
   void didUpdateWidget(covariant NotificationList old) {
     super.didUpdateWidget(old);
-  }
-
-  Future<void> _fetch() async {
-    if (widget.apiUrl == null) return;
-    setState(() {
-      _loading = true;
-      _error = null;
-    });
-    // try {
-    //   final res = await http.get(Uri.parse(widget.apiUrl!));
-    //   if (res.statusCode != 200) {
-    //     throw Exception('Error ${res.statusCode} al obtener notificaciones');
-    //   }
-    //   final decoded = jsonDecode(res.body);
-    //   final List rawList = decoded is List
-    //       ? decoded
-    //       : (decoded['data'] ?? decoded['notifications'] ?? []);
-    //   setState(() {
-    //     _items = rawList
-    //         .map(
-    //           (e) => NotificationPush.fromJson(e as Map<String, dynamic>),
-    //         )
-    //         .toList();
-    //     _loading = false;
-    //   });
-    // } catch (e) {
-    //   setState(() {
-    //     _error = 'No se pudieron cargar las notificaciones.';
-    //     _loading = false;
-    //   });
-    // }
   }
 
   Future<void> _handleDelete(NotificationPush item) async {
@@ -156,7 +135,7 @@ class _NotificationListState extends State<NotificationList> {
     // final grouped = _grouped();
 
     return ColoredBox(
-      color: _Palette.background,
+      color: const Color.fromARGB(255, 23, 24, 28),
       child: ListView(
         padding: EdgeInsets.zero,
         children: _items
@@ -164,6 +143,7 @@ class _NotificationListState extends State<NotificationList> {
               (item) => _NotificationTile(
                 key: ValueKey(item.idNotification),
                 item: item,
+                onTap: () => _handleDelete(item),
                 onDelete: () => _handleDelete(item),
               ),
             )
@@ -199,11 +179,13 @@ class _GroupHeader extends StatelessWidget {
 
 class _NotificationTile extends StatelessWidget {
   final NotificationPush item;
+  final VoidCallback onTap;
   final VoidCallback onDelete;
 
   const _NotificationTile({
     super.key,
     required this.item,
+    required this.onTap,
     required this.onDelete,
   });
 
@@ -212,7 +194,7 @@ class _NotificationTile extends StatelessWidget {
     return Dismissible(
       key: ValueKey('dismiss-${item.idNotification}'),
       direction: DismissDirection.endToStart,
-      background: Container(color: _Palette.itemBg),
+      background: Container(color: const Color.fromARGB(255, 23, 24, 28)),
       secondaryBackground: Container(
         color: _Palette.deleteBg,
         alignment: Alignment.centerRight,
@@ -237,7 +219,8 @@ class _NotificationTile extends StatelessWidget {
       confirmDismiss: (_) async => true,
       onDismissed: (_) => onDelete(),
       child: Container(
-        color: item.isRead ? _Palette.itemUnreadBg : _Palette.itemBg,
+        // color: item.isRead ? _Palette.itemUnreadBg : _Palette.itemBg,
+        color: const Color.fromARGB(255, 23, 24, 28),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -249,26 +232,32 @@ class _NotificationTile extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  RichText(
-                    text: TextSpan(
-                      style: const TextStyle(
-                        color: _Palette.textPrimary,
-                        fontSize: 14.5,
-                        height: 1.35,
-                      ),
-                      children: [
-                        TextSpan(
-                          text: item.title,
-                          style: const TextStyle(fontWeight: FontWeight.w700),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        item.title,
+                        style: const TextStyle(
+                          color: _Palette.textPrimary,
+                          fontSize: 14.5,
+                          fontWeight: FontWeight.w700,
                         ),
-                        if (item.body.isNotEmpty)
-                          TextSpan(text: ' ${item.body}'),
-                      ],
-                    ),
+                      ),
+                      if (item.body.isNotEmpty)... [
+                        const SizedBox(height: 5),
+                        Text(
+                          item.body, 
+                          style: const TextStyle(
+                            color: _Palette.textSecondary,
+                            fontSize: 13,
+                          )
+                        ),
+                      ]
+                    ],
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    item.sentAt,
+                    formatDateDetails(item.sentAt.toString()),
                     style: const TextStyle(
                       color: _Palette.textSecondary,
                       fontSize: 13,
@@ -302,6 +291,7 @@ class _Avatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final style = getNotificationStyle(item.notificationType);
     return SizedBox(
       width: 48,
       height: 48,
@@ -310,38 +300,46 @@ class _Avatar extends StatelessWidget {
         children: [
           ClipOval(
             child: item.imgUrl != null
-                ? Image.network(
-                    item.imgUrl!,
+              ? Image.network(
+                  item.imgUrl!,
+                  width: 48,
+                  height: 48,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) => Container(
+                    color: _Palette.border,
                     width: 48,
                     height: 48,
-                    fit: BoxFit.cover,
-                    errorBuilder: (_, __, ___) => Container(
-                      color: _Palette.border,
-                      width: 48,
-                      height: 48,
-                    ),
-                  )
-                : Container(color: _Palette.border, width: 48, height: 48),
+                  ),
+                )
+              : Container(
+                width: 48,
+                height: 48,
+                color: style.color.withOpacity(0.15),
+                child: Icon(
+                  style.icon,
+                  color: style.color,
+                  size: 26,
+                ),
+              ),
           ),
-          // if (item.badge != NotificationBadge.none)
-          //   Positioned(
-          //     right: -2,
-          //     bottom: -2,
-          //     child: Container(
-          //       width: 20,
-          //       height: 20,
-          //       decoration: BoxDecoration(
-          //         shape: BoxShape.circle,
-          //         color: item.badgeColor,
-          //         border: Border.all(color: _Palette.itemBg, width: 2),
-          //       ),
-          //       child: Icon(
-          //         _iconForBadge(item.badge),
-          //         size: 12,
-          //         color: Colors.white,
-          //       ),
-          //     ),
-          //   ),
+            Positioned(
+              right: -2,
+              bottom: -2,
+              child: Container(
+                width: 20,
+                height: 20,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.blueAccent,
+                  border: Border.all(color: _Palette.itemBg, width: 2),
+                ),
+                child: Icon(
+                  Icons.notifications,
+                  size: 12,
+                  color: Colors.white,
+                ),
+              ),
+            ),
         ],
       ),
     );

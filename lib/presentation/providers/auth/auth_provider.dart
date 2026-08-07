@@ -5,6 +5,7 @@ import 'package:zentinel/domain/repositories/auth_repository.dart';
 import 'package:zentinel/presentation/providers/auth/auth_repository_provider.dart';
 import 'package:zentinel/data/services/hive_service.dart';
 import 'package:zentinel/presentation/providers/onboarding/onboarding_provider.dart';
+import 'package:zentinel/presentation/providers/providers.dart';
 
 /// Provider para cargar sesión persistida
 final persistedSessionProvider = FutureProvider<User?>((ref) async {
@@ -79,8 +80,11 @@ class UserSessionNotifier extends StateNotifier<AsyncValue<User?>> {
       
       // Guardar sesión en Hive
       await hiveService.saveUserSession(user);
-      
+
       state = AsyncValue.data(user);
+
+      // El interceptor toma el JWT de este provider, por eso va después del state.
+      await _registerFcmToken(user);
     } on DioException catch (e) {
       if (!mounted) return;
       state = AsyncValue.error(
@@ -91,6 +95,48 @@ class UserSessionNotifier extends StateNotifier<AsyncValue<User?>> {
       print(e);
       print(st);
       state = AsyncValue.error('Error inesperado', st);
+    }
+  }
+
+  /// Envía el token FCM del dispositivo al backend tras iniciar sesión.
+  /// Un fallo aquí no debe romper el login.
+  Future<void> _registerFcmToken(User user) async {
+    final fcmToken = await PushNotificationProvider.instance.resolveFcmToken();
+
+    if (fcmToken == null || fcmToken.isEmpty) {
+      print('Sin token FCM disponible, no se registra en el backend');
+      return;
+    }
+
+    await _sendFcmToken(user, fcmToken);
+  }
+
+  /// Reenvía al backend un token rotado por Firebase (onTokenRefresh).
+  /// Si no hay sesión activa no se envía: el token ya quedó en
+  /// SharedPreferences y se registrará en el próximo login.
+  Future<void> syncFcmToken(String fcmToken) async {
+    final user = state.value;
+    if (user == null) return;
+
+    await _sendFcmToken(user, fcmToken);
+  }
+
+  Future<void> _sendFcmToken(User user, String fcmToken) async {
+    try {
+      final response = await ref
+          .read(pushNotificationFetchProvider.notifier)
+          .saveFcmTokenUser({
+            'fcm_token': fcmToken,
+            'platform': PushNotificationProvider.instance.platform,
+            'project_id': 1,
+            'user_id': user.idUser,
+          });
+
+      if (!response.success) {
+        print('No se pudo guardar el token FCM: ${response.message}');
+      }
+    } catch (e) {
+      print('Error registrando token FCM: $e');
     }
   }
 

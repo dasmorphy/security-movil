@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -23,6 +24,11 @@ class PushNotificationProvider {
   final FlutterLocalNotificationsPlugin _localNotifications =
       FlutterLocalNotificationsPlugin();
 
+  /// Se invoca cuando Firebase rota el token, para reenviarlo al backend.
+  /// Se asigna desde la app porque este singleton se inicializa en main(),
+  /// antes de que exista el ProviderScope.
+  Future<void> Function(String token)? onTokenRefreshed;
+
   /// Inicializa todo el flujo: permisos, canal local, listeners y token.
   Future<void> initialize() async {
     await _requestPermissions();
@@ -46,8 +52,10 @@ class PushNotificationProvider {
     await _fetchAndSaveToken();
 
     // Se actualiza si Firebase renueva el token.
-    _firebaseMessaging.onTokenRefresh.listen((newToken) {
-      _saveFcmToken(newToken);
+    _firebaseMessaging.onTokenRefresh.listen((newToken) async {
+      print('Token FCM renovado: $newToken');
+      await _saveFcmToken(newToken);
+      await onTokenRefreshed?.call(newToken);
     });
   }
 
@@ -144,6 +152,29 @@ class PushNotificationProvider {
   Future<String?> getSavedFcmToken() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString(_fcmTokenKey);
+  }
+
+  /// Plataforma tal como la espera el backend.
+  String get platform {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+        return 'ios';
+      case TargetPlatform.android:
+      default:
+        return 'android';
+    }
+  }
+
+  /// Devuelve el token guardado y, si aún no existe, lo pide a Firebase.
+  Future<String?> resolveFcmToken() async {
+    final saved = await getSavedFcmToken();
+    if (saved != null && saved.isNotEmpty) return saved;
+
+    final token = await _firebaseMessaging.getToken();
+    if (token != null) {
+      await _saveFcmToken(token);
+    }
+    return token;
   }
 
   Future<void> deleteToken() async {

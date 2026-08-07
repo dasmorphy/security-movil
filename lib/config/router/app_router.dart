@@ -175,6 +175,13 @@ final appRouter = GoRouter(
           name: PushNotificationsScreen.name,
           builder: (context, state) => const PushNotificationsScreen(),
         ),
+        GoRoute(
+          path: '/notification-history-detail',
+          name: NotificationHistoryDetailScreen.name,
+          builder: (context, state) => const NotificationHistoryDetailScreen(
+            
+          ),
+        ),
       ]
     ),
   ]

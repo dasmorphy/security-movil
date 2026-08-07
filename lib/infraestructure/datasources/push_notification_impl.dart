@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:uuid/uuid.dart';
+import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/domain/datasources/push_notification_datasource.dart';
+import 'package:zentinel/domain/entities/api_response.dart';
 import 'package:zentinel/domain/entities/notification_push.dart';
 
 class PushNotificationImpl extends PushNotificationDatasource {
@@ -25,6 +27,41 @@ class PushNotificationImpl extends PushNotificationDatasource {
       return notificationsJson.map((json) => NotificationPush.fromJson(json)).toList();
     } catch (e) {
       throw Exception('Error fetching notifications: $e');
+    }
+  }
+
+  @override
+  Future<ApiResponse<dynamic>> saveFcmTokenUser(Map<String, dynamic> data) async {
+    try {
+      final response = await dio.post(
+        '/rest/notifications-api/v1.0/fcm-token-user',
+        data: {
+          'externalTransactionId': uuid, 
+          'channel': 'ZENTINEL',
+          'data': data
+        },
+        options: onlyError(),
+      );
+
+      final body = response.data;
+
+      return ApiResponse(
+        success: response.statusCode == 200,
+        errorCode: body['error_code']?.toString(),
+        message: body['message'],
+        data: body['data'],
+      );
+    } catch (e) {
+      print('Error al guardar token: $e');
+      String messageError = "Error al guardar token";
+      if (e is DioException) {
+        messageError = e.response?.data["message"];
+      }
+      return ApiResponse(
+        success: false,
+        errorCode: 'save_error',
+        message: messageError,
+      );
     }
   }
 
