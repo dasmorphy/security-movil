@@ -1,23 +1,23 @@
 class LocationTechnical {
-  String address;
+  String? address;
   int clientId;
   DateTime createdAt;
   String createdBy;
   int idLocation;
-  dynamic lat;
-  dynamic long;
+  String? lat;
+  String? long;
   String name;
   DateTime updatedAt;
   String updatedBy;
 
   LocationTechnical({
-    required this.address,
+    this.address,
     required this.clientId,
     required this.createdAt,
     required this.createdBy,
     required this.idLocation,
-    required this.lat,
-    required this.long,
+    this.lat,
+    this.long,
     required this.name,
     required this.updatedAt,
     required this.updatedBy,

@@ -90,6 +90,16 @@ Future<void> savePendingEmployeeMovements(Map<String, dynamic> data) async {
   });
 }
 
+Future<void> savePendingRegisterTech(Map<String, dynamic> data) async {
+  final box = Hive.box('register_technical');
+  final preparedData = await _prepareDataForStorage(data);
+
+  await box.add({
+    'payload': preparedData,
+    'createdAt': DateTime.now().toIso8601String(),
+  });
+}
+
 class SyncService {
   StreamSubscription? _sub;
   VoidCallback? _onSyncNeeded;

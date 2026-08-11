@@ -122,6 +122,12 @@ class _VideoHeaderState extends ConsumerState<VideoHeader> {
                                             label: 'Despachos e ingresos',
                                             icon: Icons.assignment_turned_in_rounded,
                                           ),
+                                        if (userData.hasPermission(Permissions.registerTechnicalOffline))
+                                          BottomSheetOption(
+                                            value: 'REGISTROS_TECNICOS',
+                                            label: 'Registros técnicos',
+                                            icon: Icons.assignment_turned_in_rounded,
+                                          ),
                                       ],
                                     );
 
@@ -148,6 +154,12 @@ class _VideoHeaderState extends ConsumerState<VideoHeader> {
                                     if (option == 'DESPACHO_INGRESO') {
                                       if (context.mounted) {
                                         _openModal(context, DispatchOffline());
+                                      }
+                                    }
+
+                                    if (option == 'REGISTROS_TECNICOS') {
+                                      if (context.mounted) {
+                                        _openModal(context, RegisterTecninalOffline());
                                       }
                                     }
                                   },

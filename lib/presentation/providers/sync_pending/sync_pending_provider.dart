@@ -79,6 +79,23 @@ final pendingEmployeeMovementsProvider = StreamProvider<List<Map<String, dynamic
   }
 });
 
+final pendingRegisterTechProvider = StreamProvider<List<Map<String, dynamic>>>((ref) async* {
+  final box = Hive.box('register_technical');
+  // emite estado inicial
+  yield box.values
+    .whereType<Map>()
+    .map((e) => Map<String, dynamic>.from(e))
+    .toList();
+
+  // escucha cambios
+  await for (final _ in box.watch()) {
+    yield box.values
+      .whereType<Map>()
+      .map((e) => Map<String, dynamic>.from(e))
+      .toList();
+  }
+});
+
 /// Firma del envío real de un registro al backend.
 /// Recibe el `endpoint` guardado (puede ser null) y el payload ya restaurado,
 /// y devuelve `true` si el backend confirmó la recepción.
@@ -127,6 +144,10 @@ class SyncPendingNotifier extends StateNotifier<bool> {
         .saveEmployeeMovement(data);
   }
 
+  Future<ApiResponse> providerRegisterTechnical(Map<String, dynamic> data) async {
+    return await ref.read(technicalRecordProvider.notifier).saveTechnicalRecord(data);
+  }
+
   /// Adquiere el lock de forma SÍNCRONA (antes de cualquier `await`) y ejecuta
   /// `action`. Es la pieza clave: poner `_running = true` antes del primer
   /// `await` cierra la ventana de carrera (TOCTOU) que dejaba pasar varias
@@ -164,6 +185,11 @@ class SyncPendingNotifier extends StateNotifier<bool> {
         label: 'employee',
         send: _sendEmployee,
       );
+      await _drainBox(
+        boxName: 'register_technical',
+        label: 'register_technical',
+        send: _sendRegisterTechnical,
+      );
     });
   }
 
@@ -184,6 +210,14 @@ class SyncPendingNotifier extends StateNotifier<bool> {
         ),
       );
 
+  Future<void> syncRegisterTech() => _withLock(
+        () => _drainBox(
+          boxName: 'register_technical',
+          label: 'register_technical',
+          send: _sendRegisterTechnical,
+        ),
+      );
+
   // --- Senders por tipo de box ---------------------------------------------
 
   Future<bool> _sendLogbook(String? endpoint, Map<String, dynamic> data) async {
@@ -200,6 +234,10 @@ class SyncPendingNotifier extends StateNotifier<bool> {
 
   Future<bool> _sendEmployee(String? endpoint, Map<String, dynamic> data) async {
     return (await providerEmployeeMovements(data)).success;
+  }
+
+  Future<bool> _sendRegisterTechnical(String? endpoint, Map<String, dynamic> data) async {
+    return (await providerRegisterTechnical(data)).success;
   }
 
   // --- Worker genérico -------------------------------------------------------

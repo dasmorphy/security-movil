@@ -246,6 +246,16 @@ Map<String, dynamic> mapPendingEmployeeMovements(Map<String, dynamic> raw) {
   };
 }
 
+Map<String, dynamic> mapPendingRegisterTech(Map<String, dynamic> raw) {
+  final bool processing = raw['processing'] == true;
+
+  return {
+    "name": 'Registro técnnico',
+    "subtitle": 'Registro',
+    "statusText": processing ? 'Subiendo...' : 'Pendiente',
+  };
+}
+
 Future<Uint8List?> convertToWebP(File file) async {
   final result = await FlutterImageCompress.compressWithFile(
     file.absolute.path,

@@ -86,7 +86,7 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
     _truckLicenseFocus.dispose();
     _reasonVisitFocus.dispose();
     _vehicleFocus.dispose();
-    _observationsFocus.dispose();
+    // _observationsFocus.dispose();
     _vehicle = '0';
     imagesMinError = false;
     imagesMaxError = false;
@@ -159,87 +159,67 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
     print(data);
 
     // Verificar conexión a internet
-    // final internetAvailable = await hasInternet();
+    final internetAvailable = await hasInternet();
 
-    // if (!internetAvailable) {
-    //   // 🔴 SIN INTERNET: Guardar localmente
-    //   print('❌ Sin conexión, guardando localmente...');
-    //   data['created_at'] = DateTime.now().toString();
-    //   await savePendingBiomar(data, 'entry');
+    if (!internetAvailable) {
+      // 🔴 SIN INTERNET: Guardar localmente
+      print('❌ Sin conexión, guardando localmente...');
+      data['created_at'] = DateTime.now().toString();
+      await savePendingRegisterTech(data);
 
-    //   if (mounted) {
-    //     _clearCntrl();
-    //     context.pop();
-    //     ScaffoldMessenger.of(context).showSnackBar(
-    //       const SnackBar(
-    //         duration: Duration(seconds: 6),
-    //         content: Text(
-    //           '📱 Sin conexión. Tu información se guardará localmente y se enviará automáticamente cuando recuperes conexión.',
-    //           style: TextStyle(color: Colors.white),
-    //         ),
-    //         backgroundColor: Color.fromARGB(255, 255, 152, 0),
-    //       ),
-    //     );
-    //   }
-    //   setState(() => isLoading = false);
-    //   return;
-    // }
+      if (mounted) {
+        context.pop();
+        GlobalLoadingBottomSheet.show(
+          status: OverlayStatus.error,
+          message: 'Sin conexión. Tu información se guardará localmente y se enviará automáticamente cuando recuperes conexión.',
+          autoDismiss: const Duration(seconds: 3),
+        );
+      }
+      setState(() => isLoading = false);
+      return;
+    }
 
     GlobalLoadingBottomSheet.show(
       status: OverlayStatus.loading, 
       message: "Guardando registro..."
     );
-    final response = await widget.onSubmit.call(data);
 
-    if (!mounted) return;
+    try {
+      final response = await widget.onSubmit.call(data);
 
-    setState(() => isLoading = false);
+      if (!mounted) return;
 
-    if (Navigator.canPop(context)) {
-      context.pop();
-    }
+      setState(() => isLoading = false);
 
-    if (response.success) {
-      GlobalLoadingBottomSheet.show(
-        status: OverlayStatus.success, 
-        message: "Registro guardado exitosamente", 
-        autoDismiss: const Duration(seconds: 2)
-      );
-      ref.read(getTaskTechnical.notifier).load();
-    } else {
-      // await savePendingBiomar(data, 'entry');
+      if (Navigator.canPop(context)) {
+        context.pop();
+      }
+
+      if (response.success) {
+        GlobalLoadingBottomSheet.show(
+          status: OverlayStatus.success, 
+          message: "Registro guardado exitosamente", 
+          autoDismiss: const Duration(seconds: 2)
+        );
+        ref.read(getTaskTechnical.notifier).load();
+      } else {
+        await savePendingRegisterTech(data);
+        GlobalLoadingBottomSheet.show(
+          status: OverlayStatus.error,
+          message:
+              'Error: ${response.message ?? 'No se pudo guardar el registro.'}\n'
+              'La información se guardó localmente y se enviará automáticamente cuando sea posible.',
+          autoDismiss: const Duration(seconds: 3),
+        );
+      }
+    } catch (e) {
+      await savePendingRegisterTech(data);
       GlobalLoadingBottomSheet.show(
         status: OverlayStatus.error,
-        message: 'Error: ${response.message ?? 'Error al guardar el registro'}',
+        message: 'Error al enviar el formulario. La información se guardará localmente y se enviará automáticamente.',
         autoDismiss: const Duration(seconds: 3),
       );
     }
-
-    // if (!success) {
-    //   await savePendingRequest(data, 'logbook_entry');
-    // }
-
-    // if (!mounted) return;
-
-    // _clearCntrl();
-    // if (Navigator.canPop(context)) {
-    //   context.pop();
-    // }
-
-    // if (success) {
-    //   context.push('/check-success');
-    // } else {
-    //   ScaffoldMessenger.of(context).showSnackBar(
-    //     const SnackBar(
-    //       duration: Duration(seconds: 6),
-    //       content: Text(
-    //         '📱 Error al enviar el formulario. La información se guardará localmente y se enviará automáticamente.',
-    //         style: TextStyle(color: Colors.white),
-    //       ),
-    //       backgroundColor: Color.fromARGB(255, 255, 152, 0),
-    //     ),
-    //   );
-    // }
   }
 
   List<Map<String, dynamic>> materialsAdded = [{
@@ -537,7 +517,6 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
                       child: OutlinedButton(
                         onPressed: () {
                           context.pop();
-                          _clearCntrl();
                         },
                         style: OutlinedButton.styleFrom(
                           side: const BorderSide(color: Colors.white24),

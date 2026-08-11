@@ -92,3 +92,4 @@ export 'package:zentinel/presentation/widgets/forms/technical/auditing_record_fo
 export 'package:zentinel/presentation/widgets/forms/technical/new_project_technical.dart';
 export 'package:zentinel/presentation/widgets/shared/multi_select_dialog.dart';
 export 'package:zentinel/presentation/widgets/push_notifications/push_notification_list.dart';
+export 'package:zentinel/presentation/widgets/modals/register_tecninal_offline.dart';
