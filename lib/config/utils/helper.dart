@@ -393,7 +393,7 @@ String formatDateToApi(DateTime date) {
 
 Color getColorTxtTaskTech(String status) {
   switch (status.toLowerCase()) {
-    case 'finalizado':
+    case 'finalizado' || 'rechazado':
       return const Color.fromARGB(255, 246, 105, 105);
     case 'en ejecución':
       return const Color.fromARGB(255, 137, 172, 255);
@@ -408,7 +408,7 @@ Color getColorTxtTaskTech(String status) {
 
 Color getStatusColorTaskTech(String status) {
   switch (status.toLowerCase()) {
-    case 'finalizado':
+    case 'finalizado' || 'rechazado':
       return const Color.fromARGB(255, 54, 18, 18);
     case 'en ejecución':
       return const Color.fromARGB(255, 34, 44, 63);
@@ -421,7 +421,7 @@ Color getStatusColorTaskTech(String status) {
   }
 }
 
-getNotificationStyle(String? type) {
+NotificationStyle getNotificationStyle(String? type) {
   switch (type) {
     case 'TECHNICAL_APPROVAL_REQUEST_REJECTED':
       return const NotificationStyle(

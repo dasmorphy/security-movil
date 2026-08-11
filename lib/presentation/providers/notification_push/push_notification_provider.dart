@@ -1,16 +1,51 @@
 import 'dart:convert';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:zentinel/config/router/notification_router.dart';
 
 
 /// Handler para mensajes recibidos en background.
 /// Debe ser una función top-level o estática (requisito de Firebase).
 @pragma('vm:entry-point')
 Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  // Aquí NO se puede actualizar UI, solo procesar datos/logs.
-  print('Mensaje en background: ${message.messageId}');
+  // Este isolate no comparte estado con el main isolate:
+  // hay que inicializar Firebase y el plugin local aquí también.
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+
+  final localNotifications = FlutterLocalNotificationsPlugin();
+  await localNotifications.initialize(
+    settings: const InitializationSettings(
+      android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+      iOS: DarwinInitializationSettings(),
+    ),
+  );
+
+  // Si viene "notification" úsalo; si es data-only, cae a message.data.
+  final title = message.notification?.title ?? message.data['title'];
+  final body = message.notification?.body ?? message.data['body'];
+
+  if (title == null && body == null) return;
+
+  await localNotifications.show(
+    id: message.hashCode,
+    title: title,
+    body: body,
+    notificationDetails: const NotificationDetails(
+      android: AndroidNotificationDetails(
+        'high_importance_channel',
+        'Notificaciones importantes',
+        importance: Importance.high,
+        priority: Priority.high,
+      ),
+      iOS: DarwinNotificationDetails(),
+    ),
+    payload: jsonEncode(message.data),
+  );
 }
 
 class PushNotificationProvider {
@@ -82,9 +117,7 @@ class PushNotificationProvider {
 
     await _localNotifications.initialize(
       settings: initSettings,
-      onDidReceiveNotificationResponse: (details) {
-        print('Notificación tocada con payload: ${details.payload}');
-      },
+      onDidReceiveNotificationResponse: _onLocalNotificationTapped,
     );
 
     const androidChannel = AndroidNotificationChannel(
@@ -102,30 +135,56 @@ class PushNotificationProvider {
   }
 
   void _onForegroundMessage(RemoteMessage message) {
-    final notification = message.notification;
-    if (notification == null) return;
+    try {
+      final notification = message.notification;
+      if (notification == null) return;
 
-    _localNotifications.show(
-      id: notification.hashCode,
-      title: notification.title,
-      body: notification.body,
-      notificationDetails: const NotificationDetails(
-        android: AndroidNotificationDetails(
-          'high_importance_channel',
-          'Notificaciones importantes',
-          importance: Importance.high,
-          priority: Priority.high,
+      // Se conserva toda la data y se garantizan las claves que usa el
+      // despachador de navegación (NotificationRouter.navigateFromData).
+      final payload = <String, dynamic>{
+        ...message.data,
+        'notification_type': message.data['notification_type'],
+        'history_id': message.data['history_id'],
+      };
+
+      _localNotifications.show(
+        id: notification.hashCode,
+        title: notification.title,
+        body: notification.body,
+        notificationDetails: const NotificationDetails(
+          android: AndroidNotificationDetails(
+            'high_importance_channel',
+            'Notificaciones importantes',
+            importance: Importance.high,
+            priority: Priority.high,
+          ),
+          iOS: DarwinNotificationDetails(),
         ),
-        iOS: DarwinNotificationDetails(),
-      ),
-      payload: jsonEncode(message.data),
-    );
+        payload: jsonEncode(payload),
+      );
+    }catch (e) {
+      print('Error al manejar mensaje en foreground: $e');
+    }
   }
 
   void _onMessageOpenedApp(RemoteMessage message) {
-    // Aquí puedes navegar según message.data, por ejemplo:
-    // Navigator.pushNamed(context, message.data['route']);
     print('Notificación abierta con data: ${message.data}');
+    // Despacha la navegación según el notification_type del payload.
+    NotificationRouter.navigateFromData(message.data);
+  }
+
+  /// Se dispara al tocar una notificación local (ej. mostrada en foreground).
+  /// El payload es el `jsonEncode(message.data)` guardado al mostrarla.
+  void _onLocalNotificationTapped(NotificationResponse details) {
+    final payload = details.payload;
+    if (payload == null || payload.isEmpty) return;
+
+    try {
+      final data = Map<String, dynamic>.from(jsonDecode(payload) as Map);
+      NotificationRouter.navigateFromData(data);
+    } catch (e) {
+      print('Error al procesar payload de notificación local: $e');
+    }
   }
 
   Future<void> _fetchAndSaveToken() async {

@@ -6,7 +6,7 @@ import 'package:zentinel/interceptor/dio_interceptor.dart';
 final dioPushNotificationProvider = Provider<Dio>((ref) {
   final dio = Dio(
     BaseOptions(
-      baseUrl: Environments.notificationUrl,
+      baseUrl: Environments.baseUrl,
       headers: {'Content-Type': 'application/json'},
     ),
   );

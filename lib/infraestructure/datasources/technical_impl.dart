@@ -9,6 +9,7 @@ import 'package:zentinel/domain/datasources/technical_datasource.dart';
 import 'package:zentinel/domain/entities/api_response.dart';
 import 'package:zentinel/domain/entities/auditing_section.dart';
 import 'package:zentinel/domain/entities/client_technical.dart';
+import 'package:zentinel/domain/entities/history_status_project.dart';
 import 'package:zentinel/domain/entities/location_technical.dart';
 import 'package:zentinel/domain/entities/task_technical.dart';
 import 'package:zentinel/domain/entities/tech_material.dart';
@@ -335,7 +336,8 @@ class TechnicalImpl extends TechnicalDatasource {
           'channel': 'ZENTINEL',
           'data': {
             "new_status": data["new_status"],
-            "user": data["user"]
+            "user": data["user"],
+            "notification_type": data["notification_type"]
           }
         },
         options: onlyError(),
@@ -373,6 +375,22 @@ class TechnicalImpl extends TechnicalDatasource {
     );
     final List techStaffJson = response.data['data'];
     return techStaffJson.map((json) => TechnicalStaff.fromJson(json)).toList();
+  }
+
+  @override
+  Future<List<HistoryStatusProject>> getHistoryStatusProject(Map<String, dynamic> filters) async {
+    final response = await dio.get(
+      '/rest/technical-control-api/v1.0/history-status-project',
+      options: Options(
+        headers: {'externalTransactionId': uuid, 'channel': 'ZENTINEL'},
+        
+      ),
+      queryParameters: {
+        'id_history': filters['id_history']
+      },
+    );
+    final List history = response.data['data'];
+    return history.map((json) => HistoryStatusProject.fromJson(json)).toList();
   }
 
 }

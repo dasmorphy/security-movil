@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zentinel/domain/entities/api_response.dart';
 import 'package:zentinel/domain/entities/auditing_section.dart';
 import 'package:zentinel/domain/entities/client_technical.dart';
+import 'package:zentinel/domain/entities/history_status_project.dart';
 import 'package:zentinel/domain/entities/location_technical.dart';
 import 'package:zentinel/domain/entities/task_technical.dart';
 import 'package:zentinel/domain/entities/tech_material.dart';
@@ -80,6 +81,23 @@ final getLocationTechnical =
   },
 );
 
+final getHistoryStatusProject =
+    StateNotifierProvider.autoDispose<
+        CatalogNotifier<HistoryStatusProject>,
+        List<HistoryStatusProject>>(
+  (ref) {
+    final repo = ref.watch(technicalRepositoryProvider);
+
+    return CatalogNotifier<HistoryStatusProject>(
+      (filters) {
+        final mergedFilters = {
+          ...?filters,
+        };
+        return repo.getHistoryStatusProject(mergedFilters);
+      },
+    );
+  },
+);
 
 class FetchTechnicalProvider extends StateNotifier<AsyncValue<ApiResponse>> {
   final TechnicalRepository repository;

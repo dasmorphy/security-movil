@@ -4,11 +4,12 @@ class TaskTechnical {
   String code;
   DateTime createdAt;
   String createdBy;
-  dynamic description;
+  String? description;
   int idTask;
   String location;
-  int locatonId;
+  int locationId;
   String name;
+  List<RecordTechnical>? recordTechnical;
   String status;
   DateTime updatedAt;
   String updatedBy;
@@ -19,11 +20,12 @@ class TaskTechnical {
     required this.code,
     required this.createdAt,
     required this.createdBy,
-    required this.description,
+    this.description,
     required this.idTask,
     required this.location,
-    required this.locatonId,
+    required this.locationId,
     required this.name,
+    this.recordTechnical,
     required this.status,
     required this.updatedAt,
     required this.updatedBy,
@@ -38,8 +40,11 @@ class TaskTechnical {
     description: json["description"],
     idTask: json["id_task"],
     location: json["location"],
-    locatonId: json["locaton_id"],
+    locationId: json["location_id"],
     name: json["name"],
+    recordTechnical: (json["record_technical"] as List?)
+      ?.map((x) => RecordTechnical.fromJson(x))
+      .toList(),
     status: json["status"],
     updatedAt: DateTime.parse(json["updated_at"]),
     updatedBy: json["updated_by"],
@@ -54,10 +59,52 @@ class TaskTechnical {
     "description": description,
     "id_task": idTask,
     "location": location,
-    "locaton_id": locatonId,
+    "location_id": locationId,
     "name": name,
+    "record_technical": recordTechnical == null
+      ? null
+      : List<dynamic>.from(
+          recordTechnical!.map((x) => x.toJson()),
+        ),
     "status": status,
     "updated_at": updatedAt.toIso8601String(),
     "updated_by": updatedBy,
+  };
+}
+
+class RecordTechnical {
+  int clientId;
+  String createdAt;
+  String createdBy;
+  int idRecord;
+  int locationId;
+  String resume;
+
+  RecordTechnical({
+    required this.clientId,
+    required this.createdAt,
+    required this.createdBy,
+    required this.idRecord,
+    required this.locationId,
+    required this.resume,
+  });
+
+  factory RecordTechnical.fromJson(Map<String, dynamic> json) =>
+      RecordTechnical(
+        clientId: json["client_id"],
+        createdAt: json["created_at"],
+        createdBy: json["created_by"],
+        idRecord: json["id_record"],
+        locationId: json["location_id"],
+        resume: json["resume"],
+      );
+
+  Map<String, dynamic> toJson() => {
+    "client_id": clientId,
+    "created_at": createdAt,
+    "created_by": createdBy,
+    "id_record": idRecord,
+    "location_id": locationId,
+    "resume": resume,
   };
 }

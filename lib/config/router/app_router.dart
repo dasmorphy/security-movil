@@ -4,6 +4,7 @@ import 'package:zentinel/presentation/screens/screens.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 import 'package:zentinel/service/navigation_service.dart';
+import 'package:zentinel/config/router/notification_router.dart';
 
 final appRouter = GoRouter(
   navigatorKey: NavigationService.navigatorKey,
@@ -170,19 +171,9 @@ final appRouter = GoRouter(
           name: NewProyectTechnicalScreen.name,
           builder: (context, state) => const NewProyectTechnicalScreen()
         ),
-        GoRoute(
-          path: '/notifications',
-          name: PushNotificationsScreen.name,
-          builder: (context, state) => const PushNotificationsScreen(),
-        ),
-        GoRoute(
-          path: '/notification-history-detail',
-          name: NotificationHistoryDetailScreen.name,
-          builder: (context, state) => const NotificationHistoryDetailScreen(
-            
-          ),
-        ),
       ]
     ),
+    // Rutas del modulo de notificaciones (ver notification_router.dart)
+    ...notificationRoutes,
   ]
 );

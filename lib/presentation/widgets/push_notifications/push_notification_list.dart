@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/router/notification_router.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/domain/entities/notification_push.dart';
 
@@ -143,7 +144,7 @@ class _NotificationListState extends State<NotificationList> {
               (item) => _NotificationTile(
                 key: ValueKey(item.idNotification),
                 item: item,
-                onTap: () => _handleDelete(item),
+                onTap: () => NotificationRouter.navigate(context, item),
                 onDelete: () => _handleDelete(item),
               ),
             )
@@ -218,7 +219,9 @@ class _NotificationTile extends StatelessWidget {
       ),
       confirmDismiss: (_) async => true,
       onDismissed: (_) => onDelete(),
-      child: Container(
+      child: InkWell(
+        onTap: onTap,
+        child: Container(
         // color: item.isRead ? _Palette.itemUnreadBg : _Palette.itemBg,
         color: const Color.fromARGB(255, 23, 24, 28),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -280,6 +283,7 @@ class _NotificationTile extends StatelessWidget {
             ],
           ],
         ),
+      ),
       ),
     );
   }

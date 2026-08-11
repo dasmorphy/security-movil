@@ -34,7 +34,8 @@ class TaskDetailModal extends ConsumerWidget {
         final response =  await ref.read(technicalRecordProvider.notifier).updateStatusProject({
           "id_project": taskId,
           "new_status": "Pendiente aprobación",
-          "user": userData.user
+          "user": userData.user,
+          "notification_type": "TECHNICAL_REQUEST_APPROVAL"
         });
 
         if (response.success) {
@@ -119,7 +120,7 @@ class TaskDetailModal extends ConsumerWidget {
                           extra: TechTaskHeader(
                             taskId: item.idTask,
                             cliendId: item.clientId,
-                            locationId: item.locatonId,
+                            locationId: item.locationId,
                             client: item.client,
                             codeTask: item.code,
                             location: item.location,
@@ -175,7 +176,7 @@ class TaskDetailModal extends ConsumerWidget {
                             extra: TechTaskHeader(
                               taskId: item.idTask,
                               cliendId: item.clientId,
-                              locationId: item.locatonId,
+                              locationId: item.locationId,
                               client: item.client,
                               codeTask: item.code,
                               location: item.location,

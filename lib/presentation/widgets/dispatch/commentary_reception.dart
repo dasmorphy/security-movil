@@ -8,6 +8,7 @@ class CommentaryReception extends StatelessWidget {
   final ValueChanged<String>? onChanged;
   final int minLines;
   final int maxLines;
+  final bool enabled;
 
   const CommentaryReception({
     super.key,
@@ -17,7 +18,8 @@ class CommentaryReception extends StatelessWidget {
     this.label = 'COMENTARIO/NOVEDAD',
     this.hint = '',
     this.minLines = 3,
-    this.maxLines = 3,
+    this.maxLines = 3, 
+    this.enabled = true,
   });
 
   @override
@@ -60,6 +62,7 @@ class CommentaryReception extends StatelessWidget {
                     : [],
               ),
               child: TextFormField(
+                enabled: enabled,
                 controller: controller,
                 focusNode: focusNode,
                 style: const TextStyle(color: Colors.white),
@@ -88,6 +91,13 @@ class CommentaryReception extends StatelessWidget {
                     borderSide: const BorderSide(
                       color: Color.fromARGB(190, 58, 199, 199),
                       width: 1.5,
+                    ),
+                  ),
+                  disabledBorder: OutlineInputBorder(
+                    borderRadius: borderRadius,
+                    borderSide: const BorderSide(
+                      color: Color.fromARGB(255, 75, 83, 83),
+                      width: 1,
                     ),
                   ),
                 ),

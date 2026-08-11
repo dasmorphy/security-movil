@@ -5,6 +5,7 @@ import 'package:zentinel/domain/datasources/technical_datasource.dart';
 import 'package:zentinel/domain/entities/api_response.dart';
 import 'package:zentinel/domain/entities/auditing_section.dart';
 import 'package:zentinel/domain/entities/client_technical.dart';
+import 'package:zentinel/domain/entities/history_status_project.dart';
 import 'package:zentinel/domain/entities/location_technical.dart';
 import 'package:zentinel/domain/entities/task_technical.dart';
 import 'package:zentinel/domain/entities/tech_material.dart';
@@ -86,6 +87,12 @@ class _FakeDatasource extends TechnicalDatasource {
   @override
   Future<List<TechnicalStaff>> getTechnicalStaff() {
     // TODO: implement getTechnicalStaff
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<HistoryStatusProject>> getHistoryStatusProject(Map<String, dynamic> filters) {
+    // TODO: implement getHistoryStatusProject
     throw UnimplementedError();
   }  
 }
