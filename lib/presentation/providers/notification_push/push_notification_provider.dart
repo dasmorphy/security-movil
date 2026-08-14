@@ -20,7 +20,7 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   final localNotifications = FlutterLocalNotificationsPlugin();
   await localNotifications.initialize(
     settings: const InitializationSettings(
-      android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+      android: AndroidInitializationSettings('z-logo'),
       iOS: DarwinInitializationSettings(),
     ),
   );
@@ -41,6 +41,7 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
         'Notificaciones importantes',
         importance: Importance.high,
         priority: Priority.high,
+        icon: 'z_logo'
       ),
       iOS: DarwinNotificationDetails(),
     ),
@@ -157,6 +158,7 @@ class PushNotificationProvider {
             'Notificaciones importantes',
             importance: Importance.high,
             priority: Priority.high,
+            icon: 'z_logo'
           ),
           iOS: DarwinNotificationDetails(),
         ),
