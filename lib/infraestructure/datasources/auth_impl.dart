@@ -43,6 +43,7 @@ class AuthImpl extends AuthDatasource {
     
     // Guardar el token en los atributos para recuperarlo después
     user.attributes['accessToken'] = accessToken;
+    user.attributes['id_session'] = decodedToken["id_session"];
     
     return user;
   }

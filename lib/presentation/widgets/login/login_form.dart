@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:zentinel/domain/entities/user_session.dart';
 import 'package:zentinel/presentation/providers/auth/auth_provider.dart';
 import 'package:zentinel/presentation/providers/onboarding/onboarding_provider.dart';
+import 'package:zentinel/presentation/providers/providers.dart';
 
 class LoginForm extends ConsumerStatefulWidget {
   final String? Function(Map<String, dynamic>? data)? onTap;
@@ -185,7 +186,7 @@ void validateUser(
   String password,
   String email,
   WidgetRef ref,
-) {
+) async {
   if (email.isEmpty || password.isEmpty) {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -196,9 +197,18 @@ void validateUser(
     );
     return;
   }
+  final fcmToken = await PushNotificationProvider.instance.resolveFcmToken();
+
+  if (fcmToken == null || fcmToken.isEmpty) {
+    print('Sin token FCM disponible, no se registra en el backend');
+    return;
+  }
 
   ref.read(userSessionProvider.notifier).signin({
     "user": email,
     "password": password,
+    "fcm_token": fcmToken,
+    "platform": PushNotificationProvider.instance.platform,
+    "project_id": 1
   });
 }

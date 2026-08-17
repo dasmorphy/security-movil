@@ -84,7 +84,7 @@ class UserSessionNotifier extends StateNotifier<AsyncValue<User?>> {
       state = AsyncValue.data(user);
 
       // El interceptor toma el JWT de este provider, por eso va después del state.
-      await _registerFcmToken(user);
+      // await _registerFcmToken(user);
     } on DioException catch (e) {
       if (!mounted) return;
       state = AsyncValue.error(
@@ -100,16 +100,16 @@ class UserSessionNotifier extends StateNotifier<AsyncValue<User?>> {
 
   /// Envía el token FCM del dispositivo al backend tras iniciar sesión.
   /// Un fallo aquí no debe romper el login.
-  Future<void> _registerFcmToken(User user) async {
-    final fcmToken = await PushNotificationProvider.instance.resolveFcmToken();
+  // Future<void> _registerFcmToken(User user) async {
+  //   final fcmToken = await PushNotificationProvider.instance.resolveFcmToken();
 
-    if (fcmToken == null || fcmToken.isEmpty) {
-      print('Sin token FCM disponible, no se registra en el backend');
-      return;
-    }
+  //   if (fcmToken == null || fcmToken.isEmpty) {
+  //     print('Sin token FCM disponible, no se registra en el backend');
+  //     return;
+  //   }
 
-    await _sendFcmToken(user, fcmToken);
-  }
+  //   await _sendFcmToken(user, fcmToken);
+  // }
 
   /// Reenvía al backend un token rotado por Firebase (onTokenRefresh).
   /// Si no hay sesión activa no se envía: el token ya quedó en
@@ -130,6 +130,7 @@ class UserSessionNotifier extends StateNotifier<AsyncValue<User?>> {
             'platform': PushNotificationProvider.instance.platform,
             'project_id': 1,
             'user_id': user.idUser,
+            'session_id': user.attributes['id_session']
           });
 
       if (!response.success) {
