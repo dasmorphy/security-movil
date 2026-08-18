@@ -173,15 +173,17 @@ class TaskDetailModal extends ConsumerWidget {
                       ),
                       onPressed: () async {
                           context.push('/new-task-technical',
-                            extra: TechTaskHeader(
-                              taskId: item.idTask,
-                              cliendId: item.clientId,
-                              locationId: item.locationId,
-                              client: item.client,
-                              codeTask: item.code,
-                              location: item.location,
-                              createdBy: item.createdBy,
-                            )
+                            extra: {
+                              "taskHeader": TechTaskHeader(
+                                taskId: item.idTask,
+                                cliendId: item.clientId,
+                                locationId: item.locationId,
+                                client: item.client,
+                                codeTask: item.code,
+                                location: item.location,
+                                createdBy: item.createdBy,
+                              )
+                            }
                           );
                       },
                       child: const Text(

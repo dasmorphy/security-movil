@@ -33,21 +33,19 @@ final appRouter = GoRouter(
         GoRoute(
           path: 'personal-data',
           name: PersonalDataScreen.name,
-          builder: (context, state) => const PersonalDataScreen()
+          builder: (context, state) => const PersonalDataScreen(),
         ),
         GoRoute(
           path: 'change-email',
           name: ChangeEmailScreen.name,
-          builder: (context, state) => const ChangeEmailScreen()
+          builder: (context, state) => const ChangeEmailScreen(),
         ),
         GoRoute(
           path: 'check-success',
           name: CheckSuccessScreen.name,
           builder: (context, state) {
             final redirect = state.uri.queryParameters['redirect'];
-            return CheckSuccessScreen(
-              redirectRoute: redirect,
-            );
+            return CheckSuccessScreen(redirectRoute: redirect);
           },
         ),
         GoRoute(
@@ -55,34 +53,30 @@ final appRouter = GoRouter(
           name: LogbookListScreen.name,
           builder: (context, state) {
             final filters = state.extra as dynamic;
-            return LogbookListScreen(
-              filtersLogbook: filters,
-            );
+            return LogbookListScreen(filtersLogbook: filters);
           },
         ),
         GoRoute(
           path: 'list-dispatches',
           name: DispatchListScreen.name,
-          builder: (context, state) => const DispatchListScreen()
+          builder: (context, state) => const DispatchListScreen(),
         ),
         GoRoute(
           path: 'list-entry-access',
           name: EntryAccessListScreen.name,
-          builder: (context, state) => const EntryAccessListScreen()
+          builder: (context, state) => const EntryAccessListScreen(),
         ),
         GoRoute(
           path: 'list-employee-intern',
           name: EmployeeInternListScreen.name,
-          builder: (context, state) => const EmployeeInternListScreen()
+          builder: (context, state) => const EmployeeInternListScreen(),
         ),
         GoRoute(
           path: 'list-employee-movements',
           name: EmployeeMovementScreen.name,
           builder: (context, state) {
             final filters = state.extra as dynamic;
-            return EmployeeMovementScreen(
-              filtersMovement: filters,
-            );
+            return EmployeeMovementScreen(filtersMovement: filters);
           },
         ),
         GoRoute(
@@ -90,9 +84,7 @@ final appRouter = GoRouter(
           name: ReceptionConfirmationScreen.name,
           builder: (context, state) {
             final dispatchData = state.extra as AllDispatch;
-            return ReceptionConfirmationScreen(
-              dispatchData: dispatchData,
-            );
+            return ReceptionConfirmationScreen(dispatchData: dispatchData);
           },
         ),
         GoRoute(
@@ -100,9 +92,7 @@ final appRouter = GoRouter(
           name: UpdateStatusDispatchScreen.name,
           builder: (context, state) {
             final dispatchData = state.extra as AllDispatch;
-            return UpdateStatusDispatchScreen(
-              dispatchData: dispatchData,
-            );
+            return UpdateStatusDispatchScreen(dispatchData: dispatchData);
           },
         ),
         GoRoute(
@@ -110,9 +100,7 @@ final appRouter = GoRouter(
           name: FinishEntryAccessScreen.name,
           builder: (context, state) {
             final entryAccessData = state.extra as EntryAccessControl;
-            return FinishEntryAccessScreen(
-              entryAccessData: entryAccessData,
-            );
+            return FinishEntryAccessScreen(entryAccessData: entryAccessData);
           },
         ),
         GoRoute(
@@ -120,15 +108,13 @@ final appRouter = GoRouter(
           name: NewDispatchScreen.name,
           builder: (context, state) {
             final isProductTerm = state.extra as dynamic;
-            return NewDispatchScreen(
-              isProductTerm: isProductTerm,
-            );
+            return NewDispatchScreen(isProductTerm: isProductTerm);
           },
         ),
         GoRoute(
           path: 'new-employee',
           name: NewEmployeeScreen.name,
-          builder: (context, state) => const NewEmployeeScreen()
+          builder: (context, state) => const NewEmployeeScreen(),
         ),
         GoRoute(
           path: 'new-employee-movement',
@@ -144,15 +130,21 @@ final appRouter = GoRouter(
         GoRoute(
           path: 'list-task-technical',
           name: TaskListScreen.name,
-          builder: (context, state) => const TaskListScreen()
+          builder: (context, state) => const TaskListScreen(),
+        ),
+        GoRoute(
+          path: 'list-technical-records',
+          name: TechnicalRecordListScreen.name,
+          builder: (context, state) => const TechnicalRecordListScreen(),
         ),
         GoRoute(
           path: 'new-task-technical',
           name: NewTaskScreen.name,
           builder: (context, state) {
-            final taskSelected = state.extra as TechTaskHeader;
+            final taskSelected = state.extra as dynamic;
             return NewTaskScreen(
-              taskHeader: taskSelected,
+              dataRegisterIcompleted: taskSelected.registerIcompleted,
+              taskHeader: taskSelected.taskHeader,
             );
           },
         ),
@@ -161,19 +153,17 @@ final appRouter = GoRouter(
           name: AuditingRecordScreen.name,
           builder: (context, state) {
             final taskSelected = state.extra as TechTaskHeader;
-            return AuditingRecordScreen(
-              taskHeader: taskSelected,
-            );
+            return AuditingRecordScreen(taskHeader: taskSelected);
           },
         ),
         GoRoute(
           path: 'new-project-technical',
           name: NewProyectTechnicalScreen.name,
-          builder: (context, state) => const NewProyectTechnicalScreen()
+          builder: (context, state) => const NewProyectTechnicalScreen(),
         ),
-      ]
+      ],
     ),
     // Rutas del modulo de notificaciones (ver notification_router.dart)
     ...notificationRoutes,
-  ]
+  ],
 );

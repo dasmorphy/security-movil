@@ -88,6 +88,9 @@ export 'package:zentinel/presentation/widgets/technical/auditing_step_indicator.
 export 'package:zentinel/presentation/widgets/technical/auditing_item_tile.dart';
 export 'package:zentinel/presentation/widgets/technical/finding_card.dart';
 export 'package:zentinel/presentation/widgets/technical/signature_pad.dart';
+export 'package:zentinel/presentation/widgets/technical/item_recent_technical_record.dart';
+export 'package:zentinel/presentation/widgets/technical/technical_record_tile.dart';
+export 'package:zentinel/presentation/widgets/modals/technical_record_detail_modal.dart';
 export 'package:zentinel/presentation/widgets/forms/technical/auditing_record_form.dart';
 export 'package:zentinel/presentation/widgets/forms/technical/new_project_technical.dart';
 export 'package:zentinel/presentation/widgets/shared/multi_select_dialog.dart';

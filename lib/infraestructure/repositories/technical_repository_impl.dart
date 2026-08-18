@@ -6,6 +6,7 @@ import 'package:zentinel/domain/entities/history_status_project.dart';
 import 'package:zentinel/domain/entities/location_technical.dart';
 import 'package:zentinel/domain/entities/task_technical.dart';
 import 'package:zentinel/domain/entities/tech_material.dart';
+import 'package:zentinel/domain/entities/technical_record.dart';
 import 'package:zentinel/domain/entities/technical_staff.dart';
 import 'package:zentinel/domain/repositories/technical_repository.dart';
 
@@ -69,4 +70,9 @@ class TechnicalRepositoryImpl extends TechnicalRepository {
     return datasource.getHistoryStatusProject(filters);
   }
 
+  @override
+  Future<List<TechnicalRecord>> getTechnicalRecord(Map<String, dynamic> filters) {
+    return datasource.getTechnicalRecord(filters);
+  }
+  
 }

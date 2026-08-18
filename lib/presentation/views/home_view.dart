@@ -32,6 +32,12 @@ class HomeViewState extends ConsumerState<HomeView> {
       selectedBusiness = '1';
     }
     initProvidersByBusiness(userData);
+
+    if (userData.hasPermission(Permissions.verRegistrosTecnicos)) {
+      ref
+          .read(getTechnicalRecord.notifier)
+          .load(filters: {"user": userData.user});
+    }
   }
 
   void initProvidersByBusiness(User? userData) {
@@ -39,15 +45,17 @@ class HomeViewState extends ConsumerState<HomeView> {
       if (userData.attributes['id_business'] == 1 || selectedBusiness == "1") {
         ref.read(getHistoryLogbooks.notifier).load();
         ref.read(graphLogbookProvider.notifier).load();
-        ref.read(getEmployeeMovements.notifier).load(
-          filters:{
-            "page": 1,
-            "rows": 20,
-            "type_movement": "TRANSFER",
-            "group_business_id": userData.attributes['group_business'],
-            "status_employee": "Autorizado"
-          }
-        );
+        ref
+            .read(getEmployeeMovements.notifier)
+            .load(
+              filters: {
+                "page": 1,
+                "rows": 20,
+                "type_movement": "TRANSFER",
+                "group_business_id": userData.attributes['group_business'],
+                "status_employee": "Autorizado",
+              },
+            );
       } else if (userData.attributes['id_business'] == 2 ||
           selectedBusiness == "2") {
         ref.read(getAllVehicleTypes.notifier).load();
@@ -163,7 +171,9 @@ class HomeViewState extends ConsumerState<HomeView> {
                 /// =======================
                 if (effectiveBusiness == "1" &&
                     (userData.role == "admin_tlsg" ||
-                        userData.hasPermission(Permissions.verMovimientosPersonalInterno))) ...[
+                        userData.hasPermission(
+                          Permissions.verMovimientosPersonalInterno,
+                        ))) ...[
                   const SizedBox(height: 10),
                   RecentListHome(
                     title: 'Movimientos personal interno',
@@ -171,6 +181,18 @@ class HomeViewState extends ConsumerState<HomeView> {
                     childListBuild: ItemRecentEmployeeMovement(
                       itememployeeMovements: ref.watch(getEmployeeMovements),
                     ),
+                  ),
+                  const SizedBox(height: 30),
+                ],
+
+                if (userData.hasPermission(
+                  Permissions.verRegistrosTecnicos,
+                )) ...[
+                  const SizedBox(height: 10),
+                  RecentListHome(
+                    title: 'Registros recientes',
+                    routeLink: '/list-technical-records',
+                    childListBuild: const ItemRecentTechnicalRecord(),
                   ),
                   const SizedBox(height: 30),
                 ],

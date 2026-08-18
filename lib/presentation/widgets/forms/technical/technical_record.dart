@@ -11,8 +11,9 @@ import 'package:zentinel/service/pending_request_service.dart';
 class TechnicalRecord extends ConsumerStatefulWidget {
   final Future<ApiResponse> Function(Map<String, dynamic>) onSubmit;
   final TechTaskHeader taskData;
+  final Map<String, dynamic>? taskIncompleted;
 
-  const TechnicalRecord({super.key, required this.taskData, required this.onSubmit});
+  const TechnicalRecord({super.key, required this.taskData, required this.onSubmit, this.taskIncompleted});
 
   @override
   ConsumerState<TechnicalRecord> createState() => _TechnicalRecordState();
@@ -71,6 +72,18 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
     super.dispose();
   }
 
+  dynamic getMaterials() {
+
+    if (materialsAdded.length == 1 && materialsAdded[0]['name']) {
+      return null;
+    }
+
+    return materialsAdded.map((p) => {
+      "material": p['name'],
+      "quantity": p['quantity'],
+    }).toList();
+  }
+
   void _clearCntrl() {
     _selectedImages = [];
     _formKey.currentState?.reset();
@@ -92,21 +105,26 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
     imagesMaxError = false;
   }
 
+  bool _isFormCompleted() {
+    return
+      _vehicle != '0' &&
+      selectedUsers.isNotEmpty &&
+      materialsAdded.isNotEmpty &&
+      _selectedImages.length >= 6 &&
+      _selectedImages.length <= 10;
+  }
+
   void _submit() async {
-    // if (isLoading) return;
-    // setState(() => isLoading = true);
+    if (isLoading) return;
+    setState(() => isLoading = true);
     setState(() {
       imagesMinError = false;
       imagesMaxError = false;
     });
 
     FocusScope.of(context).unfocus();
-    if (!(_formKey.currentState?.validate() ?? false)) {
-      setState(() => isLoading = false);
-      return;
-    }
 
-    if (_selectedImages.length < 6) {
+    if (_selectedImages.isNotEmpty && _selectedImages.length < 6) {
       setState(() {
         imagesMinError = true;
         isLoading = false;
@@ -144,13 +162,11 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
       "client_id": widget.taskData.cliendId,
       "location_id": widget.taskData.locationId,
       "task_id": widget.taskData.taskId,
-      "vehicle": _vehicle,
+      "vehicle": _vehicle == '0' ? null : _vehicle,
       "technical_staff": selectedUsers,
       "user": userData.user,
-      "materials": materialsAdded.map((p) => {
-        "material": p['name'],
-        "quantity": p['quantity'],
-      }).toList(),
+      "status": _isFormCompleted() ? 'Completado' : 'Incompleto',
+      "materials": getMaterials(),
       "images": _selectedImages
         .whereType<Uint8List>()
         .toList(), // Lista de Uint8List directo, sin base64
@@ -222,12 +238,7 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
     }
   }
 
-  List<Map<String, dynamic>> materialsAdded = [{
-    'uid': const Uuid().v4(),
-    'id_equipment': '0',
-    'name': '',
-    'quantity': 1,
-  }];
+  List<Map<String, dynamic>> materialsAdded = [];
 
   @override
   Widget build(BuildContext context) {
@@ -364,9 +375,9 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
                     labelText: "Equipo técnico",
                   ),
                   validator: (values) {
-                    if (values == null || values.isEmpty) {
-                      return 'Seleccione al menos un elemento';
-                    }
+                    // if (values == null || values.isEmpty) {
+                    //   return 'Seleccione al menos un elemento';
+                    // }
                     return null;
                   },
                 ),
@@ -397,9 +408,9 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
                     }
                   },
                   validator: (v) {
-                    if (v == '0' || v == null || v.trim().isEmpty) {
-                      return messageValidatorEmpty;
-                    }
+                    // if (v == '0' || v == null || v.trim().isEmpty) {
+                    //   return messageValidatorEmpty;
+                    // }
                     return null;
                   },
                 ),
@@ -408,51 +419,47 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
 
                 CustomFieldLabelRequired(txtLabel: 'Equipos', isRequired: false,),
 
-                ...materialsAdded.asMap().entries.map((entry) {
-                  final index = entry.key;
-                  final item = entry.value;
+                if (materialsAdded.isNotEmpty)  
+                  ...materialsAdded.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final item = entry.value;
 
-                  return TeamsItem(
-                    key: ValueKey(item['uid']),
-                    selectedMaterial: item['id_equipment'],
-                    quantity: item['quantity'],
+                    return TeamsItem(
+                      key: ValueKey(item['uid']),
+                      selectedMaterial: item['id_equipment'],
+                      quantity: item['quantity'],
+                      onDeleteMaterial: () {
+                        setState(() {
+                          materialsAdded.removeAt(index);
+                        });
+                      },
+                      onMaterialChanged: (v) {
+                        final material = materials.firstWhere(
+                        (e) => e.idEquipment.toString() == v,
+                      );
 
-                    onDeleteMaterial: materialsAdded.length > 1
-                          ? () {
-                              setState(() {
-                                materialsAdded.removeAt(index);
-                              });
-                            }
-                          : null,
+                        materialsAdded[index]['id_equipment'] = v;
+                        materialsAdded[index]['name'] = material.product;
+                      },
 
-                    onMaterialChanged: (v) {
-                      final material = materials.firstWhere(
-                      (e) => e.idEquipment.toString() == v,
+                      onQuantityChanged: (v) {
+                        setState(() {
+                          materialsAdded[index]['quantity'] = v;
+                        });
+                      },
+
+                      onRemove: () {
+                        setState(() {
+                          materialsAdded.removeAt(index);
+                        });
+                      },
+
+                      materials: materials,
+
                     );
-
-                      materialsAdded[index]['id_equipment'] = v;
-                      materialsAdded[index]['name'] = material.product;
-                    },
-
-                    onQuantityChanged: (v) {
-                      setState(() {
-                        materialsAdded[index]['quantity'] = v;
-                      });
-                    },
-
-                    onRemove: () {
-                      setState(() {
-                        materialsAdded.removeAt(index);
-                      });
-                    },
-
-                    materials: materials,
-
-                  );
-                }),
+                  }),
 
                 if (materialsAdded.length < materials.length) ...[
-                  const SizedBox(height: 9),
                   GestureDetector(
                     onTap: () {
                       setState(() {

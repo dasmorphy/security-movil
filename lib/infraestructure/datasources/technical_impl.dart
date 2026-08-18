@@ -13,8 +13,9 @@ import 'package:zentinel/domain/entities/history_status_project.dart';
 import 'package:zentinel/domain/entities/location_technical.dart';
 import 'package:zentinel/domain/entities/task_technical.dart';
 import 'package:zentinel/domain/entities/tech_material.dart';
+import 'package:zentinel/domain/entities/technical_record.dart';
 import 'package:zentinel/domain/entities/technical_staff.dart';
-import 'package:zentinel/presentation/widgets/widgets.dart';
+import 'package:zentinel/presentation/widgets/widgets.dart' hide TechnicalRecord;
 
 class TechnicalImpl extends TechnicalDatasource {
   final Dio dio;
@@ -391,6 +392,22 @@ class TechnicalImpl extends TechnicalDatasource {
     );
     final List history = response.data['data'];
     return history.map((json) => HistoryStatusProject.fromJson(json)).toList();
+  }
+
+  @override
+  Future<List<TechnicalRecord>> getTechnicalRecord(Map<String, dynamic> filters) async {
+    final response = await dio.get(
+      '/rest/technical-control-api/v1.0/technical_record',
+      options: Options(
+        headers: {'externalTransactionId': uuid, 'channel': 'ZENTINEL'},
+        
+      ),
+      queryParameters: {
+        'user': filters['user']
+      },
+    );
+    final List history = response.data['data'];
+    return history.map((json) => TechnicalRecord.fromJson(json)).toList();
   }
 
 }

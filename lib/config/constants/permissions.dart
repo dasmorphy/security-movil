@@ -32,4 +32,5 @@ class Permissions {
   static const aprobarFinalizacion = 'APROBAR_FINALIZACION';
   static const nuevoProyecto = 'NUEVO_PROYECTO';
   static const registerTechnicalOffline = 'REGISTER_TECHNICAL_OFFLINE';
+  static const verRegistrosTecnicos = 'VER_REGISTROS_TECNICOS';
 }

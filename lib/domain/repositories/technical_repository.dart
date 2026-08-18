@@ -6,6 +6,7 @@ import 'package:zentinel/domain/entities/history_status_project.dart';
 import 'package:zentinel/domain/entities/location_technical.dart';
 import 'package:zentinel/domain/entities/task_technical.dart';
 import 'package:zentinel/domain/entities/tech_material.dart';
+import 'package:zentinel/domain/entities/technical_record.dart';
 import 'package:zentinel/domain/entities/technical_staff.dart';
 
 abstract class TechnicalRepository {
@@ -19,5 +20,6 @@ abstract class TechnicalRepository {
   Future<ApiResponse<dynamic>> saveProjectTechnical(Map<String, dynamic> data);
   Future<ApiResponse<dynamic>> updateStatusProject(Map<String, dynamic> data);
   Future<List<TechnicalStaff>> getTechnicalStaff();
+  Future<List<TechnicalRecord>> getTechnicalRecord(Map<String, dynamic> filters);
   Future<List<HistoryStatusProject>> getHistoryStatusProject(Map<String, dynamic> filters);
 }

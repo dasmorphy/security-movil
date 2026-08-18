@@ -6,10 +6,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class NewTaskScreen extends ConsumerStatefulWidget  {
   static const name = 'new-task-screen';
   final TechTaskHeader taskHeader;
+  final Map<String, dynamic>? dataRegisterIcompleted;
 
 
   
-  const NewTaskScreen({super.key, required this.taskHeader});
+  const NewTaskScreen({super.key, required this.taskHeader, this.dataRegisterIcompleted});
 
   @override
   ConsumerState<NewTaskScreen> createState() => _NewTaskScreenState();
@@ -36,6 +37,7 @@ class _NewTaskScreenState extends ConsumerState<NewTaskScreen> {
         // bottom: false,
         child: 
           TechnicalRecord(
+            taskIncompleted: widget.dataRegisterIcompleted,
             taskData: widget.taskHeader,
             onSubmit: (data) async {
               return await ref

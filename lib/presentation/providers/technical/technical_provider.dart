@@ -6,6 +6,7 @@ import 'package:zentinel/domain/entities/history_status_project.dart';
 import 'package:zentinel/domain/entities/location_technical.dart';
 import 'package:zentinel/domain/entities/task_technical.dart';
 import 'package:zentinel/domain/entities/tech_material.dart';
+import 'package:zentinel/domain/entities/technical_record.dart';
 import 'package:zentinel/domain/entities/technical_staff.dart';
 import 'package:zentinel/domain/repositories/technical_repository.dart';
 import 'package:zentinel/presentation/providers/catalog_notifier.dart';
@@ -61,6 +62,22 @@ final getTechnicalStaff =
     (_) => repo.getTechnicalStaff(),
   );
 });
+
+final getTechnicalRecord = StateNotifierProvider<CatalogNotifier<TechnicalRecord>,
+  List<TechnicalRecord>>(
+  (ref) {
+    final repo = ref.watch(technicalRepositoryProvider);
+
+    return CatalogNotifier<TechnicalRecord>(
+      (filters) {
+        final mergedFilters = {
+          ...?filters,
+        };
+        return repo.getTechnicalRecord(mergedFilters);
+      },
+    );
+  },
+);
 
 
 final getLocationTechnical =
