@@ -15,7 +15,7 @@ import 'package:zentinel/domain/entities/task_technical.dart';
 import 'package:zentinel/domain/entities/tech_material.dart';
 import 'package:zentinel/domain/entities/technical_record.dart';
 import 'package:zentinel/domain/entities/technical_staff.dart';
-import 'package:zentinel/presentation/widgets/widgets.dart' hide TechnicalRecord;
+import 'package:zentinel/presentation/widgets/widgets.dart';
 
 class TechnicalImpl extends TechnicalDatasource {
   final Dio dio;

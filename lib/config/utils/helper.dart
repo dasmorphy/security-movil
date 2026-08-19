@@ -465,3 +465,25 @@ NotificationStyle getNotificationStyle(String? type) {
   }
 
 }
+
+Color getStatusBackgroundTechRecord(String status) {
+  switch (status.toLowerCase()) {
+    case 'incompleto':
+      return const Color.fromARGB(255, 61, 43, 14);
+    case 'completado':
+      return const Color.fromARGB(255, 18, 54, 42);
+    default:
+      return const Color.fromARGB(255, 82, 84, 83);
+  }
+}
+
+Color getStatusColorTechRecord(String status) {
+  switch (status.toLowerCase()) {
+    case 'incompleto':
+      return const Color.fromARGB(255, 248, 172, 70);
+    case 'completado':
+      return const Color.fromARGB(255, 105, 246, 184);
+    default:
+      return const Color.fromARGB(255, 255, 255, 255);
+  }
+}

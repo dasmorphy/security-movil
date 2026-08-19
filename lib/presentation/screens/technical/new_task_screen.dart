@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/domain/entities/technical_record.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -6,7 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class NewTaskScreen extends ConsumerStatefulWidget  {
   static const name = 'new-task-screen';
   final TechTaskHeader taskHeader;
-  final Map<String, dynamic>? dataRegisterIcompleted;
+  final TechnicalRecord? dataRegisterIcompleted;
 
 
   
@@ -36,7 +37,7 @@ class _NewTaskScreenState extends ConsumerState<NewTaskScreen> {
         top: false,
         // bottom: false,
         child: 
-          TechnicalRecord(
+          TechnicalRecordForm(
             taskIncompleted: widget.dataRegisterIcompleted,
             taskData: widget.taskHeader,
             onSubmit: (data) async {

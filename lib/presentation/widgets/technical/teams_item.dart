@@ -3,12 +3,12 @@ import 'package:zentinel/domain/entities/tech_material.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
 class TeamsItem extends StatefulWidget {
-  final String? selectedMaterial;
+  final int? selectedMaterial;
   final int? quantity;
   final List<TechMaterial> materials;
 
 
-  final ValueChanged<String>? onMaterialChanged;
+  final ValueChanged<int>? onMaterialChanged;
   final ValueChanged<int>? onQuantityChanged;
   final VoidCallback? onDeleteMaterial;
 
@@ -37,13 +37,13 @@ class _TeamsItemState extends State<TeamsItem> {
   late FocusNode _nameTeamFocus;
   late TextEditingController _nameTeamCtrl;
 
-  String _materialValue = '0';
+  int _materialValue = 0;
   
 
   @override
   void initState() {
     super.initState();
-    _materialValue = widget.selectedMaterial ?? '0';
+    _materialValue = widget.selectedMaterial ?? 0;
 
     _qtyCtrl = TextEditingController(text: widget.quantity?.toString() ?? '');
     _nameTeamCtrl = TextEditingController(text: widget.selectedMaterial?.toString() ?? '');
@@ -103,7 +103,7 @@ class _TeamsItemState extends State<TeamsItem> {
 
               const SizedBox(height: 12),
 
-              GlowDropdownFormField2<String>(
+              GlowDropdownFormField2<int>(
                 value: _materialValue,
                 decoration: InputDecoration(
                   filled: true,
@@ -129,7 +129,7 @@ class _TeamsItemState extends State<TeamsItem> {
                 items: [
                   const DropdownMenuItem(
                     enabled: false,
-                    value: '0',
+                    value: 0,
                     child: Text(
                       'Seleccione una opción',
                       style: TextStyle(color: Colors.white),
@@ -138,7 +138,7 @@ class _TeamsItemState extends State<TeamsItem> {
         
                   ...widget.materials.map(
                       (c) => DropdownMenuItem(
-                        value: c.idEquipment.toString(),
+                        value: c.idEquipment,
                         child: Text(
                           c.product,
                           style: TextStyle(color: Colors.white),
@@ -156,7 +156,7 @@ class _TeamsItemState extends State<TeamsItem> {
                 },
         
                 validator: (v) {
-                  if (v == '0' || v == null || v.trim().isEmpty) {
+                  if (v == 0 || v == null ) {
                     return messageValidatorEmpty;
                   }
                   return null;

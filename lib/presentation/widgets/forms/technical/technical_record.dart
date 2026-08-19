@@ -4,22 +4,23 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 import 'package:zentinel/domain/entities/api_response.dart';
+import 'package:zentinel/domain/entities/technical_record.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/service/pending_request_service.dart';
 
-class TechnicalRecord extends ConsumerStatefulWidget {
+class TechnicalRecordForm extends ConsumerStatefulWidget {
   final Future<ApiResponse> Function(Map<String, dynamic>) onSubmit;
   final TechTaskHeader taskData;
-  final Map<String, dynamic>? taskIncompleted;
+  final TechnicalRecord? taskIncompleted;
 
-  const TechnicalRecord({super.key, required this.taskData, required this.onSubmit, this.taskIncompleted});
+  const TechnicalRecordForm({super.key, required this.taskData, required this.onSubmit, this.taskIncompleted});
 
   @override
-  ConsumerState<TechnicalRecord> createState() => _TechnicalRecordState();
+  ConsumerState<TechnicalRecordForm> createState() => _TechnicalRecordState();
 }
 
-class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
+class _TechnicalRecordState extends ConsumerState<TechnicalRecordForm> {
   final _formKey = GlobalKey<FormState>();
   bool isLoading = false;
   bool imagesMinError = false;
@@ -46,6 +47,24 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
   final FocusNode _observationsFocus = FocusNode();
   final FocusNode _personChargeFocus = FocusNode();
 
+  final vehicle = [
+    {'id': '1',
+      'name': 'GTW-8534',
+    },
+    {'id': '2',
+      'name': 'GTW-8533',
+    },
+    {'id': '3',
+      'name': 'GTA-9251',
+    },
+    {'id': '4',
+      'name': 'GSW-7476',
+    },
+    {'id': '5',
+      'name': 'GST-6597',
+    },
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -64,12 +83,43 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
 
     });
 
+    if (widget.taskIncompleted != null && mounted) {
+      _loadPreloadedData(widget.taskIncompleted!);
+    }
+
   }
 
   @override
   void dispose() {
     _clearCntrl();
     super.dispose();
+  }
+
+  void _loadPreloadedData(TechnicalRecord data) {
+    if (!mounted) return;
+
+    setState(() {
+      _observationsCtrl.text = data.resume;
+      _vehicle = vehicle.firstWhere(
+        (item) => item['name'] == data.vehicle,
+      )['name'] ?? '0';
+      selectedUsers = data.technicalStaff
+        ?.map((staff) => staff.idTechnical)
+        .whereType<int>()
+        .toList() ??
+      [];
+    });
+
+    if (data.materials != null) {
+      materialsAdded.addAll(
+        data.materials!.map((material) => {
+          'uid': const Uuid().v4(),
+          'id_equipment': material.idEquipment,
+          'name': material.material,
+          'quantity': material.quantity ?? 0,
+        }),
+      );
+    }
   }
 
   dynamic getMaterials() {
@@ -79,7 +129,7 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
     }
 
     return materialsAdded.map((p) => {
-      "material": p['name'],
+      "id_equipment": p['id_equipment'],
       "quantity": p['quantity'],
     }).toList();
   }
@@ -246,23 +296,7 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
     final theme = Theme.of(context);
     final materials = ref.watch(getTechMaterial);
     final techStaff = ref.watch(getTechnicalStaff);
-    final vehicle = [
-      {'id': '1',
-        'name': 'GTW-8534',
-      },
-      {'id': '2',
-        'name': 'GTW-8533',
-      },
-      {'id': '3',
-        'name': 'GTA-9251',
-      },
-      {'id': '4',
-        'name': 'GSW-7476',
-      },
-      {'id': '5',
-        'name': 'GST-6597',
-      },
-    ];
+    
 
     //Usuario no cargado o sesión inválida
     if (!authState.hasValue || authState.value == null) {
@@ -435,7 +469,7 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
                       },
                       onMaterialChanged: (v) {
                         final material = materials.firstWhere(
-                        (e) => e.idEquipment.toString() == v,
+                        (e) => e.idEquipment == v,
                       );
 
                         materialsAdded[index]['id_equipment'] = v;
@@ -495,6 +529,7 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecord> {
 
                 const SizedBox(height: 18),
                 
+                // if (widget.taskIncompleted)
                 CameraImagePicker(
                   minImages: 6,
                   maxImages: 10,

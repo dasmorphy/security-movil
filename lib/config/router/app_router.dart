@@ -143,8 +143,8 @@ final appRouter = GoRouter(
           builder: (context, state) {
             final taskSelected = state.extra as dynamic;
             return NewTaskScreen(
-              dataRegisterIcompleted: taskSelected.registerIcompleted,
-              taskHeader: taskSelected.taskHeader,
+              dataRegisterIcompleted: taskSelected["registerIcompleted"],
+              taskHeader: taskSelected["taskHeader"],
             );
           },
         ),

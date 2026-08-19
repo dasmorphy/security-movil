@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/domain/entities/technical_record.dart';
 import 'package:zentinel/presentation/widgets/logbook/detail_row.dart';
+import 'package:zentinel/presentation/widgets/technical/record_technical_header.dart';
 
 class TechnicalRecordDetailModal extends StatelessWidget {
   final TechnicalRecord item;
@@ -45,26 +47,135 @@ class TechnicalRecordDetailModal extends StatelessWidget {
             Flexible(
               child: SingleChildScrollView(
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     detailRow('Código de tarea', item.taskCode),
                     detailRow('Cliente', item.clientName),
                     detailRow('Ubicación', item.locationName),
-                    detailRow('Resumen', item.resume),
                     detailRow('Estado', item.status),
                     detailRow('Creado por', item.createdBy),
                     detailRow('Fecha de creación', formatDate(item.createdAt)),
-                    if (staffNames.isNotEmpty)
-                      detailRow('Personal técnico', staffNames),
-                    if (materials.isNotEmpty)
-                      detailRow('Materiales', materials),
-                    if (item.vehicle != null &&
-                        item.vehicle.toString().isNotEmpty)
+                    if (item.vehicle != null && item.vehicle.toString().isNotEmpty)
                       detailRow('Vehículo', item.vehicle.toString()),
+                    if (materials.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 6),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Materiales',
+                              style: TextStyle(
+                                color: Colors.white70,
+                              ),
+                            ),
+
+                            const SizedBox(height: 6),
+
+                            Text(
+                              materials,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    
+                    if (staffNames.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 6),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Personal técnico',
+                              style: TextStyle(
+                                color: Colors.white70,
+                              ),
+                            ),
+
+                            const SizedBox(height: 6),
+
+                            Text(
+                              staffNames,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    
+                    if (item.resume.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 6),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Resumen',
+                              style: TextStyle(
+                                color: Colors.white70,
+                              ),
+                            ),
+
+                            const SizedBox(height: 6),
+
+                            Text(
+                              item.resume,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                   ],
                 ),
               ),
             ),
+
             const SizedBox(height: 20),
+
+            if (item.status == 'Incompleto')
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    backgroundColor: const Color.fromARGB(189, 7, 213, 213),
+                    disabledBackgroundColor: const Color.fromARGB(
+                      120,
+                      7,
+                      213,
+                      213,
+                    ),
+                  ),
+                  onPressed: () => context.push('/new-task-technical', extra: {
+                    'taskHeader': TechTaskHeader(
+                      client: item.clientName, 
+                      codeTask: item.taskCode, 
+                      location: item.locationName, 
+                      createdBy: item.createdBy, 
+                      cliendId: item.clientId, 
+                      locationId: item.locationId, 
+                      taskId: item.taskId
+                    ),
+                    'registerIcompleted': item
+                  }),
+                  child: const Text(
+                    'Continuar',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ),
           ],
         ),
       ),

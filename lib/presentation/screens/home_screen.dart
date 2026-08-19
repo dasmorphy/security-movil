@@ -118,6 +118,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 }
               );
             }
+
+            if (userData.hasPermission(Permissions.verRegistrosTecnicos)) {
+              ref.read(getTechnicalRecord.notifier).load(filters: {'user': userData.user});
+            }
           }
         },
       ),

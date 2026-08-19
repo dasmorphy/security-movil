@@ -26,8 +26,8 @@ class _TechnicalRecordListScreenState
       final user = ref.read(userSessionProvider).value;
       if (user != null) {
         ref
-            .read(getTechnicalRecord.notifier)
-            .load(filters: {'user': user.user});
+        .read(getTechnicalRecord.notifier)
+        .load(filters: {'user': user.user});
       }
     });
   }

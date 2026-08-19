@@ -61,10 +61,10 @@ class TechnicalRecordTile extends StatelessWidget {
             Chip(
               side: BorderSide.none,
               label: Text(item.status),
-              backgroundColor: getStatusColorTaskTech(item.status),
+              backgroundColor: getStatusBackgroundTechRecord(item.status),
               padding: EdgeInsets.zero,
               labelStyle: TextStyle(
-                color: getColorTxtTaskTech(item.status),
+                color: getStatusColorTechRecord(item.status),
                 fontSize: 12,
                 fontWeight: FontWeight.bold,
               ),
