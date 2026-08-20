@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:zentinel/config/constants/environment.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/domain/entities/technical_record.dart';
 import 'package:zentinel/presentation/widgets/logbook/detail_row.dart';
 import 'package:zentinel/presentation/widgets/technical/record_technical_header.dart';
+import 'package:zentinel/presentation/widgets/widgets.dart';
 
 class TechnicalRecordDetailModal extends StatelessWidget {
   final TechnicalRecord item;
@@ -17,15 +19,6 @@ class TechnicalRecordDetailModal extends StatelessWidget {
             ?.map((staff) => staff.name)
             .whereType<String>()
             .where((name) => name.isNotEmpty)
-            .join(', ') ??
-        '';
-    final materials =
-        item.materials
-            ?.map((material) {
-              final name = material.material ?? 'Material';
-              final quantity = material.quantity;
-              return quantity == null ? name : '$name ($quantity)';
-            })
             .join(', ') ??
         '';
 
@@ -57,7 +50,7 @@ class TechnicalRecordDetailModal extends StatelessWidget {
                     detailRow('Fecha de creación', formatDate(item.createdAt)),
                     if (item.vehicle != null && item.vehicle.toString().isNotEmpty)
                       detailRow('Vehículo', item.vehicle.toString()),
-                    if (materials.isNotEmpty)
+                    if (item.materials?.isNotEmpty ?? false)
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 6),
                         child: Column(
@@ -70,44 +63,91 @@ class TechnicalRecordDetailModal extends StatelessWidget {
                               ),
                             ),
 
-                            const SizedBox(height: 6),
+                            const SizedBox(height: 8),
 
-                            Text(
-                              materials,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
+                            ...item.materials!.map((material) {
+                              final name = material.material ?? 'Material';
+                              final quantity = material.quantity;
+
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 5),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      '• ',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+
+                                    Expanded(
+                                      child: Text(
+                                        quantity == null
+                                            ? name
+                                            : '$name Cantidad: $quantity',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }),
                           ],
                         ),
                       ),
                     
                     if (staffNames.isNotEmpty)
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 6),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const Text(
-                              'Personal técnico',
-                              style: TextStyle(
-                                color: Colors.white70,
+                      if (item.materials?.isNotEmpty ?? false)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 6),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Personal técnico',
+                                style: TextStyle(
+                                  color: Colors.white70,
+                                ),
                               ),
-                            ),
 
-                            const SizedBox(height: 6),
+                              const SizedBox(height: 8),
 
-                            Text(
-                              staffNames,
-                              style: const TextStyle(
-                                color: Colors.white,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
+                              ...item.technicalStaff!.map((material) {
+                                final name = material.name ?? 'Material';
+
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 5),
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      const Text(
+                                        '• ',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+
+                                      Expanded(
+                                        child: Text(name,
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }),
+                            ],
+                          ),
                         ),
-                      ),
                     
                     if (item.resume.isNotEmpty)
                       Padding(
@@ -134,12 +174,15 @@ class TechnicalRecordDetailModal extends StatelessWidget {
                           ],
                         ),
                       ),
+
+                    if (item.images.isNotEmpty)
+                      ImagesGrid(title: 'Imágenes', images: item.images, urlNetwork: 'https://n8n.telearseg.net',),
                   ],
                 ),
               ),
             ),
 
-            const SizedBox(height: 20),
+            const SizedBox(height: 40),
 
             if (item.status == 'Incompleto')
               SizedBox(

@@ -26,6 +26,7 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecordForm> {
   bool imagesMinError = false;
   bool imagesMaxError = false;
   bool _isInitializing = true;
+  bool showImage = true;
 
   String _vehicle = '0';
   final FocusNode _vehicleFocus = FocusNode();
@@ -98,6 +99,10 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecordForm> {
   void _loadPreloadedData(TechnicalRecord data) {
     if (!mounted) return;
 
+    if (data.images.isNotEmpty) {
+      showImage = false;
+    }
+
     setState(() {
       _observationsCtrl.text = data.resume;
       _vehicle = vehicle.firstWhere(
@@ -153,15 +158,19 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecordForm> {
     _vehicle = '0';
     imagesMinError = false;
     imagesMaxError = false;
+    showImage = true;
   }
 
   bool _isFormCompleted() {
-    return
-      _vehicle != '0' &&
+    final imagesValid = showImage
+      ? true
+      : _selectedImages.length >= 6 &&
+        _selectedImages.length <= 10;
+
+    return _vehicle != '0' &&
       selectedUsers.isNotEmpty &&
       materialsAdded.isNotEmpty &&
-      _selectedImages.length >= 6 &&
-      _selectedImages.length <= 10;
+      imagesValid;
   }
 
   void _submit() async {
@@ -529,29 +538,31 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecordForm> {
 
                 const SizedBox(height: 18),
                 
-                // if (widget.taskIncompleted)
-                CameraImagePicker(
-                  minImages: 6,
-                  maxImages: 10,
-                  onImagesChanged: (images) {
-                    print("imagenes seleccionadas ${images.length}");
-                    _selectedImages = images;
-                  },
-                ),
-
-                const SizedBox(height: 26),
-
-                if (imagesMinError || imagesMaxError)
-                  SizedBox(
-                    width: double.infinity,
-                    child: Text(
-                      imagesMinError
-                          ? 'Debe subir mínimo 6 imagenes'
-                          : 'Debe subir máximo 10 imagenes',
-                      style: TextStyle(color: Color.fromARGB(255, 185, 28, 16)),
-                    ),
+                if (showImage)...[
+                  CameraImagePicker(
+                    minImages: 6,
+                    maxImages: 10,
+                    onImagesChanged: (images) {
+                      print("imagenes seleccionadas ${images.length}");
+                      _selectedImages = images;
+                    },
                   ),
-                  const SizedBox(height: 12,),
+
+                  const SizedBox(height: 26),
+
+                  if (imagesMinError || imagesMaxError)
+                    SizedBox(
+                      width: double.infinity,
+                      child: Text(
+                        imagesMinError
+                            ? 'Debe subir mínimo 6 imagenes'
+                            : 'Debe subir máximo 10 imagenes',
+                        style: TextStyle(color: Color.fromARGB(255, 185, 28, 16)),
+                      ),
+                    ),
+                ],
+
+                const SizedBox(height: 12,),
 
                 Row(
                   children: [

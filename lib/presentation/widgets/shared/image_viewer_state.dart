@@ -47,7 +47,7 @@ class ImageViewerState extends State<ImageViewer> {
         itemBuilder: (context, index) => InteractiveViewer(
           child: Center(
             child: Image.network(
-              'http://st.telearseg.net${widget.images[index]}',
+              '${widget.baseUrl}${widget.images[index]}',
               fit: BoxFit.contain,
               errorBuilder: (_, __, ___) => const Icon(
                 Icons.broken_image_outlined,

@@ -4,16 +4,19 @@ import 'package:zentinel/presentation/widgets/widgets.dart';
 
 class ImagesGrid extends StatelessWidget {
   final String title;
+  final String? urlNetwork;
   final List<dynamic> images;
 
   const ImagesGrid({
     super.key, 
     required this.title,
     required this.images,
+    this.urlNetwork,
   });
 
   @override
   Widget build(BuildContext context) {
+    final baseUrl = urlNetwork ?? Environments.baseUrl;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -42,11 +45,11 @@ class ImagesGrid extends StatelessWidget {
           itemBuilder: (context, index) {
             return GestureDetector(
               onTap: () => _openImageFullscreen(
-                  context, images, index),
+                  context, images, index, baseUrl),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(10),
                 child: Image.network(
-                  'http://st.telearseg.net${images[index]}',
+                  '$baseUrl${images[index]}',
                   fit: BoxFit.cover,
                   loadingBuilder: (context, child, progress) {
                     if (progress == null) return child;
@@ -76,11 +79,10 @@ class ImagesGrid extends StatelessWidget {
     );
   }
 
-   void _openImageFullscreen(
-      BuildContext context, List<dynamic> images, int initialIndex) {
+   void _openImageFullscreen(BuildContext context, List<dynamic> images, int initialIndex, String baseUrl) {
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (_) => ImageViewer(images: images, initialIndex: initialIndex, baseUrl: Environments.baseUrl),
+        builder: (_) => ImageViewer(images: images, initialIndex: initialIndex, baseUrl: baseUrl),
       ),
     );
   }
