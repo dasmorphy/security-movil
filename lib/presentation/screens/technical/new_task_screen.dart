@@ -8,10 +8,10 @@ class NewTaskScreen extends ConsumerStatefulWidget  {
   static const name = 'new-task-screen';
   final TechTaskHeader taskHeader;
   final TechnicalRecord? dataRegisterIcompleted;
-
+  final bool isSupport;
 
   
-  const NewTaskScreen({super.key, required this.taskHeader, this.dataRegisterIcompleted});
+  const NewTaskScreen({super.key, required this.taskHeader, this.dataRegisterIcompleted, this.isSupport = false});
 
   @override
   ConsumerState<NewTaskScreen> createState() => _NewTaskScreenState();
@@ -38,6 +38,7 @@ class _NewTaskScreenState extends ConsumerState<NewTaskScreen> {
         // bottom: false,
         child: 
           TechnicalRecordForm(
+            isSupport: widget.isSupport,
             taskIncompleted: widget.dataRegisterIcompleted,
             taskData: widget.taskHeader,
             onSubmit: (data) async {

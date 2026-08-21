@@ -9,8 +9,9 @@ import 'package:zentinel/presentation/widgets/widgets.dart';
 
 class TaskDetailModal extends ConsumerWidget {
   final TaskTechnical item;
+  final bool isSupport;
 
-  const TaskDetailModal({super.key, required this.item});
+  const TaskDetailModal({super.key, required this.item, this.isSupport = false});
 
 
   @override
@@ -44,7 +45,10 @@ class TaskDetailModal extends ConsumerWidget {
             message: "Solicitud enviada exitosamente", 
             autoDismiss: const Duration(seconds: 2)
           );
-          ref.read(getTaskTechnical.notifier).load(filters: {});
+          ref.read(getTaskTechnical.notifier).load(
+            filters: {
+              'support': isSupport
+          });
           if (context.mounted) {
             context.pop();
           }

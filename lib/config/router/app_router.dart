@@ -150,6 +150,7 @@ final appRouter = GoRouter(
             return NewTaskScreen(
               dataRegisterIcompleted: taskSelected["registerIcompleted"],
               taskHeader: taskSelected["taskHeader"],
+              isSupport: taskSelected["isSupport"]
             );
           },
         ),

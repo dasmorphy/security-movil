@@ -13,8 +13,9 @@ class TechnicalRecordForm extends ConsumerStatefulWidget {
   final Future<ApiResponse> Function(Map<String, dynamic>) onSubmit;
   final TechTaskHeader taskData;
   final TechnicalRecord? taskIncompleted;
+  final bool isSupport;
 
-  const TechnicalRecordForm({super.key, required this.taskData, required this.onSubmit, this.taskIncompleted});
+  const TechnicalRecordForm({super.key, required this.taskData, required this.onSubmit, this.taskIncompleted, this.isSupport = false});
 
   @override
   ConsumerState<TechnicalRecordForm> createState() => _TechnicalRecordState();
@@ -272,7 +273,10 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecordForm> {
           message: "Registro guardado exitosamente", 
           autoDismiss: const Duration(seconds: 2)
         );
-        ref.read(getTaskTechnical.notifier).load(filters: {});
+        ref.read(getTaskTechnical.notifier).load(
+          filters: {
+          'support': widget.isSupport
+        });
       } else {
         await savePendingRegisterTech(data);
         GlobalLoadingBottomSheet.show(
