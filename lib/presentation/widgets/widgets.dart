@@ -96,3 +96,5 @@ export 'package:zentinel/presentation/widgets/forms/technical/new_project_techni
 export 'package:zentinel/presentation/widgets/shared/multi_select_dialog.dart';
 export 'package:zentinel/presentation/widgets/push_notifications/push_notification_list.dart';
 export 'package:zentinel/presentation/widgets/modals/register_tecninal_offline.dart';
+export 'package:zentinel/presentation/widgets/dashboard/cards_dashboard_tech.dart';
+export 'package:zentinel/presentation/widgets/dashboard/donut_technical.dart';

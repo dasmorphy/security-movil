@@ -6,7 +6,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 class NewProyectTechnicalScreen extends ConsumerStatefulWidget  {
   static const name = 'new-proyect-technical-screen';
 
-  const NewProyectTechnicalScreen({super.key});
+  final bool isSupport;
+
+  const NewProyectTechnicalScreen({super.key, required this.isSupport});
 
   @override
   ConsumerState<NewProyectTechnicalScreen> createState() => _NewProyectTechnicalScreenState();
@@ -24,7 +26,7 @@ class _NewProyectTechnicalScreenState extends ConsumerState<NewProyectTechnicalS
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(60),
-        child: HeaderOptionsProfile(headerTxt: "Registro de proyecto",),
+        child: HeaderOptionsProfile(headerTxt: widget.isSupport ? "Registro soporte" : 'Registro de proyecto'),
       ),
       resizeToAvoidBottomInset: true,
       backgroundColor: const Color.fromARGB(255, 23, 24, 28),
@@ -33,6 +35,7 @@ class _NewProyectTechnicalScreenState extends ConsumerState<NewProyectTechnicalS
         // bottom: false,
         child: 
           NewProjectTechnical(
+            isSupport: widget.isSupport,
             onSubmit: (data) async {
               return await ref
                 .read(technicalRecordProvider.notifier)

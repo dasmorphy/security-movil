@@ -34,9 +34,11 @@ class HomeViewState extends ConsumerState<HomeView> {
     initProvidersByBusiness(userData);
 
     if (userData.hasPermission(Permissions.verRegistrosTecnicos)) {
-      ref
-          .read(getTechnicalRecord.notifier)
-          .load(filters: {"user": userData.user});
+      ref.read(getTechnicalRecord.notifier).load(filters: {"user": userData.user});
+    }
+
+    if (userData.hasPermission(Permissions.verDashboardTecnico)) {
+      ref.read(graphTechnicalProvider.notifier).load(filters: {});
     }
   }
 
@@ -133,6 +135,21 @@ class HomeViewState extends ConsumerState<HomeView> {
                       ShipmentDispatch(),
                       const SizedBox(height: 20),
                       DiscrepancyDonutWidget(),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                ],
+
+                /// =======================
+                /// DASHBOARD TECNICOS
+                /// =======================
+                if (userData.hasPermission(Permissions.verDashboardTecnico)) ...[
+                  const SizedBox(height: 10),
+                  Column(
+                    children: [
+                      CardsDashboardTech(),
+                      const SizedBox(height: 20),
+                      DonutTechnical(),
                     ],
                   ),
                   const SizedBox(height: 10),

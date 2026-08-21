@@ -44,7 +44,7 @@ class TaskDetailModal extends ConsumerWidget {
             message: "Solicitud enviada exitosamente", 
             autoDismiss: const Duration(seconds: 2)
           );
-          ref.read(getTaskTechnical.notifier).load();
+          ref.read(getTaskTechnical.notifier).load(filters: {});
           if (context.mounted) {
             context.pop();
           }

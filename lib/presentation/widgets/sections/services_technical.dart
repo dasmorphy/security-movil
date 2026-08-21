@@ -71,6 +71,23 @@ class _ServicesTechnicalState extends ConsumerState<ServicesTechnical> {
                       label: 'Nuevo proyecto',
                       onTap: () => context.push('/new-project-technical')
                     ),
+                if (userData.hasPermission(Permissions.verSoportesTecnicos))
+                  BasicServiceCard(
+                      iconImage: 'iconentrada',
+                      label: 'Soportes',
+                      onTap: () => context.push('/list-task-technical', extra: {
+                        'is_support': true
+                      })
+                    ),
+                if (userData.hasPermission(Permissions.nuevoSoporteTecnico))
+                  BasicServiceCard(
+                    iconImage: 'iconentrada',
+                    label: 'Nuevo soporte',
+                    onTap: () => context.push('/new-project-technical', extra: {
+                      'is_support': true
+                    })
+                  ),
+                  
               ],
             ),
           ],

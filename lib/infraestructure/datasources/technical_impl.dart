@@ -9,6 +9,7 @@ import 'package:zentinel/domain/datasources/technical_datasource.dart';
 import 'package:zentinel/domain/entities/api_response.dart';
 import 'package:zentinel/domain/entities/auditing_section.dart';
 import 'package:zentinel/domain/entities/client_technical.dart';
+import 'package:zentinel/domain/entities/graph_technical.dart';
 import 'package:zentinel/domain/entities/history_status_project.dart';
 import 'package:zentinel/domain/entities/location_technical.dart';
 import 'package:zentinel/domain/entities/task_technical.dart';
@@ -24,12 +25,19 @@ class TechnicalImpl extends TechnicalDatasource {
   final uuid = Uuid().v4();
 
   @override
-  Future<List<TaskTechnical>> getTaskTechnical() async {
+  Future<List<TaskTechnical>> getTaskTechnical(Map<String, dynamic> filters) async {
+    final queryParams = <String, dynamic>{};
+
+    if (filters['support'] != null) {
+      queryParams['support'] = filters['support'];
+    }
+
     final response = await dio.get(
       '/rest/technical-control-api/v1.0/project',
       options: Options(
         headers: {'externalTransactionId': uuid, 'channel': 'ZENTINEL'},
       ),
+      queryParameters: queryParams,
     );
     final List taskJson = response.data['data'];
     return taskJson.map((json) => TaskTechnical.fromJson(json)).toList();
@@ -408,6 +416,25 @@ class TechnicalImpl extends TechnicalDatasource {
     );
     final List history = response.data['data'];
     return history.map((json) => TechnicalRecord.fromJson(json)).toList();
+  }
+
+  @override
+  Future<GraphTechnical> getGraphTechnical(Map<String, dynamic> filters) async {
+    try {
+      final response = await dio.get(
+        '/rest/technical-control-api/v1.0/resume-graphs',
+        options: Options(
+          headers: {'externalTransactionId': uuid, 'channel': 'ZENTINEL'},
+        ),
+      );
+      final GraphTechnical graphsJson = GraphTechnical.fromJson(response.data['data']);
+      return graphsJson;
+      
+    } catch (e) {
+      print(e);
+      final GraphTechnical graphsJson = GraphTechnical.fromJson({});
+      return graphsJson;
+    }
   }
 
 }

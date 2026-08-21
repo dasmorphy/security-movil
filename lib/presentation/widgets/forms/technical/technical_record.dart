@@ -129,10 +129,6 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecordForm> {
 
   dynamic getMaterials() {
 
-    if (materialsAdded.length == 1 && materialsAdded[0]['name']) {
-      return null;
-    }
-
     return materialsAdded.map((p) => {
       "id_equipment": p['id_equipment'],
       "quantity": p['quantity'],
@@ -276,7 +272,7 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecordForm> {
           message: "Registro guardado exitosamente", 
           autoDismiss: const Duration(seconds: 2)
         );
-        ref.read(getTaskTechnical.notifier).load();
+        ref.read(getTaskTechnical.notifier).load(filters: {});
       } else {
         await savePendingRegisterTech(data);
         GlobalLoadingBottomSheet.show(
@@ -508,7 +504,7 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecordForm> {
                       setState(() {
                         materialsAdded.add({
                           'uid': const Uuid().v4(),
-                          'id_equipment': '0',
+                          'id_equipment': 0,
                           'name': '',
                           'quantity': 1,
                         });

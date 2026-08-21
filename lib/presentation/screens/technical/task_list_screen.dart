@@ -6,8 +6,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class TaskListScreen extends ConsumerStatefulWidget {
   static const name = 'task-list-screen';
+  final bool isSupport;
 
-  const TaskListScreen({super.key});
+  const TaskListScreen({super.key, required this.isSupport});
 
   @override
   ConsumerState<TaskListScreen> createState() =>
@@ -22,7 +23,11 @@ class _TaskListScreenState
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(getTaskTechnical.notifier).load();
+      ref.read(getTaskTechnical.notifier).load(
+        filters: {
+          'support': widget.isSupport
+        }
+      );
     });
   }
 
@@ -42,7 +47,7 @@ class _TaskListScreenState
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(60),
-        child: const HeaderOptionsProfile(headerTxt: 'Proyectos'),
+        child: HeaderOptionsProfile(headerTxt: widget.isSupport ? 'Soportes' : 'Proyectos'),
       ),
       resizeToAvoidBottomInset: false,
       backgroundColor: const Color.fromARGB(255, 23, 24, 28),

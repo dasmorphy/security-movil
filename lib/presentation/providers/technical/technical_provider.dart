@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zentinel/domain/entities/api_response.dart';
 import 'package:zentinel/domain/entities/auditing_section.dart';
 import 'package:zentinel/domain/entities/client_technical.dart';
+import 'package:zentinel/domain/entities/graph_technical.dart';
 import 'package:zentinel/domain/entities/history_status_project.dart';
 import 'package:zentinel/domain/entities/location_technical.dart';
 import 'package:zentinel/domain/entities/task_technical.dart';
@@ -12,12 +13,27 @@ import 'package:zentinel/domain/repositories/technical_repository.dart';
 import 'package:zentinel/presentation/providers/catalog_notifier.dart';
 import 'package:zentinel/presentation/providers/technical/technical_repository_provider.dart';
 
-final getTaskTechnical =
-    StateNotifierProvider<CatalogNotifier<TaskTechnical>, List<TaskTechnical>>((ref) {
-  final repo = ref.watch(technicalRepositoryProvider);
+final getTaskTechnical = StateNotifierProvider<CatalogNotifier<TaskTechnical>,
+  List<TaskTechnical>>(
+  (ref) {
+    final repo = ref.watch(technicalRepositoryProvider);
 
-  return CatalogNotifier<TaskTechnical>(
-    (_) => repo.getTaskTechnical(),
+    return CatalogNotifier<TaskTechnical>(
+      (filters) {
+        final mergedFilters = {
+          ...?filters,
+        };
+        return repo.getTaskTechnical(mergedFilters);
+      },
+    );
+  },
+);
+
+final graphTechnicalProvider =
+    StateNotifierProvider<ObjectCatalogNotifier<GraphTechnical>, GraphTechnical?>((ref) {
+  final repo = ref.watch(technicalRepositoryProvider);
+  return ObjectCatalogNotifier<GraphTechnical>(
+    (filters) => repo.getGraphTechnical({}),
   );
 });
 

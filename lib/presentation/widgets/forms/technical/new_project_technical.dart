@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:uuid/uuid.dart';
 import 'package:zentinel/domain/entities/api_response.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
 class NewProjectTechnical extends ConsumerStatefulWidget {
+  final bool isSupport;
   final Future<ApiResponse<dynamic>> Function(Map<String, dynamic>) onSubmit;
-  const NewProjectTechnical({super.key, required this.onSubmit});
+  const NewProjectTechnical({super.key, required this.onSubmit, required this.isSupport});
 
   @override
   ConsumerState<NewProjectTechnical> createState() => _NewProjectTechnicalState();
@@ -94,6 +94,7 @@ class _NewProjectTechnicalState extends ConsumerState<NewProjectTechnical> {
       "location_id": _locationSelection,
       "name": _namesCtrl.text.trim(),
       "description": _observationsCtrl.text.trim(),
+      "is_support": widget.isSupport
     };
 
     GlobalLoadingBottomSheet.show(

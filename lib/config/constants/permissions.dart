@@ -33,4 +33,7 @@ class Permissions {
   static const nuevoProyecto = 'NUEVO_PROYECTO';
   static const registerTechnicalOffline = 'REGISTER_TECHNICAL_OFFLINE';
   static const verRegistrosTecnicos = 'VER_REGISTROS_TECNICOS';
+  static const verSoportesTecnicos = 'VER_SOPORTES';
+  static const nuevoSoporteTecnico = 'NUEVO_SOPORTES';
+  static const verDashboardTecnico = 'VER_DASHBOARD_TECNICO';
 }

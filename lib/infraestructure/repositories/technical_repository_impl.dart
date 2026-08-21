@@ -2,6 +2,7 @@ import 'package:zentinel/domain/datasources/technical_datasource.dart';
 import 'package:zentinel/domain/entities/api_response.dart';
 import 'package:zentinel/domain/entities/auditing_section.dart';
 import 'package:zentinel/domain/entities/client_technical.dart';
+import 'package:zentinel/domain/entities/graph_technical.dart';
 import 'package:zentinel/domain/entities/history_status_project.dart';
 import 'package:zentinel/domain/entities/location_technical.dart';
 import 'package:zentinel/domain/entities/task_technical.dart';
@@ -16,8 +17,8 @@ class TechnicalRepositoryImpl extends TechnicalRepository {
   TechnicalRepositoryImpl(this.datasource);
 
   @override
-  Future<List<TaskTechnical>> getTaskTechnical() {
-    return datasource.getTaskTechnical();
+  Future<List<TaskTechnical>> getTaskTechnical(Map<String, dynamic> filters) {
+    return datasource.getTaskTechnical(filters);
   }
 
   @override
@@ -73,6 +74,11 @@ class TechnicalRepositoryImpl extends TechnicalRepository {
   @override
   Future<List<TechnicalRecord>> getTechnicalRecord(Map<String, dynamic> filters) {
     return datasource.getTechnicalRecord(filters);
+  }
+
+  @override
+  Future<GraphTechnical> getGraphTechnical(Map<String, dynamic> filters) {
+    return datasource.getGraphTechnical(filters);
   }
   
 }

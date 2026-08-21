@@ -130,7 +130,12 @@ final appRouter = GoRouter(
         GoRoute(
           path: 'list-task-technical',
           name: TaskListScreen.name,
-          builder: (context, state) => const TaskListScreen(),
+          builder: (context, state) {
+            final json = state.extra as Map<String, dynamic>?;
+            return TaskListScreen(
+              isSupport: json?['is_support'] ?? false,
+            );
+          },
         ),
         GoRoute(
           path: 'list-technical-records',
@@ -159,7 +164,12 @@ final appRouter = GoRouter(
         GoRoute(
           path: 'new-project-technical',
           name: NewProyectTechnicalScreen.name,
-          builder: (context, state) => const NewProyectTechnicalScreen(),
+          builder: (context, state) {
+            final json = state.extra as Map<String, dynamic>?;
+            return NewProyectTechnicalScreen(
+              isSupport: json?['is_support'] ?? false,
+            );
+          },
         ),
       ],
     ),
