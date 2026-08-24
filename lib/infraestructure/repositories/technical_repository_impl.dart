@@ -80,5 +80,10 @@ class TechnicalRepositoryImpl extends TechnicalRepository {
   Future<GraphTechnical> getGraphTechnical(Map<String, dynamic> filters) {
     return datasource.getGraphTechnical(filters);
   }
+
+  @override
+  Future<ApiResponse<dynamic>> patchTechnicalRecord(Map<String, dynamic> data) {
+    return datasource.patchTechnicalRecord(data);
+  }
   
 }

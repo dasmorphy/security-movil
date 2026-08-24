@@ -42,9 +42,13 @@ class _NewTaskScreenState extends ConsumerState<NewTaskScreen> {
             taskIncompleted: widget.dataRegisterIcompleted,
             taskData: widget.taskHeader,
             onSubmit: (data) async {
-              return await ref
-                .read(technicalRecordProvider.notifier)
-                .saveTechnicalRecord(data);
+              return widget.dataRegisterIcompleted != null 
+                ? await ref
+                  .read(technicalRecordProvider.notifier)
+                  .patchTechnicalRecord(data)
+                : await ref
+                  .read(technicalRecordProvider.notifier)
+                  .saveTechnicalRecord(data);
             },
           ),
             

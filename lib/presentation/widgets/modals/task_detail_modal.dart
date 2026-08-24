@@ -186,7 +186,8 @@ class TaskDetailModal extends ConsumerWidget {
                                 codeTask: item.code,
                                 location: item.location,
                                 createdBy: item.createdBy,
-                              )
+                              ),
+                              "isSupport": isSupport
                             }
                           );
                       },

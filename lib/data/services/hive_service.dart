@@ -22,6 +22,7 @@ class HiveService {
   static const String sessionKey = 'current_session';
   static const String pendingBiomar = 'pending_biomar';
   static const String registerTechnical = 'register_technical';
+  static const String updateTechnical = 'update_technical';
   static const String pendingEmployeeMovements = 'pending_employee_movements';
 
   Future<void> initHive() async {
@@ -42,6 +43,9 @@ class HiveService {
     // Crear cajas si no existen
     if (!Hive.isBoxOpen(registerTechnical)) {
       await Hive.openBox(registerTechnical);
+    }
+    if (!Hive.isBoxOpen(updateTechnical)) {
+      await Hive.openBox(updateTechnical);
     }
     if (!Hive.isBoxOpen(pendingRequestBox)) {
       await Hive.openBox(pendingRequestBox);

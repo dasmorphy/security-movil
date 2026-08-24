@@ -10,14 +10,44 @@ class RegisterTecninalOffline extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final pendingAsync = ref.watch(pendingRegisterTechProvider);
+    final updateAsync = ref.watch(pendingUpdateTechProvider);
+
+    final AsyncValue<List<Map<String, dynamic>>> combinedPendingAsync;
+
+    if (pendingAsync.isLoading || updateAsync.isLoading) {
+      combinedPendingAsync = const AsyncLoading();
+    } else if (pendingAsync.hasError) {
+      combinedPendingAsync = AsyncError(
+        pendingAsync.error!,
+        pendingAsync.stackTrace!,
+      );
+    } else if (updateAsync.hasError) {
+      combinedPendingAsync = AsyncError(
+        updateAsync.error!,
+        updateAsync.stackTrace!,
+      );
+    } else {
+      combinedPendingAsync = AsyncData([
+        ...(pendingAsync.value ?? []),
+        ...(updateAsync.value ?? []),
+      ]);
+    }
 
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(80),
         child: HeaderOffline(
-          headerTxt: 'Regitros técnicos offline', 
-          pendingAsync: pendingAsync, 
-          sync: ref.read(syncPendingProvider.notifier).syncRegisterTech
+          headerTxt: 'Registros técnicos offline', 
+          pendingAsync: combinedPendingAsync, 
+          sync: () async {
+            await ref
+                .read(syncPendingProvider.notifier)
+                .syncRegisterTech();
+
+            await ref
+                .read(syncPendingProvider.notifier)
+                .syncUpdateTech();
+          },
         ),
       ),
       resizeToAvoidBottomInset: false,

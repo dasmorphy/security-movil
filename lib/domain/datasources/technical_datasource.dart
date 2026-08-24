@@ -12,6 +12,7 @@ import 'package:zentinel/domain/entities/technical_staff.dart';
 abstract class TechnicalDatasource {
   Future<List<TaskTechnical>> getTaskTechnical(Map<String, dynamic> filters);
   Future<ApiResponse<dynamic>> saveTechnicalRecord(Map<String, dynamic> data);
+  Future<ApiResponse<dynamic>> patchTechnicalRecord(Map<String, dynamic> data);
   Future<List<TechMaterial>> getTechMeterial();
   Future<List<AuditingSection>> getAuditingSection();
   Future<ApiResponse<dynamic>> saveAuditing(Map<String, dynamic> data);

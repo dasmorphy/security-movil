@@ -89,7 +89,7 @@ class _TaskListScreenState
                               borderRadius: BorderRadius.circular(8),
                               onTap: () => ModalHelper.open(
                                 context,
-                                child: TaskDetailModal(item: item),
+                                child: TaskDetailModal(item: item, isSupport: widget.isSupport,),
                               ),
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),

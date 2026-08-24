@@ -28,6 +28,7 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecordForm> {
   bool imagesMaxError = false;
   bool _isInitializing = true;
   bool showImage = true;
+  bool isPickingImage = false;
 
   String _vehicle = '0';
   final FocusNode _vehicleFocus = FocusNode();
@@ -51,18 +52,21 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecordForm> {
 
   final vehicle = [
     {'id': '1',
-      'name': 'GTW-8534',
+      'name': 'No aplica',
     },
     {'id': '2',
-      'name': 'GTW-8533',
+      'name': 'GTW-8534',
     },
     {'id': '3',
-      'name': 'GTA-9251',
+      'name': 'GTW-8533',
     },
     {'id': '4',
-      'name': 'GSW-7476',
+      'name': 'GTA-9251',
     },
     {'id': '5',
+      'name': 'GSW-7476',
+    },
+    {'id': '6',
       'name': 'GST-6597',
     },
   ];
@@ -79,15 +83,17 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecordForm> {
 
       if (!mounted) return;
 
+      if (widget.taskIncompleted != null) {
+        _loadPreloadedData(widget.taskIncompleted!);
+      }
+
+      if (!mounted) return;
+
       setState(() {
         _isInitializing = false;
       });
 
     });
-
-    if (widget.taskIncompleted != null && mounted) {
-      _loadPreloadedData(widget.taskIncompleted!);
-    }
 
   }
 
@@ -104,11 +110,11 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecordForm> {
       showImage = false;
     }
 
+    final vehicleFound = vehicle.where((item) => item['name'] == data.vehicle).firstOrNull;
+
     setState(() {
       _observationsCtrl.text = data.resume;
-      _vehicle = vehicle.firstWhere(
-        (item) => item['name'] == data.vehicle,
-      )['name'] ?? '0';
+      _vehicle = vehicleFound?['id'] ?? '0';
       selectedUsers = data.technicalStaff
         ?.map((staff) => staff.idTechnical)
         .whereType<int>()
@@ -230,6 +236,11 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecordForm> {
 
     print(data);
 
+    if (widget.taskIncompleted != null) {
+      data['id_record'] = widget.taskIncompleted!.idRecord;
+    }
+
+
     // Verificar conexión a internet
     final internetAvailable = await hasInternet();
 
@@ -237,7 +248,11 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecordForm> {
       // 🔴 SIN INTERNET: Guardar localmente
       print('❌ Sin conexión, guardando localmente...');
       data['created_at'] = DateTime.now().toString();
-      await savePendingRegisterTech(data);
+      if (widget.taskIncompleted != null) {
+        await savePendingUpdateTech(data);
+      }else{
+        await savePendingRegisterTech(data);
+      }
 
       if (mounted) {
         context.pop();
@@ -542,6 +557,12 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecordForm> {
                   CameraImagePicker(
                     minImages: 6,
                     maxImages: 10,
+                    isPickingImage: isPickingImage,
+                    onPickingChanged: (value) {
+                      setState(() {
+                        isPickingImage = value;
+                      });
+                    },
                     onImagesChanged: (images) {
                       print("imagenes seleccionadas ${images.length}");
                       _selectedImages = images;
@@ -591,7 +612,7 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecordForm> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: ElevatedButton(
-                        onPressed: isLoading ? null : _submit,
+                        onPressed: (isLoading || isPickingImage) ? null : _submit,
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
