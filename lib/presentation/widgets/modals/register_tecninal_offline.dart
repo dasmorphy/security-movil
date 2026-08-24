@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
@@ -28,8 +27,12 @@ class RegisterTecninalOffline extends ConsumerWidget {
       );
     } else {
       combinedPendingAsync = AsyncData([
-        ...(pendingAsync.value ?? []),
-        ...(updateAsync.value ?? []),
+        ...(pendingAsync.value ?? []).map(
+          (item) => {...item, '_technicalOperation': 'register'},
+        ),
+        ...(updateAsync.value ?? []).map(
+          (item) => {...item, '_technicalOperation': 'update'},
+        ),
       ]);
     }
 
@@ -37,17 +40,9 @@ class RegisterTecninalOffline extends ConsumerWidget {
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(80),
         child: HeaderOffline(
-          headerTxt: 'Registros técnicos offline', 
-          pendingAsync: combinedPendingAsync, 
-          sync: () async {
-            await ref
-                .read(syncPendingProvider.notifier)
-                .syncRegisterTech();
-
-            await ref
-                .read(syncPendingProvider.notifier)
-                .syncUpdateTech();
-          },
+          headerTxt: 'Registros técnicos offline',
+          pendingAsync: combinedPendingAsync,
+          sync: ref.read(syncPendingProvider.notifier).syncTechnical,
         ),
       ),
       resizeToAvoidBottomInset: false,
@@ -55,25 +50,25 @@ class RegisterTecninalOffline extends ConsumerWidget {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),
-              child: pendingAsync.when(
-                loading: () => const Center(child: CircularProgressIndicator()),
-                error: (e, _) => Center(
-                  child: Text(
-                    'Error: $e',
-                    style: const TextStyle(color: Colors.white70),
-                  ),
-                ),
-                data: (pending) {
-                  final items = pending.map(mapPendingRegisterTech).toList();
+          child: combinedPendingAsync.when(
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (e, _) => Center(
+              child: Text(
+                'Error: $e',
+                style: const TextStyle(color: Colors.white70),
+              ),
+            ),
+            data: (pending) {
+              final items = pending.map(_mapPendingTechnical).toList();
 
-                  if (items.isEmpty) {
-                    return const Center(
-                      child: Text(
-                        'Sin registros pendientes',
-                        style: TextStyle(color: Colors.white70),
-                      ),
-                    );
-                  }
+              if (items.isEmpty) {
+                return const Center(
+                  child: Text(
+                    'Sin registros pendientes',
+                    style: TextStyle(color: Colors.white70),
+                  ),
+                );
+              }
 
               return ListView.separated(
                 itemCount: items.length,
@@ -113,10 +108,12 @@ class RegisterTecninalOffline extends ConsumerWidget {
 
                             Expanded(
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         name,
@@ -127,7 +124,7 @@ class RegisterTecninalOffline extends ConsumerWidget {
                                       ),
 
                                       const SizedBox(height: 6),
-                                  
+
                                       Text(
                                         subtitle,
                                         style: TextStyle(
@@ -135,9 +132,9 @@ class RegisterTecninalOffline extends ConsumerWidget {
                                           fontSize: 12,
                                         ),
                                       ),
-                                  
+
                                       const SizedBox(height: 6),
-                                  
+
                                       Text(
                                         statusText,
                                         style: TextStyle(
@@ -156,7 +153,7 @@ class RegisterTecninalOffline extends ConsumerWidget {
                                         height: 20,
                                         child: CircularProgressIndicator(),
                                       ),
-                                    )
+                                    ),
                                 ],
                               ),
                             ),
@@ -172,5 +169,16 @@ class RegisterTecninalOffline extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  Map<String, dynamic> _mapPendingTechnical(Map<String, dynamic> raw) {
+    final isUpdate = raw['_technicalOperation'] == 'update';
+    final processing = raw['processing'] == true;
+
+    return {
+      'name': isUpdate ? 'Actualización técnica' : 'Registro técnico',
+      'subtitle': isUpdate ? 'Actualización' : 'Nuevo registro',
+      'statusText': processing ? 'Subiendo...' : 'Pendiente',
+    };
   }
 }

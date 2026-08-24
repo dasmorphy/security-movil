@@ -15,7 +15,13 @@ class TechnicalRecordForm extends ConsumerStatefulWidget {
   final TechnicalRecord? taskIncompleted;
   final bool isSupport;
 
-  const TechnicalRecordForm({super.key, required this.taskData, required this.onSubmit, this.taskIncompleted, this.isSupport = false});
+  const TechnicalRecordForm({
+    super.key,
+    required this.taskData,
+    required this.onSubmit,
+    this.taskIncompleted,
+    this.isSupport = false,
+  });
 
   @override
   ConsumerState<TechnicalRecordForm> createState() => _TechnicalRecordState();
@@ -51,24 +57,12 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecordForm> {
   final FocusNode _personChargeFocus = FocusNode();
 
   final vehicle = [
-    {'id': '1',
-      'name': 'No aplica',
-    },
-    {'id': '2',
-      'name': 'GTW-8534',
-    },
-    {'id': '3',
-      'name': 'GTW-8533',
-    },
-    {'id': '4',
-      'name': 'GTA-9251',
-    },
-    {'id': '5',
-      'name': 'GSW-7476',
-    },
-    {'id': '6',
-      'name': 'GST-6597',
-    },
+    {'id': '1', 'name': 'No aplica'},
+    {'id': '2', 'name': 'GTW-8534'},
+    {'id': '3', 'name': 'GTW-8533'},
+    {'id': '4', 'name': 'GTA-9251'},
+    {'id': '5', 'name': 'GSW-7476'},
+    {'id': '6', 'name': 'GST-6597'},
   ];
 
   @override
@@ -78,7 +72,7 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecordForm> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await Future.wait([
         ref.read(getTechMaterial.notifier).load(),
-        ref.read(getTechnicalStaff.notifier).load()
+        ref.read(getTechnicalStaff.notifier).load(),
       ]);
 
       if (!mounted) return;
@@ -92,9 +86,7 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecordForm> {
       setState(() {
         _isInitializing = false;
       });
-
     });
-
   }
 
   @override
@@ -110,36 +102,41 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecordForm> {
       showImage = false;
     }
 
-    final vehicleFound = vehicle.where((item) => item['name'] == data.vehicle).firstOrNull;
+    final vehicleFound = vehicle
+        .where((item) => item['name'] == data.vehicle)
+        .firstOrNull;
 
     setState(() {
       _observationsCtrl.text = data.resume;
       _vehicle = vehicleFound?['id'] ?? '0';
-      selectedUsers = data.technicalStaff
-        ?.map((staff) => staff.idTechnical)
-        .whereType<int>()
-        .toList() ??
-      [];
+      selectedUsers =
+          data.technicalStaff
+              ?.map((staff) => staff.idTechnical)
+              .whereType<int>()
+              .toList() ??
+          [];
     });
 
     if (data.materials != null) {
       materialsAdded.addAll(
-        data.materials!.map((material) => {
-          'uid': const Uuid().v4(),
-          'id_equipment': material.idEquipment,
-          'name': material.material,
-          'quantity': material.quantity ?? 0,
-        }),
+        data.materials!.map(
+          (material) => {
+            'uid': const Uuid().v4(),
+            'id_equipment': material.idEquipment,
+            'name': material.material,
+            'quantity': material.quantity ?? 0,
+          },
+        ),
       );
     }
   }
 
   dynamic getMaterials() {
-
-    return materialsAdded.map((p) => {
-      "id_equipment": p['id_equipment'],
-      "quantity": p['quantity'],
-    }).toList();
+    return materialsAdded
+        .map(
+          (p) => {"id_equipment": p['id_equipment'], "quantity": p['quantity']},
+        )
+        .toList();
   }
 
   void _clearCntrl() {
@@ -166,14 +163,20 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecordForm> {
 
   bool _isFormCompleted() {
     final imagesValid = showImage
-      ? true
-      : _selectedImages.length >= 6 &&
-        _selectedImages.length <= 10;
+        ? true
+        : _selectedImages.length >= 6 && _selectedImages.length <= 10;
 
     return _vehicle != '0' &&
-      selectedUsers.isNotEmpty &&
-      materialsAdded.isNotEmpty &&
-      imagesValid;
+        selectedUsers.isNotEmpty &&
+        materialsAdded.isNotEmpty &&
+        imagesValid;
+  }
+
+  Future<void> _savePendingTechnical(Map<String, dynamic> data) {
+    if (widget.taskIncompleted != null) {
+      return savePendingUpdateTech(data);
+    }
+    return savePendingRegisterTech(data);
   }
 
   void _submit() async {
@@ -230,8 +233,8 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecordForm> {
       "status": _isFormCompleted() ? 'Completado' : 'Incompleto',
       "materials": getMaterials(),
       "images": _selectedImages
-        .whereType<Uint8List>()
-        .toList(), // Lista de Uint8List directo, sin base64
+          .whereType<Uint8List>()
+          .toList(), // Lista de Uint8List directo, sin base64
     };
 
     print(data);
@@ -240,7 +243,6 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecordForm> {
       data['id_record'] = widget.taskIncompleted!.idRecord;
     }
 
-
     // Verificar conexión a internet
     final internetAvailable = await hasInternet();
 
@@ -248,17 +250,14 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecordForm> {
       // 🔴 SIN INTERNET: Guardar localmente
       print('❌ Sin conexión, guardando localmente...');
       data['created_at'] = DateTime.now().toString();
-      if (widget.taskIncompleted != null) {
-        await savePendingUpdateTech(data);
-      }else{
-        await savePendingRegisterTech(data);
-      }
+      await _savePendingTechnical(data);
 
       if (mounted) {
         context.pop();
         GlobalLoadingBottomSheet.show(
           status: OverlayStatus.error,
-          message: 'Sin conexión. Tu información se guardará localmente y se enviará automáticamente cuando recuperes conexión.',
+          message:
+              'Sin conexión. Tu información se guardará localmente y se enviará automáticamente cuando recuperes conexión.',
           autoDismiss: const Duration(seconds: 3),
         );
       }
@@ -267,8 +266,8 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecordForm> {
     }
 
     GlobalLoadingBottomSheet.show(
-      status: OverlayStatus.loading, 
-      message: "Guardando registro..."
+      status: OverlayStatus.loading,
+      message: "Guardando registro...",
     );
 
     try {
@@ -284,16 +283,15 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecordForm> {
 
       if (response.success) {
         GlobalLoadingBottomSheet.show(
-          status: OverlayStatus.success, 
-          message: "Registro guardado exitosamente", 
-          autoDismiss: const Duration(seconds: 2)
+          status: OverlayStatus.success,
+          message: "Registro guardado exitosamente",
+          autoDismiss: const Duration(seconds: 2),
         );
-        ref.read(getTaskTechnical.notifier).load(
-          filters: {
-          'support': widget.isSupport
-        });
+        ref
+            .read(getTaskTechnical.notifier)
+            .load(filters: {'support': widget.isSupport});
       } else {
-        await savePendingRegisterTech(data);
+        await _savePendingTechnical(data);
         GlobalLoadingBottomSheet.show(
           status: OverlayStatus.error,
           message:
@@ -303,10 +301,11 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecordForm> {
         );
       }
     } catch (e) {
-      await savePendingRegisterTech(data);
+      await _savePendingTechnical(data);
       GlobalLoadingBottomSheet.show(
         status: OverlayStatus.error,
-        message: 'Error al enviar el formulario. La información se guardará localmente y se enviará automáticamente.',
+        message:
+            'Error al enviar el formulario. La información se guardará localmente y se enviará automáticamente.',
         autoDismiss: const Duration(seconds: 3),
       );
     }
@@ -320,7 +319,6 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecordForm> {
     final theme = Theme.of(context);
     final materials = ref.watch(getTechMaterial);
     final techStaff = ref.watch(getTechnicalStaff);
-    
 
     //Usuario no cargado o sesión inválida
     if (!authState.hasValue || authState.value == null) {
@@ -360,17 +358,16 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecordForm> {
               alignment: Alignment.center,
               child: SizedBox(
                 width: 280,
-                child:
-                  Text(
-                    'Cargando formulario...',
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    softWrap: true,
+                child: Text(
+                  'Cargando formulario...',
+                  textAlign: TextAlign.center,
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    color: Colors.white,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
                   ),
+                  softWrap: true,
+                ),
               ),
             ),
             const SizedBox(height: 20),
@@ -404,8 +401,8 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecordForm> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                RecordTechnicalHeader(taskData: widget.taskData,),
-                const SizedBox(height: 10,),
+                RecordTechnicalHeader(taskData: widget.taskData),
+                const SizedBox(height: 10),
                 CommentaryReception(
                   controller: _observationsCtrl,
                   focusNode: _observationsFocus,
@@ -417,15 +414,14 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecordForm> {
                   },
                 ),
 
-
                 const SizedBox(height: 12),
                 CustomFieldLabelRequired(txtLabel: 'Personal'),
                 GlowMultiSelectFormField<int>(
                   values: selectedUsers,
                   items: techStaff.map((user) => MultiSelectItem<int>(
-                    value: user.idStaff,
-                    label: user.name,
-                  )).toList(),
+                          value: user.idStaff,
+                          label: user.name,
+                        )).toList(),
                   onChanged: (values) {
                     setState(() => selectedUsers = values);
                   },
@@ -440,7 +436,6 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecordForm> {
                   },
                 ),
 
-
                 const SizedBox(height: 12),
                 CustomFieldLabelRequired(txtLabel: 'Vehículo'),
                 GlowDropdownFormField2<String>(
@@ -451,12 +446,18 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecordForm> {
                     DropdownMenuItem(
                       enabled: false,
                       value: '0',
-                      child: Text('Seleccione una opción', style: TextStyle(color: Colors.white),),
+                      child: Text(
+                        'Seleccione una opción',
+                        style: TextStyle(color: Colors.white),
+                      ),
                     ),
                     ...vehicle.map(
                       (c) => DropdownMenuItem(
                         value: c['name'],
-                        child: Text(c['name']!, style: TextStyle(color: Colors.white),),
+                        child: Text(
+                          c['name']!,
+                          style: TextStyle(color: Colors.white),
+                        ),
                       ),
                     ),
                   ],
@@ -475,9 +476,12 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecordForm> {
 
                 const SizedBox(height: 12),
 
-                CustomFieldLabelRequired(txtLabel: 'Equipos', isRequired: false,),
+                CustomFieldLabelRequired(
+                  txtLabel: 'Equipos',
+                  isRequired: false,
+                ),
 
-                if (materialsAdded.isNotEmpty)  
+                if (materialsAdded.isNotEmpty)
                   ...materialsAdded.asMap().entries.map((entry) {
                     final index = entry.key;
                     final item = entry.value;
@@ -493,8 +497,8 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecordForm> {
                       },
                       onMaterialChanged: (v) {
                         final material = materials.firstWhere(
-                        (e) => e.idEquipment == v,
-                      );
+                          (e) => e.idEquipment == v,
+                        );
 
                         materialsAdded[index]['id_equipment'] = v;
                         materialsAdded[index]['name'] = material.product;
@@ -513,7 +517,6 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecordForm> {
                       },
 
                       materials: materials,
-
                     );
                   }),
 
@@ -535,25 +538,35 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecordForm> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          Icon(Icons.add_rounded, color: kTextSecondary, size: 18),
+                          Icon(
+                            Icons.add_rounded,
+                            color: kTextSecondary,
+                            size: 18,
+                          ),
                           SizedBox(width: 2),
                           Text(
                             "Añadir equipo",
-                            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                              color: const Color.fromARGB(255, 137, 172, 255),
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                            ),
+                            style: Theme.of(context).textTheme.titleMedium
+                                ?.copyWith(
+                                  color: const Color.fromARGB(
+                                    255,
+                                    137,
+                                    172,
+                                    255,
+                                  ),
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                ),
                           ),
                         ],
                       ),
                     ),
-                  )
-                ],                
+                  ),
+                ],
 
                 const SizedBox(height: 18),
-                
-                if (showImage)...[
+
+                if (showImage) ...[
                   CameraImagePicker(
                     minImages: 6,
                     maxImages: 10,
@@ -578,12 +591,14 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecordForm> {
                         imagesMinError
                             ? 'Debe subir mínimo 6 imagenes'
                             : 'Debe subir máximo 10 imagenes',
-                        style: TextStyle(color: Color.fromARGB(255, 185, 28, 16)),
+                        style: TextStyle(
+                          color: Color.fromARGB(255, 185, 28, 16),
+                        ),
                       ),
                     ),
                 ],
 
-                const SizedBox(height: 12,),
+                const SizedBox(height: 12),
 
                 Row(
                   children: [
@@ -612,7 +627,9 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecordForm> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: ElevatedButton(
-                        onPressed: (isLoading || isPickingImage) ? null : _submit,
+                        onPressed: (isLoading || isPickingImage)
+                            ? null
+                            : _submit,
                         style: ElevatedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(

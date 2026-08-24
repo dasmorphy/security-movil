@@ -29,16 +29,16 @@ final pendingRequestsProvider = StreamProvider<List<Map<String, dynamic>>>((
 
   // emite estado inicial
   yield box.values
-    .whereType<Map>()
-    .map((e) => Map<String, dynamic>.from(e))
-    .toList();
+      .whereType<Map>()
+      .map((e) => Map<String, dynamic>.from(e))
+      .toList();
 
   // escucha cambios
   await for (final _ in box.watch()) {
     yield box.values
-      .whereType<Map>()
-      .map((e) => Map<String, dynamic>.from(e))
-      .toList();
+        .whereType<Map>()
+        .map((e) => Map<String, dynamic>.from(e))
+        .toList();
   }
 });
 
@@ -49,77 +49,80 @@ final pendingBiomarProvider = StreamProvider<List<Map<String, dynamic>>>((
 
   // emite estado inicial
   yield box.values
-    .whereType<Map>()
-    .map((e) => Map<String, dynamic>.from(e))
-    .toList();
+      .whereType<Map>()
+      .map((e) => Map<String, dynamic>.from(e))
+      .toList();
 
   // escucha cambios
   await for (final _ in box.watch()) {
     yield box.values
-      .whereType<Map>()
-      .map((e) => Map<String, dynamic>.from(e))
-      .toList();
+        .whereType<Map>()
+        .map((e) => Map<String, dynamic>.from(e))
+        .toList();
   }
 });
 
-final pendingEmployeeMovementsProvider = StreamProvider<List<Map<String, dynamic>>>((ref) async* {
-  final box = Hive.box('pending_employee_movements');
-  // emite estado inicial
-  yield box.values
-    .whereType<Map>()
-    .map((e) => Map<String, dynamic>.from(e))
-    .toList();
+final pendingEmployeeMovementsProvider =
+    StreamProvider<List<Map<String, dynamic>>>((ref) async* {
+      final box = Hive.box('pending_employee_movements');
+      // emite estado inicial
+      yield box.values
+          .whereType<Map>()
+          .map((e) => Map<String, dynamic>.from(e))
+          .toList();
 
-  // escucha cambios
-  await for (final _ in box.watch()) {
-    yield box.values
-      .whereType<Map>()
-      .map((e) => Map<String, dynamic>.from(e))
-      .toList();
-  }
-});
+      // escucha cambios
+      await for (final _ in box.watch()) {
+        yield box.values
+            .whereType<Map>()
+            .map((e) => Map<String, dynamic>.from(e))
+            .toList();
+      }
+    });
 
-final pendingRegisterTechProvider = StreamProvider<List<Map<String, dynamic>>>((ref) async* {
+final pendingRegisterTechProvider = StreamProvider<List<Map<String, dynamic>>>((
+  ref,
+) async* {
   final box = Hive.box('register_technical');
   // emite estado inicial
   yield box.values
-    .whereType<Map>()
-    .map((e) => Map<String, dynamic>.from(e))
-    .toList();
+      .whereType<Map>()
+      .map((e) => Map<String, dynamic>.from(e))
+      .toList();
 
   // escucha cambios
   await for (final _ in box.watch()) {
     yield box.values
-      .whereType<Map>()
-      .map((e) => Map<String, dynamic>.from(e))
-      .toList();
+        .whereType<Map>()
+        .map((e) => Map<String, dynamic>.from(e))
+        .toList();
   }
 });
 
-final pendingUpdateTechProvider = StreamProvider<List<Map<String, dynamic>>>((ref) async* {
+final pendingUpdateTechProvider = StreamProvider<List<Map<String, dynamic>>>((
+  ref,
+) async* {
   final box = Hive.box('update_technical');
   // emite estado inicial
   yield box.values
-    .whereType<Map>()
-    .map((e) => Map<String, dynamic>.from(e))
-    .toList();
+      .whereType<Map>()
+      .map((e) => Map<String, dynamic>.from(e))
+      .toList();
 
   // escucha cambios
   await for (final _ in box.watch()) {
     yield box.values
-      .whereType<Map>()
-      .map((e) => Map<String, dynamic>.from(e))
-      .toList();
+        .whereType<Map>()
+        .map((e) => Map<String, dynamic>.from(e))
+        .toList();
   }
 });
 
 /// Firma del envío real de un registro al backend.
 /// Recibe el `endpoint` guardado (puede ser null) y el payload ya restaurado,
 /// y devuelve `true` si el backend confirmó la recepción.
-typedef _Sender = Future<bool> Function(
-  String? endpoint,
-  Map<String, dynamic> data,
-);
+typedef _Sender =
+    Future<bool> Function(String? endpoint, Map<String, dynamic> data);
 
 class SyncPendingNotifier extends StateNotifier<bool> {
   final Ref ref;
@@ -161,12 +164,18 @@ class SyncPendingNotifier extends StateNotifier<bool> {
         .saveEmployeeMovement(data);
   }
 
-  Future<ApiResponse> providerRegisterTechnical(Map<String, dynamic> data) async {
-    return await ref.read(technicalRecordProvider.notifier).saveTechnicalRecord(data);
+  Future<ApiResponse> providerRegisterTechnical(
+    Map<String, dynamic> data,
+  ) async {
+    return await ref
+        .read(technicalRecordProvider.notifier)
+        .saveTechnicalRecord(data);
   }
 
   Future<ApiResponse> providerUpdateTechnical(Map<String, dynamic> data) async {
-    return await ref.read(technicalRecordProvider.notifier).patchTechnicalRecord(data);
+    return await ref
+        .read(technicalRecordProvider.notifier)
+        .patchTechnicalRecord(data);
   }
 
   /// Adquiere el lock de forma SÍNCRONA (antes de cualquier `await`) y ejecuta
@@ -199,8 +208,16 @@ class SyncPendingNotifier extends StateNotifier<bool> {
   /// resume de la app).
   Future<void> syncAll() async {
     await _withLock(() async {
-      await _drainBox(boxName: 'pending_requests', label: 'logbook', send: _sendLogbook);
-      await _drainBox(boxName: 'pending_biomar', label: 'biomar', send: _sendBiomar);
+      await _drainBox(
+        boxName: 'pending_requests',
+        label: 'logbook',
+        send: _sendLogbook,
+      );
+      await _drainBox(
+        boxName: 'pending_biomar',
+        label: 'biomar',
+        send: _sendBiomar,
+      );
       await _drainBox(
         boxName: 'pending_employee_movements',
         label: 'employee',
@@ -216,42 +233,63 @@ class SyncPendingNotifier extends StateNotifier<bool> {
         label: 'update_technical',
         send: _sendUpdateTechnical,
       );
-
     });
   }
 
   /// Sincronización manual de un solo box (botón de reintento por pantalla).
   Future<void> sync() => _withLock(
-        () => _drainBox(boxName: 'pending_requests', label: 'logbook', send: _sendLogbook),
-      );
+    () => _drainBox(
+      boxName: 'pending_requests',
+      label: 'logbook',
+      send: _sendLogbook,
+    ),
+  );
 
   Future<void> syncBiomar() => _withLock(
-        () => _drainBox(boxName: 'pending_biomar', label: 'biomar', send: _sendBiomar),
-      );
+    () => _drainBox(
+      boxName: 'pending_biomar',
+      label: 'biomar',
+      send: _sendBiomar,
+    ),
+  );
 
   Future<void> syncEmployeeMovements() => _withLock(
-        () => _drainBox(
-          boxName: 'pending_employee_movements',
-          label: 'employee',
-          send: _sendEmployee,
-        ),
-      );
+    () => _drainBox(
+      boxName: 'pending_employee_movements',
+      label: 'employee',
+      send: _sendEmployee,
+    ),
+  );
 
   Future<void> syncRegisterTech() => _withLock(
-        () => _drainBox(
-          boxName: 'register_technical',
-          label: 'register_technical',
-          send: _sendRegisterTechnical,
-        ),
-      );
+    () => _drainBox(
+      boxName: 'register_technical',
+      label: 'register_technical',
+      send: _sendRegisterTechnical,
+    ),
+  );
+
+  /// Sincroniza registros nuevos y actualizaciones técnicas bajo el mismo lock.
+  Future<void> syncTechnical() => _withLock(() async {
+    await _drainBox(
+      boxName: 'register_technical',
+      label: 'register_technical',
+      send: _sendRegisterTechnical,
+    );
+    await _drainBox(
+      boxName: 'update_technical',
+      label: 'update_technical',
+      send: _sendUpdateTechnical,
+    );
+  });
 
   Future<void> syncUpdateTech() => _withLock(
-      () => _drainBox(
-        boxName: 'update_technical',
-        label: 'update_technical',
-        send: _sendRegisterTechnical,
-      ),
-    );
+    () => _drainBox(
+      boxName: 'update_technical',
+      label: 'update_technical',
+      send: _sendUpdateTechnical,
+    ),
+  );
 
   // --- Senders por tipo de box ---------------------------------------------
 
@@ -267,15 +305,24 @@ class SyncPendingNotifier extends StateNotifier<bool> {
     return false;
   }
 
-  Future<bool> _sendEmployee(String? endpoint, Map<String, dynamic> data) async {
+  Future<bool> _sendEmployee(
+    String? endpoint,
+    Map<String, dynamic> data,
+  ) async {
     return (await providerEmployeeMovements(data)).success;
   }
 
-  Future<bool> _sendRegisterTechnical(String? endpoint, Map<String, dynamic> data) async {
+  Future<bool> _sendRegisterTechnical(
+    String? endpoint,
+    Map<String, dynamic> data,
+  ) async {
     return (await providerRegisterTechnical(data)).success;
   }
 
-  Future<bool> _sendUpdateTechnical(String? endpoint, Map<String, dynamic> data) async {
+  Future<bool> _sendUpdateTechnical(
+    String? endpoint,
+    Map<String, dynamic> data,
+  ) async {
     return (await providerUpdateTechnical(data)).success;
   }
 
@@ -382,6 +429,8 @@ class SyncPendingNotifier extends StateNotifier<bool> {
       }
     }
 
-    print('🎉 [$label] Sincronización completada: $synced enviados, $failed fallidos');
+    print(
+      '🎉 [$label] Sincronización completada: $synced enviados, $failed fallidos',
+    );
   }
 }
