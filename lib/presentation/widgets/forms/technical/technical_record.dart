@@ -99,7 +99,7 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecordForm> {
     if (!mounted) return;
 
     if (data.images.isNotEmpty) {
-      showImage = false;
+      setState(() => showImage = false);
     }
 
     final vehicleFound = vehicle
@@ -162,7 +162,7 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecordForm> {
   }
 
   bool _isFormCompleted() {
-    final imagesValid = showImage
+    final imagesValid = widget.taskIncompleted != null && widget.taskIncompleted!.images.isNotEmpty
         ? true
         : _selectedImages.length >= 6 && _selectedImages.length <= 10;
 
