@@ -29,7 +29,6 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
   double _longitude = -78.5953478;
   bool isLoading = false;
   bool imagesMinError = false;
-  bool imagesMaxError = false;
   String _authorized = '0';
 
   final _guideCtrl = TextEditingController();
@@ -190,14 +189,6 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
       return;
     }
 
-    if (_selectedImages.length > 10) {
-      setState(() {
-        imagesMaxError = true;
-        isLoading = false;
-      });
-      return;
-    }
-
     final authState = ref.watch(userSessionProvider);
 
     //Usuario no cargado o sesión inválida
@@ -321,7 +312,6 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
     _personWithdrawsCtrl.clear();
     _destinyCtrl.clear();
     imagesMinError = false;
-    imagesMaxError = false;
   }
 
   @override
@@ -791,7 +781,6 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
 
                 CameraImagePicker(
                   minImages: 3,
-                  maxImages: 10,
                   isPickingImage: isPickingImage,
                   onPickingChanged: (value) {
                     setState(() {
@@ -804,13 +793,11 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                   },
                 ),
 
-                if (imagesMinError || imagesMaxError)
+                if (imagesMinError)
                   SizedBox(
                     width: double.infinity,
                     child: Text(
-                      imagesMinError
-                          ? 'Debe subir mínimo $_minImages imagenes'
-                          : 'Debe subir máximo 10 imagenes',
+                      'Debe subir mínimo $_minImages imagenes',
                       style: TextStyle(color: Color.fromARGB(255, 185, 28, 16)),
                     ),
                   ),

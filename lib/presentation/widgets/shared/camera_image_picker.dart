@@ -7,7 +7,7 @@ import 'package:zentinel/presentation/screens/screens.dart';
 
 class CameraImagePicker extends StatefulWidget {
   final int minImages;
-  final int maxImages;
+  final int? maxImages;
   final bool isPickingImage;
   final String? textBtn;
   final Function(List<Uint8List>) onImagesChanged;
@@ -16,7 +16,7 @@ class CameraImagePicker extends StatefulWidget {
   const CameraImagePicker({
     super.key,
     this.minImages = 0,
-    this.maxImages = 10,
+    this.maxImages,
     this.isPickingImage = false,
     this.textBtn = "Adjuntar Evidencia Fotográfica",
     required this.onImagesChanged,
@@ -38,7 +38,8 @@ class _CameraImagePickerState extends State<CameraImagePicker> {
     Future<void> captureImageFromCamera() async {
       if (widget.isPickingImage) return;
 
-      if (_selectedImages.length >= widget.maxImages) {
+      if (widget.maxImages != null &&
+        _selectedImages.length >= widget.maxImages!) {
         setState(() => imagesMaxError = true);
         return;
       }

@@ -23,7 +23,6 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
   String _groupBusiness = '0';
   bool isLoading = false;
   bool imagesMinError = false;
-  bool imagesMaxError = false;
   String _authorized = '0';
   String _destiny = '0';
 
@@ -179,14 +178,6 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
       return;
     }
 
-    if (_selectedImages.length > 10) {
-      setState(() {
-        imagesMaxError = true;
-        isLoading = false;
-      });
-      return;
-    }
-
     final authState = ref.watch(userSessionProvider);
 
     //Usuario no cargado o sesión inválida
@@ -309,7 +300,6 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
     _authorized = '0';
     _observationsCtrl.clear();
     imagesMinError = false;
-    imagesMaxError = false;
   }
 
   @override
@@ -805,7 +795,6 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
 
                 CameraImagePicker(
                   minImages: 3,
-                  maxImages: 10,
                   isPickingImage: isPickingImage,
                   onPickingChanged: (value) {
                     setState(() {
@@ -818,13 +807,11 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                   },
                 ),
 
-                if (imagesMinError || imagesMaxError)
+                if (imagesMinError)
                   SizedBox(
                     width: double.infinity,
                     child: Text(
-                      imagesMinError
-                          ? 'Debe subir mínimo $_minImages imagenes'
-                          : 'Debe subir máximo 10 imagenes',
+                      'Debe subir mínimo $_minImages imagenes',
                       style: TextStyle(color: Color.fromARGB(255, 185, 28, 16)),
                     ),
                   ),
