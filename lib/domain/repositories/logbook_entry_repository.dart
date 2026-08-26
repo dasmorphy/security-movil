@@ -8,6 +8,7 @@ import 'package:zentinel/domain/entities/employee_movement.dart';
 import 'package:zentinel/domain/entities/graph_logbook.dart';
 import 'package:zentinel/domain/entities/group_business.dart';
 import 'package:zentinel/domain/entities/unity_weight.dart';
+import 'package:zentinel/domain/entities/user_session.dart';
 
 abstract class LogbookEntryRepository {
   Future<List<Category>> getAllCategory();
@@ -25,4 +26,5 @@ abstract class LogbookEntryRepository {
   Future <GraphLogbook> getGraphLogbook(Map<String, dynamic> filters);
   Future <List<EmployeeIntern>> getEmployeeInterns(Map<String, dynamic> filters);
   Future <List<EmployeeMovement>> getEmployeeMovements(Map<String, dynamic> filters);
+  Future<List<User>> getUsers(Map<String, dynamic> filters);
 }

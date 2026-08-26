@@ -18,6 +18,7 @@ import 'package:zentinel/domain/entities/unity_weight.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:uuid/uuid.dart';
 import 'package:http_parser/http_parser.dart';
+import 'package:zentinel/domain/entities/user_session.dart';
 
 class LogbookEntryImpl extends LogbookEntryDatasource {
   final Dio dio;
@@ -507,5 +508,17 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
         message: messageError,
       );
     }
+  }
+
+  @override
+  Future<List<User>> getUsers(Map<String, dynamic> filters) async {
+    final response = await dio.get(
+      '/rest/zent-logbook-api/v1.0/get/all-users',
+      options: Options(
+        headers: {'externalTransactionId': uuid, 'channel': 'ZENTINEL', 'roles': filters['roles']},
+      ),
+    );
+    final List userJson = response.data['data'];
+    return userJson.map((json) => User.fromJson(json)).toList();
   }
 }

@@ -9,6 +9,7 @@ import 'package:zentinel/domain/entities/employee_movement.dart';
 import 'package:zentinel/domain/entities/graph_logbook.dart';
 import 'package:zentinel/domain/entities/group_business.dart';
 import 'package:zentinel/domain/entities/unity_weight.dart';
+import 'package:zentinel/domain/entities/user_session.dart';
 import 'package:zentinel/domain/repositories/logbook_entry_repository.dart';
 
 class LogbookEntryRepositoryImpl extends LogbookEntryRepository {
@@ -90,6 +91,11 @@ class LogbookEntryRepositoryImpl extends LogbookEntryRepository {
   @override
   Future<ApiResponse<dynamic>> updateStatusEmployeeIntern(Map<String, dynamic> data) {
     return datasource.updateStatusEmployeeIntern(data);
+  }
+
+  @override
+  Future<List<User>> getUsers(Map<String, dynamic> filters) {
+    return datasource.getUsers(filters);
   }
   
 }

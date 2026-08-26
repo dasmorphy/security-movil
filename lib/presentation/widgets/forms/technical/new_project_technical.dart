@@ -20,6 +20,7 @@ class _NewProjectTechnicalState extends ConsumerState<NewProjectTechnical> {
   bool isLoading = false;
   int _clientSelection = 0;
   int _locationSelection = 0;
+  List<dynamic> selectedUsers = <dynamic>[];
 
   final _observationsCtrl = TextEditingController();
   final _namesCtrl = TextEditingController();
@@ -49,6 +50,11 @@ class _NewProjectTechnicalState extends ConsumerState<NewProjectTechnical> {
   @override
   void initState() {
     ref.read(getClientsTechnical.notifier).load();
+    ref.read(getUsers.notifier).load(
+      filters:{
+        "roles": ["tecnico"]
+      }
+    );
     super.initState();
   }
 
@@ -94,7 +100,8 @@ class _NewProjectTechnicalState extends ConsumerState<NewProjectTechnical> {
       "location_id": _locationSelection,
       "name": _namesCtrl.text.trim(),
       "description": _observationsCtrl.text.trim(),
-      "is_support": widget.isSupport
+      "is_support": widget.isSupport,
+      "assigned_technicians": selectedUsers
     };
 
     GlobalLoadingBottomSheet.show(
@@ -138,6 +145,7 @@ class _NewProjectTechnicalState extends ConsumerState<NewProjectTechnical> {
     final authState = ref.watch(userSessionProvider);
     final clientTech = ref.watch(getClientsTechnical);
     final locationTech = ref.watch(getLocationTechnical);
+    final usersTechnical = ref.watch(getUsers);
 
     //Usuario no cargado o sesión inválida
     if (!authState.hasValue || authState.value == null) {
@@ -240,6 +248,28 @@ class _NewProjectTechnicalState extends ConsumerState<NewProjectTechnical> {
                     validator: (v) {
                       if (v == 0 || v == null ) {
                         return messageValidatorEmpty;
+                      }
+                      return null;
+                    },
+                  ),
+
+                  const SizedBox(height: 12),
+                  CustomFieldLabelRequired(txtLabel: 'Equipo Técnicos'),
+                  GlowMultiSelectFormField<dynamic>(
+                    values: selectedUsers,
+                    items: usersTechnical.map((user) => MultiSelectItem<dynamic>(
+                      value: user.idUser,
+                      label: user.attributes["fullname"],
+                    )).toList(),
+                    onChanged: (values) {
+                      setState(() => selectedUsers = values);
+                    },
+                    decoration: const InputDecoration(
+                      labelText: "Tecnicos asignados",
+                    ),
+                    validator: (values) {
+                      if (values == null || values.isEmpty) {
+                        return 'Seleccione al menos un elemento';
                       }
                       return null;
                     },

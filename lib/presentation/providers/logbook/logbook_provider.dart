@@ -17,6 +17,7 @@ import 'package:zentinel/domain/entities/employee_movement.dart';
 import 'package:zentinel/domain/entities/graph_logbook.dart';
 import 'package:zentinel/domain/entities/group_business.dart';
 import 'package:zentinel/domain/entities/unity_weight.dart';
+import 'package:zentinel/domain/entities/user_session.dart';
 import 'package:zentinel/domain/entities/vehicle_type.dart';
 import 'package:zentinel/domain/repositories/logbook_entry_repository.dart';
 import 'package:zentinel/presentation/providers/auth/auth_provider.dart';
@@ -397,6 +398,20 @@ final getEmployeeMovements =
           ...?filters,
         };
         return repo.getEmployeeMovements(mergedFilters);
+      },
+    );
+  },
+);
+
+final getUsers = StateNotifierProvider<CatalogNotifier<User>, List<User>>(
+  (ref) {
+    final repo = ref.watch(logbookEntryRepositoryProvider);
+    return CatalogNotifier<User>(
+      (filters) {
+        final mergedFilters = {
+          ...?filters,
+        };
+        return repo.getUsers(mergedFilters);
       },
     );
   },
