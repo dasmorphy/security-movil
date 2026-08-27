@@ -25,4 +25,5 @@ abstract class TechnicalRepository {
   Future<List<TechnicalRecord>> getTechnicalRecord(Map<String, dynamic> filters);
   Future<List<HistoryStatusProject>> getHistoryStatusProject(Map<String, dynamic> filters);
   Future<GraphTechnical> getGraphTechnical(Map<String, dynamic> filters);
+  Future<ApiResponse<dynamic>> saveLocationClient(Map<String, dynamic> data);
 }

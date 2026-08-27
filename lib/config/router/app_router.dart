@@ -172,6 +172,11 @@ final appRouter = GoRouter(
             );
           },
         ),
+        GoRoute(
+          path: 'new-location',
+          name: NewLocationScreen.name,
+          builder: (context, state) => const NewLocationScreen(),
+        ),
       ],
     ),
     // Rutas del modulo de notificaciones (ver notification_router.dart)

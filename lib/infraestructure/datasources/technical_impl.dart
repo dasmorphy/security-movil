@@ -32,6 +32,18 @@ class TechnicalImpl extends TechnicalDatasource {
       queryParams['support'] = filters['support'];
     }
 
+    if (filters['tech_assignments'] != null) {
+      queryParams['tech_assignments'] = filters['tech_assignments'];
+    }
+
+    if (filters['locations'] != null) {
+      queryParams['locations'] = filters['locations'];
+    }
+
+    if (filters['clients'] != null) {
+      queryParams['clients'] = filters['clients'];
+    }
+
     final response = await dio.get(
       '/rest/technical-control-api/v1.0/project',
       options: Options(
@@ -282,14 +294,18 @@ class TechnicalImpl extends TechnicalDatasource {
 
   @override
   Future<List<LocationTechnical>> getLocationTechnical(Map<String, dynamic> filters) async {
+    final queryParams = <String, dynamic>{};
+
+    if (filters['client_id'] != null) {
+      queryParams['client_id'] = filters['client_id'];
+    }
+
     final response = await dio.get(
       '/rest/technical-control-api/v1.0/location',
       options: Options(
         headers: {'externalTransactionId': uuid, 'channel': 'ZENTINEL'},
       ),
-      queryParameters: {
-        'client_id': filters['client_id']
-      },
+      queryParameters: queryParams,
     );
     final List taskJson = response.data['data'];
     return taskJson.map((json) => LocationTechnical.fromJson(json)).toList();
@@ -502,6 +518,41 @@ class TechnicalImpl extends TechnicalDatasource {
             e.type == DioExceptionType.receiveTimeout) {
           rethrow;
         }
+        messageError = e.response?.data["message"];
+      }
+      return ApiResponse(
+        success: false,
+        errorCode: 'save_error',
+        message: messageError,
+      );
+    }
+  }
+
+  @override
+  Future<ApiResponse<dynamic>> saveLocationClient(Map<String, dynamic> data) async {
+    try {
+      final response = await dio.post(
+        '/rest/technical-control-api/v1.0/location',
+        data: {
+          'externalTransactionId': uuid, 
+          'channel': 'ZENTINEL',
+          'data': data
+        },
+        options: onlyError(),
+      );
+
+      final body = response.data;
+
+      return ApiResponse(
+        success: response.statusCode == 200,
+        errorCode: body['error_code']?.toString(),
+        message: body['message'],
+        data: body['data'],
+      );
+    } catch (e) {
+      print('Error al guardar ubicación: $e');
+      String messageError = "Error al guardar la ubicación";
+      if (e is DioException) {
         messageError = e.response?.data["message"];
       }
       return ApiResponse(

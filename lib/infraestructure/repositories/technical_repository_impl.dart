@@ -86,4 +86,8 @@ class TechnicalRepositoryImpl extends TechnicalRepository {
     return datasource.patchTechnicalRecord(data);
   }
   
+  @override
+  Future<ApiResponse<dynamic>> saveLocationClient(Map<String, dynamic> data) {
+    return datasource.saveLocationClient(data);
+  }
 }

@@ -10,6 +10,7 @@ class TaskTechnical {
   int locationId;
   String name;
   List<RecordTechnical>? recordTechnical;
+  List<TechnicalsAssignment>? technicalsAssignments;
   String status;
   DateTime updatedAt;
   String updatedBy;
@@ -29,6 +30,7 @@ class TaskTechnical {
     required this.status,
     required this.updatedAt,
     required this.updatedBy,
+    this.technicalsAssignments,
   });
 
   factory TaskTechnical.fromJson(Map<String, dynamic> json) => TaskTechnical(
@@ -46,6 +48,7 @@ class TaskTechnical {
       ?.map((x) => RecordTechnical.fromJson(x))
       .toList(),
     status: json["status"],
+    technicalsAssignments: json["technicals_assignments"] == null ? [] : List<TechnicalsAssignment>.from(json["technicals_assignments"]!.map((x) => TechnicalsAssignment.fromJson(x))),
     updatedAt: DateTime.parse(json["updated_at"]),
     updatedBy: json["updated_by"],
   );
@@ -67,6 +70,7 @@ class TaskTechnical {
           recordTechnical!.map((x) => x.toJson()),
         ),
     "status": status,
+    "technicals_assignments": technicalsAssignments == null ? [] : List<dynamic>.from(technicalsAssignments!.map((x) => x.toJson())),
     "updated_at": updatedAt.toIso8601String(),
     "updated_by": updatedBy,
   };
@@ -106,5 +110,39 @@ class RecordTechnical {
     "id_record": idRecord,
     "location_id": locationId,
     "resume": resume,
+  };
+}
+
+
+class TechnicalsAssignment {
+  String? fullnameUser;
+  int? idAssignment;
+  int? taskId;
+  String user;
+  String userTechId;
+
+  TechnicalsAssignment({
+    this.fullnameUser,
+    this.idAssignment,
+    this.taskId,
+    required this.user,
+    required this.userTechId,
+  });
+
+  factory TechnicalsAssignment.fromJson(Map<String, dynamic> json) =>
+      TechnicalsAssignment(
+        fullnameUser: json["fullname_user"],
+        idAssignment: json["id_assignment"],
+        taskId: json["task_id"],
+        user: json["user"],
+        userTechId: json["user_tech_id"],
+      );
+
+  Map<String, dynamic> toJson() => {
+    "fullname_user": fullnameUser,
+    "id_assignment": idAssignment,
+    "task_id": taskId,
+    "user": user,
+    "user_tech_id": userTechId,
   };
 }

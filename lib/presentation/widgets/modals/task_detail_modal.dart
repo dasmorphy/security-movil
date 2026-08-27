@@ -95,11 +95,55 @@ class TaskDetailModal extends ConsumerWidget {
                       'Fecha Creación',
                       formatDateDetails(item.createdAt.toString()),
                     ),
-                    // detailRow('Actualizado por', item.updatedBy),
-                    // detailRow(
-                    //   'Fecha Actualización',
-                    //   formatDateDetails(item.updatedAt.toString()),
-                    // ),
+
+                    if (item.technicalsAssignments?.isNotEmpty ?? false)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 6),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Técnicos asignados',
+                              style: TextStyle(
+                                color: Colors.white70,
+                              ),
+                            ),
+
+                            const SizedBox(height: 8),
+
+                            ...item.technicalsAssignments!.map((material) {
+                              final name = material.fullnameUser ?? 'N/A';
+
+                              return Padding(
+                                padding: const EdgeInsets.only(bottom: 5),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      '• ',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+
+                                    Expanded(
+                                      child: Text(name,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }),
+                          ],
+                        ),
+                      ),
+
+
                   ],
                 ),
               ),
