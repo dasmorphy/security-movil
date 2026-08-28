@@ -189,7 +189,7 @@ class _NewProjectTechnicalState extends ConsumerState<NewLocationForm> {
 
 
                   const SizedBox(height: 12),
-                  CustomFieldLabelRequired(txtLabel: 'Nombres del proyecto'),
+                  CustomFieldLabelRequired(txtLabel: 'Nombre'),
                   GlowTextFormField(
                     controller: _namesCtrl,
                     focusNode: _namesFocus,

@@ -36,4 +36,6 @@ class Permissions {
   static const verSoportesTecnicos = 'VER_SOPORTES';
   static const nuevoSoporteTecnico = 'NUEVO_SOPORTES';
   static const verDashboardTecnico = 'VER_DASHBOARD_TECNICO';
+  static const nuevaLocalizacion = 'NUEVA_LOCALIZACION';
+  static const nuevoProducto = 'NUEVO_PRODUCTO';
 }

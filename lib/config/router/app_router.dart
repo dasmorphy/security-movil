@@ -132,9 +132,7 @@ final appRouter = GoRouter(
           name: TaskListScreen.name,
           builder: (context, state) {
             final json = state.extra as Map<String, dynamic>?;
-            return TaskListScreen(
-              isSupport: json?['is_support'] ?? false,
-            );
+            return TaskListScreen(isSupport: json?['is_support'] ?? false);
           },
         ),
         GoRoute(
@@ -150,7 +148,7 @@ final appRouter = GoRouter(
             return NewTaskScreen(
               dataRegisterIcompleted: taskSelected?["registerIcompleted"],
               taskHeader: taskSelected["taskHeader"],
-              isSupport: taskSelected?["isSupport"] ?? false
+              isSupport: taskSelected?["isSupport"] ?? false,
             );
           },
         ),
@@ -176,6 +174,11 @@ final appRouter = GoRouter(
           path: 'new-location',
           name: NewLocationScreen.name,
           builder: (context, state) => const NewLocationScreen(),
+        ),
+        GoRoute(
+          path: 'new-product',
+          name: NewProductScreen.name,
+          builder: (context, state) => const NewProductScreen(),
         ),
       ],
     ),

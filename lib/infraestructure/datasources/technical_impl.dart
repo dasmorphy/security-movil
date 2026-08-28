@@ -534,6 +534,41 @@ class TechnicalImpl extends TechnicalDatasource {
       final response = await dio.post(
         '/rest/technical-control-api/v1.0/location',
         data: {
+          'external_transaction_id': uuid, 
+          'channel': 'ZENTINEL',
+          'data': data
+        },
+        options: onlyError(),
+      );
+
+      final body = response.data;
+
+      return ApiResponse(
+        success: response.statusCode == 200,
+        errorCode: body['error_code']?.toString(),
+        message: body['message'],
+        data: body['data'],
+      );
+    } catch (e) {
+      print('Error al guardar ubicación: $e');
+      String messageError = "Error al guardar la ubicación";
+      if (e is DioException) {
+        messageError = e.response?.data["message"];
+      }
+      return ApiResponse(
+        success: false,
+        errorCode: 'save_error',
+        message: messageError,
+      );
+    }
+  }
+
+  @override
+  Future<ApiResponse<dynamic>> saveProduct(Map<String, dynamic> data) async {
+    try {
+      final response = await dio.post(
+        '/rest/technical-control-api/v1.0/tech-materials',
+        data: {
           'externalTransactionId': uuid, 
           'channel': 'ZENTINEL',
           'data': data

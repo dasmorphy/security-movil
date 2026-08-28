@@ -87,6 +87,20 @@ class _ServicesTechnicalState extends ConsumerState<ServicesTechnical> {
                       'is_support': true
                     })
                   ),
+
+                if (userData.hasPermission(Permissions.nuevaLocalizacion))
+                  BasicServiceCard(
+                    iconImage: 'iconentrada',
+                    label: 'Nueva localización',
+                    onTap: () => context.push('/new-location')
+                  ),
+
+                if (userData.hasPermission(Permissions.nuevoProducto))
+                  BasicServiceCard(
+                    iconImage: 'iconentrada',
+                    label: 'Nuevo producto',
+                    onTap: () => context.push('/new-product')
+                  ),
                   
               ],
             ),

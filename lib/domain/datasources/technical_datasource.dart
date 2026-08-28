@@ -25,4 +25,5 @@ abstract class TechnicalDatasource {
   Future<List<TechnicalRecord>> getTechnicalRecord(Map<String, dynamic> filters);
   Future<GraphTechnical> getGraphTechnical(Map<String, dynamic> filters);
   Future<ApiResponse<dynamic>> saveLocationClient(Map<String, dynamic> data);
+  Future<ApiResponse<dynamic>> saveProduct(Map<String, dynamic> data);
 }

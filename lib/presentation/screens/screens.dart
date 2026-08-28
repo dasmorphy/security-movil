@@ -25,3 +25,4 @@ export 'package:zentinel/presentation/screens/technical/technical_record_list_sc
 export 'package:zentinel/presentation/screens/push_notifications/push_notifications_screen.dart';
 export 'package:zentinel/presentation/screens/push_notifications/notification_history_detail.dart';
 export 'package:zentinel/presentation/screens/technical/new_location_screen.dart';
+export 'package:zentinel/presentation/screens/technical/new_product_screen.dart';

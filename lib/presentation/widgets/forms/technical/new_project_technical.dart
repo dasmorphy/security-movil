@@ -253,7 +253,25 @@ class _NewProjectTechnicalState extends ConsumerState<NewProjectTechnical> {
                     },
                   ),
 
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 10),
+                  TextButton(
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.zero,
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      alignment: Alignment.centerLeft,
+                    ),
+                    onPressed: () => context.push('/new-location'),
+                    child: const Text(
+                      '¿Nueva ubicación?',
+                      style: TextStyle(
+                        color: Color.fromARGB(255, 14, 170, 170),
+                        fontWeight: FontWeight.w700
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 18),
                   CustomFieldLabelRequired(txtLabel: 'Equipo Técnicos'),
                   GlowMultiSelectFormField<dynamic>(
                     values: selectedUsers,

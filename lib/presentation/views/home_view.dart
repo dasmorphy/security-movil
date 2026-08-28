@@ -19,6 +19,7 @@ class HomeViewState extends ConsumerState<HomeView> {
   final List<Map<String, String>> optionsDashboard = [
     {"id": "1", "value": "Expalsa"},
     {"id": "2", "value": "Biomar"},
+    {"id": "3", "value": "Técnicos"},
   ];
 
   @override
@@ -143,7 +144,10 @@ class HomeViewState extends ConsumerState<HomeView> {
                 /// =======================
                 /// DASHBOARD TECNICOS
                 /// =======================
-                if (userData.hasPermission(Permissions.verDashboardTecnico)) ...[
+                
+                if (effectiveBusiness == "3"  ||
+                  userData.hasPermission(Permissions.verDashboardTecnico)
+                )... [
                   const SizedBox(height: 10),
                   Column(
                     children: [
