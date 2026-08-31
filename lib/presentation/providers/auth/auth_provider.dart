@@ -155,6 +155,7 @@ class UserSessionNotifier extends StateNotifier<AsyncValue<User?>> {
 
     // Eliminar sesión de Hive
     await hiveService.deleteUserSession();
+    if (!mounted) return;
     state = const AsyncValue.data(null);
   }
 }

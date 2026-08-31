@@ -226,6 +226,7 @@ class ProfileViewState extends ConsumerState<ProfileView> {
                                   .logout();
                               
                               ref.invalidate(userSessionProvider);
+                              if (!context.mounted) return;
                               context.go('/login');
                             },
                             style: ElevatedButton.styleFrom(

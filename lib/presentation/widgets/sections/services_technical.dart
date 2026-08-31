@@ -51,6 +51,7 @@ class _ServicesTechnicalState extends ConsumerState<ServicesTechnical> {
             ),
 
             GridView.count(
+              padding: const EdgeInsetsGeometry.only(top: 10),
               crossAxisCount: 3,
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),

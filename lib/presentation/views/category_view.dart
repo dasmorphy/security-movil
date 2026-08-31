@@ -57,10 +57,7 @@ class CategoryViewState extends ConsumerState<CategoryView> {
                     parent: AlwaysScrollableScrollPhysics(),
                   ),
                   child: Column(
-                    children: [
-                      if (userData.hasPermission(Permissions.verProyectos))
-                        ServicesTechnical(),
-
+                    children: [  
                       if (userData.attributes['id_business'] == 1 || 
                           userData.attributes['id_business'] == 3)
                         BasicServicesSection(),
@@ -68,6 +65,9 @@ class CategoryViewState extends ConsumerState<CategoryView> {
                       if (userData.attributes['id_business'] == 2 || 
                           userData.attributes['id_business'] == 3)
                         ServicesBiomar(),
+                      
+                      if (userData.attributes['id_business'] == 3)
+                        ServicesTechnical(),
 
                     ],
                   ),

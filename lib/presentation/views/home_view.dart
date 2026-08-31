@@ -38,9 +38,9 @@ class HomeViewState extends ConsumerState<HomeView> {
       ref.read(getTechnicalRecord.notifier).load(filters: {"user": userData.user});
     }
 
-    if (userData.hasPermission(Permissions.verDashboardTecnico)) {
-      ref.read(graphTechnicalProvider.notifier).load(filters: {});
-    }
+    // if (userData.hasPermission(Permissions.verDashboardTecnico)) {
+    //   ref.read(graphTechnicalProvider.notifier).load(filters: {});
+    // }
   }
 
   void initProvidersByBusiness(User? userData) {
@@ -67,6 +67,9 @@ class HomeViewState extends ConsumerState<HomeView> {
         ref.read(getHistoryDispatch.notifier).load();
         ref.read(getHistoryEntryAccess.notifier).load();
         ref.read(graphDispatchProvider.notifier).load();
+      } else if (userData.attributes['id_business'] == 3 ||
+          selectedBusiness == "3") {
+        ref.read(graphTechnicalProvider.notifier).load(filters: {});
       }
     }
   }

@@ -36,7 +36,7 @@ class _BasicServicesStionState extends ConsumerState<BasicServicesSection> {
     final userData = authState.value!;
 
     return Padding(
-      padding: const EdgeInsetsGeometry.only(left: 15, right: 15, bottom: 20, top: 0),
+      padding: const EdgeInsetsGeometry.only(left: 15, right: 15, bottom: 0, top: 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -51,6 +51,7 @@ class _BasicServicesStionState extends ConsumerState<BasicServicesSection> {
             ),
 
           GridView.count(
+            padding: const EdgeInsetsGeometry.only(top: 10),
             crossAxisCount: 3,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -100,7 +101,7 @@ class _BasicServicesStionState extends ConsumerState<BasicServicesSection> {
             ],
           ),
 
-          const SizedBox(height: 25),
+          const SizedBox(height: 15),
 
           // if (userData.hasPermission(Permissions.listaReportes) || userData.hasPermission(Permissions.generarReportes))
           //   const Text(

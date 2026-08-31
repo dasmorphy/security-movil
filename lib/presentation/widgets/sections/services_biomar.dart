@@ -71,6 +71,7 @@ class _ServicesBiomarState extends ConsumerState<ServicesBiomar> {
             ),
 
             GridView.count(
+              padding: const EdgeInsetsGeometry.only(top: 10),
               crossAxisCount: 3,
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
@@ -96,7 +97,7 @@ class _ServicesBiomarState extends ConsumerState<ServicesBiomar> {
           ],
 
           if (userData.hasPermission(Permissions.verIngresosBiomar))...[
-            const SizedBox(height: 25),
+            const SizedBox(height: 15),
             const Text(
               'Control de accesos',
               style: TextStyle(
@@ -107,6 +108,7 @@ class _ServicesBiomarState extends ConsumerState<ServicesBiomar> {
             ),
 
             GridView.count(
+              padding: const EdgeInsetsGeometry.only(top: 10),
               crossAxisCount: 3,
               shrinkWrap: true,
               physics: const BouncingScrollPhysics(),
