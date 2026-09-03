@@ -163,7 +163,7 @@ class _ReceptionConfirmationFormState extends ConsumerState<ReceptionConfirmatio
 
     setState(() => _isLoading = true);
 
-    if (_selectedImages.length < 5) {
+    if (_selectedImages.length < 2) {
       setState(() {
         imagesMinError = true;
         _isLoading = false;
@@ -393,7 +393,7 @@ class _ReceptionConfirmationFormState extends ConsumerState<ReceptionConfirmatio
               const SizedBox(height: 30),
 
               CameraImagePicker(
-                minImages: 5,
+                minImages: 2,
                 maxImages: 10,
                 onImagesChanged: (images) {
               
@@ -411,7 +411,7 @@ class _ReceptionConfirmationFormState extends ConsumerState<ReceptionConfirmatio
                     width: double.infinity,
                     child: Text(
                       imagesMinError
-                          ? 'Debe subir mínimo 5 imagenes'
+                          ? 'Debe subir mínimo 2 imagenes'
                           : 'Debe subir máximo 10 imagenes',
                       style: TextStyle(color: Color.fromARGB(255, 239, 28, 13)),
                     ),

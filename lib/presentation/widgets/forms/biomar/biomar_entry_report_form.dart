@@ -83,6 +83,10 @@ class _BiomarEntryReportFormState extends ConsumerState<BiomarEntryReportForm> {
   void _submit() async {
     // if (isLoading) return;
     // setState(() => isLoading = true);
+    setState(() {
+      imagesMinError = false;
+      imagesMaxError = false;
+    });
 
     FocusScope.of(context).unfocus();
     if (!(_formKey.currentState?.validate() ?? false)) {
@@ -90,7 +94,7 @@ class _BiomarEntryReportFormState extends ConsumerState<BiomarEntryReportForm> {
       return;
     }
 
-    if (_selectedImages.length < 3) {
+    if (_selectedImages.length < 2) {
       setState(() {
         imagesMinError = true;
         isLoading = false;
@@ -620,7 +624,7 @@ class _BiomarEntryReportFormState extends ConsumerState<BiomarEntryReportForm> {
                 const SizedBox(height: 26),
                 
                 CameraImagePicker(
-                  minImages: 3,
+                  minImages: 2,
                   maxImages: 10,
                   onImagesChanged: (images) {
                     print("imagenes seleccionadas ${images.length}");
@@ -635,7 +639,7 @@ class _BiomarEntryReportFormState extends ConsumerState<BiomarEntryReportForm> {
                     width: double.infinity,
                     child: Text(
                       imagesMinError
-                          ? 'Debe subir mínimo 3 imagenes'
+                          ? 'Debe subir mínimo 2 imagenes'
                           : 'Debe subir máximo 10 imagenes',
                       style: TextStyle(color: Color.fromARGB(255, 185, 28, 16)),
                     ),

@@ -23,7 +23,6 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
   bool isLoading = false;
   bool isBlacklist = false;
   bool imagesMinError = false;
-  bool imagesMaxError = false;
   String _authorized = '0';
   String _destiny = '0';
 
@@ -227,17 +226,9 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
 
     _minImages = requiredImages;
 
-    // if (_selectedImages.length < requiredImages) {
-    //   setState(() {
-    //     imagesMinError = true;
-    //     isLoading = false;
-    //   });
-    //   return;
-    // }
-
-    if (_selectedImages.length > 10) {
+    if (_selectedImages.length < requiredImages) {
       setState(() {
-        imagesMaxError = true;
+        imagesMinError = true;
         isLoading = false;
       });
       return;
@@ -378,7 +369,6 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
     _authorized = '0';
     _observationsCtrl.clear();
     imagesMinError = false;
-    imagesMaxError = false;
   }
 
   @override
@@ -414,8 +404,8 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
     final categoryName = categoryMap[_categoryEntry]?.nameCategory;    
     const hiddenWeightCategories = {
       'Ejecutivos de expalsa',
-      'Personal interno',
-      'Personal externo',
+      // 'Personal interno',
+      // 'Personal externo',
       'Cuadrillas para pesca'
     };
 
@@ -605,6 +595,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                       }
 
                       if (!hidePersonal) {
+                        _guideCtrl.clear();
                         _providerCtrl.clear();
                         _employeeCtrl.clear();
                         _unityId = '0';
@@ -757,11 +748,17 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
 
                 if (!hideWeight) ...[
                   const SizedBox(height: 12),
-                  CustomFieldLabelRequired(txtLabel: 'OC/ Guia de remision'),
+                  CustomFieldLabelRequired(
+                    txtLabel: 'OC/ Guia de remision',
+                    isRequired: hidePersonal ? false : true,
+                  ),
                   GlowTextFormField(
                     controller: _guideCtrl,
                     focusNode: _guideFocus,
                     validator: (v) {
+                      if (hidePersonal) {
+                        return null;
+                      }
                       if (v == null || v.trim().isEmpty) {
                         return messageValidatorEmpty;
                       }
@@ -994,7 +991,6 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
 
                 CameraImagePicker(
                   minImages: 3,
-                  maxImages: 10,
                   isPickingImage: isPickingImage,
                   onPickingChanged: (value) {
                     setState(() {
@@ -1007,13 +1003,11 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                   },
                 ),
 
-                if (imagesMinError || imagesMaxError)
+                if (imagesMinError)
                   SizedBox(
                     width: double.infinity,
                     child: Text(
-                      imagesMinError
-                          ? 'Debe subir mínimo $_minImages imagenes'
-                          : 'Debe subir máximo 10 imagenes',
+                      'Debe subir mínimo $_minImages imagenes',
                       style: TextStyle(color: Color.fromARGB(255, 185, 28, 16)),
                     ),
                   ),

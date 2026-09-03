@@ -29,7 +29,6 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
   bool isLoading = false;
   bool isBlacklist = false;
   bool imagesMinError = false;
-  bool imagesMaxError = false;
   String _authorized = '0';
 
   final _guideCtrl = TextEditingController();
@@ -233,21 +232,14 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
 
     _minImages = requiredImages;
 
-    // if (_selectedImages.length < requiredImages) {
-    //   setState(() {
-    //     imagesMinError = true;
-    //     isLoading = false;
-    //   });
-    //   return;
-    // }
-
-    if (_selectedImages.length > 10) {
+    if (_selectedImages.length < requiredImages) {
       setState(() {
-        imagesMaxError = true;
+        imagesMinError = true;
         isLoading = false;
       });
       return;
     }
+
 
     if (_dniCtrl.text.length < 10) {
       GlobalLoadingBottomSheet.show(
@@ -383,7 +375,6 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
     _personWithdrawsCtrl.clear();
     _destinyCtrl.clear();
     imagesMinError = false;
-    imagesMaxError = false;
   }
 
   @override
@@ -425,8 +416,8 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
     final categoryName = categoryMap[_categoryEntry]?.nameCategory;    
     const hiddenWeightCategories = {
       'Ejecutivos de expalsa',
-      'Personal interno',
-      'Personal externo',
+      // 'Personal interno',
+      // 'Personal externo',
       'Cuadrillas para pesca'
     };
 
@@ -639,6 +630,7 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                       if (!hideEject || !hidePersonal) {
                         _unityId = '0';
                         _quantityCtrl.clear();
+                        _guideCtrl.clear();
                       }
 
                       if (!hideEject) {
@@ -685,11 +677,17 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
 
                 if (!hideWeight) ...[
                   const SizedBox(height: 12),
-                  CustomFieldLabelRequired(txtLabel: 'Guía / Documento'),
+                  CustomFieldLabelRequired(
+                    txtLabel: 'Guía / Documento',
+                    isRequired: hidePersonal ? false : true,
+                  ),
                   GlowTextFormField(
                     controller: _guideCtrl,
                     focusNode: _guideFocus,
                     validator: (v) {
+                      if (hidePersonal) {
+                        return null;
+                      }
                       if (v == null || v.trim().isEmpty) {
                         return messageValidatorEmpty;
                       }
@@ -883,7 +881,6 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
 
                 CameraImagePicker(
                   minImages: 3,
-                  maxImages: 10,
                   isPickingImage: isPickingImage,
                   onPickingChanged: (value) {
                     setState(() {
@@ -896,13 +893,11 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                   },
                 ),
 
-                if (imagesMinError || imagesMaxError)
+                if (imagesMinError)
                   SizedBox(
                     width: double.infinity,
                     child: Text(
-                      imagesMinError
-                          ? 'Debe subir mínimo $_minImages imagenes'
-                          : 'Debe subir máximo 10 imagenes',
+                      'Debe subir mínimo $_minImages imagenes',
                       style: TextStyle(color: Color.fromARGB(255, 185, 28, 16)),
                     ),
                   ),

@@ -54,7 +54,7 @@ class _UpdateStatusDispatchState extends ConsumerState<UpdateStatusDispatch> {
       if (_isLoading) return;
       setState(() => _isLoading = true);
 
-      if (_selectedImages.length < 5) {
+      if (_selectedImages.length < 2) {
         setState(() {
           imagesMinError = true;
           _isLoading = false;
@@ -220,7 +220,7 @@ class _UpdateStatusDispatchState extends ConsumerState<UpdateStatusDispatch> {
               const SizedBox(height: 20),
 
               CameraImagePicker(
-                minImages: 5,
+                minImages: 2,
                 maxImages: 10,
                 onImagesChanged: (images) {
               
@@ -238,7 +238,7 @@ class _UpdateStatusDispatchState extends ConsumerState<UpdateStatusDispatch> {
                     width: double.infinity,
                     child: Text(
                       imagesMinError
-                          ? 'Debe subir mínimo 5 imagenes'
+                          ? 'Debe subir mínimo 2 imagenes'
                           : 'Debe subir máximo 10 imagenes',
                       style: TextStyle(color: Color.fromARGB(255, 239, 28, 13)),
                     ),
