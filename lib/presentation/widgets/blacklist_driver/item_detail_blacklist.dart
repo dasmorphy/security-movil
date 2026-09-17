@@ -16,7 +16,6 @@ class ItemDetailBlacklist extends StatelessWidget {
         detailRow('Identificación', item.dni),
         detailRow('Nombres completos', item.fullNames),
         detailRow('Restricción', item.reasonRestriction),
-        detailRow('Usuario', item.createdBy),
         detailRow(
           'Fecha Ingreso',
           formatDateDetails(item.createdAt.toString()),
