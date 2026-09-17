@@ -3,13 +3,12 @@ import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http_parser/http_parser.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:zentinel/domain/entities/unity_weight.dart';
 import 'package:intl/intl.dart';
 import 'package:zentinel/domain/entities/user_session.dart';
-import 'package:path/path.dart' as p;
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -247,6 +246,19 @@ Map<String, dynamic> mapPendingEmployeeMovements(Map<String, dynamic> raw) {
   };
 }
 
+class UpperCaseTextFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    return newValue.copyWith(
+      text: newValue.text.toUpperCase(),
+      selection: newValue.selection,
+    );
+  }
+}
+
 Future<Uint8List?> convertToWebP(File file) async {
   final result = await FlutterImageCompress.compressWithFile(
     file.absolute.path,
@@ -383,6 +395,36 @@ Color getStatusColorMovements(String status) {
       return const Color.fromARGB(255, 61, 43, 14);
     case 'ingreso':
       return const Color.fromARGB(255, 18, 54, 42);
+    default:
+      return const Color.fromARGB(255, 82, 84, 83);
+  }
+}
+
+Color getColorTxtOrder(String status) {
+  switch (status.toLowerCase()) {
+    case 'con novedad':
+      return const Color.fromARGB(255, 246, 105, 105);
+    case 'incompleto':
+      return const Color.fromARGB(255, 248, 172, 70);
+    case 'completado':
+      return const Color.fromARGB(255, 105, 246, 184);
+    case 'programado':
+      return const Color.fromARGB(255, 137, 172, 255);
+    default:
+      return const Color.fromARGB(255, 255, 255, 255);
+  }
+}
+
+Color getStatusColorOrder(String status) {
+  switch (status.toLowerCase()) {
+    case 'con novedad':
+      return const Color.fromARGB(255, 54, 18, 18);
+    case 'incompleto':
+      return const Color.fromARGB(255, 61, 43, 14);
+    case 'completado':
+      return const Color.fromARGB(255, 18, 54, 42);
+    case 'programado':
+      return const Color.fromARGB(255, 34, 44, 63);
     default:
       return const Color.fromARGB(255, 82, 84, 83);
   }

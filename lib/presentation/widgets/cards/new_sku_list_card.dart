@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:zentinel/domain/entities/dispatch_products.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
 class NewSkuListCard extends StatefulWidget {

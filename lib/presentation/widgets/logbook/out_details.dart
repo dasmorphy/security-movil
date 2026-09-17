@@ -34,6 +34,8 @@ class OutDetails extends StatelessWidget {
         detailRow('Peso', out.weight),
         detailRow('Destino', out.destiny),
         detailRow('Conductor', out.nameDriver),
+        detailRow('Lista negra', out.isBlacklist ? 'Si' : 'No'),
+        detailRow('Cédula conductor', out.dniDriver),
         detailRow('Placa', out.truckLicense),
         detailRow('Autorización', out.authorizedBy),
         detailRow('Fecha Salida', formatDateDetails(out.createdAt.toString())),

@@ -36,7 +36,7 @@ class _BasicServicesStionState extends ConsumerState<BasicServicesSection> {
     final userData = authState.value!;
 
     return Padding(
-      padding: const EdgeInsetsGeometry.only(left: 15, right: 15, bottom: 20, top: 0),
+      padding: const EdgeInsetsGeometry.only(left: 15, right: 15, bottom: 0, top: 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -50,6 +50,7 @@ class _BasicServicesStionState extends ConsumerState<BasicServicesSection> {
           ),
 
           GridView.count(
+            padding: const EdgeInsetsGeometry.only(top: 10),
             crossAxisCount: 3,
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -99,7 +100,81 @@ class _BasicServicesStionState extends ConsumerState<BasicServicesSection> {
             ],
           ),
 
-          const SizedBox(height: 25),
+          const SizedBox(height: 18),
+
+          if (userData.hasPermission(Permissions.verListaNegra) || userData.hasPermission(Permissions.nuevoListaNegra))...[
+            const Text(
+              'Lista negra',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            GridView.count(
+              padding: const EdgeInsetsGeometry.only(top: 10),
+              crossAxisCount: 3,
+              shrinkWrap: true,
+              physics: const BouncingScrollPhysics(),
+              mainAxisSpacing: 10,
+              crossAxisSpacing: 11,
+              childAspectRatio: 0.9,
+              children: [
+                if (userData.hasPermission(Permissions.verListaNegra))
+                  BasicServiceCard(
+                    iconImage: 'iconsalida',
+                    label: 'Lista negra',
+                    onTap: () => context.push('/list-blacklist')
+                  ),
+
+                if (userData.hasPermission(Permissions.nuevoListaNegra))
+                  BasicServiceCard(
+                    iconImage: 'iconsalida',
+                    label: 'Nuevo lista negra',
+                    onTap: () => context.push('/new-black-list')
+                  ),
+                ],
+            ),
+
+            const SizedBox(height: 18),
+          ],
+
+
+          if (userData.hasPermission(Permissions.verOrdenesCompra) || userData.hasPermission(Permissions.nuevoOrdenesCompra))...[
+            const Text(
+              'Balanceado y combustible',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            GridView.count(
+              padding: const EdgeInsetsGeometry.only(top: 10),
+              crossAxisCount: 3,
+              shrinkWrap: true,
+              physics: const BouncingScrollPhysics(),
+              mainAxisSpacing: 10,
+              crossAxisSpacing: 11,
+              childAspectRatio: 0.9,
+              children: [
+                if (userData.hasPermission(Permissions.verOrdenesCompra))
+                  BasicServiceCard(
+                    iconImage: 'iconsalida',
+                    label: 'Lista órdenes',
+                    onTap: () => context.push('/list-purchase-order')
+                  ),
+
+                if (userData.hasPermission(Permissions.nuevoOrdenesCompra))
+                  BasicServiceCard(
+                    iconImage: 'iconsalida',
+                    label: 'Nueva orden',
+                    onTap: () => context.push('/new-purchase-order')
+                  ),
+              ],
+            ),
+            const SizedBox(height: 18),
+          ],
 
           // if (userData.hasPermission(Permissions.listaReportes) || userData.hasPermission(Permissions.generarReportes))
           //   const Text(

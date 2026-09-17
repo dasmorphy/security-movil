@@ -34,6 +34,8 @@ class EntryDetails extends StatelessWidget {
         detailRow('Peso', item.weight),
         detailRow('Destino', item.destiny),
         detailRow('Conductor', item.nameDriver),
+        detailRow('Lista negra', item.isBlacklist ? 'Si' : 'No'),
+        detailRow('Cédula conductor', item.dniDriver),
         detailRow('Placa', item.truckLicense),
         detailRow('Autorización', item.authorizedBy),
         detailRow(

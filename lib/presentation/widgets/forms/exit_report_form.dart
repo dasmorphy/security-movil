@@ -5,7 +5,6 @@ import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/domain/entities/all_logbook.dart';
-import 'package:zentinel/presentation/providers/onboarding/onboarding_provider.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 import 'package:zentinel/service/pending_request_service.dart';
@@ -28,6 +27,7 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
   double _latitude = -0.1865936;
   double _longitude = -78.5953478;
   bool isLoading = false;
+  bool isBlacklist = false;
   bool imagesMinError = false;
   String _authorized = '0';
 
@@ -40,6 +40,7 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
   final _destinyCtrl = TextEditingController();
   final _observationsCtrl = TextEditingController();
   final _personWithdrawsCtrl = TextEditingController();
+  final _dniCtrl = TextEditingController();
   
   List<Uint8List?> _selectedImages = [];
 
@@ -56,6 +57,8 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
   final FocusNode _categoryEntryFocus = FocusNode();
   final FocusNode _personWithdrawsFocus = FocusNode();
   final FocusNode _unitFocus = FocusNode();
+  final FocusNode _dniFocus = FocusNode();
+
   bool isPickingImage = false;
 
   bool _isInitializing = true;
@@ -88,6 +91,12 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
     if (widget.preloadedData != null && mounted) {
       _loadPreloadedData(widget.preloadedData!);
     }
+
+    _dniFocus.addListener(() {
+      if (!_dniFocus.hasFocus) {
+        _validateDni();
+      }
+    });
   }
   
   @override
@@ -104,6 +113,47 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
     _employeeFocus.dispose();
     _groupBusinessFocus.dispose();
     super.dispose();
+  }
+
+  void _validateDni() async {
+    setState(() => isBlacklist = false);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      ref.invalidate(getBlacklistDriverByDni);
+
+      if (_dniCtrl.text.length < 10) {
+        return;
+      }
+
+      await Future.wait([
+        ref.read(getBlacklistDriverByDni.notifier).load(filters: {
+          'dni': _dniCtrl.text
+        }),
+      ]);
+
+      if (!mounted) return;
+
+      final blacklistDni = ref.read(getBlacklistDriverByDni);
+
+      if (blacklistDni.isNotEmpty) {
+        setState(() => isBlacklist = true);
+        BlacklistBottomSheet.show(
+          context,
+          personName: blacklistDni[0].fullNames,
+          documentId: blacklistDni[0].dni,
+          restrictionReason: blacklistDni[0].reasonRestriction,
+          registrationDate: formatDate(blacklistDni[0].createdAt),
+          photoUrl: blacklistDni[0].imagePath != null ? 'http://st.telearseg.net${blacklistDni[0].imagePath}' : null
+        );
+      }else {
+        GlobalLoadingBottomSheet.show(
+          status: OverlayStatus.success, 
+          message: "Cédula verificada correctamente", 
+          autoDismiss: const Duration(seconds: 2)
+        );
+      }
+
+    });
   }
 
   void _getUserLocation() async {
@@ -138,7 +188,8 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
       _guideCtrl.text = data.shippingGuide ?? '';
       _unityId = data.unityId?.toString() ?? '0';
       _truckLicenseCtrl.text = data.truckLicense;
-      _nameDriverCtrl.text = data.nameDriver ?? '';
+      _nameDriverCtrl.text = data.nameDriver;
+      _dniCtrl.text = data.dniDriver ?? '';
     });
   }
 
@@ -189,6 +240,16 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
       return;
     }
 
+
+    if (_dniCtrl.text.length < 10) {
+      GlobalLoadingBottomSheet.show(
+        status: OverlayStatus.error,
+        message: 'La cédula debe ser de 10 dígitos',
+        autoDismiss: const Duration(seconds: 3),
+      );
+      return;
+    }
+
     final authState = ref.watch(userSessionProvider);
 
     //Usuario no cargado o sesión inválida
@@ -213,6 +274,8 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
       "quantity": int.tryParse(_quantityCtrl.text) == 0 ? null : int.tryParse(_quantityCtrl.text),
       "weight": int.tryParse(_weightCtrl.text),
       "truck_license": _truckLicenseCtrl.text.trim(),
+      "dni_driver": _dniCtrl.text.trim(),
+      "is_blacklist": isBlacklist,
       "lat": _latitude.toString(),
       "long": _longitude.toString(),
       "person_withdraws": _personWithdrawsCtrl.text.trim(),
@@ -584,6 +647,34 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                   },
                 ),
 
+                const SizedBox(height: 12),
+                CustomFieldLabelRequired(txtLabel: 'Cédula'),
+                GlowTextFormField(
+                  maxLength: 10,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  keyboardType: TextInputType.number,
+                  controller: _dniCtrl,
+                  focusNode: _dniFocus,
+                  validator: (v) {
+                    if (v == null || v.trim().isEmpty) {
+                      return messageValidatorEmpty;
+                    }
+                    return null;
+                  },
+                ),
+
+                if (isBlacklist)
+                  SizedBox(
+                    width: double.infinity,
+                    child: const Text(
+                      'Conductor en lista negra',
+                      textAlign: TextAlign.left, 
+                      style: TextStyle(
+                        color: Color.fromARGB(255, 196, 39, 28)
+                      ),
+                    ),
+                  ),
+
                 if (!hideWeight) ...[
                   const SizedBox(height: 12),
                   CustomFieldLabelRequired(
@@ -688,11 +779,19 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                 CustomFieldLabelRequired(txtLabel: 'Placa del Camión'),
                 GlowTextFormField(
                   maxLength: 10,
+                  uppercase: true,
                   controller: _truckLicenseCtrl,
                   focusNode: _truckLicenseFocus,
                   validator: (v) {
                     if (v == null || v.trim().isEmpty) {
                       return messageValidatorEmpty;
+                    }
+                    if (!v.contains('-')) {
+                      return 'La placa debe contener un guion (-)';
+                    }
+
+                    if (!RegExp(r'\d').hasMatch(v)) {
+                      return 'La placa debe contener al menos un número';
                     }
                     return null;
                   },
@@ -701,6 +800,7 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                 const SizedBox(height: 12),
                 CustomFieldLabelRequired(txtLabel: 'Nombre del Chofer'),
                 GlowTextFormField(
+                  uppercase: true,
                   controller: _nameDriverCtrl,
                   focusNode: _nameDriverFocus,
                   validator: (v) {

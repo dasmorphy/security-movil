@@ -56,7 +56,7 @@ class _ServicesBiomarState extends ConsumerState<ServicesBiomar> {
     }
 
     return Padding(
-      padding: const EdgeInsetsGeometry.only(left: 15, right: 15, bottom: 20, top: 0),
+      padding: const EdgeInsetsGeometry.only(left: 15, right: 15, bottom: 0, top: 0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -71,6 +71,7 @@ class _ServicesBiomarState extends ConsumerState<ServicesBiomar> {
             ),
 
             GridView.count(
+              padding: const EdgeInsetsGeometry.only(top: 10),
               crossAxisCount: 3,
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
@@ -107,6 +108,7 @@ class _ServicesBiomarState extends ConsumerState<ServicesBiomar> {
             ),
 
             GridView.count(
+              padding: const EdgeInsetsGeometry.only(top: 10),
               crossAxisCount: 3,
               shrinkWrap: true,
               physics: const BouncingScrollPhysics(),
@@ -128,6 +130,7 @@ class _ServicesBiomarState extends ConsumerState<ServicesBiomar> {
                   ),
               ],
             ),
+            const SizedBox(height: 10),
           ],
         ],
       ),

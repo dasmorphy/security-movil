@@ -1,5 +1,6 @@
 import 'package:zentinel/domain/entities/all_dispatch.dart';
 import 'package:zentinel/domain/entities/entry_access_control.dart';
+import 'package:zentinel/domain/entities/purchase_order.dart';
 import 'package:zentinel/presentation/screens/screens.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zentinel/service/navigation_service.dart';
@@ -138,7 +139,37 @@ final appRouter = GoRouter(
               idEmployee: params.idEmployee,
             );
           },
-        )
+        ),
+        GoRoute(
+          path: 'new-black-list',
+          name: NewBlackListScreen.name,
+          builder: (context, state) => const NewBlackListScreen()
+        ),
+        GoRoute(
+          path: 'list-blacklist',
+          name: BacklistListScreen.name,
+          builder: (context, state) => const BacklistListScreen()
+        ),
+        GoRoute(
+          path: 'new-purchase-order',
+          name: NewPurchaseOrderScreen.name,
+          builder: (context, state) => const NewPurchaseOrderScreen()
+        ),
+        GoRoute(
+          path: 'list-purchase-order',
+          name: ListPurchaseOrderScreen.name,
+          builder: (context, state) => const ListPurchaseOrderScreen()
+        ),
+        GoRoute(
+          path: 'register-quantity-order',
+          name: RegisterQuantityScreen.name,
+          builder: (context, state) {
+            final purchaseOrderData = state.extra as dynamic;
+            return RegisterQuantityScreen(
+              purchaseOrder: purchaseOrderData,
+            );
+          },
+        ),
       ]
     ),
   ]

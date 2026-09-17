@@ -10,12 +10,15 @@ import 'package:zentinel/data/models/hive/group_business_model.dart';
 import 'package:zentinel/domain/entities/all_logbook.dart';
 import 'package:zentinel/domain/entities/api_response.dart';
 import 'package:zentinel/domain/entities/authorized.dart';
+import 'package:zentinel/domain/entities/blacklist_driver.dart';
 import 'package:zentinel/domain/entities/category.dart';
 import 'package:zentinel/domain/entities/destiny_intern.dart';
 import 'package:zentinel/domain/entities/employee_intern.dart';
 import 'package:zentinel/domain/entities/employee_movement.dart';
 import 'package:zentinel/domain/entities/graph_logbook.dart';
 import 'package:zentinel/domain/entities/group_business.dart';
+import 'package:zentinel/domain/entities/purchase_order.dart';
+import 'package:zentinel/domain/entities/reason_restriction.dart';
 import 'package:zentinel/domain/entities/unity_weight.dart';
 import 'package:zentinel/domain/entities/vehicle_type.dart';
 import 'package:zentinel/domain/repositories/logbook_entry_repository.dart';
@@ -232,8 +235,6 @@ final getAllDestinyIntern = StateNotifierProvider<CatalogNotifierWithCache<Desti
     );
   }
 
-  final userData = authState.value!;
-
   return CatalogNotifierWithCache<DestinyIntern>(
     fetch: (filters) async {
       final mergedFilters = {
@@ -290,7 +291,7 @@ final saveOutLogbookProvider =
   return OutLogbookNotifier(repo);
 });
 
-final saveEmployeeInternProvider =
+final postApiResponseProvider =
     StateNotifierProvider<FetchApiResponse, AsyncValue<ApiResponse<dynamic>>>((ref) {
   final repo = ref.watch(logbookEntryRepositoryProvider);
   return FetchApiResponse(repo);
@@ -365,6 +366,69 @@ final getEmployeeInterns =
     );
   },
 );
+
+final getReasonRestriction = StateNotifierProvider<CatalogNotifier<ReasonRestriction>, List<ReasonRestriction>>((ref) {
+  final repo = ref.watch(logbookEntryRepositoryProvider);
+  return CatalogNotifier<ReasonRestriction>(
+    (filters) {
+      return repo.getReasonRestriction();
+    },
+  );
+});
+
+final getBlacklistDriver = StateNotifierProvider<CatalogNotifier<BlacklistDriver>, List<BlacklistDriver>>((ref) {
+  final repo = ref.watch(logbookEntryRepositoryProvider);
+  return CatalogNotifier<BlacklistDriver>(
+    (filters) {
+      final mergedFilters = {
+        ...?filters,
+      };
+      return repo.getBlacklistDriver(mergedFilters);
+    },
+  );
+});
+
+final getBlacklistDriverByDni = StateNotifierProvider<CatalogNotifier<BlacklistDriver>, List<BlacklistDriver>>((ref) {
+  final repo = ref.watch(logbookEntryRepositoryProvider);
+  return CatalogNotifier<BlacklistDriver>(
+    (filters) {
+      final mergedFilters = {
+        ...?filters,
+      };
+      return repo.getBlacklistDriver(mergedFilters);
+    },
+  );
+});
+
+final getPurchaseOrder = StateNotifierProvider<CatalogNotifier<PurchaseOrder>, List<PurchaseOrder>>((ref) {
+  final repo = ref.watch(logbookEntryRepositoryProvider);
+  final authState = ref.watch(userSessionProvider);
+
+  if (!authState.hasValue || authState.value == null) {
+    return CatalogNotifier<PurchaseOrder>((_) async => []);
+  }
+
+  final userData = authState.value!;
+
+  return CatalogNotifier<PurchaseOrder>(
+    (filters) {
+      final mergedFilters = {
+        'rol': userData.role,
+        if (userData.hasPermission(Permissions.dataGroupBusiness))
+          'groups_business_id': userData.attributes['group_business'],
+        if (userData.role == 'admin' || userData.role == 'admin_tlsg')
+          'id_business': userData.attributes['id_business'],
+        if (userData.role == 'guardia')... {
+          'user': userData.user,
+          'destiny_id': userData.attributes['group_business'],
+        },
+        ...?filters,
+      };
+      
+      return repo.getPurchaseOrder(mergedFilters);
+    },
+  );
+});
 
 final getEmployeeInternById =
     StateNotifierProvider<
@@ -580,6 +644,57 @@ class FetchApiResponse extends StateNotifier<AsyncValue<ApiResponse>> {
     state = const AsyncLoading();
     try {
       final response = await repository.saveEmployeeMovement(data);
+      state = AsyncData(response);
+      return response;
+    } catch (e, st) {
+      print('Error out E, $e');
+      print('Error out ST, $st');
+      state = AsyncError(e, st);
+      return ApiResponse(
+        success: false,
+        message: e.toString(),
+      );
+    }
+  }
+
+  Future<ApiResponse> saveDriverBlacklist(Map<String, dynamic> data) async {
+    state = const AsyncLoading();
+    try {
+      final response = await repository.saveDriverBlacklist(data);
+      state = AsyncData(response);
+      return response;
+    } catch (e, st) {
+      print('Error out E, $e');
+      print('Error out ST, $st');
+      state = AsyncError(e, st);
+      return ApiResponse(
+        success: false,
+        message: e.toString(),
+      );
+    }
+  }
+
+  Future<ApiResponse> savePurchaseOrder(Map<String, dynamic> data) async {
+    state = const AsyncLoading();
+    try {
+      final response = await repository.savePurchaseOrder(data);
+      state = AsyncData(response);
+      return response;
+    } catch (e, st) {
+      print('Error out E, $e');
+      print('Error out ST, $st');
+      state = AsyncError(e, st);
+      return ApiResponse(
+        success: false,
+        message: e.toString(),
+      );
+    }
+  }
+
+  Future<ApiResponse> savePurchaseOrderReceipts(Map<String, dynamic> data) async {
+    state = const AsyncLoading();
+    try {
+      final response = await repository.savePurchaseOrderReceipts(data);
       state = AsyncData(response);
       return response;
     } catch (e, st) {

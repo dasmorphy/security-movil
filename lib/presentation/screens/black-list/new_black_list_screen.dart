@@ -3,16 +3,16 @@ import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class NewEmployeeScreen extends ConsumerStatefulWidget {
-  static const name = 'new-employee-screen';
+class NewBlackListScreen extends ConsumerStatefulWidget {
+  static const name = 'new-black-list-screen';
 
-  const NewEmployeeScreen({super.key});
+  const NewBlackListScreen({super.key});
 
   @override
-  ConsumerState<NewEmployeeScreen> createState() => _NewEmployeeScreenState();
+  ConsumerState<NewBlackListScreen> createState() => _NewBlackListScreenState();
 }
 
-class _NewEmployeeScreenState extends ConsumerState<NewEmployeeScreen> {
+class _NewBlackListScreenState extends ConsumerState<NewBlackListScreen> {
   String searchText = '';
 
   @override
@@ -26,18 +26,18 @@ class _NewEmployeeScreenState extends ConsumerState<NewEmployeeScreen> {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(60),
-        child: HeaderOptionsProfile(headerTxt: 'Nuevo personal'),
+        child: HeaderOptionsProfile(headerTxt: 'Nuevo registro'),
       ),
       resizeToAvoidBottomInset: true,
       backgroundColor: const Color.fromARGB(255, 23, 24, 28),
       body: SafeArea(
         top: false,
         // bottom: false,
-        child: EmployeeInternForm(
+        child: BlackListForm(
           onSubmit: (data) async {
             return await ref
               .read(postApiResponseProvider.notifier)
-              .saveEmployeeIntern(data);
+              .saveDriverBlacklist(data);
           },
         ),
       ),

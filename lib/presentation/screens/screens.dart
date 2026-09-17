@@ -17,3 +17,8 @@ export 'package:zentinel/presentation/screens/employee/employee_intern_list_scre
 export 'package:zentinel/presentation/screens/employee/employee_movement_screen.dart';
 export 'package:zentinel/presentation/screens/employee/new_employee_movement_screen.dart';
 export 'package:zentinel/presentation/screens/shared/camera_screen.dart';
+export 'package:zentinel/presentation/screens/black-list/new_black_list_screen.dart';
+export 'package:zentinel/presentation/screens/black-list/backlist_list_screen.dart';
+export 'package:zentinel/presentation/screens/purchase_order/new_purchase_order_screen.dart';
+export 'package:zentinel/presentation/screens/purchase_order/list_purchase_order_screen.dart';
+export 'package:zentinel/presentation/screens/purchase_order/register_quantity_screen.dart';

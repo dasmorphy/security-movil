@@ -45,7 +45,6 @@ class _EmployeeMovementFormState extends ConsumerState<EmployeeMovementForm> {
   final _weightCtrl = TextEditingController();
   final _providerCtrl = TextEditingController();
   final _observationsCtrl = TextEditingController();
-  final _truckLicenseCtrl = TextEditingController();
   final _nameDriverCtrl = TextEditingController();
 
   final _dniCtrl = TextEditingController();
@@ -57,7 +56,6 @@ class _EmployeeMovementFormState extends ConsumerState<EmployeeMovementForm> {
 
   List<Uint8List?> _selectedImages = [];
 
-  final FocusNode _truckLicenseFocus = FocusNode();
   final FocusNode _nameDriverFocus = FocusNode();
   final FocusNode _employeeFocus = FocusNode();
   final FocusNode _destinyFocus = FocusNode();
@@ -106,14 +104,12 @@ class _EmployeeMovementFormState extends ConsumerState<EmployeeMovementForm> {
     _weightCtrl.dispose();
     _providerCtrl.dispose();
     _nameDriverCtrl.dispose();
-    _truckLicenseCtrl.dispose();
     _observationsCtrl.dispose();
     _quantityFocus.dispose();
     _descFocus.dispose();
     _guideFocus.dispose();
     _categoryEntryFocus.dispose();
     _groupBusinessFocus.dispose();
-    _truckLicenseFocus.dispose();
     _nameDriverFocus.dispose();
     _employeeFocus.dispose();
     super.dispose();
@@ -316,7 +312,6 @@ class _EmployeeMovementFormState extends ConsumerState<EmployeeMovementForm> {
     _weightCtrl.clear();
     _providerCtrl.clear();
     _nameDriverCtrl.clear();
-    _truckLicenseCtrl.clear();
     _authorized = '0';
     _observationsCtrl.clear();
     imagesMinError = false;

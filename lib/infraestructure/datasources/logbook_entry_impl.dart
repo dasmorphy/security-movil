@@ -8,12 +8,15 @@ import 'package:zentinel/domain/datasources/logbook_entry_datasource.dart';
 import 'package:zentinel/domain/entities/all_logbook.dart';
 import 'package:zentinel/domain/entities/api_response.dart';
 import 'package:zentinel/domain/entities/authorized.dart';
+import 'package:zentinel/domain/entities/blacklist_driver.dart';
 import 'package:zentinel/domain/entities/category.dart';
 import 'package:zentinel/domain/entities/destiny_intern.dart';
 import 'package:zentinel/domain/entities/employee_intern.dart';
 import 'package:zentinel/domain/entities/employee_movement.dart';
 import 'package:zentinel/domain/entities/graph_logbook.dart';
 import 'package:zentinel/domain/entities/group_business.dart';
+import 'package:zentinel/domain/entities/purchase_order.dart';
+import 'package:zentinel/domain/entities/reason_restriction.dart';
 import 'package:zentinel/domain/entities/unity_weight.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:uuid/uuid.dart';
@@ -499,6 +502,253 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
       print('Error al guardar estado: $e');
       String messageError = "Error al guardar estado";
       if (e is DioException) {
+        messageError = e.response?.data["message"];
+      }
+      return ApiResponse(
+        success: false,
+        errorCode: 'save_error',
+        message: messageError,
+      );
+    }
+  }
+
+  @override
+  Future<List<BlacklistDriver>> getBlacklistDriver(Map<String, dynamic> filters) async {
+    final response = await dio.get(
+      '/rest/zent-logbook-api/v1.0/blacklist-driver',
+      queryParameters: {
+        'dni': filters['dni'] != "" ? filters['dni'] : null,
+      },
+      options: Options(
+        headers: {
+          'externalTransactionId': uuid, 
+          'channel': 'ZENTINEL'
+        },
+      ),
+    );
+    final data = response.data['data'] as List? ?? [];
+    return data.map((json) => BlacklistDriver.fromJson(json)).toList();
+  }
+  
+  @override
+  Future<ApiResponse<dynamic>> saveDriverBlacklist(Map<String, dynamic> data) async {
+    try {
+      final images = (data['photo'] as List?)?.whereType<Uint8List>().toList() ?? [];
+      final blacklistData = Map<String, dynamic>.from(data);
+      blacklistData.remove('photo');
+
+      blacklistData['channel'] = 'ZENTINEL';
+      // blacklistData['external_transaction_id'] = "3067dc66-ac5e-49d7-8ef9-eb62c51d4bc6";
+
+      final blacklistJson = jsonEncode(blacklistData);
+      final blacklistBytes = utf8.encode(blacklistJson);
+
+      final formData = FormData();
+
+      // Agregar logbook_out
+      formData.files.add(
+        MapEntry(
+          'data',
+          MultipartFile.fromBytes(
+            blacklistBytes,
+            filename: 'data.json',
+            contentType: MediaType('application', 'json'),
+          ),
+        ),
+      );
+
+      // NUEVO: usar Uint8List directamente
+      if (images.isNotEmpty) {
+        for (var i = 0; i < images.length; i++) {
+          formData.files.add(
+            MapEntry(
+              'images',
+              MultipartFile.fromBytes(
+                images[i],
+                filename: 'image_$i.webp',         // nombre con índice
+                contentType: MediaType('image', 'webp'),
+              ),
+            ),
+          );
+        }
+      }
+
+      final response = await dio.post(
+        '/rest/zent-logbook-api/v1.0/blacklist-driver',
+        data: formData,
+        options: onlyError(),
+      );
+
+      final body = response.data;
+
+      return ApiResponse(
+        success: response.statusCode == 200,
+        errorCode: body['error_code']?.toString(),
+        message: body['message'],
+        data: body['data'],
+      );
+    } catch (e) {
+      print('Error al guardar registro: $e');
+      String messageError = "Error al guardar el registro";
+      if (e is DioException) {
+        if (e.type == DioExceptionType.connectionError ||
+            e.type == DioExceptionType.connectionTimeout ||
+            e.type == DioExceptionType.receiveTimeout) {
+          rethrow;
+        }
+        messageError = e.response?.data["message"];
+      }
+      return ApiResponse(
+        success: false,
+        errorCode: 'save_error',
+        message: messageError,
+      );
+    }
+  }
+
+  @override
+  Future<List<ReasonRestriction>> getReasonRestriction() async {
+    final response = await dio.get(
+      '/rest/zent-logbook-api/v1.0/reason_restriction',
+      options: Options(
+        headers: {
+          'externalTransactionId': uuid, 
+          'channel': 'ZENTINEL'
+        },
+      ),
+    );
+    final data = response.data['data'] as List? ?? [];
+    return data.map((json) => ReasonRestriction.fromJson(json)).toList();
+  }
+  
+  @override
+  Future<ApiResponse<dynamic>> savePurchaseOrder(Map<String, dynamic> data) async {
+    try {
+      final response = await dio.post(
+        '/rest/zent-logbook-api/v1.0/purchase-order',
+        data: {
+          'order': data,
+          'externalTransactionId': Uuid().v4(),
+          'channel': "ZENTINEL"
+        },
+        options: onlyError(),
+      );
+
+      final body = response.data;
+
+      return ApiResponse(
+        success: response.statusCode == 200,
+        errorCode: body['error_code']?.toString(),
+        message: body['message'],
+        data: body['data'],
+      );
+    } catch (e) {
+      print('Error al guardar registro: $e');
+      String messageError = "Error al guardar el registro";
+      if (e is DioException) {
+        if (e.type == DioExceptionType.connectionError ||
+            e.type == DioExceptionType.connectionTimeout ||
+            e.type == DioExceptionType.receiveTimeout) {
+          rethrow;
+        }
+        messageError = e.response?.data["message"];
+      }
+      return ApiResponse(
+        success: false,
+        errorCode: 'save_error',
+        message: messageError,
+      );
+    }
+  }
+
+  @override
+  Future<List<PurchaseOrder>> getPurchaseOrder(Map<String, dynamic> filters) async {
+    final response = await dio.get(
+      '/rest/zent-logbook-api/v1.0/purchase-order',
+      queryParameters: {
+        'destiny_id': filters['destiny_id'],
+        'groups_business_id': filters['groups_business_id'],
+        'user': filters['user'],
+        'rol': filters['rol'],
+        'id_business': filters['id_business'],
+        'status': filters['status'],
+      },
+      options: Options(
+        headers: {
+          'externalTransactionId': uuid, 
+          'channel': 'ZENTINEL'
+        },
+      ),
+    );
+    final data = response.data['data'] as List? ?? [];
+    return data.map((json) => PurchaseOrder.fromJson(json)).toList();
+  }
+  
+  @override
+  Future<ApiResponse<dynamic>> savePurchaseOrderReceipts(Map<String, dynamic> data) async {
+    try {
+      final images = (data['images'] as List?)?.whereType<Uint8List>().toList() ?? [];
+      final receiptsData = Map<String, dynamic>.from(data);
+      receiptsData.remove('images');
+
+      receiptsData['channel'] = 'ZENTINEL';
+
+      final receiptsJson = jsonEncode(receiptsData);
+      final receipts = utf8.encode(receiptsJson);
+
+      final formData = FormData();
+
+      // Agregar logbook_out
+      formData.files.add(
+        MapEntry(
+          'data',
+          MultipartFile.fromBytes(
+            receipts,
+            filename: 'data.json',
+            contentType: MediaType('application', 'json'),
+          ),
+        ),
+      );
+
+      // NUEVO: usar Uint8List directamente
+      if (images.isNotEmpty) {
+        for (var i = 0; i < images.length; i++) {
+          formData.files.add(
+            MapEntry(
+              'images',
+              MultipartFile.fromBytes(
+                images[i],
+                filename: 'image_$i.webp',         // nombre con índice
+                contentType: MediaType('image', 'webp'),
+              ),
+            ),
+          );
+        }
+      }
+
+      final response = await dio.post(
+        '/rest/zent-logbook-api/v1.0/purchase-order-receipts',
+        data: formData,
+        options: onlyError(),
+      );
+
+      final body = response.data;
+
+      return ApiResponse(
+        success: response.statusCode == 200,
+        errorCode: body['error_code']?.toString(),
+        message: body['message'],
+        data: body['data'],
+      );
+    } catch (e) {
+      print('Error al guardar registro: $e');
+      String messageError = "Error al guardar el registro";
+      if (e is DioException) {
+        if (e.type == DioExceptionType.connectionError ||
+            e.type == DioExceptionType.connectionTimeout ||
+            e.type == DioExceptionType.receiveTimeout) {
+          rethrow;
+        }
         messageError = e.response?.data["message"];
       }
       return ApiResponse(

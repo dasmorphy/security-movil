@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class CommentaryReception extends StatelessWidget {
   final String label;
   final String hint;
+  final bool showLabel;
   final TextEditingController controller;
   final FocusNode focusNode;
   final ValueChanged<String>? onChanged;
@@ -14,6 +15,7 @@ class CommentaryReception extends StatelessWidget {
     required this.controller,
     required this.focusNode,
     this.onChanged,
+    this.showLabel = true,
     this.label = 'COMENTARIO/NOVEDAD',
     this.hint = '',
     this.minLines = 3,
@@ -28,16 +30,18 @@ class CommentaryReception extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: const TextStyle(
-            color: Color.fromARGB(255, 150, 150, 150),
-            fontSize: 11,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.5,
+        if (showLabel)...[
+          Text(
+            label,
+            style: const TextStyle(
+              color: Color.fromARGB(255, 150, 150, 150),
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.5,
+            ),
           ),
-        ),
-        const SizedBox(height: 8),
+          const SizedBox(height: 8),
+        ],
         AnimatedBuilder(
           animation: focusNode,
           builder: (_, __) {

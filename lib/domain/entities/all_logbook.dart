@@ -16,6 +16,8 @@ class AllLogbook {
   String nameDriver;
   String? nameSector;
   String nameUser;
+  dynamic dniDriver;
+  bool isBlacklist;
   String observations;
   AllLogbook? out;
   String? personWithdraws;
@@ -47,6 +49,8 @@ class AllLogbook {
     this.logbookOutId,
     this.long,
     required this.nameCategory,
+    required this.dniDriver,
+    required this.isBlacklist,
     required this.nameDriver,
     this.nameSector,
     required this.nameUser,
@@ -99,7 +103,9 @@ class AllLogbook {
     updatedAt: DateTime.parse(json["updated_at"]),
     updatedBy: json["updated_by"],
     weight: json["weight"],
-    workday: json["workday"],
+    workday: json["workday"], 
+    dniDriver: json["dni_driver"], 
+    isBlacklist: json["is_blacklist"],
   );
 
   Map<String, dynamic> toJson() => {
@@ -118,6 +124,8 @@ class AllLogbook {
     "long": long,
     "name_category": nameCategory,
     "name_driver": nameDriver,
+    "is_blacklist": isBlacklist,
+    "dni_driver": dniDriver,
     "name_sector": nameSector,
     "name_user": nameUser,
     "observations": observations,
