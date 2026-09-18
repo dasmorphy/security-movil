@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
+import 'package:zentinel/config/constants/permissions.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
@@ -611,7 +612,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                   },
                 ),
 
-                if (hideBalancedFuel) ...[
+                if (hideBalancedFuel && userData.hasPermission(Permissions.verOrdenesCompra)) ...[
                   const SizedBox(height: 12),
                   CustomFieldLabelRequired(txtLabel: 'Orden de compra'),
                   GlowDropdownFormField2<int>(
