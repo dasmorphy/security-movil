@@ -879,13 +879,13 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                     if (v == null || v.trim().isEmpty) {
                       return messageValidatorEmpty;
                     }
-                    if (!v.contains('-')) {
-                      return 'La placa debe contener un guion (-)';
-                    }
+                    // if (!v.contains('-')) {
+                    //   return 'La placa debe contener un guion (-)';
+                    // }
 
-                    if (!RegExp(r'\d').hasMatch(v)) {
-                      return 'La placa debe contener al menos un número';
-                    }
+                    // if (!RegExp(r'\d').hasMatch(v)) {
+                    //   return 'La placa debe contener al menos un número';
+                    // }
                     return null;
                   },
                 ),
