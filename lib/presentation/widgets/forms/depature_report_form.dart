@@ -26,6 +26,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
   bool imagesMinError = false;
   String _authorized = '0';
   String _destiny = '0';
+  bool hidePersonalIntern = false;
 
   String _unityId = '0';
   int _orderId = 0;
@@ -235,15 +236,6 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
       return;
     }
 
-    if (_dniCtrl.text.length < 10) {
-      GlobalLoadingBottomSheet.show(
-        status: OverlayStatus.error,
-        message: 'La cédula debe ser de 10 dígitos',
-        autoDismiss: const Duration(seconds: 3),
-      );
-      return;
-    }
-
     final authState = ref.watch(userSessionProvider);
 
     //Usuario no cargado o sesión inválida
@@ -427,6 +419,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
     final hideWeight = hiddenWeightCategories.contains(categoryName);
     final hideEject = hiddenEjectCategories.contains(categoryName);
     final hidePersonal = hiddenPersonalCategories.contains(categoryName);
+    hidePersonalIntern = !{"Personal interno"}.contains(categoryName);
     final hideBalancedFuel = hiddenBalancedFuelCategories.contains(categoryName);
 
     InputDecoration styleDecoration() => InputDecoration(
@@ -602,6 +595,9 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                         _unityId = '0';
                         _quantityCtrl.clear();
                       }
+
+                      _dniCtrl.clear();
+                      isBlacklist = false;
                     }
                   },
                   validator: (v) {
@@ -719,33 +715,38 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                     ),
                 ],
 
-                const SizedBox(height: 12),
-                CustomFieldLabelRequired(txtLabel: 'Cédula'),
-                GlowTextFormField(
-                  maxLength: 10,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                  keyboardType: TextInputType.number,
-                  controller: _dniCtrl,
-                  focusNode: _dniFocus,
-                  validator: (v) {
-                    if (v == null || v.trim().isEmpty) {
-                      return messageValidatorEmpty;
-                    }
-                    return null;
-                  },
-                ),
+                if (hidePersonalIntern)... [
+                  const SizedBox(height: 12),
+                  CustomFieldLabelRequired(txtLabel: 'Cédula'),
+                  GlowTextFormField(
+                    maxLength: 10,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    keyboardType: TextInputType.number,
+                    controller: _dniCtrl,
+                    focusNode: _dniFocus,
+                    validator: (v) {
+                      if (v == null || v.trim().isEmpty) {
+                        return messageValidatorEmpty;
+                      }
+                      if (v.length < 10) {
+                        return 'La cédula debe ser de 10 dígitos';
+                      }
+                      return null;
+                    },
+                  ),
 
-                if (isBlacklist)
-                  SizedBox(
-                    width: double.infinity,
-                    child: const Text(
-                      'Conductor en lista negra',
-                      textAlign: TextAlign.left, 
-                      style: TextStyle(
-                        color: Color.fromARGB(255, 196, 39, 28)
+                  if (isBlacklist)
+                    SizedBox(
+                      width: double.infinity,
+                      child: const Text(
+                        'Conductor en lista negra',
+                        textAlign: TextAlign.left, 
+                        style: TextStyle(
+                          color: Color.fromARGB(255, 196, 39, 28)
+                        ),
                       ),
                     ),
-                  ),
+                ],
 
                 if (!hideWeight) ...[
                   const SizedBox(height: 12),

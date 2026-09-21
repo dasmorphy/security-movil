@@ -1,6 +1,5 @@
 import 'package:zentinel/domain/entities/all_dispatch.dart';
 import 'package:zentinel/domain/entities/entry_access_control.dart';
-import 'package:zentinel/domain/entities/purchase_order.dart';
 import 'package:zentinel/presentation/screens/screens.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zentinel/service/navigation_service.dart';
