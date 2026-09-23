@@ -31,6 +31,7 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
   bool imagesMinError = false;
   String _authorized = '0';
   bool hidePersonalIntern = false;
+  bool hideEjectExpalsa = false;
 
   final _guideCtrl = TextEditingController();
   final _quantityCtrl = TextEditingController();
@@ -144,7 +145,7 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
           documentId: blacklistDni[0].dni,
           restrictionReason: blacklistDni[0].reasonRestriction,
           registrationDate: formatDate(blacklistDni[0].createdAt),
-          photoUrl: blacklistDni[0].imagePath != null ? 'http://st.telearseg.net${blacklistDni[0].imagePath}' : null
+          photoUrl: blacklistDni[0].imagePath != null ? 'https://st.telearseg.net${blacklistDni[0].imagePath}' : null
         );
       }else {
         GlobalLoadingBottomSheet.show(
@@ -432,6 +433,7 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
     final hideEject = hiddenEjectCategories.contains(categoryName);
     final hidePersonal = hiddenPersonalCategories.contains(categoryName);
     hidePersonalIntern = !{"Personal interno"}.contains(categoryName);
+    hideEjectExpalsa = !hiddenEjectCategories.contains(categoryName);
     final isDestinyRequired = categoryName == 'Camarón';
 
     InputDecoration styleDecoration() => InputDecoration(
@@ -641,7 +643,7 @@ class _ExitReportFormState extends ConsumerState<ExitReportForm> {
                   },
                 ),
 
-                if (hidePersonalIntern)... [
+                if (hidePersonalIntern && hideEjectExpalsa)... [
                   const SizedBox(height: 12),
                   CustomFieldLabelRequired(txtLabel: 'Cédula'),
                   GlowTextFormField(

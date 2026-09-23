@@ -27,6 +27,9 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
   String _authorized = '0';
   String _destiny = '0';
   bool hidePersonalIntern = false;
+  bool hideEjectExpalsa = false;
+  bool isFuel = false;
+  bool isBalanced = false;
 
   String _unityId = '0';
   int _orderId = 0;
@@ -152,7 +155,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
           restrictionReason: blacklistDni[0].reasonRestriction,
           registrationDate: formatDate(blacklistDni[0].createdAt),
           photoUrl: blacklistDni[0].imagePath != null
-            ? 'http://st.telearseg.net${blacklistDni[0].imagePath}'
+            ? 'https://st.telearseg.net${blacklistDni[0].imagePath}'
             : null,
         );
       } else {
@@ -344,6 +347,18 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
     }
   }
 
+  String txtLabelQuantity() {
+    if (isFuel) {
+      return 'Cantidad (Combustible)';
+    }
+
+    if (isBalanced) {
+      return 'Cantidad (Sacos)';
+    }
+
+    return 'Cantidad';
+  }
+
   void _clearCntrl() {
     _selectedImages = [];
     _formKey.currentState?.reset();
@@ -420,7 +435,10 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
     final hideEject = hiddenEjectCategories.contains(categoryName);
     final hidePersonal = hiddenPersonalCategories.contains(categoryName);
     hidePersonalIntern = !{"Personal interno"}.contains(categoryName);
+    hideEjectExpalsa = !hiddenEjectCategories.contains(categoryName);
     final hideBalancedFuel = hiddenBalancedFuelCategories.contains(categoryName);
+    isFuel = {"Combustibles"}.contains(categoryName);
+    isBalanced = {"Balanceado"}.contains(categoryName);
 
     InputDecoration styleDecoration() => InputDecoration(
       filled: true,
@@ -715,7 +733,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                     ),
                 ],
 
-                if (hidePersonalIntern)... [
+                if (hidePersonalIntern && hideEjectExpalsa)... [
                   const SizedBox(height: 12),
                   CustomFieldLabelRequired(txtLabel: 'Cédula'),
                   GlowTextFormField(
@@ -787,9 +805,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                 if (!hideEject && !hidePersonal) ...[
                   const SizedBox(height: 12),
                   CustomFieldLabelRequired(
-                    txtLabel: !hideBalancedFuel
-                    ? 'Cantidad'
-                    : 'Cantidad (Sacos)'
+                    txtLabel: txtLabelQuantity()
                   ),
                   GlowTextFormField(
                     controller: _quantityCtrl,
