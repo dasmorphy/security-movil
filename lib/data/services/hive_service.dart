@@ -7,6 +7,7 @@ import 'package:zentinel/data/models/hive/destiny_intern_model.dart';
 import 'package:zentinel/data/models/hive/unity_weight_model.dart';
 import 'package:zentinel/data/models/hive/vehicle_type_model.dart';
 import 'package:zentinel/data/models/hive/group_business_model.dart';
+import 'package:zentinel/data/models/hive/purchase_order_model.dart';
 import 'package:zentinel/domain/entities/user_session.dart';
 
 class HiveService {
@@ -19,6 +20,7 @@ class HiveService {
   static const String unityWeightBox = 'unity_weight';
   static const String vehicleTypeBox = 'vehicle_type';
   static const String groupBusinessBox = 'group_business';
+  static const String purchaseOrderBox = 'purchase_order';
   static const String sessionKey = 'current_session';
   static const String pendingBiomar = 'pending_biomar';
   static const String pendingEmployeeMovements = 'pending_employee_movements';
@@ -37,6 +39,7 @@ class HiveService {
     Hive.registerAdapter(UnityWeightModelAdapter());
     Hive.registerAdapter(VehicleTypeModelAdapter());
     Hive.registerAdapter(GroupBusinessModelAdapter());
+    Hive.registerAdapter(PurchaseOrderModelAdapter());
     
     // Crear cajas si no existen
     if (!Hive.isBoxOpen(pendingRequestBox)) {
@@ -71,6 +74,9 @@ class HiveService {
     }
     if (!Hive.isBoxOpen(groupBusinessBox)) {
       await Hive.openBox<GroupBusinessModel>(groupBusinessBox);
+    }
+    if (!Hive.isBoxOpen(purchaseOrderBox)) {
+      await Hive.openBox<PurchaseOrderModel>(purchaseOrderBox);
     }
   }
 
@@ -248,6 +254,25 @@ class HiveService {
 
   bool hasGroupBusiness() {
     final box = Hive.box<GroupBusinessModel>(groupBusinessBox);
+    return box.isNotEmpty;
+  }
+
+  // PURCHASE ORDERS
+  Future<void> savePurchaseOrders(List<PurchaseOrderModel> purchaseOrders) async {
+    final box = Hive.box<PurchaseOrderModel>(purchaseOrderBox);
+    await box.clear();
+    for (var i = 0; i < purchaseOrders.length; i++) {
+      await box.put(i, purchaseOrders[i]);
+    }
+  }
+
+  List<PurchaseOrderModel> getPurchaseOrders() {
+    final box = Hive.box<PurchaseOrderModel>(purchaseOrderBox);
+    return box.values.toList();
+  }
+
+  bool hasPurchaseOrders() {
+    final box = Hive.box<PurchaseOrderModel>(purchaseOrderBox);
     return box.isNotEmpty;
   }
 }

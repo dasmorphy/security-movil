@@ -787,7 +787,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                   ),
                 ],
 
-                if (!hideEject && !hideBalancedFuel) ...[
+                if (!hideEject) ...[
                   const SizedBox(height: 12),
                   CustomFieldLabelRequired(txtLabel: 'Descripción'),
                   GlowTextFormField(
@@ -871,7 +871,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                   ),
                 ],
                 
-                if (!hideEject && !hidePersonal && !hideBalancedFuel) ...[
+                if (!hideEject && !hidePersonal) ...[
                   const SizedBox(height: 12),
                   CustomFieldLabelRequired(txtLabel: 'Proveedor / Origen'),
                   GlowTextFormField(
@@ -956,7 +956,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                   ),
                 ],
 
-                if (!hideEject && !hideBalancedFuel) ...[
+                if (!hideEject) ...[
                   const SizedBox(height: 12),
                   CustomFieldLabelRequired(txtLabel: 'Autorizado por'),
                   GlowDropdownFormField2<String>(
@@ -990,20 +990,18 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                   ),
                 ],
 
-                if (!hideBalancedFuel) ...[
-                  const SizedBox(height: 12),
-                  CustomFieldLabelRequired(
-                    txtLabel: 'Observaciones',
-                    isRequired: false,
-                  ),
-                  GlowTextFormField(
-                    controller: _observationsCtrl,
-                    focusNode: _observationsFocus,
-                    validator: (v) {
-                      return null;
-                    },
-                  ),
-                ],
+                const SizedBox(height: 12),
+                CustomFieldLabelRequired(
+                  txtLabel: 'Observaciones',
+                  isRequired: false,
+                ),
+                GlowTextFormField(
+                  controller: _observationsCtrl,
+                  focusNode: _observationsFocus,
+                  validator: (v) {
+                    return null;
+                  },
+                ),
 
                 const SizedBox(height: 20),
 

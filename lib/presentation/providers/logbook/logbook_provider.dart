@@ -7,6 +7,7 @@ import 'package:zentinel/data/models/hive/destiny_intern_model.dart';
 import 'package:zentinel/data/models/hive/unity_weight_model.dart';
 import 'package:zentinel/data/models/hive/vehicle_type_model.dart';
 import 'package:zentinel/data/models/hive/group_business_model.dart';
+import 'package:zentinel/data/models/hive/purchase_order_model.dart';
 import 'package:zentinel/domain/entities/all_logbook.dart';
 import 'package:zentinel/domain/entities/api_response.dart';
 import 'package:zentinel/domain/entities/authorized.dart';
@@ -400,18 +401,24 @@ final getBlacklistDriverByDni = StateNotifierProvider<CatalogNotifier<BlacklistD
   );
 });
 
-final getPurchaseOrder = StateNotifierProvider<CatalogNotifier<PurchaseOrder>, List<PurchaseOrder>>((ref) {
+final getPurchaseOrder = StateNotifierProvider<CatalogNotifierWithCache<PurchaseOrder>, List<PurchaseOrder>>((ref) {
   final repo = ref.watch(logbookEntryRepositoryProvider);
   final authState = ref.watch(userSessionProvider);
+  final hiveService = ref.watch(hiveServiceProvider);
 
   if (!authState.hasValue || authState.value == null) {
-    return CatalogNotifier<PurchaseOrder>((_) async => []);
+    return CatalogNotifierWithCache<PurchaseOrder>(
+      fetch: (_) async => [],
+      cacheGetter: () => [],
+      cacheSaver: (_) async {},
+      cacheChecker: () => false,
+    );
   }
 
   final userData = authState.value!;
 
-  return CatalogNotifier<PurchaseOrder>(
-    (filters) {
+  return CatalogNotifierWithCache<PurchaseOrder>(
+    fetch: (filters) async {
       final mergedFilters = {
         'rol': userData.role,
         if (userData.hasPermission(Permissions.dataGroupBusiness))
@@ -427,6 +434,42 @@ final getPurchaseOrder = StateNotifierProvider<CatalogNotifier<PurchaseOrder>, L
       
       return repo.getPurchaseOrder(mergedFilters);
     },
+    cacheGetter: () => hiveService.getPurchaseOrders().map((model) => PurchaseOrder(
+      createdAt: DateTime.parse(model.createdAt),
+      createdBy: model.createdBy,
+      endDate: DateTime.parse(model.endDate),
+      idOrder: model.idOrder,
+      numberOrder: model.numberOrder,
+      observations: model.observations,
+      provider: model.provider,
+      quantity: model.quantity,
+      startDate: DateTime.parse(model.startDate),
+      statusId: model.statusId,
+      statusName: model.statusName,
+      typeOrder: model.typeOrder,
+      updatedAt: DateTime.parse(model.updatedAt),
+      updatedBy: model.updatedBy,
+    )).toList(),
+    cacheSaver: (purchaseOrders) async {
+      final models = purchaseOrders.map((order) => PurchaseOrderModel(
+        createdAt: order.createdAt.toIso8601String(),
+        createdBy: order.createdBy,
+        endDate: order.endDate.toIso8601String(),
+        idOrder: order.idOrder,
+        numberOrder: order.numberOrder,
+        observations: order.observations,
+        provider: order.provider,
+        quantity: order.quantity,
+        startDate: order.startDate.toIso8601String(),
+        statusId: order.statusId,
+        statusName: order.statusName,
+        typeOrder: order.typeOrder,
+        updatedAt: order.updatedAt.toIso8601String(),
+        updatedBy: order.updatedBy,
+      )).toList();
+      await hiveService.savePurchaseOrders(models);
+    },
+    cacheChecker: () => hiveService.hasPurchaseOrders(),
   );
 });
 
