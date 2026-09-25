@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -27,6 +28,31 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
 
   LogbookEntryImpl({required this.dio});
   final uuid = Uuid().v4();
+
+  /// Tiempo máximo total (conexión + subida + respuesta) para enviar un
+  /// formulario de bitácora. Pasado este tiempo se cancela la petición y el
+  /// formulario se guarda en modo offline.
+  static const _formDeadline = Duration(minutes: 1);
+
+  /// POST con límite de tiempo total. Los timeouts de Dio (send/receive) son
+  /// por inactividad, así que con red inestable que envía datos a goteo nunca
+  /// saltan; por eso se cancela la petición con un timer.
+  Future<Response> _postWithDeadline(String path, FormData formData) async {
+    final cancelToken = CancelToken();
+    final timer = Timer(_formDeadline, () {
+      cancelToken.cancel('Tiempo límite de envío superado');
+    });
+    try {
+      return await dio.post(
+        path,
+        data: formData,
+        cancelToken: cancelToken,
+        options: onlyError(),
+      );
+    } finally {
+      timer.cancel();
+    }
+  }
 
   @override
   Future<List<Category>> getAllCategory() async {
@@ -98,10 +124,9 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
       }
       final stopwatch = Stopwatch()..start();
 
-      final response = await dio.post(
+      final response = await _postWithDeadline(
         '/rest/zent-logbook-api/v1.0/post/logbook-entry',
-        data: formData,
-        options: onlyError(),
+        formData,
       );
 
       stopwatch.stop();
@@ -161,10 +186,9 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
         }
       }
 
-      final response = await dio.post(
+      final response = await _postWithDeadline(
         '/rest/zent-logbook-api/v1.0/post/logbook-out',
-        data: formData,
-        options: onlyError(),
+        formData,
       );
 
       return response.statusCode == 200 || response.statusCode == 409;

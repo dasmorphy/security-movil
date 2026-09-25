@@ -9,7 +9,16 @@ import 'package:hive/hive.dart';
 
 Future<bool> hasInternet() async {
   try {
-    final result = await InternetAddress.lookup('google.com');
+    // Chequeo local e inmediato: con el WiFi apagado (los dispositivos no
+    // tienen red móvil) no hay interfaz de red y se evita el DNS lookup, que
+    // en ese estado puede quedarse colgado varios segundos.
+    final interfaces = await Connectivity().checkConnectivity();
+    if (!interfaces.any((r) => r != ConnectivityResult.none)) return false;
+
+    // WiFi conectado no garantiza salida a internet; se verifica con un
+    // lookup acotado en tiempo.
+    final result = await InternetAddress.lookup('google.com')
+        .timeout(const Duration(seconds: 5));
     return result.isNotEmpty && result.first.rawAddress.isNotEmpty;
   } catch (_) {
     return false;
@@ -99,8 +108,8 @@ class SyncService {
     
     _sub = Connectivity()
         .onConnectivityChanged
-        .listen((result) async {
-      if (result != ConnectivityResult.none) {
+        .listen((results) async {
+      if (results.any((r) => r != ConnectivityResult.none)) {
         if (await hasInternet()) {
           // Notificar que hay internet disponible para sincronizar
           _onSyncNeeded?.call();

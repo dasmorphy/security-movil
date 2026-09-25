@@ -100,6 +100,13 @@ class DioInterceptor extends Interceptor {
       return;
     }
 
+    // Cancelación intencional (p. ej. tiempo límite de envío de formularios):
+    // el llamador ya la maneja guardando en modo offline.
+    if (err.type == DioExceptionType.cancel) {
+      handler.next(err);
+      return;
+    }
+
     if (showError && statusCode != 401) {
       String message;
 
