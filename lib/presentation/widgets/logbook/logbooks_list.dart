@@ -341,8 +341,24 @@ class LogbooksListState extends ConsumerState<LogbooksList> {
     return '$start - $end';
   }
 
+  /// Reinicia la paginación y recarga desde la página 1 conservando el rango de fechas actual
+  Future<void> reload() async {
+    setState(() {
+      _isLoading = true;
+      _page = 1;
+      _loadMoreData = true;
+    });
+
+    await widget.onFilterDate?.call(_currentRange, _page, false);
+
+    if (!mounted) return;
+
+    setState(() {
+      _isLoading = false;
+    });
+  }
+
   Future<void> _onScroll() async {
-    print(_loadMoreData);
     if (_isFetchingMore || _isLoading ) return;
 
     // Verificar si el scroll ha llegado al final (200px antes)

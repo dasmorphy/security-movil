@@ -19,6 +19,7 @@ class LogbookListScreen extends ConsumerStatefulWidget  {
 
 class _LogbookListScreenState extends ConsumerState<LogbookListScreen> {
   String searchText = '';
+  final GlobalKey<LogbooksListState> _logbooksListKey = GlobalKey<LogbooksListState>();
 
   Timer? _debounce;
 
@@ -66,6 +67,7 @@ class _LogbookListScreenState extends ConsumerState<LogbookListScreen> {
               const SizedBox(height: 30,),
               Expanded(
                 child: LogbooksList(
+                  key: _logbooksListKey,
                   items: historyLogbooks,
                   onFilterDate: (range, page, append) async {
                     DateTime? endDate;
@@ -85,6 +87,12 @@ class _LogbookListScreenState extends ConsumerState<LogbookListScreen> {
                       filters: {
                         "page": page,
                         "rows": 20,
+
+                        if (searchText.isNotEmpty)
+                          "search": searchText,
+
+                        if (widget.filtersLogbook != null)
+                          "employees-intern": widget.filtersLogbook['employees-intern'],
 
                         if (range != null)
                           "start_date": range.start.toIso8601String(),
@@ -116,13 +124,8 @@ class _LogbookListScreenState extends ConsumerState<LogbookListScreen> {
         searchText = value;
       });
 
-      await ref.read(getHistoryLogbooks.notifier).load(
-        filters: {
-          "first": 1,
-          "rows": 20,
-          "search": value,
-        },
-      );
+      // Recarga desde la página 1; onFilterDate agrega la búsqueda y el rango de fechas
+      await _logbooksListKey.currentState?.reload();
     });
   }
 }
