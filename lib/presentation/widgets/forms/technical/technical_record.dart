@@ -189,6 +189,16 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecordForm> {
 
     FocusScope.of(context).unfocus();
 
+    if (getMaterials().isNotEmpty && getMaterials().any((material) => material['id_equipment'] == 0)) {
+      GlobalLoadingBottomSheet.show(
+          status: OverlayStatus.error,
+          message: 'Debe seleccionar un equipo válido para cada material agregado.',
+          autoDismiss: const Duration(seconds: 3),
+        );
+      setState(() => isLoading = false);
+      return;
+    }
+
     if (_selectedImages.isNotEmpty && _selectedImages.length < 6) {
       setState(() {
         imagesMinError = true;
