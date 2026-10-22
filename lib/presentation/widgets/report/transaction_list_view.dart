@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
 import 'package:intl/intl.dart';
@@ -69,7 +70,7 @@ class _TransactionListViewState extends State<TransactionListView> {
                     width: 50,
                     height: 5,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: context.colors.textPrimary,
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
@@ -133,7 +134,7 @@ class _TransactionListViewState extends State<TransactionListView> {
                         vertical: 14,
                       ),
                       decoration: BoxDecoration(
-                        color: const Color.fromARGB(189, 21, 139, 139),
+                        color: context.colors.secondary,
                         borderRadius: BorderRadius.circular(40),
                         boxShadow: [
                           BoxShadow(
@@ -213,7 +214,7 @@ class _TransactionListViewState extends State<TransactionListView> {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey[800],
+        color: (context.isDarkMode ? Colors.grey[800] : Colors.grey[300]),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
@@ -222,14 +223,14 @@ class _TransactionListViewState extends State<TransactionListView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(height: 14, width: 180, color: Colors.white),
+                Container(height: 14, width: 180, color: context.colors.textPrimary),
                 const SizedBox(height: 8),
-                Container(height: 12, width: 120, color: Colors.white),
+                Container(height: 12, width: 120, color: context.colors.textPrimary),
               ],
             ),
           ),
           const SizedBox(width: 16),
-          Container(height: 20, width: 50, color: Colors.white),
+          Container(height: 20, width: 50, color: context.colors.textPrimary),
         ],
       ),
     );
@@ -240,7 +241,7 @@ class _TransactionListViewState extends State<TransactionListView> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(13),
       decoration: BoxDecoration(
-        color: Colors.grey[800],
+        color: (context.isDarkMode ? Colors.grey[800] : Colors.grey[300]),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
@@ -251,8 +252,8 @@ class _TransactionListViewState extends State<TransactionListView> {
               children: [
                 Text(
                   transaction.title,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: context.colors.textPrimary,
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
                   ),
@@ -274,7 +275,7 @@ class _TransactionListViewState extends State<TransactionListView> {
               Text(
                 transaction.amount,
                 style: TextStyle(
-                  color: Colors.white,
+                  color: context.colors.textPrimary,
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
                 ),
@@ -304,7 +305,7 @@ class _TransactionListViewState extends State<TransactionListView> {
                 'Reportes totalizados ',
                 textAlign: TextAlign.left,
                 style: theme.textTheme.titleLarge?.copyWith(
-                  color: Colors.white,
+                  color: context.colors.textPrimary,
                   fontSize: 25,
                   fontWeight: FontWeight.bold,
                 ),
@@ -330,7 +331,7 @@ class _TransactionListViewState extends State<TransactionListView> {
 
     return await showMaterialModalBottomSheet<DateTimeRange>(
       context: context,
-      backgroundColor: const Color(0xFF1E1E1E),
+      backgroundColor: context.colors.sheet,
       duration: const Duration(milliseconds: 600),
       builder: (context) => SingleChildScrollView(
         controller: ModalScrollController.of(context),

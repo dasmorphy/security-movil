@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
@@ -53,7 +54,7 @@ class _LogbookListScreenState extends ConsumerState<LogbookListScreen> {
         child: const HeaderOptionsProfile(headerTxt: 'Bitácoras recientes',),
       ),
       resizeToAvoidBottomInset: false,
-      backgroundColor: const Color.fromARGB(255, 23, 24, 28),
+      backgroundColor: context.colors.card,
       body: SafeArea(
         top: false,
         // bottom: false,

@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
@@ -360,24 +361,19 @@ class _BottomBar extends StatelessWidget {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
-            backgroundColor: const Color.fromARGB(189, 7, 213, 213),
-            disabledBackgroundColor: const Color.fromARGB(
-              120,
-              7,
-              213,
-              213,
-            ),
+            backgroundColor: context.colors.primary,
+            disabledBackgroundColor: context.colors.primaryDisabled,
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               if (isLoading) ...[
-                const SizedBox(
+                SizedBox(
                   width: 14,
                   height: 14,
                   child: CircularProgressIndicator(
                     strokeWidth: 2,
-                    color: Colors.white,
+                    color: context.colors.textPrimary,
                   ),
                 ),
                 const SizedBox(width: 12),

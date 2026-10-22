@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 
 class FinishMaterialItemCard extends StatelessWidget {
   final String materialName;
@@ -18,7 +19,7 @@ class FinishMaterialItemCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color.fromARGB(255, 30, 30, 35),
+        color: context.colors.surfaceAlt,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.grey, width: 1),
       ),
@@ -34,8 +35,8 @@ class FinishMaterialItemCard extends StatelessWidget {
                   children: [
                     Text(
                       materialName,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: context.colors.textPrimary,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),
@@ -43,15 +44,15 @@ class FinishMaterialItemCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       'Cantidad: $quantity unidad(es)',
-                      style: const TextStyle(
-                        color: Color.fromARGB(255, 150, 150, 150),
+                      style: TextStyle(
+                        color: context.colors.textTertiary,
                         fontSize: 12,
                       ),
                     ),
                   ],
                 ),
               ),
-              if (isChecked != null && onChanged != null) _buildToggle(),
+              if (isChecked != null && onChanged != null) _buildToggle(context),
             ],
           ),
         ],
@@ -59,7 +60,7 @@ class FinishMaterialItemCard extends StatelessWidget {
     );
   }
 
-  Widget _buildToggle() {
+  Widget _buildToggle(BuildContext context) {
     return GestureDetector(
       onTap: () => onChanged!(!isChecked!),
       child: Container(
@@ -68,8 +69,8 @@ class FinishMaterialItemCard extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(14),
           color: isChecked!
-              ? const Color.fromARGB(255, 34, 197, 94)
-              : const Color.fromARGB(255, 75, 83, 83),
+              ? context.colors.success
+              : context.colors.borderStrong,
         ),
         child: Stack(
           children: [
@@ -80,7 +81,7 @@ class FinishMaterialItemCard extends StatelessWidget {
               child: Container(
                 width: 24,
                 height: 24,
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: Colors.white,
                 ),

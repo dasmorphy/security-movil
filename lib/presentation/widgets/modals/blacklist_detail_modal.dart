@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zentinel/domain/entities/blacklist_driver.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
@@ -48,7 +49,7 @@ class BlacklistDetailModalState extends ConsumerState<BlacklistDetailModal> {
             Text(
               'Detalle',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: Colors.white,
+                color: context.colors.textPrimary,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -78,16 +79,16 @@ class BlacklistDetailModalState extends ConsumerState<BlacklistDetailModal> {
               width: double.infinity,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF444444),
+                  backgroundColor: context.colors.neutralButton,
                   padding: const EdgeInsets.symmetric(vertical: 14),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12),
                   ),
                 ),
                 onPressed: () => Navigator.of(context).pop(),
-                child: const Text(
+                child: Text(
                   'Cerrar',
-                  style: TextStyle(color: Colors.white),
+                  style: TextStyle(color: context.colors.textPrimary),
                 ),
               ),
             ),

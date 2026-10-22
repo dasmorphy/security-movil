@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
@@ -56,7 +57,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   dotHeight: 10,
                   dotWidth: 10,
                   spacing: 8,
-                  activeDotColor: const Color.fromARGB(189, 7, 213, 213),
+                  activeDotColor: context.colors.primary,
                   dotColor: Colors.white.withOpacity(0.3),
                 ),
               ),

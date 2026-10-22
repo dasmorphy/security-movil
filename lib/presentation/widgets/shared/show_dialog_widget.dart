@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 
 class ShowDialogWidget extends StatelessWidget {
   final String? title;
@@ -16,20 +17,24 @@ class ShowDialogWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+
     return AlertDialog(
-      backgroundColor: const Color(0xFF2A2A2A),
+      backgroundColor: colors.overlayPanel,
       title: title != null
-          ? Text(title!, style: const TextStyle(color: Colors.white))
+          ? Text(title!, style: TextStyle(color: colors.textPrimary))
           : null,
       content: content != null
-          ? Text(content!, style: const TextStyle(color: Colors.white70))
+          ? Text(content!, style: TextStyle(color: colors.textSecondary))
           : null,
       actions: [
         TextButton(
           onPressed: onPressed ?? () => Navigator.pop(context),
           child: Text(
             buttonText,
-            style: const TextStyle(color: Colors.greenAccent),
+            style: TextStyle(
+              color: context.isDarkMode ? Colors.greenAccent : colors.success,
+            ),
           ),
         ),
       ],

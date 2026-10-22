@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/domain/entities/all_dispatch.dart';
@@ -20,7 +21,7 @@ class ReceptionConfirmationScreen extends ConsumerWidget {
       destiny: dispatchData.nameDestiny,
       driver: dispatchData.driver,
       status: dispatchData.status,
-      statusColor: getStatusColorDispatch(dispatchData.status),
+      statusColor: getStatusColorDispatch(dispatchData.status, isDark: context.isDarkMode),
     );
 
     // final products = dispatchData.skus

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/domain/entities/entry_access_cards.dart';
@@ -21,7 +22,7 @@ class FinishEntryAccessScreen extends ConsumerWidget {
       nameVisit: entryAccessData.namesVisit,
       areaVisit: entryAccessData.areaName,
       status: entryAccessData.status,
-      statusColor: getStatusColorEntryAccess(entryAccessData.status),
+      statusColor: getStatusColorEntryAccess(entryAccessData.status, isDark: context.isDarkMode),
     );
 
     final materials = entryAccessData.materials.map((material) {

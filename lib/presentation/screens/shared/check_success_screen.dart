@@ -1,5 +1,6 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:lottie/lottie.dart';
@@ -35,7 +36,7 @@ class _CheckSuccessScreenState extends ConsumerState<CheckSuccessScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      backgroundColor: const Color.fromARGB(255, 23, 24, 28),
+      backgroundColor: context.colors.card,
       body: SizedBox(
         width: double.infinity,
         child: Column(
@@ -53,7 +54,7 @@ class _CheckSuccessScreenState extends ConsumerState<CheckSuccessScreen> {
             Text(
               '¡Proceso con éxito!',
               style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                color: const Color.fromARGB(255, 255, 255, 255),
+                color: context.colors.textPrimary,
                 fontWeight: FontWeight.w600,
               ) ?? const TextStyle(
                 fontSize: 28,

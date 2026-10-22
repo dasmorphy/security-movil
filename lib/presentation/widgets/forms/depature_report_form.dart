@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -402,7 +403,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
     final unitiesWeight = ref.watch(getAllUnitiesWeight);
     final theme = Theme.of(context);
     final messageValidatorEmpty = 'Este campo es obligatorio';
-    final fieldFill = const Color.fromARGB(255, 20, 21, 23);
+    final fieldFill = context.colors.fieldFill;
     final borderRadius = BorderRadius.circular(8.0);
 
     final categoryMap = {
@@ -446,11 +447,11 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
       contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
       border: OutlineInputBorder(
         borderRadius: borderRadius,
-        borderSide: BorderSide(color: Colors.white12),
+        borderSide: BorderSide(color: context.colors.border),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: borderRadius,
-        borderSide: BorderSide(color: Color.fromARGB(190, 58, 199, 199)),
+        borderSide: BorderSide(color: context.colors.focus),
       ),
     );
 
@@ -479,7 +480,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                   width: 50,
                   height: 5,
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: context.colors.textPrimary,
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
@@ -492,7 +493,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                       'Registro Integral de Ingresos',
                       textAlign: TextAlign.left,
                       style: theme.textTheme.titleLarge?.copyWith(
-                        color: Colors.white,
+                        color: context.colors.textPrimary,
                         fontSize: 25,
                         fontWeight: FontWeight.bold,
                       ),
@@ -517,7 +518,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                           const SizedBox(width: 8),
                           Text(
                             userData.attributes['name_group_business'],
-                            style: const TextStyle(color: Colors.white),
+                            style: TextStyle(color: context.colors.textPrimary),
                           ),
                         ] else ...[
                           Expanded(
@@ -576,7 +577,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                       value: '0',
                       child: Text(
                         'Seleccione una opción',
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(color: context.colors.textPrimary),
                       ),
                     ),
                     ...categories.map(
@@ -584,7 +585,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                         value: c.idCategory.toString(),
                         child: Text(
                           c.nameCategory,
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(color: context.colors.textPrimary),
                         ),
                       ),
                     ),
@@ -640,7 +641,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                         value: 0,
                         child: Text(
                           'Seleccione una opción',
-                          style: TextStyle(color: Colors.white)
+                          style: TextStyle(color: context.colors.textPrimary)
                         ),
                       ),
                       ...purchaseOrders.map(
@@ -648,7 +649,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                           value: c.idOrder,
                           child: Text(
                             '${c.numberOrder} - ${c.typeOrder}',
-                            style: TextStyle(color: Colors.white)
+                            style: TextStyle(color: context.colors.textPrimary)
                           ),
                         ),
                       ),
@@ -684,11 +685,11 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                         visualDensity: const VisualDensity(horizontal: -4, vertical: -4),
                       ),
                       const SizedBox(width: 4),
-                      const Expanded(
+                      Expanded(
                         child: Text(
                           'Sin orden de compra',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: context.colors.textPrimary,
                             fontSize: 14,
                           ),
                         ),
@@ -718,11 +719,11 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                             size: 28,
                           ),
                           const SizedBox(width: 12),
-                          const Expanded(
+                          Expanded(
                             child: Text(
                               'Este registro se guardará sin una orden de compra asignada.',
                               style: TextStyle(
-                                color: Colors.white,
+                                color: context.colors.textPrimary,
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -933,12 +934,12 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                       DropdownMenuItem(
                         enabled: false,
                         value: '0',
-                        child: Text('Seleccione una opción', style: TextStyle(color: Colors.white),),
+                        child: Text('Seleccione una opción', style: TextStyle(color: context.colors.textPrimary),),
                       ),
                       ...destinyIntern.map(
                         (c) => DropdownMenuItem(
                           value: c.name,
-                          child: Text(c.name, style: TextStyle(color: Colors.white),),
+                          child: Text(c.name, style: TextStyle(color: context.colors.textPrimary),),
                         ),
                       ),
                     ],
@@ -967,12 +968,12 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                       DropdownMenuItem(
                         enabled: false,
                         value: '0',
-                        child: Text('Seleccione una opción', style: TextStyle(color: Colors.white),),
+                        child: Text('Seleccione una opción', style: TextStyle(color: context.colors.textPrimary),),
                       ),
                       ...authorized.map(
                         (c) => DropdownMenuItem(
                           value: c.name,
-                          child: Text(c.name, style: TextStyle(color: Colors.white),),
+                          child: Text(c.name, style: TextStyle(color: context.colors.textPrimary),),
                         ),
                       ),
                     ],
@@ -1024,7 +1025,7 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                     width: double.infinity,
                     child: Text(
                       'Debe subir mínimo $_minImages imagenes',
-                      style: TextStyle(color: Color.fromARGB(255, 185, 28, 16)),
+                      style: TextStyle(color: context.colors.error),
                     ),
                   ),
                 const SizedBox(height: 26),
@@ -1037,16 +1038,16 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                           _clearCntrl();
                         },
                         style: OutlinedButton.styleFrom(
-                          side: const BorderSide(color: Colors.white24),
+                          side: BorderSide(color: context.colors.borderStrong),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
                           padding: const EdgeInsets.symmetric(vertical: 14),
                         ),
-                        child: const Text(
+                        child: Text(
                           'Cancelar',
                           style: TextStyle(
-                            color: Colors.white,
+                            color: context.colors.textPrimary,
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
                           ),
@@ -1062,18 +1063,8 @@ class _DepatureReportFormState extends ConsumerState<DepatureReportForm> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
-                          backgroundColor: const Color.fromARGB(
-                            189,
-                            7,
-                            213,
-                            213,
-                          ),
-                          disabledBackgroundColor: const Color.fromARGB(
-                            120,
-                            7,
-                            213,
-                            213,
-                          ),
+                          backgroundColor: context.colors.primary,
+                          disabledBackgroundColor: context.colors.primaryDisabled,
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -42,7 +43,7 @@ class _EntryAccessListScreenState extends ConsumerState<EntryAccessListScreen> {
         child: const HeaderOptionsProfile(headerTxt: 'Control de acceso',),
       ),
       resizeToAvoidBottomInset: false,
-      backgroundColor: const Color.fromARGB(255, 23, 24, 28),
+      backgroundColor: context.colors.card,
       body: SafeArea(
         top: false,
         // bottom: false,

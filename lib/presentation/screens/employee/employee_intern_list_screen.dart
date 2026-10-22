@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
@@ -70,7 +71,7 @@ class _EmployeeInternListScreenState
         ),
       ),
       resizeToAvoidBottomInset: false,
-      backgroundColor: const Color.fromARGB(255, 23, 24, 28),
+      backgroundColor: context.colors.card,
       body: SafeArea(
         top: false,
         child: Padding(
@@ -87,10 +88,10 @@ class _EmployeeInternListScreenState
               const SizedBox(height: 30),
               Expanded(
                 child: filtered.isEmpty
-                    ? const Center(
+                    ? Center(
                         child: Text(
                           'No hay registros',
-                          style: TextStyle(color: Colors.white54),
+                          style: TextStyle(color: context.colors.textPrimary.withOpacity(0.54)),
                         ),
                       )
                     : ListView.builder(
@@ -129,7 +130,7 @@ class _EmployeeInternListScreenState
                                                 .textTheme
                                                 .bodyMedium
                                                 ?.copyWith(
-                                                  color: Colors.white,
+                                                  color: context.colors.textPrimary,
                                                   fontWeight:
                                                       FontWeight.w600,
                                                 ),
@@ -192,13 +193,13 @@ class _EmployeeInternListScreenState
                                       backgroundColor:
                                           getStatusColorMovements(
                                             item.lastStatusMovement,
-                                          ),
+                                           isDark: context.isDarkMode,),
                                       padding: EdgeInsets.zero,
                                       labelStyle: TextStyle(
                                         color:
                                             getColorTxtMovements(
                                               item.lastStatusMovement,
-                                            ),
+                                             isDark: context.isDarkMode,),
                                         fontSize: 12,
                                         fontWeight: FontWeight.bold,
                                       ),

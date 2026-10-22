@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -218,7 +219,8 @@ class _RegisterQuantityFormState extends ConsumerState<RegisterQuantityForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 0, 0, 0),
+      backgroundColor:
+          context.isDarkMode ? Colors.black : context.colors.background,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(60),
         child: const HeaderOptionsProfile(headerTxt: 'Registro de cantidades',)
@@ -258,11 +260,11 @@ class _RegisterQuantityFormState extends ConsumerState<RegisterQuantityForm> {
                           size: 28,
                         ),
                         const SizedBox(width: 12),
-                        const Expanded(
+                        Expanded(
                           child: Text(
                             'Este registro se guardará sin una orden de compra asignada.',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: context.colors.textPrimary,
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
                             ),
@@ -388,24 +390,19 @@ class _RegisterQuantityFormState extends ConsumerState<RegisterQuantityForm> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      backgroundColor: const Color.fromARGB(189, 7, 213, 213),
-                      disabledBackgroundColor: const Color.fromARGB(
-                        120,
-                        7,
-                        213,
-                        213,
-                      ),
+                      backgroundColor: context.colors.primary,
+                      disabledBackgroundColor: context.colors.primaryDisabled,
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         if (_isLoading) ...[
-                          const SizedBox(
+                          SizedBox(
                             width: 14,
                             height: 14,
                             child: CircularProgressIndicator(
                               strokeWidth: 2,
-                              color: Colors.white,
+                              color: context.colors.textPrimary,
                             ),
                           ),
                           const SizedBox(width: 12),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:go_router/go_router.dart';
 
 class RecentListHome extends StatelessWidget {
@@ -27,7 +28,7 @@ class RecentListHome extends StatelessWidget {
               Text(
                 title,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: Colors.white,
+                  color: context.colors.textPrimary,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -40,7 +41,7 @@ class RecentListHome extends StatelessWidget {
                     child: Text(
                       "Ver más",
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: const Color.fromARGB(255, 137, 172, 255),
+                        color: context.colors.info,
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                       ),

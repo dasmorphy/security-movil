@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 
 class HeaderCategory extends StatelessWidget {
   const HeaderCategory({super.key});
@@ -15,6 +16,9 @@ class HeaderCategory extends StatelessWidget {
               width: 120,
               height: 36,
               fit: BoxFit.contain,
+              // El logo es blanco; en modo claro se tiñe con el color del texto.
+              color: context.isDarkMode ? null : context.colors.textPrimary,
+              colorBlendMode: BlendMode.srcIn,
             ),
 
             const Spacer(),

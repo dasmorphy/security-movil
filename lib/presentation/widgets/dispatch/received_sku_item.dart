@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
 class ReceivedSkuItem extends StatefulWidget {
@@ -58,11 +59,11 @@ class _ReceivedSkuItemState extends State<ReceivedSkuItem> {
 
   Color _getStatusColor() {
     if (widget.status == 'CORRECTO') {
-      return const Color.fromARGB(255, 34, 197, 94);
+      return context.colors.success;
     } else if (widget.status == 'DISCREPANCIA') {
       return const Color.fromARGB(255, 245, 158, 11);
     }
-    return const Color.fromARGB(255, 150, 150, 150);
+    return context.colors.textTertiary;
   }
 
   @override
@@ -70,7 +71,7 @@ class _ReceivedSkuItemState extends State<ReceivedSkuItem> {
     
     return Container(
       decoration: BoxDecoration(
-        color: const Color.fromARGB(255, 30, 30, 35),
+        color: context.colors.surfaceAlt,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: Colors.grey,
@@ -91,8 +92,8 @@ class _ReceivedSkuItemState extends State<ReceivedSkuItem> {
                   children: [
                     Text(
                       'Sku ${widget.index + 1}',
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: context.colors.textPrimary,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),
@@ -179,8 +180,8 @@ class _ReceivedSkuItemState extends State<ReceivedSkuItem> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(14),
           color: !widget.hasDiscrepancy
-            ? const Color.fromARGB(255, 34, 197, 94)
-            : const Color.fromARGB(255, 75, 83, 83),
+            ? context.colors.success
+            : context.colors.borderStrong,
         ),
         child: Stack(
           children: [
@@ -193,7 +194,7 @@ class _ReceivedSkuItemState extends State<ReceivedSkuItem> {
                 height: 24,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.white,
+                  color: context.colors.textPrimary,
                 ),
               ),
             ),

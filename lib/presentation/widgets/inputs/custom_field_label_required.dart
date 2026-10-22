@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 
 class CustomFieldLabelRequired extends StatelessWidget {
   final String txtLabel;
@@ -17,10 +18,10 @@ class CustomFieldLabelRequired extends StatelessWidget {
       children: [
         Row(
           children: [
-            Text(txtLabel, style: const TextStyle(color: Colors.white)),
+            Text(txtLabel, style: TextStyle(color: context.colors.textPrimary)),
 
             if (isRequired)
-              const Text(' *', style: TextStyle(color: Colors.red)),
+              Text(' *', style: TextStyle(color: context.colors.error)),
           ],
         ),
         const SizedBox(height: 6),

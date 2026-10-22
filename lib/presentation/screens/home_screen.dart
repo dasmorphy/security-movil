@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zentinel/config/constants/permissions.dart';
@@ -79,7 +80,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       //   child: const CustomAppbar(),
       // ),
       // resizeToAvoidBottomInset: false,
-      backgroundColor: const Color.fromARGB(255, 11, 16, 20),
+      backgroundColor: context.colors.background,
       body: SafeArea(
         top: false,
         // bottom: false,

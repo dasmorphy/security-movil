@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
@@ -33,11 +34,11 @@ class HeaderOffline extends ConsumerWidget {
                   child: InkWell(
                     borderRadius: BorderRadius.circular(20),
                     onTap: () => context.pop(),
-                    child: const Padding(
-                      padding: EdgeInsets.all(7),
+                    child: Padding(
+                      padding: const EdgeInsets.all(7),
                       child: Icon(
                         Icons.arrow_back_ios_new,
-                        color: Colors.white,
+                        color: context.colors.icon,
                       ),
                     ),
                   ),
@@ -45,9 +46,9 @@ class HeaderOffline extends ConsumerWidget {
           
                 Text(
                   headerTxt,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
-                    color: Colors.white,
+                    color: context.colors.textPrimary,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -63,9 +64,9 @@ class HeaderOffline extends ConsumerWidget {
                         _showNoPendingDialog(context);
                       }
                     },
-                    child: const Padding(
-                      padding: EdgeInsets.all(7),
-                      child: Icon(Icons.refresh, color: Colors.white),
+                    child: Padding(
+                      padding: const EdgeInsets.all(7),
+                      child: Icon(Icons.refresh, color: context.colors.icon),
                     ),
                   ),
                 ),

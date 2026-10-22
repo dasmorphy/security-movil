@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
@@ -13,16 +14,16 @@ class DiscrepancyDonutWidget extends ConsumerWidget {
     final data = ref.watch(graphDispatchProvider);
 
     if (data == null) {
-      return const Text(
+      return Text(
         'No hay registros',
-        style: TextStyle(color: Colors.white54),
+        style: TextStyle(color: context.colors.textPrimary.withOpacity(0.54)),
       );
     }
 
     final pct = data.discrepancyPercentage;
 
     return Card(
-      color: const Color.fromARGB(255, 11, 16, 20),
+      color: context.colors.background,
       elevation: 0,
       // shape: RoundedRectangleBorder(
       //   borderRadius: BorderRadius.circular(16),
@@ -35,7 +36,7 @@ class DiscrepancyDonutWidget extends ConsumerWidget {
           Text(
             'Informes',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
-              color: Colors.white,
+              color: context.colors.textPrimary,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -64,16 +65,16 @@ class DiscrepancyDonutWidget extends ConsumerWidget {
                     children: [
                       Text(
                         '${pct.toStringAsFixed(0)}%',
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 30,
                           fontWeight: FontWeight.w500,
-                          color: Colors.white,
+                          color: context.colors.textPrimary,
                         ),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         'discrepancias',
-                        style: TextStyle(fontSize: 11, color: Colors.white),
+                        style: TextStyle(fontSize: 11, color: context.colors.textPrimary),
                       ),
                     ],
                   ),
@@ -154,15 +155,15 @@ class _LegendItem extends StatelessWidget {
         Expanded(
           child: Text(
             label,
-            style: TextStyle(fontSize: 13, color: Colors.white),
+            style: TextStyle(fontSize: 13, color: context.colors.textPrimary),
           ),
         ),
         Text(
           '$count',
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w500,
-            color: Colors.white,
+            color: context.colors.textPrimary,
           ),
         ),
         const SizedBox(width: 12),
@@ -171,7 +172,7 @@ class _LegendItem extends StatelessWidget {
           child: Text(
             '${percentage.toStringAsFixed(0)}%',
             textAlign: TextAlign.right,
-            style: TextStyle(fontSize: 12, color: Colors.white),
+            style: TextStyle(fontSize: 12, color: context.colors.textPrimary),
           ),
         ),
       ],

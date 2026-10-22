@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:zentinel/presentation/widgets/modals/animated_modal.dart';
 
 class BasicServiceCard extends StatelessWidget {
   final String iconImage;
   final String label;
-  final Color backgroundColor;
+  final Color? backgroundColor;
   final Widget? childWidget;
   final VoidCallback? onTap;
   
@@ -13,7 +14,7 @@ class BasicServiceCard extends StatelessWidget {
     required this.iconImage,
     required this.label,
     this.childWidget,
-    this.backgroundColor = const Color(0xFF2a2a2a), 
+    this.backgroundColor,
     this.onTap,
   });
 
@@ -29,9 +30,9 @@ class BasicServiceCard extends StatelessWidget {
       },
       child: Container(
         decoration: BoxDecoration(
-          color: backgroundColor,
+          color: backgroundColor ?? context.colors.overlayPanel,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Color.fromARGB(255, 75, 83, 83), width: 1),
+          border: Border.all(color: context.colors.borderStrong, width: 1),
           // border: Border(
           //   top: BorderSide(
           //     color: Color.fromARGB(171, 46, 175, 132),
@@ -69,8 +70,8 @@ class BasicServiceCard extends StatelessWidget {
               Text(
                 label,
                 textAlign: TextAlign.center,
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: context.colors.textPrimary,
                   fontSize: 11,
                   fontWeight: FontWeight.w800,
                 ),

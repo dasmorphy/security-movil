@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 
 class ConfirmBottomSheet {
   static Future<bool?> show(
@@ -12,12 +13,14 @@ class ConfirmBottomSheet {
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
       barrierColor: Colors.black54,
-      builder: (_) {
+      builder: (sheetContext) {
+        final colors = sheetContext.colors;
+
         return Container(
           padding: const EdgeInsets.all(20),
           margin: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: colors.card,
             borderRadius: BorderRadius.circular(18),
           ),
           child: Column(
@@ -25,15 +28,20 @@ class ConfirmBottomSheet {
             children: [
               Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
+                  color: colors.textPrimary,
                 ),
               ),
 
               const SizedBox(height: 10),
 
-              Text(message, textAlign: TextAlign.center),
+              Text(
+                message,
+                textAlign: TextAlign.center,
+                style: TextStyle(color: colors.textSecondary),
+              ),
 
               const SizedBox(height: 20),
 

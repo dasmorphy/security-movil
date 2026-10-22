@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zentinel/config/constants/permissions.dart';
 import 'package:zentinel/config/utils/helper.dart';
@@ -40,10 +41,10 @@ class _BasicServicesStionState extends ConsumerState<BasicServicesSection> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Servicios básicos',
             style: TextStyle(
-              color: Colors.white,
+              color: context.colors.textPrimary,
               fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
@@ -103,10 +104,10 @@ class _BasicServicesStionState extends ConsumerState<BasicServicesSection> {
           const SizedBox(height: 18),
 
           if (userData.hasPermission(Permissions.verListaNegra) || userData.hasPermission(Permissions.nuevoListaNegra))...[
-            const Text(
+            Text(
               'Lista negra',
               style: TextStyle(
-                color: Colors.white,
+                color: context.colors.textPrimary,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
@@ -141,10 +142,10 @@ class _BasicServicesStionState extends ConsumerState<BasicServicesSection> {
 
 
           if (userData.hasPermission(Permissions.verOrdenesCompra) || userData.hasPermission(Permissions.nuevoOrdenesCompra))...[
-            const Text(
+            Text(
               'Balanceado y combustible',
               style: TextStyle(
-                color: Colors.white,
+                color: context.colors.textPrimary,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
 class ReceivedProductItem extends StatefulWidget {
@@ -67,11 +68,11 @@ class _ReceivedProductItemState extends State<ReceivedProductItem> {
 
   Color _getStatusColor() {
     if (widget.status == 'CORRECTO') {
-      return const Color.fromARGB(255, 34, 197, 94);
+      return context.colors.success;
     } else if (widget.status == 'DISCREPANCIA') {
       return const Color.fromARGB(255, 245, 158, 11);
     }
-    return const Color.fromARGB(255, 150, 150, 150);
+    return context.colors.textTertiary;
   }
 
   @override
@@ -79,7 +80,7 @@ class _ReceivedProductItemState extends State<ReceivedProductItem> {
     
     return Container(
       decoration: BoxDecoration(
-        color: const Color.fromARGB(255, 30, 30, 35),
+        color: context.colors.surfaceAlt,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: Colors.grey,
@@ -100,8 +101,8 @@ class _ReceivedProductItemState extends State<ReceivedProductItem> {
                   children: [
                     Text(
                       widget.productName,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: context.colors.textPrimary,
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                       ),
@@ -109,8 +110,8 @@ class _ReceivedProductItemState extends State<ReceivedProductItem> {
                     const SizedBox(height: 4),
                     Text(
                       'Cantidad esperada: ${widget.expectedQty} unidades',
-                      style: const TextStyle(
-                        color: Color.fromARGB(255, 150, 150, 150),
+                      style: TextStyle(
+                        color: context.colors.textTertiary,
                         fontSize: 12,
                       ),
                     ),
@@ -195,8 +196,8 @@ class _ReceivedProductItemState extends State<ReceivedProductItem> {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(14),
           color: !widget.hasDiscrepancy
-            ? const Color.fromARGB(255, 34, 197, 94)
-            : const Color.fromARGB(255, 75, 83, 83),
+            ? context.colors.success
+            : context.colors.borderStrong,
         ),
         child: Stack(
           children: [
@@ -209,7 +210,7 @@ class _ReceivedProductItemState extends State<ReceivedProductItem> {
                 height: 24,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Colors.white,
+                  color: context.colors.textPrimary,
                 ),
               ),
             ),

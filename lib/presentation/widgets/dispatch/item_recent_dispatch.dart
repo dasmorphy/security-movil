@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
@@ -13,9 +14,9 @@ class ItemRecentDispatch extends ConsumerWidget {
     final limitedList = historyDispatch.take(5).toList();
 
     if (limitedList.isEmpty) {
-      return const Text(
+      return Text(
         'No hay registros',
-        style: TextStyle(color: Colors.white54),
+        style: TextStyle(color: context.colors.textPrimary.withOpacity(0.54)),
       );
     }
 
@@ -53,7 +54,7 @@ class ItemRecentDispatch extends ConsumerWidget {
                                 .textTheme
                                 .bodyMedium
                                 ?.copyWith(
-                                  color: Colors.white,
+                                  color: context.colors.textPrimary,
                                   fontWeight: FontWeight.w600,
                                 ),
                           ),
@@ -64,7 +65,7 @@ class ItemRecentDispatch extends ConsumerWidget {
                                 .textTheme
                                 .bodySmall
                                 ?.copyWith(
-                                  color: const Color.fromARGB(255, 180, 180, 180),
+                                  color: context.colors.textSecondary,
                                 ),
                           ),
                           const SizedBox(height: 2),
@@ -74,7 +75,7 @@ class ItemRecentDispatch extends ConsumerWidget {
                                 .textTheme
                                 .bodySmall
                                 ?.copyWith(
-                                  color: const Color.fromARGB(255, 180, 180, 180),
+                                  color: context.colors.textSecondary,
                                 ),
                           ),
                           const SizedBox(height: 2),
@@ -84,7 +85,7 @@ class ItemRecentDispatch extends ConsumerWidget {
                                 .textTheme
                                 .bodySmall
                                 ?.copyWith(
-                                  color: const Color.fromARGB(255, 180, 180, 180),
+                                  color: context.colors.textSecondary,
                                 ),
                           ),
                         ],
@@ -94,10 +95,10 @@ class ItemRecentDispatch extends ConsumerWidget {
                       side: BorderSide.none,
                       label: Text(item.status),
                       backgroundColor:
-                          getStatusColorBckgDispatch(item.status),
+                          getStatusColorBckgDispatch(item.status, isDark: context.isDarkMode),
                       padding: EdgeInsets.zero,
                       labelStyle: TextStyle(
-                        color: getStatusColorDispatch(item.status),
+                        color: getStatusColorDispatch(item.status, isDark: context.isDarkMode),
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                       ),

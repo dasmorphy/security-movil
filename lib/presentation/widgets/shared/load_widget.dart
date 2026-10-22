@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 
 class LoadWidget extends StatelessWidget {
   final String textLoad;
@@ -21,7 +22,7 @@ class LoadWidget extends StatelessWidget {
                 textLoad,
                 textAlign: TextAlign.center,
                 style: theme.textTheme.titleLarge?.copyWith(
-                  color: Colors.white,
+                  color: context.colors.textPrimary,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
@@ -34,7 +35,7 @@ class LoadWidget extends StatelessWidget {
             width: 20,
             height: 20,
             child: CircularProgressIndicator(
-              color: Colors.white,
+              color: context.colors.textPrimary,
               strokeWidth: 2,
             ),
           ),

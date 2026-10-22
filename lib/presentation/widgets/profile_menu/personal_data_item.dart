@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 
 class PersonalDataItem extends StatelessWidget {
   final String title;
@@ -21,14 +22,14 @@ class PersonalDataItem extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: Colors.grey[800],
+          color: context.colors.surfaceAlt,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
           children: [
             Icon(
               icon,
-              color: const Color.fromARGB(255, 255, 255, 255),
+              color: context.colors.icon,
               size: 22,
             ),
             const SizedBox(width: 16),
@@ -38,19 +39,21 @@ class PersonalDataItem extends StatelessWidget {
                 children: [
                   Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 13.5,
                       fontWeight: FontWeight.w500,
-                      color: Colors.white,
+                      color: context.colors.textPrimary,
                     ),
                   ),
 
                   Text(
                     subTitle,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
-                      color: Color.fromARGB(255, 167, 162, 162),
+                      color: context.isDarkMode
+                          ? const Color.fromARGB(255, 167, 162, 162)
+                          : context.colors.textSecondary,
                     ),
                   ),
                 ],

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 
 class FavoritesCategorySection extends StatelessWidget {
   const FavoritesCategorySection({super.key});
@@ -8,10 +9,14 @@ class FavoritesCategorySection extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 30),
       decoration: BoxDecoration(
-        color: const Color.fromARGB(255, 30, 30, 30),
+        color: context.isDarkMode
+            ? const Color.fromARGB(255, 30, 30, 30)
+            : context.colors.card,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: const Color.fromARGB(255, 80, 80, 80),
+          color: context.isDarkMode
+              ? const Color.fromARGB(255, 80, 80, 80)
+              : context.colors.borderStrong,
           width: 1.5,
         ),
       ),
@@ -30,7 +35,7 @@ class FavoritesCategorySection extends StatelessWidget {
             'Agrega tu primer favorito',
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-              color: Colors.white,
+              color: context.colors.textPrimary,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -40,7 +45,7 @@ class FavoritesCategorySection extends StatelessWidget {
             'Elige tus servicios más frecuentes y guárdalos para acceder directamente',
             textAlign: TextAlign.center,
             style: Theme.of(context).textTheme.labelLarge?.copyWith(
-              color: const Color.fromARGB(255, 150, 150, 150),
+              color: context.colors.textTertiary,
               fontWeight: FontWeight.w400,
             ),
           ),

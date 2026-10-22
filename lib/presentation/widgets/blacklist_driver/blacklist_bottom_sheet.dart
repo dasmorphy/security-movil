@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 
 class BlacklistBottomSheet {
   static Future<bool?> show(
@@ -44,8 +45,8 @@ class _BlacklistAlertSheet extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        color: Color(0xFF1E1E1E),
+      decoration: BoxDecoration(
+        color: context.colors.sheet,
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       padding: const EdgeInsets.fromLTRB(20, 24, 20, 32),
@@ -54,11 +55,11 @@ class _BlacklistAlertSheet extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _buildHeader(),
+            _buildHeader(context),
             const SizedBox(height: 18),
-            _buildPersonCard(),
+            _buildPersonCard(context),
             const SizedBox(height: 12),
-            _buildRestrictionReason(),
+            _buildRestrictionReason(context),
             const SizedBox(height: 12),
             _buildDate(),
             const SizedBox(height: 20),
@@ -69,14 +70,14 @@ class _BlacklistAlertSheet extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(BuildContext context) {
     return Column(
       children: [
         Container(
           width: 52,
           height: 52,
           decoration: BoxDecoration(
-            color: const Color(0xFF3D1A1A),
+            color: (context.isDarkMode ? const Color(0xFF3D1A1A) : const Color(0xFFFEE2E2)),
             shape: BoxShape.circle,
           ),
           child: const Icon(
@@ -105,11 +106,11 @@ class _BlacklistAlertSheet extends StatelessWidget {
     );
   }
 
-  Widget _buildPersonCard() {
+  Widget _buildPersonCard(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF2A2A2A),
+        color: context.colors.overlayPanel,
         borderRadius: BorderRadius.circular(14),
       ),
       child: Row(
@@ -127,9 +128,9 @@ class _BlacklistAlertSheet extends StatelessWidget {
                       width: 62,
                       height: 72,
                       fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => _photoPlaceholder(),
+                      errorBuilder: (_, __, ___) => _photoPlaceholder(context),
                     )
-                  : _photoPlaceholder(),
+                  : _photoPlaceholder(context),
               ),
             ],
           ),
@@ -141,9 +142,9 @@ class _BlacklistAlertSheet extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _dataField('NOMBRE COMPLETO', personName),
+                _dataField(context, 'NOMBRE COMPLETO', personName),
                 const SizedBox(height: 10),
-                _dataField('DOCUMENTO ID', documentId)
+                _dataField(context, 'DOCUMENTO ID', documentId)
               ],
             ),
           ),
@@ -152,16 +153,16 @@ class _BlacklistAlertSheet extends StatelessWidget {
     );
   }
 
-  Widget _photoPlaceholder() {
+  Widget _photoPlaceholder(BuildContext context) {
     return Container(
       width: 62,
       height: 72,
-      color: const Color(0xFF3A3A3A),
+      color: (context.isDarkMode ? const Color(0xFF3A3A3A) : const Color(0xFFE5E7EB)),
       child: const Icon(Icons.person, color: Color(0xFF666666), size: 32),
     );
   }
 
-  Widget _dataField(String label, String? value) {
+  Widget _dataField(BuildContext context, String label, String? value) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -177,8 +178,10 @@ class _BlacklistAlertSheet extends StatelessWidget {
           const SizedBox(height: 2),
           Text(
             value,
-            style: const TextStyle(
-              color: Color(0xFFF0F0F0),
+            style: TextStyle(
+              color: context.isDarkMode
+                  ? const Color(0xFFF0F0F0)
+                  : context.colors.textPrimary,
               fontSize: 13,
               fontWeight: FontWeight.w500,
               height: 1.3,
@@ -189,7 +192,7 @@ class _BlacklistAlertSheet extends StatelessWidget {
     );
   }
 
-  Widget _buildRestrictionReason() {
+  Widget _buildRestrictionReason(BuildContext context) {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -205,8 +208,8 @@ class _BlacklistAlertSheet extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         width: double.infinity,
         decoration: BoxDecoration(
-          color: const Color(0xFF2A1414),
-          border: Border.all(color: const Color(0xFF5A2020), width: 0.5),
+          color: (context.isDarkMode ? const Color(0xFF2A1414) : const Color(0xFFFEF2F2)),
+          border: Border.all(color: (context.isDarkMode ? const Color(0xFF5A2020) : const Color(0xFFFCA5A5)), width: 0.5),
           borderRadius: const BorderRadius.only(
             topRight: Radius.circular(8),
             bottomRight: Radius.circular(8),
@@ -214,8 +217,8 @@ class _BlacklistAlertSheet extends StatelessWidget {
         ),
         child: Text(
           restrictionReason,
-          style: const TextStyle(
-            color: Color(0xFFF09595),
+          style: TextStyle(
+            color: (context.isDarkMode ? const Color(0xFFF09595) : const Color(0xFFB91C1C)),
             fontSize: 12.5,
             fontStyle: FontStyle.italic,
             height: 1.5,

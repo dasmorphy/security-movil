@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
@@ -241,7 +242,7 @@ class _ReceptionConfirmationFormState extends ConsumerState<ReceptionConfirmatio
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 20, 21, 23),
+      backgroundColor: context.colors.fieldFill,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(60),
         child: const HeaderOptionsProfile(headerTxt: 'Confirmar Recepción',)
@@ -269,18 +270,18 @@ class _ReceptionConfirmationFormState extends ConsumerState<ReceptionConfirmatio
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       'Skus a Recibir',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: context.colors.textPrimary,
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                     Text(
                       '${widget.skus.length} Skus',
-                      style: const TextStyle(
-                        color: Color.fromARGB(255, 150, 150, 150),
+                      style: TextStyle(
+                        color: context.colors.textTertiary,
                         fontSize: 14,
                       ),
                     ),
@@ -427,24 +428,19 @@ class _ReceptionConfirmationFormState extends ConsumerState<ReceptionConfirmatio
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    backgroundColor: const Color.fromARGB(189, 7, 213, 213),
-                    disabledBackgroundColor: const Color.fromARGB(
-                      120,
-                      7,
-                      213,
-                      213,
-                    ),
+                    backgroundColor: context.colors.primary,
+                    disabledBackgroundColor: context.colors.primaryDisabled,
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       if (_isLoading) ...[
-                        const SizedBox(
+                        SizedBox(
                           width: 14,
                           height: 14,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: Colors.white,
+                            color: context.colors.textPrimary,
                           ),
                         ),
                         const SizedBox(width: 12),

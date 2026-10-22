@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zentinel/config/constants/permissions.dart';
 import 'package:zentinel/config/utils/helper.dart';
@@ -44,11 +45,11 @@ class _ServicesBiomarState extends ConsumerState<ServicesBiomar> {
     final hasAnyOption = hasDispatchOptions || hasAccessOptions;
 
     if (!hasAnyOption) {
-      return const Center(
+      return Center(
         child: Text(
           'No tiene permisos para acceder a ningún módulo',
           style: TextStyle(
-            color: Colors.white,
+            color: context.colors.textPrimary,
             fontSize: 16,
           ),
         ),
@@ -61,10 +62,10 @@ class _ServicesBiomarState extends ConsumerState<ServicesBiomar> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           if (userData.hasPermission(Permissions.nuevoDespacho) || userData.hasPermission(Permissions.nuevoProductoInterno))...[
-            const Text(
+            Text(
               'Control Despachos',
               style: TextStyle(
-                color: Colors.white,
+                color: context.colors.textPrimary,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
@@ -98,10 +99,10 @@ class _ServicesBiomarState extends ConsumerState<ServicesBiomar> {
 
           if (userData.hasPermission(Permissions.verIngresosBiomar))...[
             const SizedBox(height: 25),
-            const Text(
+            Text(
               'Control de accesos',
               style: TextStyle(
-                color: Colors.white,
+                color: context.colors.textPrimary,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),

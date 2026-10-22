@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/domain/entities/employee_movement.dart';
@@ -15,9 +16,9 @@ class ItemRecentEmployeeMovement extends ConsumerWidget {
     final limitedList = employeeMovements.take(5).toList();
 
     if (employeeMovements.isEmpty) {
-      return const Text(
+      return Text(
         'No hay registros',
-        style: TextStyle(color: Colors.white54),
+        style: TextStyle(color: context.colors.textPrimary.withOpacity(0.54)),
       );
     }
 
@@ -47,7 +48,7 @@ class ItemRecentEmployeeMovement extends ConsumerWidget {
                           '${item.employeeNames} ${item.employeeLastname}',
                           style: Theme.of(context).textTheme.bodyMedium
                               ?.copyWith(
-                                color: Colors.white,
+                                color: context.colors.textPrimary,
                                 fontWeight: FontWeight.w600,
                               ),
                         ),
@@ -57,7 +58,7 @@ class ItemRecentEmployeeMovement extends ConsumerWidget {
                           item.employeeStatus,
                           style: Theme.of(context).textTheme.bodySmall
                             ?.copyWith(
-                              color: const Color.fromARGB(255, 180, 180, 180),
+                              color: context.colors.textSecondary,
                             ),
                         ),
                         const SizedBox(height: 2),
@@ -66,7 +67,7 @@ class ItemRecentEmployeeMovement extends ConsumerWidget {
                           formattedDate,
                           style: Theme.of(context).textTheme.bodySmall
                               ?.copyWith(
-                                color: const Color.fromARGB(255, 180, 180, 180),
+                                color: context.colors.textSecondary,
                               ),
                         ),
                         const SizedBox(height: 2),
@@ -77,10 +78,10 @@ class ItemRecentEmployeeMovement extends ConsumerWidget {
                   Chip(
                     side: BorderSide.none,
                     label: Text(item.status),
-                    backgroundColor: getStatusColorMovements(item.status),
+                    backgroundColor: getStatusColorMovements(item.status, isDark: context.isDarkMode),
                     padding: EdgeInsets.zero,
                     labelStyle: TextStyle(
-                      color: getColorTxtMovements(item.status),
+                      color: getColorTxtMovements(item.status, isDark: context.isDarkMode),
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
                     ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
@@ -23,7 +24,7 @@ class _NewPurchaseOrderScreenState
         child: HeaderOptionsProfile(headerTxt: 'Nueva orden de compra'),
       ),
       resizeToAvoidBottomInset: true,
-      backgroundColor: const Color.fromARGB(255, 23, 24, 28),
+      backgroundColor: context.colors.card,
       body: SafeArea(
         top: false,
         child: PurchaseOrderForm(

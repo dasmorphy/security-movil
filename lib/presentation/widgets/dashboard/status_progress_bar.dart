@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 
 class StatusProgressBar extends StatelessWidget {
   /// Etiqueta descriptiva del estado.
@@ -46,7 +47,7 @@ class StatusProgressBar extends StatelessWidget {
             Expanded(
               child: Text(
                 label,
-                style: const TextStyle(fontSize: 12, color: Colors.white),
+                style: TextStyle(fontSize: 12, color: context.colors.textPrimary),
                 overflow: TextOverflow.ellipsis,
               ),
             ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/domain/entities/all_logbook.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
@@ -17,7 +18,7 @@ class EntryDetails extends StatelessWidget {
         Text(
           'Ingreso',
           style: Theme.of(context).textTheme.titleMedium?.copyWith(
-            color: Colors.white,
+            color: context.colors.textPrimary,
             fontWeight: FontWeight.bold,
           ),
         ),

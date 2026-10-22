@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:zentinel/config/constants/environment.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
@@ -23,7 +24,7 @@ class ImagesGrid extends StatelessWidget {
 
         Text(
           title,
-          style: const TextStyle(color: Colors.white70),
+          style: TextStyle(color: context.colors.textSecondary),
         ),
 
         const SizedBox(height: 8),
@@ -51,20 +52,20 @@ class ImagesGrid extends StatelessWidget {
                   loadingBuilder: (context, child, progress) {
                     if (progress == null) return child;
                     return Container(
-                      color: Colors.white10,
-                      child: const Center(
+                      color: context.colors.textPrimary.withOpacity(0.1),
+                      child: Center(
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          color: Colors.white54,
+                          color: context.colors.textTertiary,
                         ),
                       ),
                     );
                   },
                   errorBuilder: (context, _, __) => Container(
-                    color: Colors.white10,
-                    child: const Icon(
+                    color: context.colors.textPrimary.withOpacity(0.1),
+                    child: Icon(
                       Icons.broken_image_outlined,
-                      color: Colors.white30,
+                      color: context.colors.textTertiary,
                     ),
                   ),
                 ),

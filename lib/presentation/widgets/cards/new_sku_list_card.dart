@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
 class NewSkuListCard extends StatefulWidget {
@@ -120,10 +121,10 @@ class _SkuCard extends StatelessWidget {
         : 'Individual';
   }
 
-  Color _getStatusColor() {
+  Color _getStatusColor(BuildContext context) {
     return (isChecked)
         ? const Color.fromARGB(255, 245, 158, 11)
-        : const Color.fromARGB(255, 34, 197, 94);
+        : context.colors.success;
   }
 
   @override
@@ -135,7 +136,7 @@ class _SkuCard extends StatelessWidget {
         Container(
           margin: const EdgeInsets.only(bottom: 16),
           decoration: BoxDecoration(
-            color: const Color.fromARGB(255, 30, 30, 35),
+            color: context.colors.surfaceAlt,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: Colors.grey, width: 1),
           ),
@@ -150,10 +151,10 @@ class _SkuCard extends StatelessWidget {
                   if (canDelete)
                     GestureDetector(
                       onTap: onDeleteSku,
-                      child: const Icon(
+                      child: Icon(
                         Icons.close_rounded,
                         size: 18,
-                        color: Color.fromARGB(255, 255, 255, 255),
+                        color: context.colors.icon,
                       ),
                     ),
                 ],
@@ -171,8 +172,8 @@ class _SkuCard extends StatelessWidget {
                         children: [
                           Text(
                             'SKU ${(skuIndex + 1).toString()}',
-                            style: const TextStyle(
-                              color: Colors.white,
+                            style: TextStyle(
+                              color: context.colors.textPrimary,
                               fontSize: 16,
                               fontWeight: FontWeight.w600,
                             ),
@@ -189,13 +190,13 @@ class _SkuCard extends StatelessWidget {
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: _getStatusColor().withOpacity(0.2),
+                            color: _getStatusColor(context).withOpacity(0.2),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
                             _status.toUpperCase(),
                             style: TextStyle(
-                              color: _getStatusColor(),
+                              color: _getStatusColor(context),
                               fontSize: 11,
                               fontWeight: FontWeight.bold,
                               letterSpacing: 0.5,
@@ -203,7 +204,7 @@ class _SkuCard extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: 12),
-                        _buildSkuToggle(),
+                        _buildSkuToggle(context),
                       ],
                     ),
                   ],
@@ -216,7 +217,7 @@ class _SkuCard extends StatelessWidget {
     );
   }
 
-  Widget _buildSkuToggle() {
+  Widget _buildSkuToggle(BuildContext context) {
     return GestureDetector(
       onTap: () {
         onSkuCheckedChanged(!isChecked);
@@ -227,8 +228,8 @@ class _SkuCard extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(14),
           color: isChecked
-              ? const Color.fromARGB(255, 34, 197, 94)
-              : const Color.fromARGB(255, 75, 83, 83),
+              ? context.colors.success
+              : context.colors.borderStrong,
         ),
         child: Stack(
           children: [
@@ -239,7 +240,7 @@ class _SkuCard extends StatelessWidget {
               child: Container(
                 width: 24,
                 height: 24,
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: Colors.white,
                 ),
@@ -270,7 +271,7 @@ class _AgregarSkuBtn extends StatelessWidget {
             Text(
               "Añadir Sku",
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                color: const Color.fromARGB(255, 137, 172, 255),
+                color: context.colors.info,
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
               ),

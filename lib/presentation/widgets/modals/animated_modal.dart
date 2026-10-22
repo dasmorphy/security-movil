@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 
 class AnimatedModal extends StatelessWidget {
   final Widget child;
@@ -25,9 +26,9 @@ class AnimatedModal extends StatelessWidget {
               padding: EdgeInsets.only(bottom: bottomInset),
               child: Container(
                 height: height,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF1E1E1E),
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                decoration: BoxDecoration(
+                  color: context.colors.sheet,
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
                 ),
                 child: child,
               ),

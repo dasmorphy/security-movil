@@ -24,6 +24,7 @@ class HiveService {
   static const String sessionKey = 'current_session';
   static const String pendingBiomar = 'pending_biomar';
   static const String pendingEmployeeMovements = 'pending_employee_movements';
+  static const String settingsBox = 'settings';
 
   Future<void> initHive() async {
     await Hive.initFlutter();
@@ -50,6 +51,9 @@ class HiveService {
     }
     if (!Hive.isBoxOpen(pendingBiomar)) {
       await Hive.openBox(pendingBiomar);
+    }
+    if (!Hive.isBoxOpen(settingsBox)) {
+      await Hive.openBox(settingsBox);
     }
     if (!Hive.isBoxOpen(userProfileBox)) {
       await Hive.openBox<UserProfileModel>(userProfileBox);

@@ -15,6 +15,7 @@ import 'package:zentinel/service/local_storage.dart';
 import 'package:zentinel/service/pending_request_service.dart';
 import 'package:zentinel/presentation/widgets/shared/sync_listener.dart';
 import 'package:zentinel/presentation/providers/sync_pending/sync_pending_provider.dart';
+import 'package:zentinel/presentation/providers/shared/theme_mode_provider.dart';
 
 final syncService = SyncService();
 
@@ -107,7 +108,20 @@ class _MyAppState extends ConsumerState<MyApp> {
           GlobalWidgetsLocalizations.delegate,
           GlobalCupertinoLocalizations.delegate,
         ],
-        theme: AppTheme().getTheme(),
+        theme: AppTheme().lightTheme(),
+        darkTheme: AppTheme().darkTheme(),
+        themeMode: ref.watch(themeModeProvider),
+        // Íconos de la barra de estado según el tema activo.
+        builder: (context, child) {
+          final isDark = Theme.of(context).brightness == Brightness.dark;
+          return AnnotatedRegion<SystemUiOverlayStyle>(
+            value: (isDark
+                    ? SystemUiOverlayStyle.light
+                    : SystemUiOverlayStyle.dark)
+                .copyWith(statusBarColor: Colors.transparent),
+            child: child!,
+          );
+        },
       ),
     );
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/config/constants/permissions.dart';
@@ -97,7 +98,7 @@ class HomeViewState extends ConsumerState<HomeView> {
                           child: Text(
                             c["value"]!,
                             style: TextStyle(
-                              color: const Color.fromARGB(255, 31, 30, 30),
+                              color: context.colors.textPrimary,
                             ),
                           ),
                         ),

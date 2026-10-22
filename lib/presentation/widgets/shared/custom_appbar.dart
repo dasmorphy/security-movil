@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class CustomAppbar extends ConsumerWidget {
@@ -36,6 +37,9 @@ class CustomAppbar extends ConsumerWidget {
                       width: 120,
                       height: 36,
                       fit: BoxFit.contain,
+                      // El logo es blanco; en modo claro se tiñe con el color del texto.
+                      color: context.isDarkMode ? null : context.colors.textPrimary,
+                      colorBlendMode: BlendMode.srcIn,
                     ),
 
                     const Spacer(),
@@ -43,18 +47,18 @@ class CustomAppbar extends ConsumerWidget {
                     InkWell(
                       borderRadius: BorderRadius.circular(20),
                       onTap: () {},
-                      child: const Padding(
-                        padding: EdgeInsets.all(7),
-                        child: Icon(Icons.search, color: Colors.white),
+                      child: Padding(
+                        padding: const EdgeInsets.all(7),
+                        child: Icon(Icons.search, color: context.colors.icon),
                       ),
                     ),
 
                     InkWell(
                       borderRadius: BorderRadius.circular(20),
                       onTap: () {},
-                      child: const Padding(
-                        padding: EdgeInsets.all(7),
-                        child: Icon(Icons.help_outline, color: Colors.white),
+                      child: Padding(
+                        padding: const EdgeInsets.all(7),
+                        child: Icon(Icons.help_outline, color: context.colors.icon),
                       ),
                     ),
                   ],

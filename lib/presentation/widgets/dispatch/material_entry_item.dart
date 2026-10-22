@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
 class MaterialEntryItem extends StatefulWidget {
@@ -76,7 +77,7 @@ class _MaterialEntryItemState extends State<MaterialEntryItem> {
 
         Container(
           decoration: BoxDecoration(
-            color: const Color.fromARGB(255, 30, 30, 35),
+            color: context.colors.surfaceAlt,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: Colors.grey, width: 1),
           ),
@@ -87,10 +88,10 @@ class _MaterialEntryItemState extends State<MaterialEntryItem> {
             children: [          
               Row(
                 children: [
-                  const Text(
+                  Text(
                     'MATERIAL',
                     style: TextStyle(
-                      color: Color.fromARGB(255, 150, 150, 150),
+                      color: context.colors.textTertiary,
                       fontSize: 11,
                       fontWeight: FontWeight.w600,
                       letterSpacing: 0.5,
@@ -115,32 +116,34 @@ class _MaterialEntryItemState extends State<MaterialEntryItem> {
                 value: _materialValue,
                 decoration: InputDecoration(
                   filled: true,
-                  fillColor: const Color.fromARGB(255, 25, 25, 30),
+                  fillColor: context.isDarkMode
+                      ? const Color.fromARGB(255, 25, 25, 30)
+                      : context.colors.fieldFill,
                   contentPadding: const EdgeInsets.symmetric(
                     vertical: 14,
                     horizontal: 12,
                   ),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(
-                      color: Color.fromARGB(255, 75, 83, 83),
+                    borderSide: BorderSide(
+                      color: context.colors.borderStrong,
                     ),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(
-                      color: Color.fromARGB(190, 58, 199, 199),
+                    borderSide: BorderSide(
+                      color: context.colors.focus,
                       width: 1.5,
                     ),
                   ),
                 ),
                 items: [
-                  const DropdownMenuItem(
+                  DropdownMenuItem(
                     enabled: false,
                     value: '0',
                     child: Text(
                       'Seleccione una opción',
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: context.colors.textPrimary),
                     ),
                   ),
         
@@ -149,15 +152,15 @@ class _MaterialEntryItemState extends State<MaterialEntryItem> {
                       value: c['id_material'].toString(),
                       child: Text(
                         c['name'],
-                        style: const TextStyle(color: Colors.white),
+                        style: TextStyle(color: context.colors.textPrimary),
                       ),
                     ),
                   ),
-                  const DropdownMenuItem(
+                  DropdownMenuItem(
                     value: '1000',
                     child: Text(
                       'Otros',
-                      style: TextStyle(color: Colors.white),
+                      style: TextStyle(color: context.colors.textPrimary),
                     ),
                   ),
                 ],
@@ -180,10 +183,10 @@ class _MaterialEntryItemState extends State<MaterialEntryItem> {
         
               const SizedBox(height: 16),
               
-              const Text(
+              Text(
                 'CANTIDAD',
                 style: TextStyle(
-                  color: Color.fromARGB(255, 150, 150, 150),
+                  color: context.colors.textTertiary,
                   fontSize: 11,
                   fontWeight: FontWeight.w600,
                   letterSpacing: 0.5,
@@ -213,10 +216,10 @@ class _MaterialEntryItemState extends State<MaterialEntryItem> {
               const SizedBox(height: 16),
               
               if (_materialValue == '1000')...[
-                const Text(
+                Text(
                   'OTRO',
                   style: TextStyle(
-                    color: Color.fromARGB(255, 150, 150, 150),
+                    color: context.colors.textTertiary,
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 0.5,

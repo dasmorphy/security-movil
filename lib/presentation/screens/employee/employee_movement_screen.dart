@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/domain/entities/employee_movement.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
@@ -91,7 +92,7 @@ class _EmployeeMovementScreenState
         child: const HeaderOptionsProfile(headerTxt: 'Movimientos de personal'),
       ),
       resizeToAvoidBottomInset: false,
-      backgroundColor: const Color.fromARGB(255, 23, 24, 28),
+      backgroundColor: context.colors.card,
       body: SafeArea(
         top: false,
         child: Padding(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zentinel/config/constants/permissions.dart';
@@ -30,7 +31,7 @@ class EmployeeInternDetailModal extends ConsumerWidget {
             Text(
               'Detalle Personal Interno',
               style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                color: Colors.white,
+                color: context.colors.textPrimary,
                 fontWeight: FontWeight.bold,
               ),
             ),

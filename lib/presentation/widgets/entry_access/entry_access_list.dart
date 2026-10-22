@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/domain/entities/entry_access_control.dart';
@@ -63,10 +64,10 @@ class EntryAccessListState extends ConsumerState<EntryAccessList> {
       : items.take(widget.limit ?? items.length).toList();
 
     if (!_isLoading && _filteredItems.isEmpty) {
-      return const Center(
+      return Center(
         child: Text(
           'No hay registros',
-          style: TextStyle(color: Colors.white70),
+          style: TextStyle(color: context.colors.textPrimary.withOpacity(0.7)),
         ),
       );
     }
@@ -118,7 +119,7 @@ class EntryAccessListState extends ConsumerState<EntryAccessList> {
                                   Text(
                                     createdBy,
                                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                      color: Colors.white,
+                                      color: context.colors.textPrimary,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
@@ -127,7 +128,7 @@ class EntryAccessListState extends ConsumerState<EntryAccessList> {
                                   Text(
                                     description,
                                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: const Color.fromARGB(255, 180, 180, 180),
+                                      color: context.colors.textSecondary,
                                     ),
                                   ),
                                   const SizedBox(height: 2),
@@ -135,7 +136,7 @@ class EntryAccessListState extends ConsumerState<EntryAccessList> {
                                   Text(
                                     formattedDate,
                                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: const Color.fromARGB(255, 180, 180, 180),
+                                      color: context.colors.textSecondary,
                                     ),
                                   ),
                                 ],
@@ -145,10 +146,10 @@ class EntryAccessListState extends ConsumerState<EntryAccessList> {
                             Chip(
                               side: BorderSide.none,
                               label: Text(item.status),
-                              backgroundColor: getStatusColorBckgEntry(item.status),
+                              backgroundColor: getStatusColorBckgEntry(item.status, isDark: context.isDarkMode),
                               padding: EdgeInsets.zero,
                               labelStyle: TextStyle(
-                                color: getStatusColorEntryAccess(item.status),
+                                color: getStatusColorEntryAccess(item.status, isDark: context.isDarkMode),
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -204,7 +205,7 @@ class EntryAccessListState extends ConsumerState<EntryAccessList> {
                       vertical: 14,
                     ),
                     decoration: BoxDecoration(
-                      color: const Color.fromARGB(189, 21, 139, 139),
+                      color: context.colors.secondary,
                       borderRadius: BorderRadius.circular(40),
                       boxShadow: [
                         BoxShadow(
@@ -221,10 +222,10 @@ class EntryAccessListState extends ConsumerState<EntryAccessList> {
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
-                      children: const [
+                      children: [
                         Icon(
                           Icons.calendar_today,
-                          color: Colors.white,
+                          color: context.colors.textPrimary,
                           size: 15,
                         ),
                         SizedBox(width: 10),
@@ -232,7 +233,7 @@ class EntryAccessListState extends ConsumerState<EntryAccessList> {
                           'Filtrar por fechas',
                           style: TextStyle(
                             fontSize: 12,
-                            color: Colors.white,
+                            color: context.colors.textPrimary,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -253,7 +254,7 @@ class EntryAccessListState extends ConsumerState<EntryAccessList> {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey[800],
+        color: (context.isDarkMode ? Colors.grey[800] : Colors.grey[300]),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
@@ -262,7 +263,7 @@ class EntryAccessListState extends ConsumerState<EntryAccessList> {
             width: 24,
             height: 24,
             decoration: BoxDecoration(
-              color: Colors.grey[700],
+              color: (context.isDarkMode ? Colors.grey[700] : Colors.grey[200]),
               borderRadius: BorderRadius.circular(4),
             ),
           ),
@@ -271,18 +272,18 @@ class EntryAccessListState extends ConsumerState<EntryAccessList> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(height: 14, width: 150, color: Colors.grey[700]),
+                Container(height: 14, width: 150, color: (context.isDarkMode ? Colors.grey[700] : Colors.grey[200])),
                 const SizedBox(height: 8),
-                Container(height: 12, width: 200, color: Colors.grey[700]),
+                Container(height: 12, width: 200, color: (context.isDarkMode ? Colors.grey[700] : Colors.grey[200])),
                 const SizedBox(height: 8),
-                Container(height: 12, width: 100, color: Colors.grey[700]),
+                Container(height: 12, width: 100, color: (context.isDarkMode ? Colors.grey[700] : Colors.grey[200])),
                 const SizedBox(height: 8),
-                Container(height: 20, width: 80, color: Colors.grey[700]),
+                Container(height: 20, width: 80, color: (context.isDarkMode ? Colors.grey[700] : Colors.grey[200])),
               ],
             ),
           ),
           const SizedBox(width: 16),
-          Container(width: 20, height: 20, color: Colors.grey[700]),
+          Container(width: 20, height: 20, color: (context.isDarkMode ? Colors.grey[700] : Colors.grey[200])),
         ],
       ),
     );

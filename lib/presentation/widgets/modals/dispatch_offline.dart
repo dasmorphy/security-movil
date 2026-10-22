@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
@@ -21,7 +22,7 @@ class DispatchOffline extends ConsumerWidget {
         ),
       ),
       resizeToAvoidBottomInset: false,
-      backgroundColor: const Color.fromARGB(255, 23, 24, 28),
+      backgroundColor: context.colors.card,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -30,17 +31,17 @@ class DispatchOffline extends ConsumerWidget {
                 error: (e, _) => Center(
                   child: Text(
                     'Error: $e',
-                    style: const TextStyle(color: Colors.white70),
+                    style: TextStyle(color: context.colors.textPrimary.withOpacity(0.7)),
                   ),
                 ),
                 data: (pending) {
                   final items = pending.map(mapPendingBiomar).toList();
 
                   if (items.isEmpty) {
-                    return const Center(
+                    return Center(
                       child: Text(
                         'Sin registros pendientes',
-                        style: TextStyle(color: Colors.white70),
+                        style: TextStyle(color: context.colors.textPrimary.withOpacity(0.7)),
                       ),
                     );
                   }
@@ -57,7 +58,7 @@ class DispatchOffline extends ConsumerWidget {
                   return Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF2A2A2A),
+                      color: context.colors.overlayPanel,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Column(
@@ -69,12 +70,12 @@ class DispatchOffline extends ConsumerWidget {
                               width: 48,
                               height: 48,
                               decoration: BoxDecoration(
-                                color: Colors.grey.shade800,
+                                color: (context.isDarkMode ? Colors.grey.shade800 : Colors.grey.shade300),
                                 borderRadius: BorderRadius.circular(6),
                               ),
-                              child: const Icon(
+                              child: Icon(
                                 Icons.upload_file,
-                                color: Colors.white54,
+                                color: context.colors.textPrimary.withOpacity(0.54),
                                 size: 22,
                               ),
                             ),
@@ -90,8 +91,8 @@ class DispatchOffline extends ConsumerWidget {
                                     children: [
                                       Text(
                                         name,
-                                        style: const TextStyle(
-                                          color: Colors.white,
+                                        style: TextStyle(
+                                          color: context.colors.textPrimary,
                                           fontWeight: FontWeight.w600,
                                         ),
                                       ),
@@ -101,7 +102,7 @@ class DispatchOffline extends ConsumerWidget {
                                       Text(
                                         subtitle,
                                         style: TextStyle(
-                                          color: Colors.white70,
+                                          color: context.colors.textPrimary.withOpacity(0.7),
                                           fontSize: 12,
                                         ),
                                       ),
@@ -111,7 +112,7 @@ class DispatchOffline extends ConsumerWidget {
                                       Text(
                                         statusText,
                                         style: TextStyle(
-                                          color: Colors.white70,
+                                          color: context.colors.textPrimary.withOpacity(0.7),
                                           fontSize: 12,
                                         ),
                                       ),

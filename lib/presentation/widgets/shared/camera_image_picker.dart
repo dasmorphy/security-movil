@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/presentation/screens/screens.dart';
 
@@ -106,16 +107,18 @@ class _CameraImagePickerState extends State<CameraImagePicker> {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 40, 40, 45),
+              color: context.isDarkMode
+                  ? const Color.fromARGB(255, 40, 40, 45)
+                  : context.colors.surfaceAlt,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
-                color: const Color.fromARGB(255, 75, 83, 83),
+                color: context.colors.borderStrong,
                 width: 1.5,
                 style: BorderStyle.solid,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.3),
+                  color: Colors.black.withOpacity(context.isDarkMode ? 0.3 : 0.06),
                   blurRadius: 8,
                   offset: const Offset(0, 2),
                 ),
@@ -124,16 +127,16 @@ class _CameraImagePickerState extends State<CameraImagePicker> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(
+                Icon(
                   Icons.camera_alt_outlined,
-                  color: Color.fromARGB(255, 150, 150, 150),
+                  color: context.colors.textTertiary,
                   size: 20,
                 ),
                 const SizedBox(width: 8),
                 Text(
                   widget.textBtn!,
                   style: TextStyle(
-                    color: Color.fromARGB(255, 150, 150, 150),
+                    color: context.colors.textTertiary,
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                   ),
@@ -211,7 +214,7 @@ class _CameraImagePickerState extends State<CameraImagePicker> {
                   padding: const EdgeInsets.symmetric(vertical: 20),
                   child: Text(
                     'No hay imágenes capturadas',
-                    style: TextStyle(color: Colors.white54),
+                    style: TextStyle(color: context.colors.textTertiary),
                   ),
                 ),
               ),
@@ -223,7 +226,7 @@ class _CameraImagePickerState extends State<CameraImagePicker> {
               imagesMinError
                   ? 'Debe subir mínimo ${widget.minImages} imagenes'
                   : 'Debe subir máximo ${widget.maxImages} imagenes',
-              style: TextStyle(color: Color.fromARGB(255, 185, 28, 16)),
+              style: TextStyle(color: context.colors.error),
             ),
           ),
       ],

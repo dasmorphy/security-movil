@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:video_player/video_player.dart';
 import 'package:zentinel/presentation/providers/onboarding/onboarding_provider.dart';
@@ -98,14 +99,16 @@ class _StepPhotoState extends ConsumerState<StepPhoto> {
     // final userName = ref.watch(userNameProvider);
 
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            Color.fromARGB(255, 15, 32, 39),
-            Color.fromARGB(255, 32, 47, 56),
-          ],
+          colors: context.isDarkMode
+              ? const [
+                  Color.fromARGB(255, 15, 32, 39),
+                  Color.fromARGB(255, 32, 47, 56),
+                ]
+              : const [Color(0xFFE3F2F2), Color(0xFFF7FBFB)],
         ),
       ),
       child: SafeArea(
@@ -156,12 +159,7 @@ class _StepPhotoState extends ConsumerState<StepPhoto> {
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: const Color.fromARGB(
-                              189,
-                              7,
-                              213,
-                              213,
-                            ).withOpacity(0.3),
+                            color: context.colors.primary.withOpacity(0.3),
                             blurRadius: 50,
                             spreadRadius: 0,
                           ),
@@ -190,14 +188,14 @@ class _StepPhotoState extends ConsumerState<StepPhoto> {
                   ),
                   RichText(
                     textAlign: TextAlign.center,
-                    text: const TextSpan(
+                    text: TextSpan(
                       children: [
                         TextSpan(
                           text: 'Tu foto de ',
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: context.colors.textPrimary,
                           ),
                         ),
                         TextSpan(
@@ -205,16 +203,16 @@ class _StepPhotoState extends ConsumerState<StepPhoto> {
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
-                            color: Color.fromARGB(189, 7, 213, 213),
+                            color: context.colors.primary,
                           ),
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
+                  Text(
                     'Captura una foto clara desde tu cámara',
-                    style: TextStyle(fontSize: 14, color: Colors.white70),
+                    style: TextStyle(fontSize: 14, color: context.colors.textPrimary.withOpacity(0.7)),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 20),
@@ -238,7 +236,7 @@ class _StepPhotoState extends ConsumerState<StepPhoto> {
                                 color: Colors.white.withOpacity(0.05),
                                 borderRadius: BorderRadius.circular(20),
                                 border: Border.all(
-                                  color: const Color.fromARGB(189, 7, 213, 213),
+                                  color: context.colors.primary,
                                   width: 2,
                                   strokeAlign: BorderSide.strokeAlignOutside,
                                 ),
@@ -246,10 +244,10 @@ class _StepPhotoState extends ConsumerState<StepPhoto> {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  const Icon(
+                                  Icon(
                                     Icons.camera_alt_outlined,
                                     size: 50,
-                                    color: Color.fromARGB(189, 7, 213, 213),
+                                    color: context.colors.primary,
                                   ),
                                   const SizedBox(height: 12),
                                   Text(
@@ -274,8 +272,8 @@ class _StepPhotoState extends ConsumerState<StepPhoto> {
                         width: 6,
                         height: 6,
                         margin: const EdgeInsets.only(top: 6, right: 12),
-                        decoration: const BoxDecoration(
-                          color: Color.fromARGB(189, 7, 213, 213),
+                        decoration: BoxDecoration(
+                          color: context.colors.primary,
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -298,8 +296,8 @@ class _StepPhotoState extends ConsumerState<StepPhoto> {
                         width: 6,
                         height: 6,
                         margin: const EdgeInsets.only(top: 6, right: 12),
-                        decoration: const BoxDecoration(
-                          color: Color.fromARGB(189, 7, 213, 213),
+                        decoration: BoxDecoration(
+                          color: context.colors.primary,
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -332,7 +330,7 @@ class _StepPhotoState extends ConsumerState<StepPhoto> {
                   //     shape: RoundedRectangleBorder(
                   //       borderRadius: BorderRadius.circular(30),
                   //     ),
-                  //     backgroundColor: const Color.fromARGB(189, 7, 213, 213),
+                  //     backgroundColor: context.colors.primary,
                   //   ),
                   // ),
                   const SizedBox(height: 18),
@@ -343,7 +341,7 @@ class _StepPhotoState extends ConsumerState<StepPhoto> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
-                      backgroundColor: const Color.fromARGB(189, 7, 213, 213),
+                      backgroundColor: context.colors.primary,
                       // disabledBackgroundColor: Colors.green.withOpacity(0.4),
                     ),
                     child: _isLoading

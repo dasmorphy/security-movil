@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:video_player/video_player.dart';
 import 'package:zentinel/presentation/providers/onboarding/onboarding_provider.dart';
@@ -61,14 +62,16 @@ class _StepNameState extends ConsumerState<StepName> {
     }
 
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            Color.fromARGB(255, 15, 32, 39),
-            Color.fromARGB(255, 32, 47, 56),
-          ],
+          colors: context.isDarkMode
+              ? const [
+                  Color.fromARGB(255, 15, 32, 39),
+                  Color.fromARGB(255, 32, 47, 56),
+                ]
+              : const [Color(0xFFE3F2F2), Color(0xFFF7FBFB)],
         ),
       ),
       child: SafeArea(
@@ -88,12 +91,7 @@ class _StepNameState extends ConsumerState<StepName> {
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: const Color.fromARGB(
-                              189,
-                              7,
-                              213,
-                              213,
-                            ).withOpacity(0.3),
+                            color: context.colors.primary.withOpacity(0.3),
                             blurRadius: 50,
                             spreadRadius: 0,
                           ),
@@ -129,14 +127,14 @@ class _StepNameState extends ConsumerState<StepName> {
                       children: [
                         RichText(
                           textAlign: TextAlign.center,
-                          text: const TextSpan(
+                          text: TextSpan(
                             children: [
                               TextSpan(
                                 text: '¡Hola! ¿Cómo te ',
                                 style: TextStyle(
                                   fontSize: 28,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                                  color: context.colors.textPrimary,
                                 ),
                               ),
                               TextSpan(
@@ -144,44 +142,44 @@ class _StepNameState extends ConsumerState<StepName> {
                                 style: TextStyle(
                                   fontSize: 28,
                                   fontWeight: FontWeight.bold,
-                                  color: Color.fromARGB(189, 7, 213, 213),
+                                  color: context.colors.primary,
                                 ),
                               ),
                             ],
                           ),
                         ),
                         const SizedBox(height: 12),
-                        const Text(
+                        Text(
                           'Personalizaremos tu experiencia de seguridad digital',
-                          style: TextStyle(fontSize: 14, color: Colors.white70),
+                          style: TextStyle(fontSize: 14, color: context.colors.textPrimary.withOpacity(0.7)),
                           textAlign: TextAlign.center,
                         ),
                       ],
                     ),
                   ),
                   const SizedBox(height: 20),
-                  const Text(
+                  Text(
                     'TU NOMBRE',
                     style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w600,
-                      color: Color.fromARGB(189, 7, 213, 213),
+                      color: context.colors.primary,
                       letterSpacing: 1.5,
                     ),
                   ),
                   const SizedBox(height: 12),
                   TextField(
                     controller: controller,
-                    style: const TextStyle(color: Colors.white, fontSize: 16),
+                    style: TextStyle(color: context.colors.textPrimary, fontSize: 16),
                     onChanged: (value) {
                       ref.read(userNameProvider.notifier).state = value;
                     },
                     decoration: InputDecoration(
                       hintText: 'Ingresa tu nombre',
-                      hintStyle: const TextStyle(color: Colors.white54),
-                      prefixIcon: const Icon(
+                      hintStyle: TextStyle(color: context.colors.textPrimary.withOpacity(0.54)),
+                      prefixIcon: Icon(
                         Icons.person,
-                        color: Colors.white54,
+                        color: context.colors.textPrimary.withOpacity(0.54),
                       ),
                       filled: true,
                       fillColor: Colors.white.withOpacity(0.02),
@@ -199,7 +197,7 @@ class _StepNameState extends ConsumerState<StepName> {
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(30),
                         borderSide: BorderSide(
-                          color: const Color.fromARGB(189, 7, 213, 213),
+                          color: context.colors.primary,
                           width: 2,
                         ),
                       ),
@@ -213,7 +211,7 @@ class _StepNameState extends ConsumerState<StepName> {
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
-                      backgroundColor: const Color.fromARGB(189, 7, 213, 213),
+                      backgroundColor: context.colors.primary,
                     ),
                     child: const Text(
                       'Siguiente →',

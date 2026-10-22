@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:go_router/go_router.dart';
 
 class HeaderOptionsProfile extends StatelessWidget {
@@ -19,9 +20,9 @@ class HeaderOptionsProfile extends StatelessWidget {
               child: InkWell(
                 borderRadius: BorderRadius.circular(20),
                 onTap: () => context.pop(),
-                child: const Padding(
-                  padding: EdgeInsets.all(7),
-                  child: Icon(Icons.arrow_back_ios_new, color: Colors.white),
+                child: Padding(
+                  padding: const EdgeInsets.all(7),
+                  child: Icon(Icons.arrow_back_ios_new, color: context.colors.icon),
                 ),
               ),
             ),
@@ -31,7 +32,7 @@ class HeaderOptionsProfile extends StatelessWidget {
               headerTxt,
               style: TextStyle(
                 fontSize: 16,
-                color: Colors.white,
+                color: context.colors.textPrimary,
                 fontWeight: FontWeight.w600,
               ),
             ),

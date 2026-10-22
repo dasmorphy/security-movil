@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:zentinel/config/utils/helper.dart';
@@ -80,10 +81,10 @@ class EmployeeMovementListState extends ConsumerState<EmployeeMovementList> {
         : items.take(items.length).toList();
 
     if (!_isLoading && _filteredItems.isEmpty) {
-      return const Center(
+      return Center(
         child: Text(
           'No hay registros',
-          style: TextStyle(color: Colors.white70),
+          style: TextStyle(color: context.colors.textPrimary.withOpacity(0.7)),
         ),
       );
     }
@@ -148,7 +149,7 @@ class EmployeeMovementListState extends ConsumerState<EmployeeMovementList> {
                                       .textTheme
                                       .bodyMedium
                                       ?.copyWith(
-                                        color: Colors.white,
+                                        color: context.colors.textPrimary,
                                         fontWeight: FontWeight.w600,
                                       ),
                                 ),
@@ -157,12 +158,7 @@ class EmployeeMovementListState extends ConsumerState<EmployeeMovementList> {
                                   item.employeeStatus,
                                   style: Theme.of(context).textTheme.bodySmall
                                       ?.copyWith(
-                                        color: const Color.fromARGB(
-                                          255,
-                                          180,
-                                          180,
-                                          180,
-                                        ),
+                                        color: context.colors.textSecondary,
                                       ),
                                 ),
                                 const SizedBox(height: 2),
@@ -170,12 +166,7 @@ class EmployeeMovementListState extends ConsumerState<EmployeeMovementList> {
                                   formattedDate,
                                   style: Theme.of(context).textTheme.bodySmall
                                       ?.copyWith(
-                                        color: const Color.fromARGB(
-                                          255,
-                                          180,
-                                          180,
-                                          180,
-                                        ),
+                                        color: context.colors.textSecondary,
                                       ),
                                 ),
                                 const SizedBox(height: 2),
@@ -188,10 +179,10 @@ class EmployeeMovementListState extends ConsumerState<EmployeeMovementList> {
                             label: Text(item.status),
                             backgroundColor: getStatusColorMovements(
                               item.status,
-                            ),
+                             isDark: context.isDarkMode,),
                             padding: EdgeInsets.zero,
                             labelStyle: TextStyle(
-                              color: getColorTxtMovements(item.status),
+                              color: getColorTxtMovements(item.status, isDark: context.isDarkMode),
                               fontSize: 12,
                               fontWeight: FontWeight.bold,
                             ),
@@ -278,7 +269,7 @@ class EmployeeMovementListState extends ConsumerState<EmployeeMovementList> {
                       vertical: 14,
                     ),
                     decoration: BoxDecoration(
-                      color: const Color.fromARGB(189, 21, 139, 139),
+                      color: context.colors.secondary,
                       borderRadius: BorderRadius.circular(40),
                       boxShadow: [
                         BoxShadow(
@@ -296,9 +287,9 @@ class EmployeeMovementListState extends ConsumerState<EmployeeMovementList> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.calendar_today,
-                          color: Colors.white,
+                          color: context.colors.textPrimary,
                           size: 15,
                         ),
                         const SizedBox(width: 10),
@@ -306,9 +297,9 @@ class EmployeeMovementListState extends ConsumerState<EmployeeMovementList> {
                           _currentRange != null
                               ? _formatDateRangeLabel()
                               : 'Filtrar por fechas',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
-                            color: Colors.white,
+                            color: context.colors.textPrimary,
                             fontWeight: FontWeight.w600,
                           ),
                           maxLines: 1,
@@ -378,7 +369,7 @@ class EmployeeMovementListState extends ConsumerState<EmployeeMovementList> {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey[800],
+        color: (context.isDarkMode ? Colors.grey[800] : Colors.grey[300]),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
@@ -387,7 +378,7 @@ class EmployeeMovementListState extends ConsumerState<EmployeeMovementList> {
             width: 24,
             height: 24,
             decoration: BoxDecoration(
-              color: Colors.grey[700],
+              color: (context.isDarkMode ? Colors.grey[700] : Colors.grey[200]),
               borderRadius: BorderRadius.circular(4),
             ),
           ),
@@ -396,18 +387,18 @@ class EmployeeMovementListState extends ConsumerState<EmployeeMovementList> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(height: 14, width: 150, color: Colors.grey[700]),
+                Container(height: 14, width: 150, color: (context.isDarkMode ? Colors.grey[700] : Colors.grey[200])),
                 const SizedBox(height: 8),
-                Container(height: 12, width: 200, color: Colors.grey[700]),
+                Container(height: 12, width: 200, color: (context.isDarkMode ? Colors.grey[700] : Colors.grey[200])),
                 const SizedBox(height: 8),
-                Container(height: 12, width: 100, color: Colors.grey[700]),
+                Container(height: 12, width: 100, color: (context.isDarkMode ? Colors.grey[700] : Colors.grey[200])),
                 const SizedBox(height: 8),
-                Container(height: 20, width: 80, color: Colors.grey[700]),
+                Container(height: 20, width: 80, color: (context.isDarkMode ? Colors.grey[700] : Colors.grey[200])),
               ],
             ),
           ),
           const SizedBox(width: 16),
-          Container(width: 20, height: 20, color: Colors.grey[700]),
+          Container(width: 20, height: 20, color: (context.isDarkMode ? Colors.grey[700] : Colors.grey[200])),
         ],
       ),
     );
@@ -422,9 +413,9 @@ class EmployeeMovementListState extends ConsumerState<EmployeeMovementList> {
           infinite: true,
           child: Container(
             padding: const EdgeInsets.all(12),
-            child: const Icon(
+            child: Icon(
               Icons.sync,
-              color: Colors.white,
+              color: context.colors.textPrimary,
               size: 24,
             ),
           ),

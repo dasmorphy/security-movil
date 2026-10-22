@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 
 class ConfirmationHeader extends StatelessWidget {
   final String title;
@@ -23,15 +24,15 @@ class ConfirmationHeader extends StatelessWidget {
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: const Color.fromARGB(255, 40, 40, 45),
+                  color: context.colors.surfaceAlt,
                   border: Border.all(
-                    color: const Color.fromARGB(255, 75, 83, 83),
+                    color: context.colors.borderStrong,
                     width: 1,
                   ),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.arrow_back,
-                  color: Colors.white,
+                  color: context.colors.icon,
                   size: 20,
                 ),
               ),
@@ -40,8 +41,8 @@ class ConfirmationHeader extends StatelessWidget {
             Expanded(
               child: Text(
                 title,
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: context.colors.textPrimary,
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
                 ),

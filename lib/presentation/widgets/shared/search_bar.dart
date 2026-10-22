@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 
 class SearchBarWidget extends StatelessWidget {
   final ValueChanged<String>? onChanged;
@@ -7,19 +8,21 @@ class SearchBarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+
     return Container(
       height: 45,
       decoration: BoxDecoration(
-        color: const Color(0xFF1E1E1E),
+        color: colors.sheet,
         borderRadius: BorderRadius.circular(12),
       ),
       child: TextField(
         onChanged: onChanged,
-        style: const TextStyle(color: Colors.white),
+        style: TextStyle(color: colors.textPrimary),
         decoration: InputDecoration(
           hintText: 'Buscar...',
-          hintStyle: const TextStyle(color: Colors.white54),
-          prefixIcon: const Icon(Icons.search, color: Colors.white54),
+          hintStyle: TextStyle(color: colors.textTertiary),
+          prefixIcon: Icon(Icons.search, color: colors.textTertiary),
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(vertical: 12),
         ),

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 
 Widget detailRow(String label, dynamic value) {
-  return Padding(
+  // Builder para leer los colores del tema sin cambiar la firma (se usa en
+  // muchos lugares).
+  return Builder(builder: (context) => Padding(
     padding: const EdgeInsets.symmetric(vertical: 6),
     child: Row(
       children: [
@@ -9,7 +12,7 @@ Widget detailRow(String label, dynamic value) {
           flex: 3,
           child: Text(
             label,
-            style: const TextStyle(color: Colors.white70),
+            style: TextStyle(color: context.colors.textSecondary),
           ),
         ),
         Expanded(
@@ -17,13 +20,13 @@ Widget detailRow(String label, dynamic value) {
           child: Text(
             value?.toString() ?? '—',
             textAlign: TextAlign.right,
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: context.colors.textPrimary,
               fontWeight: FontWeight.w600,
             ),
           ),
         ),
       ],
     ),
-  );
+  ));
 }

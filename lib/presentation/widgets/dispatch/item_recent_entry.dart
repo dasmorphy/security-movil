@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
@@ -13,9 +14,9 @@ class ItemRecentEntry extends ConsumerWidget {
     final limitedList = historyEntryAccess.take(5).toList();
 
     if (historyEntryAccess.isEmpty) {
-      return const Text(
+      return Text(
         'No hay registros',
-        style: TextStyle(color: Colors.white54),
+        style: TextStyle(color: context.colors.textPrimary.withOpacity(0.54)),
       );
     }
 
@@ -48,7 +49,7 @@ class ItemRecentEntry extends ConsumerWidget {
                         Text(
                           createdBy,
                           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                            color: Colors.white,
+                            color: context.colors.textPrimary,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -57,7 +58,7 @@ class ItemRecentEntry extends ConsumerWidget {
                         Text(
                           description,
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: const Color.fromARGB(255, 180, 180, 180),
+                            color: context.colors.textSecondary,
                           ),
                         ),
                         const SizedBox(height: 2),
@@ -65,7 +66,7 @@ class ItemRecentEntry extends ConsumerWidget {
                         Text(
                           formattedDate,
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: const Color.fromARGB(255, 180, 180, 180),
+                            color: context.colors.textSecondary,
                           ),
                         ),
                       ],
@@ -75,10 +76,10 @@ class ItemRecentEntry extends ConsumerWidget {
                   Chip(
                     side: BorderSide.none,
                     label: Text(item.status),
-                    backgroundColor: getStatusColorBckgEntry(item.status),
+                    backgroundColor: getStatusColorBckgEntry(item.status, isDark: context.isDarkMode),
                     padding: EdgeInsets.zero,
                     labelStyle: TextStyle(
-                      color: getStatusColorEntryAccess(item.status),
+                      color: getStatusColorEntryAccess(item.status, isDark: context.isDarkMode),
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
                     ),

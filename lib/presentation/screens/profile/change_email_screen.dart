@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
 class ChangeEmailScreen extends StatelessWidget {
@@ -14,7 +15,7 @@ class ChangeEmailScreen extends StatelessWidget {
         child: const HeaderOptionsProfile(headerTxt: 'Nuevo correo electrónico',),
       ),
       resizeToAvoidBottomInset: false,
-      backgroundColor: const Color.fromARGB(255, 23, 24, 28),
+      backgroundColor: context.colors.card,
       body: SafeArea(
         top: false,
         // bottom: false,

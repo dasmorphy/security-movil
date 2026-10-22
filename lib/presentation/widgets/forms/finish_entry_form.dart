@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
@@ -134,7 +135,8 @@ class _FinishEntryFormState extends ConsumerState<FinishEntryForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 0, 0, 0),
+      backgroundColor:
+          context.isDarkMode ? Colors.black : context.colors.background,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(60),
         child: const HeaderOptionsProfile(headerTxt: 'Registrar Salida',)
@@ -155,18 +157,18 @@ class _FinishEntryFormState extends ConsumerState<FinishEntryForm> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
+                    Text(
                       'Materiales / Equipos',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: context.colors.textPrimary,
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                     Text(
                       '${_materials.length} Material(es)',
-                      style: const TextStyle(
-                        color: Color.fromARGB(255, 150, 150, 150),
+                      style: TextStyle(
+                        color: context.colors.textTertiary,
                         fontSize: 14,
                       ),
                     ),
@@ -247,24 +249,19 @@ class _FinishEntryFormState extends ConsumerState<FinishEntryForm> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    backgroundColor: const Color.fromARGB(189, 7, 213, 213),
-                    disabledBackgroundColor: const Color.fromARGB(
-                      120,
-                      7,
-                      213,
-                      213,
-                    ),
+                    backgroundColor: context.colors.primary,
+                    disabledBackgroundColor: context.colors.primaryDisabled,
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       if (_isLoading) ...[
-                        const SizedBox(
+                        SizedBox(
                           width: 14,
                           height: 14,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            color: Colors.white,
+                            color: context.colors.textPrimary,
                           ),
                         ),
                         const SizedBox(width: 12),

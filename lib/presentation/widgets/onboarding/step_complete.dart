@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:video_player/video_player.dart';
@@ -41,14 +42,16 @@ class _StepCompleteState extends ConsumerState<StepComplete> {
     final userName = ref.watch(userNameProvider);
 
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            Color.fromARGB(255, 15, 32, 39),
-            Color.fromARGB(255, 32, 47, 56),
-          ],
+          colors: context.isDarkMode
+              ? const [
+                  Color.fromARGB(255, 15, 32, 39),
+                  Color.fromARGB(255, 32, 47, 56),
+                ]
+              : const [Color(0xFFE3F2F2), Color(0xFFF7FBFB)],
         ),
       ),
       child: Padding(
@@ -70,12 +73,7 @@ class _StepCompleteState extends ConsumerState<StepComplete> {
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: const Color.fromARGB(
-                              189,
-                              7,
-                              213,
-                              213,
-                            ).withOpacity(0.3),
+                            color: context.colors.primary.withOpacity(0.3),
                             blurRadius: 50,
                           ),
                         ],
@@ -107,28 +105,28 @@ class _StepCompleteState extends ConsumerState<StepComplete> {
                     textAlign: TextAlign.center,
                     text: TextSpan(
                       children: [
-                        const TextSpan(
+                        TextSpan(
                           text: '¡Todo ',
                           style: TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: context.colors.textPrimary,
                           ),
                         ),
-                        const TextSpan(
+                        TextSpan(
                           text: 'listo',
                           style: TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
-                            color: Color.fromARGB(189, 7, 213, 213),
+                            color: context.colors.primary,
                           ),
                         ),
                         TextSpan(
                           text: ', $userName! 🎉',
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: context.colors.textPrimary,
                           ),
                         ),
                       ],
@@ -156,17 +154,17 @@ class _StepCompleteState extends ConsumerState<StepComplete> {
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       border: Border.all(
-                        color: const Color.fromARGB(189, 7, 213, 213),
+                        color: context.colors.primary,
                         width: 1.5,
                       ),
                       borderRadius: BorderRadius.circular(16),
                       color: Colors.white.withOpacity(0.03),
                     ),
                     child: Row(
-                      children: const [
+                      children: [
                         Icon(
                           Icons.security,
-                          color: Color.fromARGB(189, 7, 213, 213),
+                          color: context.colors.primary,
                           size: 28,
                         ),
                         SizedBox(width: 12),
@@ -177,7 +175,7 @@ class _StepCompleteState extends ConsumerState<StepComplete> {
                               'Nivel de seguridad:',
                               style: TextStyle(
                                 fontSize: 13,
-                                color: Colors.white54,
+                                color: context.colors.textPrimary.withOpacity(0.54),
                               ),
                             ),
                             Text(
@@ -185,7 +183,7 @@ class _StepCompleteState extends ConsumerState<StepComplete> {
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
-                                color: Color.fromARGB(189, 7, 213, 213),
+                                color: context.colors.primary,
                               ),
                             ),
                           ],
@@ -238,8 +236,8 @@ class _StepCompleteState extends ConsumerState<StepComplete> {
           width: 20,
           height: 20,
           margin: const EdgeInsets.only(right: 12),
-          decoration: const BoxDecoration(
-            color: Color.fromARGB(189, 7, 213, 213),
+          decoration: BoxDecoration(
+            color: context.colors.primary,
             shape: BoxShape.circle,
           ),
           child: const Icon(Icons.check, color: Colors.white, size: 12),

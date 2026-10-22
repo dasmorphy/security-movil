@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:zentinel/config/constants/environment.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
+import 'package:zentinel/presentation/providers/shared/theme_mode_provider.dart';
 import 'dart:io';
 import 'package:zentinel/presentation/providers/auth/auth_provider.dart';
 import 'package:zentinel/presentation/providers/onboarding/onboarding_provider.dart';
@@ -31,6 +33,7 @@ class ProfileViewState extends ConsumerState<ProfileView> {
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(userSessionProvider);
+    final colors = context.colors;
 
     return authState.when(
       loading: () => const SizedBox(),
@@ -101,10 +104,10 @@ class ProfileViewState extends ConsumerState<ProfileView> {
                                 userProfile?.name ??
                                     userData.attributes['fullname'] ??
                                     'Usuario',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 24,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                                  color: colors.textPrimary,
                                 ),
                               ),
                               const SizedBox(height: 4),
@@ -121,7 +124,7 @@ class ProfileViewState extends ConsumerState<ProfileView> {
                                 userData.user,
                                 style: TextStyle(
                                   fontSize: 12,
-                                  color: Colors.grey,
+                                  color: colors.textTertiary,
                                 ),
                               )
                             ],
@@ -166,14 +169,16 @@ class ProfileViewState extends ConsumerState<ProfileView> {
                         // const SizedBox(height: 24),
 
                         // EXPERIENCIA EN EL APP
-                        const Text(
+                        Text(
                           'Experiencia en el app',
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                            color: colors.textPrimary,
                           ),
                         ),
+                        const SizedBox(height: 12),
+                        _buildThemeSelector(),
                         // const SizedBox(height: 12),
                         // _buildMenuTile(
                         //   icon: Icons.phonelink,
@@ -229,19 +234,19 @@ class ProfileViewState extends ConsumerState<ProfileView> {
                               context.go('/login');
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.grey[800],
+                              backgroundColor: colors.surfaceAlt,
                               padding:
                                   const EdgeInsets.symmetric(vertical: 14),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(12),
                               ),
                             ),
-                            child: const Text(
+                            child: Text(
                               'Cerrar Sesión',
                               style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                color: Color(0xFFFF4757),
+                                color: colors.error,
                               ),
                             ),
                           ),
@@ -259,38 +264,103 @@ class ProfileViewState extends ConsumerState<ProfileView> {
     );
   }
 
+  Widget _buildThemeSelector() {
+    final colors = context.colors;
+    final mode = ref.watch(themeModeProvider);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: colors.surfaceAlt,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.brightness_6_rounded, color: colors.icon, size: 22),
+              const SizedBox(width: 16),
+              Text(
+                'Tema',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: colors.textPrimary,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: SegmentedButton<ThemeMode>(
+              showSelectedIcon: false,
+              segments: const [
+                ButtonSegment(
+                  value: ThemeMode.system,
+                  icon: Icon(Icons.phone_android_rounded, size: 18),
+                  label: Text('Sistema'),
+                ),
+                ButtonSegment(
+                  value: ThemeMode.light,
+                  icon: Icon(Icons.light_mode_rounded, size: 18),
+                  label: Text('Claro'),
+                ),
+                ButtonSegment(
+                  value: ThemeMode.dark,
+                  icon: Icon(Icons.dark_mode_rounded, size: 18),
+                  label: Text('Oscuro'),
+                ),
+              ],
+              selected: {mode},
+              onSelectionChanged: (selection) => ref
+                  .read(themeModeProvider.notifier)
+                  .setMode(selection.first),
+              style: SegmentedButton.styleFrom(
+                foregroundColor: colors.textSecondary,
+                selectedForegroundColor: colors.onPrimary,
+                selectedBackgroundColor: colors.primary,
+                side: BorderSide(color: colors.border),
+                textStyle: const TextStyle(fontSize: 12),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildMenuTile({
     required IconData icon,
     required String title,
     required VoidCallback onTap,
   }) {
+    final colors = context.colors;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: Colors.grey[800],
+          color: colors.surfaceAlt,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Row(
           children: [
-            Icon(
-              icon,
-              color: const Color.fromARGB(255, 255, 255, 255),
-              size: 22,
-            ),
+            Icon(icon, color: colors.icon, size: 22),
             const SizedBox(width: 16),
             Expanded(
               child: Text(
                 title,
-                style: const TextStyle(
+                style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w500,
-                  color: Colors.white,
+                  color: colors.textPrimary,
                 ),
               ),
             ),
-            Icon(Icons.chevron_right, color: Colors.grey[600], size: 24),
+            Icon(Icons.chevron_right, color: colors.textTertiary, size: 24),
           ],
         ),
       ),

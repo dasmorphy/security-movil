@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:intl/intl.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
@@ -82,29 +83,24 @@ class _DateRangePickerState extends State<DateRangePicker> {
                     ),
                   ),
                 ),
-                startRangeSelectionColor: const Color.fromARGB(
-                  190,
-                  58,
-                  199,
-                  199,
-                ),
-                endRangeSelectionColor: const Color.fromARGB(190, 58, 199, 199),
+                startRangeSelectionColor: context.colors.focus,
+                endRangeSelectionColor: context.colors.focus,
                 rangeSelectionColor: const Color.fromARGB(255, 58, 199, 199),
-                todayHighlightColor: const Color.fromARGB(190, 58, 199, 199),
+                todayHighlightColor: context.colors.focus,
 
                 monthCellStyle: DateRangePickerMonthCellStyle(
                   textStyle: TextStyle(
-                    color: Colors.white,
+                    color: context.colors.textPrimary,
                     fontSize: dayFontSize,
                     fontFamily: theme.textTheme.bodyMedium?.fontFamily,
                   ),
                   todayTextStyle: TextStyle(
-                    color: Colors.white,
+                    color: context.colors.textPrimary,
                     fontSize: dayFontSize,
                     fontWeight: FontWeight.bold,
                   ),
                   weekendTextStyle: TextStyle(
-                    color: Colors.white,
+                    color: context.colors.textPrimary,
                     fontSize: dayFontSize,
                   ),
                 ),
@@ -113,7 +109,7 @@ class _DateRangePickerState extends State<DateRangePicker> {
                   textAlign: TextAlign.center,
                   backgroundColor: Colors.transparent,
                   textStyle: TextStyle(
-                    color: Colors.white,
+                    color: context.colors.textPrimary,
                     fontSize: headerFontSize,
                     fontWeight: FontWeight.w600,
                     fontFamily: theme.textTheme.titleMedium?.fontFamily,
@@ -121,7 +117,7 @@ class _DateRangePickerState extends State<DateRangePicker> {
                 ),
 
                 rangeTextStyle: TextStyle(
-                  color: Colors.white,
+                  color: context.colors.textPrimary,
                   fontSize: rangeFontSize, // 👈 theme
                   fontFamily: theme.textTheme.bodySmall?.fontFamily,
                 ),
@@ -132,9 +128,9 @@ class _DateRangePickerState extends State<DateRangePicker> {
             const SizedBox(height: 8),
             Text(
               _formatRange(),
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.w600,
-                color: Colors.white,
+                color: context.colors.textPrimary,
               ),
             ),
             const SizedBox(height: 25),
@@ -142,7 +138,7 @@ class _DateRangePickerState extends State<DateRangePicker> {
               width: double.infinity,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color.fromARGB(190, 58, 199, 199),
+                  backgroundColor: context.colors.focus,
                   foregroundColor: Colors.white,
                 ),
                 onPressed: () {
@@ -169,9 +165,9 @@ class _DateRangePickerState extends State<DateRangePicker> {
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.transparent,
-                  foregroundColor: Colors.white,
-                  side: const BorderSide(
-                    color: Color.fromARGB(190, 58, 199, 199),
+                  foregroundColor: context.colors.textPrimary,
+                  side: BorderSide(
+                    color: context.colors.focus,
                     width: 1.5,
                   ),
                 ),

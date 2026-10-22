@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 
 class CustomBottomNavigation extends StatelessWidget {
   final int currentIndex;
@@ -24,13 +25,18 @@ class CustomBottomNavigation extends StatelessWidget {
   Widget build(BuildContext context) {
     // final bottomPadding = MediaQuery.of(context).padding.bottom;
 
+    final colors = context.colors;
+
     return Container(
-      decoration: const BoxDecoration(
-        color: Color.fromARGB(255, 34, 33, 33),
-        borderRadius: BorderRadius.only(
+      decoration: BoxDecoration(
+        color: colors.navBar,
+        borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(20),
           topRight: Radius.circular(20),
         ),
+        boxShadow: context.isDarkMode
+            ? null
+            : const [BoxShadow(color: Colors.black12, blurRadius: 12)],
       ),
       padding: EdgeInsets.only(
         top: 15,
@@ -53,18 +59,14 @@ class CustomBottomNavigation extends StatelessWidget {
                   Icon(
                     isActive ? item.activeIcon : item.icon,
                     size: 23,
-                    color: isActive
-                        ? const Color.fromARGB(255, 4, 229, 221)
-                        : Colors.white70,
+                    color: isActive ? colors.navActive : colors.navInactive,
                   ),
                   const SizedBox(height: 4),
                   Text(
                     item.label,
                     style: TextStyle(
                       fontSize: 10,
-                      color: isActive
-                          ? const Color.fromARGB(255, 4, 229, 221)
-                          : Colors.white70,
+                      color: isActive ? colors.navActive : colors.navInactive,
                     ),
                   ),
                 ],

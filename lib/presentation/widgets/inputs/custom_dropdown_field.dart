@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 
 class CustomDropdownField<T> extends StatelessWidget {
   final String label;
@@ -71,7 +72,7 @@ class CustomDropdownField<T> extends StatelessWidget {
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
                     ),
-                    dropdownColor: Colors.white,
+                    dropdownColor: context.colors.textPrimary,
                     borderRadius: BorderRadius.circular(10),
                     items: items
                       .map(

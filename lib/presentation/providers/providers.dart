@@ -4,3 +4,4 @@ export 'package:zentinel/presentation/providers/auth/auth_provider.dart';
 export 'package:zentinel/presentation/providers/sync_pending/sync_pending_provider.dart';
 export 'package:zentinel/presentation/providers/dispatch/dispatch_provider.dart';
 export 'package:zentinel/presentation/providers/onboarding/onboarding_provider.dart';
+export 'package:zentinel/presentation/providers/shared/theme_mode_provider.dart';

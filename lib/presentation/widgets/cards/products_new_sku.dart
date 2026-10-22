@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:zentinel/domain/entities/dispatch_products.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
@@ -30,7 +31,7 @@ class ProductsNewSku extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.colors.textPrimary,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: kGrayBorder, width: 0.5),
       ),

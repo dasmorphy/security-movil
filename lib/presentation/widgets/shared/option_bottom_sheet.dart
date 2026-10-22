@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:path/path.dart';
 
 class BottomSheetOption<T> {
@@ -17,9 +18,11 @@ class OptionBottomSheet {
   }) {
     return showModalBottomSheet<T>(
       context: context,
-      backgroundColor: const Color.fromARGB(255, 23, 24, 28),
+      backgroundColor: context.colors.card,
       useRootNavigator: true,
-      builder: (_) {
+      builder: (sheetContext) {
+        final colors = sheetContext.colors;
+
         return SafeArea(
           child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -29,10 +32,10 @@ class OptionBottomSheet {
                 if (title != null)...[
                   Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white
+                      color: colors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -40,8 +43,8 @@ class OptionBottomSheet {
 
                 ...options.map(
                   (option) => ListTile(
-                    leading: option.icon != null ? Icon(option.icon, color: Colors.white) : null,
-                    title: Text(option.label, style: TextStyle(color: Colors.white),),
+                    leading: option.icon != null ? Icon(option.icon, color: colors.icon) : null,
+                    title: Text(option.label, style: TextStyle(color: colors.textPrimary)),
                     onTap: () {
                       Navigator.pop(context, option.value);
                     },

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zentinel/domain/entities/graph_dispatch.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
@@ -11,9 +12,9 @@ class ShipmentDispatch extends ConsumerWidget {
     final data = ref.watch(graphDispatchProvider);
 
     if (data == null) {
-      return const Text(
+      return Text(
         'No hay registros',
-        style: TextStyle(color: Colors.white54),
+        style: TextStyle(color: context.colors.textPrimary.withOpacity(0.54)),
       );
     }
     
@@ -21,13 +22,13 @@ class ShipmentDispatch extends ConsumerWidget {
       padding: const EdgeInsets.symmetric(horizontal: 10),
       child: Column(
         children: [
-          _buildTotalCard(data),
+          _buildTotalCard(context, data),
           const SizedBox(height: 16),
           Row(
             children: [
-              Expanded(child: _buildPendingCard(data)),
+              Expanded(child: _buildPendingCard(context, data)),
               const SizedBox(width: 12),
-              Expanded(child: _buildTransitCard(data)),
+              Expanded(child: _buildTransitCard(context, data)),
             ],
           ),
         ],
@@ -35,10 +36,10 @@ class ShipmentDispatch extends ConsumerWidget {
     );
   }
 
-  Widget _buildTotalCard(GraphDispatch data) {
+  Widget _buildTotalCard(BuildContext context, GraphDispatch data) {
     return Container(
       padding: const EdgeInsets.all(20),
-      decoration: _cardDecoration(null),
+      decoration: _cardDecoration(context, null),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -57,8 +58,8 @@ class ShipmentDispatch extends ConsumerWidget {
               const SizedBox(height: 8),
               Text(
                 _formatNumber(data.totalRecords),
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: context.colors.textPrimary,
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
                 ),
@@ -75,11 +76,11 @@ class ShipmentDispatch extends ConsumerWidget {
     );
   }
 
-  Widget _buildPendingCard(GraphDispatch data) {
+  Widget _buildPendingCard(BuildContext context, GraphDispatch data) {
     return Container(
       // height: 115,
       padding: const EdgeInsets.all(16),
-      decoration: _cardDecoration(Colors.orange),
+      decoration: _cardDecoration(context, Colors.orange),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -90,8 +91,8 @@ class ShipmentDispatch extends ConsumerWidget {
           const SizedBox(height: 6),
           Text(
             data.getCountByStatus('Ingresado en bodega').toString(),
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: context.colors.textPrimary,
               fontSize: 26,
               fontWeight: FontWeight.bold,
             ),
@@ -102,10 +103,10 @@ class ShipmentDispatch extends ConsumerWidget {
     );
   }
 
-  Widget _buildTransitCard(GraphDispatch data) {
+  Widget _buildTransitCard(BuildContext context, GraphDispatch data) {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: _cardDecoration(Color.fromARGB(255, 11, 126, 202)),
+      decoration: _cardDecoration(context, Color.fromARGB(255, 11, 126, 202)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -116,8 +117,8 @@ class ShipmentDispatch extends ConsumerWidget {
           const SizedBox(height: 6),
           Text(
             data.getCountByStatus('Salida de planta').toString(),
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: context.colors.textPrimary,
               fontSize: 26,
               fontWeight: FontWeight.bold,
             ),
@@ -128,9 +129,9 @@ class ShipmentDispatch extends ConsumerWidget {
     );
   }
 
-  BoxDecoration _cardDecoration(Color? colorBorder) {
+  BoxDecoration _cardDecoration(BuildContext context, Color? colorBorder) {
     return BoxDecoration(
-      color: const Color(0xFF1C1C1E),
+      color: (context.isDarkMode ? const Color(0xFF1C1C1E) : context.colors.card),
       borderRadius: BorderRadius.circular(20),
       border: colorBorder != null
           ? Border(left: BorderSide(color: colorBorder, width: 3))

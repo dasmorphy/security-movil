@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:zentinel/config/utils/helper.dart';
 
 class GlowTextFormField extends StatelessWidget {
@@ -33,7 +34,7 @@ class GlowTextFormField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final fieldFill = const Color.fromARGB(255, 20, 21, 23);
+    final colors = context.colors;
     final borderRadius = BorderRadius.circular(8);
 
     return AnimatedBuilder(
@@ -46,12 +47,7 @@ class GlowTextFormField extends StatelessWidget {
             boxShadow: focusNode.hasFocus
                 ? [
                     BoxShadow(
-                      color: const Color.fromARGB(
-                        190,
-                        58,
-                        199,
-                        199,
-                      ).withOpacity(0.6),
+                      color: colors.focus.withOpacity(0.6),
                       blurRadius: 18,
                       spreadRadius: 1,
                     ),
@@ -62,7 +58,7 @@ class GlowTextFormField extends StatelessWidget {
             enabled: enabled,
             controller: controller,
             focusNode: focusNode,
-            style: const TextStyle(color: Colors.white),
+            style: TextStyle(color: colors.textPrimary),
             maxLines: maxLines,
             maxLength: maxLength,
             onChanged: onChanged,
@@ -74,22 +70,24 @@ class GlowTextFormField extends StatelessWidget {
             validator: validator,
             decoration: InputDecoration(
               filled: true,
-              fillColor: fieldFill,
+              fillColor: colors.fieldFill,
               hintText: hint,
+              hintStyle: TextStyle(color: colors.textTertiary),
               contentPadding: const EdgeInsets.symmetric(
                 vertical: 14,
                 horizontal: 12,
               ),
               border: OutlineInputBorder(
                 borderRadius: borderRadius,
-                borderSide: BorderSide(color: Colors.white12),
+                borderSide: BorderSide(color: colors.border),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: borderRadius,
+                borderSide: BorderSide(color: colors.border),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: borderRadius,
-                borderSide: const BorderSide(
-                  color: Color.fromARGB(190, 58, 199, 199),
-                  width: 1.5,
-                ),
+                borderSide: BorderSide(color: colors.focus, width: 1.5),
               ),
             ),
           ),
@@ -107,7 +105,7 @@ class GlowDropdownFormField<T> extends StatelessWidget {
   final ValueChanged<T?> onChanged;
   final String? Function(T?)? validator; // ✅ AQUÍ
   final InputDecoration decoration;
-  final Color glowColor;
+  final Color? glowColor;
 
   const GlowDropdownFormField({
     super.key,
@@ -117,12 +115,15 @@ class GlowDropdownFormField<T> extends StatelessWidget {
     required this.onChanged,
     required this.decoration,
     this.enabled = true,
-    this.glowColor = const Color.fromARGB(190, 58, 199, 199),
+    this.glowColor,
     this.validator,
   });
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+    final glow = glowColor ?? colors.focus;
+
     return AnimatedBuilder(
       animation: focusNode,
       builder: (_, __) {
@@ -133,7 +134,7 @@ class GlowDropdownFormField<T> extends StatelessWidget {
             boxShadow: focusNode.hasFocus
                 ? [
                     BoxShadow(
-                      color: glowColor.withOpacity(0.6),
+                      color: glow.withOpacity(0.6),
                       blurRadius: 18,
                       spreadRadius: 1,
                     ),
@@ -143,8 +144,8 @@ class GlowDropdownFormField<T> extends StatelessWidget {
           child: DropdownButtonFormField<T>(
             value: value,
             focusNode: focusNode,
-            style: TextStyle(color: const Color.fromARGB(255, 255, 255, 255)),
-            dropdownColor: decoration.fillColor,
+            style: TextStyle(color: colors.textPrimary),
+            dropdownColor: decoration.fillColor ?? colors.fieldFill,
             decoration: decoration,
             items: items,
             validator: validator,
@@ -154,9 +155,7 @@ class GlowDropdownFormField<T> extends StatelessWidget {
                 return Text(
                   item.child is Text ? (item.child as Text).data ?? '' : '',
                   style: TextStyle(
-                    color: enabled
-                        ? Color.fromARGB(255, 255, 255, 255)
-                        : Color.fromARGB(255, 84, 81, 81),
+                    color: enabled ? colors.textPrimary : colors.textTertiary,
                   ),
                 );
               }).toList();
@@ -176,8 +175,8 @@ class GlowDropdownFormField2<T> extends StatefulWidget {
   final ValueChanged<T?> onChanged;
   final String? Function(T?)? validator;
   final InputDecoration? decoration;
-  final Color glowColor;
-  final Color textColor;
+  final Color? glowColor;
+  final Color? textColor;
   final String searchHint;
 
   const GlowDropdownFormField2({
@@ -188,9 +187,9 @@ class GlowDropdownFormField2<T> extends StatefulWidget {
     required this.onChanged,
     this.decoration,
     this.enabled = true,
-    this.glowColor = const Color.fromARGB(190, 58, 199, 199),
+    this.glowColor,
     this.validator,
-    this.textColor = Colors.white,
+    this.textColor,
     this.searchHint = 'Buscar...',
   });
 
@@ -210,6 +209,9 @@ class _GlowDropdownFormField2State<T> extends State<GlowDropdownFormField2<T>> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+    final textColor = widget.textColor ?? colors.textPrimary;
+
     return DropdownButtonFormField2<T>(
       value: widget.value,
       focusNode: widget.focusNode,
@@ -222,7 +224,7 @@ class _GlowDropdownFormField2State<T> extends State<GlowDropdownFormField2<T>> {
       dropdownStyleData: DropdownStyleData(
         maxHeight: 300,
         decoration: BoxDecoration(
-          color: widget.decoration?.fillColor,
+          color: widget.decoration?.fillColor ?? colors.fieldFill,
           borderRadius: BorderRadius.circular(8),
         ),
       ),
@@ -237,13 +239,13 @@ class _GlowDropdownFormField2State<T> extends State<GlowDropdownFormField2<T>> {
           padding: const EdgeInsets.all(2),
           child: TextFormField(
             controller: searchController,
-            style: TextStyle(color: widget.textColor),
+            style: TextStyle(color: textColor),
             decoration: InputDecoration(
               hintText: widget.searchHint,
-              hintStyle: const TextStyle(color: Color.fromARGB(255, 255, 255, 255)),
-              prefixIcon: const Icon(Icons.search, color: Colors.white,),
+              hintStyle: TextStyle(color: colors.textTertiary),
+              prefixIcon: Icon(Icons.search, color: colors.icon),
               filled: true,
-              fillColor: const Color.fromARGB(40, 255, 255, 255),
+              fillColor: colors.textPrimary.withOpacity(0.08),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
               ),
@@ -274,9 +276,7 @@ class _GlowDropdownFormField2State<T> extends State<GlowDropdownFormField2<T>> {
               item.child is Text ? (item.child as Text).data ?? '' : '',
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                color: widget.enabled
-                    ? widget.textColor
-                    : const Color.fromARGB(255, 84, 81, 81),
+                color: widget.enabled ? textColor : colors.textTertiary,
               ),
             ),
           );

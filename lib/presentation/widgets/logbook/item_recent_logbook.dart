@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
@@ -13,9 +14,9 @@ class ItemRecentLogbook extends ConsumerWidget {
     final limitedList = historyLogbooks.take(5).toList();
 
     if (historyLogbooks.isEmpty) {
-      return const Text(
+      return Text(
         'No hay registros',
-        style: TextStyle(color: Colors.white54),
+        style: TextStyle(color: context.colors.textTertiary),
       );
     }
 
@@ -54,7 +55,7 @@ class ItemRecentLogbook extends ConsumerWidget {
                           createdBy,
                           style: Theme.of(context).textTheme.bodyMedium
                               ?.copyWith(
-                                color: Colors.white,
+                                color: context.colors.textPrimary,
                                 fontWeight: FontWeight.w600,
                               ),
                         ),
@@ -64,7 +65,7 @@ class ItemRecentLogbook extends ConsumerWidget {
                           description,
                           style: Theme.of(context).textTheme.bodySmall
                               ?.copyWith(
-                                color: const Color.fromARGB(255, 180, 180, 180),
+                                color: context.colors.textSecondary,
                               ),
                         ),
                         const SizedBox(height: 2),
@@ -73,7 +74,7 @@ class ItemRecentLogbook extends ConsumerWidget {
                           formattedDate,
                           style: Theme.of(context).textTheme.bodySmall
                               ?.copyWith(
-                                color: const Color.fromARGB(255, 180, 180, 180),
+                                color: context.colors.textSecondary,
                               ),
                         ),
                         const SizedBox(height: 2),
@@ -84,10 +85,10 @@ class ItemRecentLogbook extends ConsumerWidget {
                   Chip(
                     side: BorderSide.none,
                     label: Text(item.status ?? ''),
-                    backgroundColor: getStatusColorBckgEntry(item.status ?? ''),
+                    backgroundColor: getStatusColorBckgEntry(item.status ?? '', isDark: context.isDarkMode),
                     padding: EdgeInsets.zero,
                     labelStyle: TextStyle(
-                      color: getStatusColorEntryAccess(item.status ?? ''),
+                      color: getStatusColorEntryAccess(item.status ?? '', isDark: context.isDarkMode),
                       fontSize: 12,
                       fontWeight: FontWeight.bold,
                     ),

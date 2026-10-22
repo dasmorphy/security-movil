@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zentinel/presentation/providers/providers.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
@@ -91,7 +92,7 @@ class CategoryViewState extends ConsumerState<CategoryView> {
         margin: const EdgeInsets.symmetric(horizontal: 17.0),
         height: 35.0,
         decoration: BoxDecoration(
-          color: Colors.white24,
+          color: context.colors.borderStrong,
           borderRadius: BorderRadius.circular(25.0),
         ),
         child: TabBar(
@@ -103,7 +104,7 @@ class CategoryViewState extends ConsumerState<CategoryView> {
             color: const Color.fromARGB(255, 30, 145, 139),
             borderRadius: BorderRadius.circular(25),
           ),
-          indicatorColor: Colors.white,
+          indicatorColor: context.colors.textPrimary,
           labelColor: const Color.fromARGB(255, 255, 255, 255),
           labelStyle: TextStyle(fontSize: 12, fontWeight: FontWeight.w700),
           unselectedLabelColor: const Color.fromARGB(255, 46, 45, 45),

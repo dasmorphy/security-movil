@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:zentinel/service/navigation_service.dart';
 
 enum OverlayStatus { loading, success, error, warning }
@@ -55,6 +56,8 @@ class _LoadingOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
+
     return Material(
       color: Colors.black45,
       child: Center(
@@ -63,8 +66,11 @@ class _LoadingOverlay extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           constraints: const BoxConstraints(maxWidth: 320),
           decoration: BoxDecoration(
-            color: const Color(0xFF2A2A2A),
+            color: colors.overlayPanel,
             borderRadius: BorderRadius.circular(14),
+            boxShadow: context.isDarkMode
+                ? null
+                : const [BoxShadow(color: Colors.black26, blurRadius: 16)],
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -74,7 +80,7 @@ class _LoadingOverlay extends StatelessWidget {
               Flexible(
                 child: Text(
                   message,
-                  style: const TextStyle(color: Colors.white, fontSize: 14),
+                  style: TextStyle(color: colors.textPrimary, fontSize: 14),
                 ),
               ),
             ],

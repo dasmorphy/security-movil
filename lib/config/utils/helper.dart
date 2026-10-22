@@ -304,7 +304,60 @@ Future<Position?> getLocation() async {
   );
 }
 
-Color getStatusColorDispatch(String status) {
+/// Los colores de estado están pensados para modo oscuro (fondo oscuro con
+/// texto brillante). En modo claro se cambian por su equivalente: fondo
+/// pastel con texto oscuro de la misma familia.
+const Map<int, Color> _statusLightEquivalent = {
+  // Textos
+  0xFFF8AC46: Color(0xFFB45309), // ámbar
+  0xFF89ACFF: Color(0xFF1D4ED8), // azul
+  0xFF69F6B8: Color(0xFF047857), // verde
+  0xFFF66969: Color(0xFFB91C1C), // rojo
+  0xFFFFFFFF: Color(0xFF374151), // neutro
+  // Fondos
+  0xFF3D2B0E: Color(0xFFFEF3C7), // ámbar
+  0xFF222C3F: Color(0xFFDBEAFE), // azul
+  0xFF12362A: Color(0xFFD1FAE5), // verde
+  0xFF361212: Color(0xFFFEE2E2), // rojo
+  0xFF525453: Color(0xFFE5E7EB), // neutro
+};
+
+Color adaptStatusColor(Color color, {bool isDark = true}) {
+  if (isDark) return color;
+  return _statusLightEquivalent[color.value] ?? color;
+}
+
+Color getStatusColorDispatch(String status, {bool isDark = true}) =>
+    adaptStatusColor(_getStatusColorDispatch(status), isDark: isDark);
+
+Color getStatusColorBckgDispatch(String status, {bool isDark = true}) =>
+    adaptStatusColor(_getStatusColorBckgDispatch(status), isDark: isDark);
+
+Color getStatusColorEntryAccess(String status, {bool isDark = true}) =>
+    adaptStatusColor(_getStatusColorEntryAccess(status), isDark: isDark);
+
+Color getStatusColorBckgEntry(String status, {bool isDark = true}) =>
+    adaptStatusColor(_getStatusColorBckgEntry(status), isDark: isDark);
+
+Color getStatusColorEmployees(String status, {bool isDark = true}) =>
+    adaptStatusColor(_getStatusColorEmployees(status), isDark: isDark);
+
+Color getColorTxtEmployees(String status, {bool isDark = true}) =>
+    adaptStatusColor(_getColorTxtEmployees(status), isDark: isDark);
+
+Color getColorTxtMovements(String status, {bool isDark = true}) =>
+    adaptStatusColor(_getColorTxtMovements(status), isDark: isDark);
+
+Color getStatusColorMovements(String status, {bool isDark = true}) =>
+    adaptStatusColor(_getStatusColorMovements(status), isDark: isDark);
+
+Color getColorTxtOrder(String status, {bool isDark = true}) =>
+    adaptStatusColor(_getColorTxtOrder(status), isDark: isDark);
+
+Color getStatusColorOrder(String status, {bool isDark = true}) =>
+    adaptStatusColor(_getStatusColorOrder(status), isDark: isDark);
+
+Color _getStatusColorDispatch(String status) {
   switch (status.toLowerCase()) {
     case 'en tránsito':
       return const Color.fromARGB(255, 248, 172, 70);
@@ -317,7 +370,7 @@ Color getStatusColorDispatch(String status) {
   }
 }
 
-Color getStatusColorBckgDispatch(String status) {
+Color _getStatusColorBckgDispatch(String status) {
   switch (status.toLowerCase()) {
     case 'en tránsito':
       return const Color.fromARGB(255, 61, 43, 14);
@@ -330,7 +383,7 @@ Color getStatusColorBckgDispatch(String status) {
   }
 }
 
-Color getStatusColorEntryAccess(String status) {
+Color _getStatusColorEntryAccess(String status) {
   switch (status.toLowerCase()) {
     case 'pendiente salida':
       return const Color.fromARGB(255, 248, 172, 70);
@@ -341,7 +394,7 @@ Color getStatusColorEntryAccess(String status) {
   }
 }
 
-Color getStatusColorBckgEntry(String status) {
+Color _getStatusColorBckgEntry(String status) {
   switch (status.toLowerCase()) {
     case 'pendiente salida':
       return const Color.fromARGB(255, 61, 43, 14);
@@ -352,7 +405,7 @@ Color getStatusColorBckgEntry(String status) {
   }
 }
 
-Color getStatusColorEmployees(String status) {
+Color _getStatusColorEmployees(String status) {
   switch (status.toLowerCase()) {
     case 'no autorizado':
       return const Color.fromARGB(255, 54, 18, 18);
@@ -363,7 +416,7 @@ Color getStatusColorEmployees(String status) {
   }
 }
 
-Color getColorTxtEmployees(String status) {
+Color _getColorTxtEmployees(String status) {
   switch (status.toLowerCase()) {
     case 'no autorizado':
       return const Color.fromARGB(255, 246, 105, 105);
@@ -374,7 +427,7 @@ Color getColorTxtEmployees(String status) {
   }
 }
 
-Color getColorTxtMovements(String status) {
+Color _getColorTxtMovements(String status) {
   switch (status.toLowerCase()) {
     case 'salida':
       return const Color.fromARGB(255, 246, 105, 105);
@@ -387,7 +440,7 @@ Color getColorTxtMovements(String status) {
   }
 }
 
-Color getStatusColorMovements(String status) {
+Color _getStatusColorMovements(String status) {
   switch (status.toLowerCase()) {
     case 'salida':
       return const Color.fromARGB(255, 54, 18, 18);
@@ -400,7 +453,7 @@ Color getStatusColorMovements(String status) {
   }
 }
 
-Color getColorTxtOrder(String status) {
+Color _getColorTxtOrder(String status) {
   switch (status.toLowerCase()) {
     case 'con novedad':
       return const Color.fromARGB(255, 246, 105, 105);
@@ -415,7 +468,7 @@ Color getColorTxtOrder(String status) {
   }
 }
 
-Color getStatusColorOrder(String status) {
+Color _getStatusColorOrder(String status) {
   switch (status.toLowerCase()) {
     case 'con novedad':
       return const Color.fromARGB(255, 54, 18, 18);

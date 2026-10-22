@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:zentinel/config/utils/helper.dart';
 import 'package:zentinel/domain/entities/purchase_order.dart';
@@ -68,10 +69,10 @@ class ListPurchaseOrderState extends ConsumerState<ListPurchaseOrder> {
       : items.take(widget.limit ?? items.length).toList();
 
     if (!_isLoading && _filteredItems.isEmpty) {
-      return const Center(
+      return Center(
         child: Text(
           'No hay registros',
-          style: TextStyle(color: Colors.white70),
+          style: TextStyle(color: context.colors.textPrimary.withOpacity(0.7)),
         ),
       );
     }
@@ -120,7 +121,7 @@ class ListPurchaseOrderState extends ConsumerState<ListPurchaseOrder> {
                                   Text(
                                     item.numberOrder,
                                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                      color: Colors.white,
+                                      color: context.colors.textPrimary,
                                       fontWeight: FontWeight.w600,
                                     ),
                                   ),
@@ -128,7 +129,7 @@ class ListPurchaseOrderState extends ConsumerState<ListPurchaseOrder> {
                                   Text(
                                     item.typeOrder,
                                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: const Color.fromARGB(255, 180, 180, 180),
+                                      color: context.colors.textSecondary,
                                     ),
                                   ),
                                   const SizedBox(height: 2),
@@ -136,7 +137,7 @@ class ListPurchaseOrderState extends ConsumerState<ListPurchaseOrder> {
                                   Text(
                                     formattedDate,
                                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: const Color.fromARGB(255, 180, 180, 180),
+                                      color: context.colors.textSecondary,
                                     ),
                                   ),
                                 ],
@@ -149,10 +150,10 @@ class ListPurchaseOrderState extends ConsumerState<ListPurchaseOrder> {
                                 label: Text(item.statusName),
                                 backgroundColor: getStatusColorOrder(
                                   item.statusName,
-                                ),
+                                 isDark: context.isDarkMode,),
                                 padding: EdgeInsets.zero,
                                 labelStyle: TextStyle(
-                                  color: getColorTxtOrder(item.statusName),
+                                  color: getColorTxtOrder(item.statusName, isDark: context.isDarkMode),
                                   fontSize: 12,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -208,7 +209,7 @@ class ListPurchaseOrderState extends ConsumerState<ListPurchaseOrder> {
                       vertical: 14,
                     ),
                     decoration: BoxDecoration(
-                      color: const Color.fromARGB(189, 21, 139, 139),
+                      color: context.colors.secondary,
                       borderRadius: BorderRadius.circular(40),
                       boxShadow: [
                         BoxShadow(
@@ -225,10 +226,10 @@ class ListPurchaseOrderState extends ConsumerState<ListPurchaseOrder> {
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
-                      children: const [
+                      children: [
                         Icon(
                           Icons.calendar_today,
-                          color: Colors.white,
+                          color: context.colors.textPrimary,
                           size: 15,
                         ),
                         SizedBox(width: 10),
@@ -236,7 +237,7 @@ class ListPurchaseOrderState extends ConsumerState<ListPurchaseOrder> {
                           'Filtrar por fechas',
                           style: TextStyle(
                             fontSize: 12,
-                            color: Colors.white,
+                            color: context.colors.textPrimary,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -257,7 +258,7 @@ class ListPurchaseOrderState extends ConsumerState<ListPurchaseOrder> {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey[800],
+        color: (context.isDarkMode ? Colors.grey[800] : Colors.grey[300]),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
@@ -266,7 +267,7 @@ class ListPurchaseOrderState extends ConsumerState<ListPurchaseOrder> {
             width: 24,
             height: 24,
             decoration: BoxDecoration(
-              color: Colors.grey[700],
+              color: (context.isDarkMode ? Colors.grey[700] : Colors.grey[200]),
               borderRadius: BorderRadius.circular(4),
             ),
           ),
@@ -275,18 +276,18 @@ class ListPurchaseOrderState extends ConsumerState<ListPurchaseOrder> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(height: 14, width: 150, color: Colors.grey[700]),
+                Container(height: 14, width: 150, color: (context.isDarkMode ? Colors.grey[700] : Colors.grey[200])),
                 const SizedBox(height: 8),
-                Container(height: 12, width: 200, color: Colors.grey[700]),
+                Container(height: 12, width: 200, color: (context.isDarkMode ? Colors.grey[700] : Colors.grey[200])),
                 const SizedBox(height: 8),
-                Container(height: 12, width: 100, color: Colors.grey[700]),
+                Container(height: 12, width: 100, color: (context.isDarkMode ? Colors.grey[700] : Colors.grey[200])),
                 const SizedBox(height: 8),
-                Container(height: 20, width: 80, color: Colors.grey[700]),
+                Container(height: 20, width: 80, color: (context.isDarkMode ? Colors.grey[700] : Colors.grey[200])),
               ],
             ),
           ),
           const SizedBox(width: 16),
-          Container(width: 20, height: 20, color: Colors.grey[700]),
+          Container(width: 20, height: 20, color: (context.isDarkMode ? Colors.grey[700] : Colors.grey[200])),
         ],
       ),
     );

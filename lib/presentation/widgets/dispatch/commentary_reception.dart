@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 
 class CommentaryReception extends StatelessWidget {
   final String label;
@@ -24,7 +25,9 @@ class CommentaryReception extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const fieldFill = Color.fromARGB(255, 25, 25, 30);
+    final fieldFill = context.isDarkMode
+        ? const Color.fromARGB(255, 25, 25, 30)
+        : context.colors.fieldFill;
     final borderRadius = BorderRadius.circular(8);
 
     return Column(
@@ -33,8 +36,8 @@ class CommentaryReception extends StatelessWidget {
         if (showLabel)...[
           Text(
             label,
-            style: const TextStyle(
-              color: Color.fromARGB(255, 150, 150, 150),
+            style: TextStyle(
+              color: context.colors.textTertiary,
               fontSize: 11,
               fontWeight: FontWeight.w600,
               letterSpacing: 0.5,
@@ -52,12 +55,7 @@ class CommentaryReception extends StatelessWidget {
                 boxShadow: focusNode.hasFocus
                     ? [
                         BoxShadow(
-                          color: const Color.fromARGB(
-                            190,
-                            58,
-                            199,
-                            199,
-                          ).withOpacity(0.4),
+                          color: context.colors.focus.withOpacity(0.4),
                           blurRadius: 12,
                         ),
                       ]
@@ -66,7 +64,7 @@ class CommentaryReception extends StatelessWidget {
               child: TextFormField(
                 controller: controller,
                 focusNode: focusNode,
-                style: const TextStyle(color: Colors.white),
+                style: TextStyle(color: context.colors.textPrimary),
                 minLines: minLines,
                 maxLines: maxLines,
                 onChanged: onChanged,
@@ -74,8 +72,10 @@ class CommentaryReception extends StatelessWidget {
                   filled: true,
                   fillColor: fieldFill,
                   hintText: hint,
-                  hintStyle: const TextStyle(
-                    color: Color.fromARGB(255, 100, 100, 100),
+                  hintStyle: TextStyle(
+                    color: context.isDarkMode
+                        ? const Color.fromARGB(255, 100, 100, 100)
+                        : context.colors.textTertiary,
                   ),
                   contentPadding: const EdgeInsets.symmetric(
                     vertical: 12,
@@ -83,14 +83,14 @@ class CommentaryReception extends StatelessWidget {
                   ),
                   border: OutlineInputBorder(
                     borderRadius: borderRadius,
-                    borderSide: const BorderSide(
-                      color: Color.fromARGB(255, 75, 83, 83),
+                    borderSide: BorderSide(
+                      color: context.colors.borderStrong,
                     ),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: borderRadius,
-                    borderSide: const BorderSide(
-                      color: Color.fromARGB(190, 58, 199, 199),
+                    borderSide: BorderSide(
+                      color: context.colors.focus,
                       width: 1.5,
                     ),
                   ),

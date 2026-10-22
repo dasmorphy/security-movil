@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -188,7 +189,7 @@ class _PurchaseOrderFormState extends ConsumerState<PurchaseOrderForm> {
     final groupBusiness = ref.watch(getGroupBusinessByIdBusiness);
 
     const messageValidatorEmpty = 'Este campo es obligatorio';
-    final fieldFill = const Color.fromARGB(255, 20, 21, 23);
+    final fieldFill = context.colors.fieldFill;
     final borderRadius = BorderRadius.circular(8.0);
 
     InputDecoration styleDecoration() => InputDecoration(
@@ -197,11 +198,11 @@ class _PurchaseOrderFormState extends ConsumerState<PurchaseOrderForm> {
       contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
       border: OutlineInputBorder(
         borderRadius: borderRadius,
-        borderSide: const BorderSide(color: Colors.white12),
+        borderSide: BorderSide(color: context.colors.border),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: borderRadius,
-        borderSide: const BorderSide(color: Color.fromARGB(190, 58, 199, 199)),
+        borderSide: BorderSide(color: context.colors.focus),
       ),
     );
 
@@ -219,7 +220,7 @@ class _PurchaseOrderFormState extends ConsumerState<PurchaseOrderForm> {
                   'Cargando formulario...',
                   textAlign: TextAlign.center,
                   style: theme.textTheme.titleLarge?.copyWith(
-                    color: Colors.white,
+                    color: context.colors.textPrimary,
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
@@ -228,11 +229,11 @@ class _PurchaseOrderFormState extends ConsumerState<PurchaseOrderForm> {
               ),
             ),
             const SizedBox(height: 20),
-            const SizedBox(
+            SizedBox(
               width: 20,
               height: 20,
               child: CircularProgressIndicator(
-                color: Colors.white,
+                color: context.colors.textPrimary,
                 strokeWidth: 2,
               ),
             ),
@@ -260,9 +261,9 @@ class _PurchaseOrderFormState extends ConsumerState<PurchaseOrderForm> {
                     child: InputDecorator(
                       decoration: styleDecoration().copyWith(
                         errorText: _dateError ? messageValidatorEmpty : null,
-                        suffixIcon: const Icon(
+                        suffixIcon: Icon(
                           Icons.calendar_today,
-                          color: Color.fromARGB(190, 58, 199, 199),
+                          color: context.colors.focus,
                           size: 18,
                         ),
                       ),
@@ -270,8 +271,8 @@ class _PurchaseOrderFormState extends ConsumerState<PurchaseOrderForm> {
                         _formatRange(),
                         style: TextStyle(
                           color: _startDate == null
-                              ? Colors.white54
-                              : Colors.white,
+                              ? context.colors.textPrimary.withOpacity(0.54)
+                              : context.colors.textPrimary,
                         ),
                       ),
                     ),
@@ -284,27 +285,27 @@ class _PurchaseOrderFormState extends ConsumerState<PurchaseOrderForm> {
                     value: _typeOrder,
                     focusNode: _typeOrderFocus,
                     decoration: styleDecoration(),
-                    items: const [
+                    items: [
                       DropdownMenuItem(
                         enabled: false,
                         value: '0',
                         child: Text(
                           'Seleccione una opción',
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(color: context.colors.textPrimary),
                         ),
                       ),
                       DropdownMenuItem(
                         value: 'Balanceado',
                         child: Text(
                           'Balanceado',
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(color: context.colors.textPrimary),
                         ),
                       ),
                       DropdownMenuItem(
                         value: 'Combustible',
                         child: Text(
                           'Combustible',
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(color: context.colors.textPrimary),
                         ),
                       ),
                     ],
@@ -327,12 +328,12 @@ class _PurchaseOrderFormState extends ConsumerState<PurchaseOrderForm> {
                     focusNode: _destinyFocus,
                     decoration: styleDecoration(),
                     items: [
-                      const DropdownMenuItem(
+                      DropdownMenuItem(
                         enabled: false,
                         value: '0',
                         child: Text(
                           'Seleccione una opción',
-                          style: TextStyle(color: Colors.white),
+                          style: TextStyle(color: context.colors.textPrimary),
                         ),
                       ),
                       ...groupBusiness.map(
@@ -340,7 +341,7 @@ class _PurchaseOrderFormState extends ConsumerState<PurchaseOrderForm> {
                           value: g.idGroupBusiness.toString(),
                           child: Text(
                             g.name,
-                            style: const TextStyle(color: Colors.white),
+                            style: TextStyle(color: context.colors.textPrimary),
                           ),
                         ),
                       ),
@@ -428,16 +429,16 @@ class _PurchaseOrderFormState extends ConsumerState<PurchaseOrderForm> {
                         child: OutlinedButton(
                           onPressed: () => context.pop(),
                           style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: Colors.white24),
+                            side: BorderSide(color: context.colors.borderStrong),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),
                             padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
-                          child: const Text(
+                          child: Text(
                             'Cancelar',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: context.colors.textPrimary,
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
                             ),
@@ -453,29 +454,19 @@ class _PurchaseOrderFormState extends ConsumerState<PurchaseOrderForm> {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),
-                            backgroundColor: const Color.fromARGB(
-                              189,
-                              7,
-                              213,
-                              213,
-                            ),
-                            disabledBackgroundColor: const Color.fromARGB(
-                              120,
-                              7,
-                              213,
-                              213,
-                            ),
+                            backgroundColor: context.colors.primary,
+                            disabledBackgroundColor: context.colors.primaryDisabled,
                           ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               if (isLoading) ...[
-                                const SizedBox(
+                                SizedBox(
                                   width: 14,
                                   height: 14,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
-                                    color: Colors.white,
+                                    color: context.colors.textPrimary,
                                   ),
                                 ),
                                 const SizedBox(width: 12),

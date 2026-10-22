@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/config/theme/app_colors.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -192,7 +193,7 @@ class _BlackListFormState extends ConsumerState<BlackListForm> {
 
     final groupBusiness = ref.watch(getGroupBusinessByIdBusiness);
     final messageValidatorEmpty = 'Este campo es obligatorio';
-    final fieldFill = const Color.fromARGB(255, 20, 21, 23);
+    final fieldFill = context.colors.fieldFill;
     final borderRadius = BorderRadius.circular(8.0);
 
     InputDecoration styleDecoration() => InputDecoration(
@@ -201,11 +202,11 @@ class _BlackListFormState extends ConsumerState<BlackListForm> {
       contentPadding: const EdgeInsets.symmetric(vertical: 14, horizontal: 12),
       border: OutlineInputBorder(
         borderRadius: borderRadius,
-        borderSide: BorderSide(color: Colors.white12),
+        borderSide: BorderSide(color: context.colors.border),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: borderRadius,
-        borderSide: BorderSide(color: Color.fromARGB(190, 58, 199, 199)),
+        borderSide: BorderSide(color: context.colors.focus),
       ),
     );
 
@@ -223,7 +224,7 @@ class _BlackListFormState extends ConsumerState<BlackListForm> {
                   'Cargando formulario...',
                   textAlign: TextAlign.center,
                   style: theme.textTheme.titleLarge?.copyWith(
-                    color: Colors.white,
+                    color: context.colors.textPrimary,
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
@@ -236,7 +237,7 @@ class _BlackListFormState extends ConsumerState<BlackListForm> {
               width: 20,
               height: 20,
               child: CircularProgressIndicator(
-                color: Colors.white,
+                color: context.colors.textPrimary,
                 strokeWidth: 2,
               ),
             ),
@@ -293,12 +294,12 @@ class _BlackListFormState extends ConsumerState<BlackListForm> {
                       DropdownMenuItem(
                         enabled: false,
                         value: '0',
-                        child: Text('Seleccione una opción', style: TextStyle(color: Colors.white),),
+                        child: Text('Seleccione una opción', style: TextStyle(color: context.colors.textPrimary),),
                       ),
                       ...resonRestriction.map(
                         (c) => DropdownMenuItem(
                           value: c.reason.toString(),
-                          child: Text(c.reason, style: TextStyle(color: Colors.white)),
+                          child: Text(c.reason, style: TextStyle(color: context.colors.textPrimary)),
                         ),
                       ),
                     ],
@@ -354,7 +355,7 @@ class _BlackListFormState extends ConsumerState<BlackListForm> {
                             ? 'Debe subir mínimo 1 imagen'
                             : 'Debe subir máximo 1 imagen',
                         style: TextStyle(
-                          color: Color.fromARGB(255, 185, 28, 16),
+                          color: context.colors.error,
                         ),
                       ),
                     ),
@@ -368,16 +369,16 @@ class _BlackListFormState extends ConsumerState<BlackListForm> {
                             context.pop();
                           },
                           style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: Colors.white24),
+                            side: BorderSide(color: context.colors.borderStrong),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),
                             padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
-                          child: const Text(
+                          child: Text(
                             'Cancelar',
                             style: TextStyle(
-                              color: Colors.white,
+                              color: context.colors.textPrimary,
                               fontSize: 15,
                               fontWeight: FontWeight.bold,
                             ),
@@ -395,29 +396,19 @@ class _BlackListFormState extends ConsumerState<BlackListForm> {
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8),
                             ),
-                            backgroundColor: const Color.fromARGB(
-                              189,
-                              7,
-                              213,
-                              213,
-                            ),
-                            disabledBackgroundColor: const Color.fromARGB(
-                              120,
-                              7,
-                              213,
-                              213,
-                            ),
+                            backgroundColor: context.colors.primary,
+                            disabledBackgroundColor: context.colors.primaryDisabled,
                           ),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               if (isLoading) ...[
-                                const SizedBox(
+                                SizedBox(
                                   width: 14,
                                   height: 14,
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
-                                    color: Colors.white,
+                                    color: context.colors.textPrimary,
                                   ),
                                 ),
                                 const SizedBox(width: 12),
