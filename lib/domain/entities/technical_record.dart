@@ -6,6 +6,7 @@ class TechnicalRecord {
   int idRecord;
   int locationId;
   String locationName;
+  String? nameResponsible;
   List<Material>? materials;
   String resume;
   String status;
@@ -25,6 +26,7 @@ class TechnicalRecord {
     required this.idRecord,
     required this.locationId,
     required this.locationName,
+    this.nameResponsible,
     this.materials,
     required this.resume,
     required this.status,
@@ -47,6 +49,7 @@ class TechnicalRecord {
       idRecord: json["id_record"],
       locationId: json["location_id"],
       locationName: json["location_name"],
+      nameResponsible: json["name_responsible"],
       materials: json["materials"] == null
           ? []
           : List<Material>.from(
@@ -75,6 +78,7 @@ class TechnicalRecord {
     "id_record": idRecord,
     "location_id": locationId,
     "location_name": locationName,
+    "name_responsible": nameResponsible,
     "materials": materials == null
         ? []
         : List<dynamic>.from(materials!.map((x) => x.toJson())),
@@ -115,13 +119,22 @@ class Material {
 }
 
 class TechnicalStaffRecord {
-  int? idTechnical;
   String? name;
+  String? userTechId;
+  String? user;
 
-  TechnicalStaffRecord({this.idTechnical, this.name});
+  TechnicalStaffRecord({this.name, this.userTechId, this.user});
 
   factory TechnicalStaffRecord.fromJson(Map<String, dynamic> json) =>
-    TechnicalStaffRecord(idTechnical: json["id_technical"], name: json["name"]);
+    TechnicalStaffRecord(
+      name: json["name"],
+      userTechId: json["user_tech_id"],
+      user: json["user"],
+    );
 
-  Map<String, dynamic> toJson() => {"id_technical": idTechnical, "name": name};
+  Map<String, dynamic> toJson() => {
+    "name": name,
+    "user_tech_id": userTechId,
+    "user": user,
+  };
 }

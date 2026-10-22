@@ -65,6 +65,8 @@ class _NotificationHistoryDetailScreenState
             cliendId: task.clientId,
             locationId: task.locationId,
             taskId: task.idTask,
+            nameResponsible: task.nameResponsible,
+            technicalsAssignments: task.technicalsAssignments,
           );
 
     return Scaffold(

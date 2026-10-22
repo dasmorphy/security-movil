@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zentinel/domain/entities/task_technical.dart';
 
 
 class TechTaskHeader {
@@ -6,18 +7,22 @@ class TechTaskHeader {
   final int locationId;
   final int taskId;
   final String client;
+  final String? nameResponsible;
   final String codeTask;
   final String location;
   final String createdBy;
+  List<TechnicalsAssignment>? technicalsAssignments;
 
-  const TechTaskHeader({
+  TechTaskHeader({
     required this.client,
     required this.codeTask,
     required this.location,
     required this.createdBy, 
     required this.cliendId, 
     required this.locationId, 
-    required this.taskId,
+    required this.taskId, 
+    this.nameResponsible,
+    this.technicalsAssignments,
   });
 }
 
@@ -106,7 +111,7 @@ class RecordTechnicalHeader extends StatelessWidget {
               Expanded(
                 child: _InfoColumn(
                   label: 'RESPONSABLE',
-                  value: taskData.createdBy,
+                  value: taskData.nameResponsible ?? 'N/A',
                   icon: Icons.person,
                 ),
               ),

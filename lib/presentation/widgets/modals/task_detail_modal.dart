@@ -19,6 +19,10 @@ class TaskDetailModal extends ConsumerWidget {
     final authState = ref.watch(userSessionProvider);
     final userData = authState.value!;
 
+    if (!context.mounted) {
+      return const SizedBox.shrink();
+    }
+
     showConfirmationDialog(int taskId) async {
       final confirmed = await ConfirmBottomSheet.show(
         context,
@@ -90,7 +94,8 @@ class TaskDetailModal extends ConsumerWidget {
                     detailRow('Código tarea', item.code),
                     detailRow('Descripción', item.description),
                     detailRow('Estado', item.status),
-                    detailRow('Creado por', item.createdBy),
+                    detailRow('Responsable', item.nameResponsible ?? 'N/A'),
+                    // detailRow('Creado por', item.createdBy),
                     detailRow(
                       'Fecha Creación',
                       formatDateDetails(item.createdAt.toString()),
@@ -173,6 +178,7 @@ class TaskDetailModal extends ConsumerWidget {
                             codeTask: item.code,
                             location: item.location,
                             createdBy: item.createdBy,
+                            nameResponsible: item.nameResponsible,
                           )
                         );
                       },
@@ -230,6 +236,8 @@ class TaskDetailModal extends ConsumerWidget {
                                 codeTask: item.code,
                                 location: item.location,
                                 createdBy: item.createdBy,
+                                nameResponsible: item.nameResponsible,
+                                technicalsAssignments: item.technicalsAssignments,
                               ),
                               "isSupport": isSupport
                             }

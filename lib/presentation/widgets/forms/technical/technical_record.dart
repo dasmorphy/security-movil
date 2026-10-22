@@ -46,7 +46,7 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecordForm> {
   final _reasonVisitCtrl = TextEditingController();
 
   List<Uint8List?> _selectedImages = [];
-  List<int> selectedUsers = <int>[];
+  List<String> selectedUsers = <String>[];
 
   final FocusNode _truckLicenseFocus = FocusNode();
   final FocusNode _reasonVisitFocus = FocusNode();
@@ -65,14 +65,25 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecordForm> {
     {'id': '6', 'name': 'GST-6597'},
   ];
 
+  /// ids (`user_tech_id`) de los técnicos asignados a la tarea.
+  List<String> get _assignedUserIds =>
+      widget.taskData.technicalsAssignments
+          ?.map((assignment) => assignment.userTechId)
+          .where((id) => id.isNotEmpty)
+          .toSet()
+          .toList() ??
+      [];
+
   @override
   void initState() {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      final assignedIds = _assignedUserIds;
       await Future.wait([
         ref.read(getTechMaterial.notifier).load(),
-        ref.read(getTechnicalStaff.notifier).load(),
+        if (assignedIds.isNotEmpty)
+          ref.read(getUsers.notifier).load(filters: {'users': assignedIds}),
       ]);
 
       if (!mounted) return;
@@ -108,11 +119,12 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecordForm> {
 
     setState(() {
       _observationsCtrl.text = data.resume;
-      _vehicle = vehicleFound?['id'] ?? '0';
+      _vehicle = vehicleFound?['name'] ?? '0';
       selectedUsers =
           data.technicalStaff
-              ?.map((staff) => staff.idTechnical)
-              .whereType<int>()
+              ?.map((staff) => staff.userTechId)
+              .whereType<String>()
+              .where((id) => id.isNotEmpty)
               .toList() ??
           [];
     });
@@ -299,7 +311,13 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecordForm> {
         );
         ref
             .read(getTaskTechnical.notifier)
-            .load(filters: {'support': widget.isSupport});
+            .load(filters: 
+              {
+                'support': widget.isSupport,
+                if (userData.role == 'tecnico')
+                  'tech_assignments': userData.idUser,
+              }
+            );
       } else {
         await _savePendingTechnical(data);
         GlobalLoadingBottomSheet.show(
@@ -328,7 +346,11 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecordForm> {
     final authState = ref.watch(userSessionProvider);
     final theme = Theme.of(context);
     final materials = ref.watch(getTechMaterial);
-    final techStaff = ref.watch(getTechnicalStaff);
+    final assignedIds = _assignedUserIds;
+    final techUsers = ref
+        .watch(getUsers)
+        .where((user) => assignedIds.contains(user.idUser))
+        .toList();
 
     //Usuario no cargado o sesión inválida
     if (!authState.hasValue || authState.value == null) {
@@ -426,11 +448,11 @@ class _TechnicalRecordState extends ConsumerState<TechnicalRecordForm> {
 
                 const SizedBox(height: 12),
                 CustomFieldLabelRequired(txtLabel: 'Personal'),
-                GlowMultiSelectFormField<int>(
+                GlowMultiSelectFormField<String>(
                   values: selectedUsers,
-                  items: techStaff.map((user) => MultiSelectItem<int>(
-                          value: user.idStaff,
-                          label: user.name,
+                  items: techUsers.map((user) => MultiSelectItem<String>(
+                          value: user.idUser,
+                          label: user.attributes['fullname'] ?? '',
                         )).toList(),
                   onChanged: (values) {
                     setState(() => selectedUsers = values);

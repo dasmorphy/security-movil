@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:zentinel/config/constants/environment.dart';
 import 'package:zentinel/config/utils/helper.dart';
+import 'package:zentinel/domain/entities/task_technical.dart';
 import 'package:zentinel/domain/entities/technical_record.dart';
-import 'package:zentinel/presentation/widgets/logbook/detail_row.dart';
-import 'package:zentinel/presentation/widgets/technical/record_technical_header.dart';
 import 'package:zentinel/presentation/widgets/widgets.dart';
 
 class TechnicalRecordDetailModal extends StatelessWidget {
@@ -209,7 +208,13 @@ class TechnicalRecordDetailModal extends StatelessWidget {
                       createdBy: item.createdBy, 
                       cliendId: item.clientId, 
                       locationId: item.locationId, 
-                      taskId: item.taskId
+                      taskId: item.taskId,
+                      nameResponsible: item.nameResponsible,
+                      technicalsAssignments: item.technicalStaff?.map((staff) => TechnicalsAssignment(
+                        userTechId: staff.userTechId ?? '',
+                        user: staff.user ?? '',
+                        fullnameUser: staff.name ?? '',
+                      )).toList(),
                     ),
                     'registerIcompleted': item
                   }),

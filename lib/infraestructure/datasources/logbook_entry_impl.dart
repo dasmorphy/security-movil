@@ -515,7 +515,12 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
     final response = await dio.get(
       '/rest/zent-logbook-api/v1.0/get/all-users',
       options: Options(
-        headers: {'externalTransactionId': uuid, 'channel': 'ZENTINEL', 'roles': filters['roles']},
+        headers: {
+          'externalTransactionId': uuid, 
+          'channel': 'ZENTINEL', 
+          'roles': filters['roles'],
+          'users': filters['users']
+        },
       ),
     );
     final List userJson = response.data['data'];

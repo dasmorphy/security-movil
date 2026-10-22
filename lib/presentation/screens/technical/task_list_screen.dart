@@ -59,7 +59,8 @@ class _TaskListScreenState extends ConsumerState<TaskListScreen> {
 
     try {
       await ref.read(getTaskTechnical.notifier).load(filters: _buildFilters());
-    } catch (_) {
+    } catch (e) {
+      print('Error loading tasks: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
