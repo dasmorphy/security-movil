@@ -132,14 +132,18 @@ class TechnicalImpl extends TechnicalDatasource {
 
   @override
   Future<List<TechMaterial>> getTechMeterial() async {
-    final response = await dio.get(
-      '/rest/technical-control-api/v1.0/tech-materials',
-      options: Options(
-        headers: {'externalTransactionId': uuid, 'channel': 'ZENTINEL'},
-      ),
-    );
-    final List taskJson = response.data['data'];
-    return taskJson.map((json) => TechMaterial.fromJson(json)).toList();
+    try {
+      final response = await dio.get(
+        '/rest/technical-control-api/v1.0/tech-materials',
+        options: Options(
+          headers: {'externalTransactionId': uuid, 'channel': 'ZENTINEL'},
+        ),
+      );
+      final List taskJson = response.data['data'];
+      return taskJson.map((json) => TechMaterial.fromJson(json)).toList();
+    } catch (e) {
+      return [];
+    }
   }
 
   @override

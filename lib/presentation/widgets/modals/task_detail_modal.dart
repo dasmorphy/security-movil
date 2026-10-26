@@ -51,7 +51,9 @@ class TaskDetailModal extends ConsumerWidget {
           );
           ref.read(getTaskTechnical.notifier).load(
             filters: {
-              'support': isSupport
+              'support': isSupport,
+              if (userData.role == 'tecnico')
+                'tech_assignments': userData.idUser,
           });
           if (context.mounted) {
             context.pop();
