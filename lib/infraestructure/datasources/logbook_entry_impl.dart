@@ -60,6 +60,8 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
       '/rest/zent-logbook-api/v1.0/get/allCategories',
       options: Options(
         headers: {'externalTransactionId': uuid, 'channel': 'ZENTINEL'},
+        // Catálogo refrescado en segundo plano: si falla se usa la caché
+        extra: {'showErrorMessage': false},
       ),
     );
     final List categoriesJson = response.data['data'];
@@ -72,6 +74,7 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
       '/rest/zent-logbook-api/v1.0/get/allUnitiesWeight',
       options: Options(
         headers: {'externalTransactionId': uuid, 'channel': 'ZENTINEL'},
+        extra: {'showErrorMessage': false},
       ),
     );
     final List unitiesJson = response.data['data'];
@@ -262,6 +265,7 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
       '/rest/zent-logbook-api/v1.0/get/group-business-by-id-business/$idBusinness',
       options: Options(
         headers: {'externalTransactionId': uuid, 'channel': 'ZENTINEL'},
+        extra: {'showErrorMessage': false},
       ),
     );
 
@@ -277,6 +281,7 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
       '/rest/zent-logbook-api/v1.0/get/allAuthorized',
       options: Options(
         headers: {'externalTransactionId': uuid, 'channel': 'ZENTINEL'},
+        extra: {'showErrorMessage': false},
       ),
     );
     final List authorizedJson = response.data['data'];
@@ -289,6 +294,7 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
       '/rest/zent-logbook-api/v1.0/get/allDestinyIntern',
       options: Options(
         headers: {'externalTransactionId': uuid, 'channel': 'ZENTINEL', 'business': filters['business']},
+        extra: {'showErrorMessage': false},
       ),
     );
     final List destinyJson = response.data['data'];
@@ -699,9 +705,10 @@ class LogbookEntryImpl extends LogbookEntryDatasource {
       },
       options: Options(
         headers: {
-          'externalTransactionId': uuid, 
+          'externalTransactionId': uuid,
           'channel': 'ZENTINEL'
         },
+        extra: {'showErrorMessage': false},
       ),
     );
     final data = response.data['data'] as List? ?? [];

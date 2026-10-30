@@ -1,5 +1,4 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:zentinel/service/pending_request_service.dart';
 
 typedef FetchListCallback<T> = Future<List<T>> Function(
   Map<String, dynamic>? filters,
@@ -14,13 +13,17 @@ typedef CacheSaver<T> = Future<void> Function(List<T>);
 typedef CacheChecker = bool Function();
 
 /// CatalogNotifier con soporte para caché offline usando Hive
-/// Intenta obtener datos de internet primero, si falla usa caché
+/// Caché primero: si hay datos en Hive se muestran de inmediato y se
+/// refrescan desde la API en segundo plano. Solo se espera a la red cuando
+/// no hay caché (p. ej. primera instalación).
 class CatalogNotifierWithCache<T> extends StateNotifier<List<T>> {
   final FetchListCallback<T> fetch;
   final CacheGetter<T> cacheGetter;
   final CacheSaver<T> cacheSaver;
   final CacheChecker cacheChecker;
-  bool _isLoading = false;
+
+  // Refresco en curso; se reutiliza para no duplicar peticiones
+  Future<void>? _inflight;
 
   CatalogNotifierWithCache({
     required this.fetch,
@@ -30,50 +33,37 @@ class CatalogNotifierWithCache<T> extends StateNotifier<List<T>> {
   }) : super(const []);
 
   Future<void> load({Map<String, dynamic>? filters}) async {
-    if (_isLoading || !mounted) return;
+    if (!mounted) return;
 
-    _isLoading = true;
+    if (state.isEmpty) {
+      try {
+        if (cacheChecker()) state = cacheGetter();
+      } catch (_) {
+        // Caché corrupta: se ignora y se intenta la red
+      }
+    }
 
+    final refresh = _inflight ??= _refresh(filters);
+
+    // Con datos ya disponibles no se bloquea al llamador
+    if (state.isNotEmpty) return;
+
+    await refresh;
+  }
+
+  Future<void> _refresh(Map<String, dynamic>? filters) async {
     try {
-      // Verificar si hay conexión a internet
-      final hasConnection = await hasInternet();
+      final data = await fetch(filters);
 
-      if (hasConnection) {
-        // Intentar obtener datos de internet
-        try {
-          final data = await fetch(filters);
+      if (!mounted) return;
 
-          if (!mounted) return;
-
-          // Guardar en caché para uso offline
-          await cacheSaver(data);
-          state = data;
-        } catch (e) {
-          // Si falla internet, usar caché
-          if (!mounted) return;
-
-          if (cacheChecker()) {
-            state = cacheGetter();
-          } else {
-            state = [];
-          }
-        }
-      } else {
-        // Sin conexión, usar caché
-        if (!mounted) return;
-
-        if (cacheChecker()) {
-          state = cacheGetter();
-        } else {
-          state = [];
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        state = [];
-      }
+      // Guardar en caché para uso offline
+      await cacheSaver(data);
+      if (mounted) state = data;
+    } catch (_) {
+      // Sin red o timeout: se conserva lo que ya se muestra (caché)
     } finally {
-      _isLoading = false;
+      _inflight = null;
     }
   }
 }

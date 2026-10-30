@@ -8,6 +8,8 @@ final dioProvider = Provider<Dio>((ref) {
     BaseOptions(
       baseUrl: Environments.baseUrl,
       headers: {'Content-Type': 'application/json'},
+      connectTimeout: const Duration(seconds: 10),
+      receiveTimeout: const Duration(seconds: 20),
     ),
   );
 
@@ -22,6 +24,8 @@ final dioLocalDevProvider = Provider<Dio>((ref) {
     BaseOptions(
       baseUrl: Environments.localDevUrl,
       headers: {'Content-Type': 'application/json'},
+      connectTimeout: const Duration(seconds: 10),
+      receiveTimeout: const Duration(seconds: 20),
     ),
   );
 
